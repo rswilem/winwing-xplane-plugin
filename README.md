@@ -23,16 +23,16 @@ The table below lists the compatibility status of various Winwing devices with t
 
 | Device Name                   | Compatibility         | Tested | Roadmap / suggestions                     |
 | ----------------------------- | --------------------- | ------ | ----------------------------------------- |
-| URSA MINOR Airline Joystick L | 🟢 Partly implemented | 🟢 Yes | Implement vibrations                      |
-| URSA MINOR Airline Joystick R | 🟠 Partly implemented | 🔴 No  | Implement vibrations, find the product ID |
-| MCDU-32                       | 🟢 Fully implemented  | 🟢 Yes |                                           |
-| FCU Unit                      | 🔴 Not implemented    | 🔴 No  |                                           |
-| EFIS R                        | 🔴 Not implemented    | 🔴 No  |                                           |
-| EFIS L                        | 🔴 Not implemented    | 🔴 No  |                                           |
-| Panel of Autopilot 3          | 🔴 Not implemented    | 🔴 No  |                                           |
-| PFP 4                         | 🟠 Partly implemented | 🔴 No  |                                           |
-| PFP 7                         | 🟠 Partly implemented | 🔴 No  |                                           |
-| PFP 3N                        | 🟠 Partly implemented | 🔴 No  |                                           |
+| URSA MINOR Airline Joystick L | 🟢 Partly implemented | 🟢     | Implement vibrations                      |
+| URSA MINOR Airline Joystick R | 🟠 Partly implemented | 🔴     | Implement vibrations, find the product ID |
+| MCDU-32                       | 🟢 Fully implemented  | 🟢     |                                           |
+| FCU Unit                      | 🔴 Not implemented    | 🔴     |                                           |
+| EFIS R                        | 🔴 Not implemented    | 🔴     |                                           |
+| EFIS L                        | 🔴 Not implemented    | 🔴     |                                           |
+| Panel of Autopilot 3          | 🔴 Not implemented    | 🔴     |                                           |
+| PFP 4                         | 🟠 Partly implemented | 🔴     |                                           |
+| PFP 7                         | 🟠 Partly implemented | 🔴     |                                           |
+| PFP 3N                        | 🟠 Partly implemented | 🔴     |                                           |
 
 ### Aircraft Compatibility
 
@@ -49,3 +49,10 @@ Below is a table of aircraft that are compatible with the plugin.
 
 - [@Schenlap](https://github.com/schenlap) for the initial python implementation and providing the HID protocol documentation.
 - [@zodiac1214](https://github.com/zodiac1214) for the Ursa Minor Joystick HID protocol.
+
+### Demonstration
+A20N (left) - B738 (right)
+
+![IMG_8507 Medium](https://github.com/user-attachments/assets/75d4e3e0-af9e-488f-bd5e-2d834bea110d)
+![IMG_8506 Medium](https://github.com/user-attachments/assets/8f5750e2-f913-479a-9f7a-6e3d6c31382d)
+
