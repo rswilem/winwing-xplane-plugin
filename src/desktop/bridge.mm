@@ -1,7 +1,6 @@
 #include "bridge.h"
 #include "usbcontroller.h"
 #include "dataref.h"
-#include "animations.h"
 #include "product-ursa-minor-joystick.h"
 #include "product-mcdu.h"
 #include "product-pfp.h"
