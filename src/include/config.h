@@ -10,11 +10,11 @@
 
 #define PRODUCT_NAME "winwing"
 #define FRIENDLY_NAME "Winwing"
-#define VERSION "0.0.1"
+#define VERSION "0.0.2"
 #define ALL_PLUGINS_DIRECTORY "/Resources/plugins/"
 #define PLUGIN_DIRECTORY (ALL_PLUGINS_DIRECTORY PRODUCT_NAME)
 #define BUNDLE_ID "com.ramonster." PRODUCT_NAME
 
-#define REFRESH_INTERVAL_SECONDS 0.3
+#define REFRESH_INTERVAL_SECONDS 0.4
 
 #define WINWING_VENDOR_ID 0x4098

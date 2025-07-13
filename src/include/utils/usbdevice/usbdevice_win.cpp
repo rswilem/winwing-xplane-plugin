@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <hidsdi.h>
 #include <setupapi.h>
+#include <XPLMUtilities.h>
 
 USBDevice::USBDevice(HIDDeviceHandle aHidDevice, uint16_t aVendorId, uint16_t aProductId, std::string aVendorName, std::string aProductName)
 : hidDevice(aHidDevice), vendorId(aVendorId), productId(aProductId), vendorName(aVendorName), productName(aProductName), connected(false) {}
@@ -35,7 +36,7 @@ bool USBDevice::connect() {
             } else if (!result) {
                 DWORD error = GetLastError();
                 if (error != ERROR_DEVICE_NOT_CONNECTED) {
-                    std::cerr << "ReadFile failed with error: " << error << std::endl;
+                    debug("ReadFile failed with error: %s\n", error);
                 }
                 break;
             }
@@ -44,7 +45,6 @@ bool USBDevice::connect() {
     });
     inputThread.detach();
     
-    printf("HID device connected.\n");
     return true;
 }
 
@@ -77,20 +77,18 @@ void USBDevice::disconnect() {
         delete[] inputBuffer;
         inputBuffer = nullptr;
     }
-    
-    printf("HID device disconnected.\n");
 }
 
 bool USBDevice::writeData(std::vector<uint8_t> data) {
     if (hidDevice == INVALID_HANDLE_VALUE || !connected) {
-        std::cerr << "HID device not open\n";
+        debug("HID device not open\n");
         return false;
     }
     
     DWORD bytesWritten;
     BOOL result = WriteFile(hidDevice, data.data(), (DWORD)data.size(), &bytesWritten, nullptr);
     if (!result || bytesWritten != data.size()) {
-        std::cerr << "WriteFile failed with error: " << GetLastError() << std::endl;
+        debug("WriteFile failed: %s\n", GetLastError());
         return false;
     }
     return true;

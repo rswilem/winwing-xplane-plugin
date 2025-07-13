@@ -1,9 +1,6 @@
 #include "product-mcdu.h"
 #include "dataref.h"
 #include "appstate.h"
-#include <map>
-#include <thread>
-#include <regex>
 
 constexpr unsigned int PAGE_LINES = 14; // Header + 6 * label + 6 * cont + textbox
 constexpr unsigned int PAGE_CHARS_PER_LINE = 24;
@@ -231,6 +228,9 @@ static std::vector<std::string> datarefs = {
 
 ProductMCDU::ProductMCDU(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
     page = std::vector<std::vector<char>>(PAGE_LINES, std::vector<char>(PAGE_BYTES_PER_LINE, ' '));
+    previousPage = std::vector<std::vector<char>>(PAGE_LINES, std::vector<char>(PAGE_BYTES_PER_LINE, ' '));
+    // Pre-compile the regex pattern
+    datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
     connect();
 }
 
@@ -314,6 +314,9 @@ void ProductMCDU::disconnect() {
     Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
     Dataref::getInstance()->unbind("AirbusFBW/MCDUIntegBrightness");
     didInitializeDatarefs = false;
+    
+    // Clear caches
+    cachedDatarefValues.clear();
 }
 
 void ProductMCDU::update() {
@@ -375,17 +378,40 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
 }
 
 void ProductMCDU::updatePage() {
+    if (!didInitializeDatarefs) {
+        return;
+    }
+    
     std::array<int, PAGE_BYTES_PER_LINE> spw_line{};
     std::array<int, PAGE_BYTES_PER_LINE> spa_line{};
     int vertslew_key = 0;
 
-    page = std::vector<std::vector<char>>(PAGE_LINES, std::vector<char>(PAGE_BYTES_PER_LINE, ' '));
+    bool anyDatarefChanged = false;
+    for (const std::string &ref : datarefs) {
+        std::string newValue = Dataref::getInstance()->getCached<std::string>(ref.c_str());
+        auto it = cachedDatarefValues.find(ref);
+        if (it == cachedDatarefValues.end() || it->second != newValue) {
+            cachedDatarefValues[ref] = newValue;
+            anyDatarefChanged = true;
+        }
+    }
+
+    if (!anyDatarefChanged) {
+        return;
+    }
+
+    // Clear only changed areas instead of entire page
+    for (int i = 0; i < PAGE_LINES; ++i) {
+        std::fill(page[i].begin(), page[i].end(), ' ');
+    }
 
     for (const std::string &ref : datarefs) {
-        bool isScratchpad = (ref.ends_with("spw") || ref.ends_with("spa"));
-        std::regex rgx("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
+        bool isScratchpad = (ref.size() >= 3 && 
+                           (ref.substr(ref.size() - 3) == "spw" || ref.substr(ref.size() - 3) == "spa"));
         std::smatch match;
-        if (!std::regex_match(ref, match, rgx) && !isScratchpad) {
+        
+        // Use pre-compiled regex
+        if (!std::regex_match(ref, match, datarefRegex) && !isScratchpad) {
             continue;
         }
         
@@ -399,13 +425,15 @@ void ProductMCDU::updatePage() {
         char color = match[6].str()[0];
         bool fontSmall = match[2] == "s" || (type == "label" && match[5] != "L") || color == 's';
 
-        std::string text = Dataref::getInstance()->getCached<std::string>(ref.c_str());
+        // Use cached value
+        const std::string &text = cachedDatarefValues[ref];
         
         if (text.empty()) {
             continue;
         }
 
-        for (int i = 0; i < text.size(); ++i) {
+        // Process text characters
+        for (size_t i = 0; i < text.size(); ++i) {
             char c = text[i];
             if (c == 0x00 || (c == 0x20 && !isScratchpad)) {
                 continue;
@@ -414,15 +442,15 @@ void ProductMCDU::updatePage() {
             unsigned char targetColor = color;
             if (color == 's') {
                 switch (c) {
-                    case 'A': c = 91; targetColor = 'b'; break; // '[', should be blue
-                    case 'B': c = 93; targetColor = 'b'; break; // ']', should be blue
-                    case '0': c = 60; targetColor = 'b'; break; // '<', should be a small blue arrow
-                    case '1': c = 62; targetColor = 'b'; break; // '>', should be a small blue arrow
-                    case '2': c = 60; targetColor = 'w'; break; // '<', should be a small white arrow in title
-                    case '3': c = 62; targetColor = 'w'; break; // '>', should be a small white arrow in title
-                    case '4': c = 60; targetColor = 'a'; break; // '<', should be a small orange arrow in cont
-                    case '5': c = 62; targetColor = 'a'; break; // '>', should be a small orange arrow in cont
-                    case 'E': c = 35; targetColor = 'a'; break; // '#', should be an orange box
+                    case 'A': c = 91; targetColor = 'b'; break;
+                    case 'B': c = 93; targetColor = 'b'; break;
+                    case '0': c = 60; targetColor = 'b'; break;
+                    case '1': c = 62; targetColor = 'b'; break;
+                    case '2': c = 60; targetColor = 'w'; break;
+                    case '3': c = 62; targetColor = 'w'; break;
+                    case '4': c = 60; targetColor = 'a'; break;
+                    case '5': c = 62; targetColor = 'a'; break;
+                    case 'E': c = 35; targetColor = 'a'; break;
                 }
             }
 
@@ -434,10 +462,9 @@ void ProductMCDU::updatePage() {
             } else if (type.find("cont") != std::string::npos || type.find("scont") != std::string::npos) {
                 writeLineToPage(line, i, std::string(1, c), targetColor, fontSmall);
             } else if (isScratchpad) {
-                if (ref.ends_with("spw")) {
+                if (ref.size() >= 3 && ref.substr(ref.size() - 3) == "spw") {
                     spw_line[i] = c;
-                }
-                else {
+                } else {
                     if (i <= 21) {
                         spa_line[i] = c;
                     }
@@ -450,7 +477,7 @@ void ProductMCDU::updatePage() {
         }
     }
 
-    // workaround for buggy spa/spw data
+    // Process scratchpad data
     for (int i = 0; i < PAGE_CHARS_PER_LINE; ++i) {
         if (spw_line[i] == 0) {
             std::fill(spw_line.begin() + i, spw_line.end(), 0);
@@ -464,7 +491,7 @@ void ProductMCDU::updatePage() {
         }
     }
 
-    // merge spw and spa into line 13
+    // Merge spw and spa into line 13
     for (int i = 0; i < PAGE_CHARS_PER_LINE; ++i) {
         char disp_char = ' ';
         char disp_color = 'w';
@@ -478,28 +505,34 @@ void ProductMCDU::updatePage() {
         writeLineToPage(13, i, std::string(1, disp_char), disp_color, false);
     }
     
-    draw();
+    // Check if page actually changed before drawing
+    if (page != previousPage) {
+        previousPage = page;
+        draw();
+    }
 }
 
 void ProductMCDU::writeLineToPage(int line, int pos, const std::string &text, char color, bool fontSmall) {
     if (line < 0 || line >= PAGE_LINES) {
-        debug("Not writing line %i: Line number is out of range!\n", line);
+        //debug("Not writing line %i: Line number is out of range!\n", line);
         return;
     }
     if (pos < 0 || pos + text.length() > PAGE_CHARS_PER_LINE) {
-        debug("Not writing line %i: Position number (%i) is out of range!\n", line, pos);
+        //debug("Not writing line %i: Position number (%i) is out of range!\n", line, pos);
         return;
     }
     if (text.length() > PAGE_CHARS_PER_LINE) {
-        debug("Not writing line %i: Text is too long (%lu) for line.\n", line, text.length());
+        //debug("Not writing line %i: Text is too long (%lu) for line.\n", line, text.length());
         return;
     }
 
     pos = pos * PAGE_BYTES_PER_CHAR;
-    for (size_t c = 0; c < text.length(); ++c) {
-        page[line][pos + c * PAGE_BYTES_PER_CHAR] = color;
-        page[line][pos + c * PAGE_BYTES_PER_CHAR + 1] = fontSmall;
-        page[line][pos + c * PAGE_BYTES_PER_CHAR + PAGE_BYTES_PER_CHAR - 1] = text[c];
+    size_t textLen = text.length();
+    for (size_t c = 0; c < textLen; ++c) {
+        int pagePos = pos + c * PAGE_BYTES_PER_CHAR;
+        page[line][pagePos] = color;
+        page[line][pagePos + 1] = fontSmall;
+        page[line][pagePos + PAGE_BYTES_PER_CHAR - 1] = text[c];
     }
 }
 
@@ -570,9 +603,10 @@ std::pair<uint8_t, uint8_t> ProductMCDU::dataFromColFont(char color, bool fontSm
         {' ', 0x0042},
     };
 
-    auto it = col_map.find(std::toupper(color));
+    char upperColor = std::toupper(color);
+    auto it = col_map.find(upperColor);
     if (it == col_map.end()) {
-        debug("Unknown color '%c', defaulting to white\n", color);
+        //debug("Unknown color '%c', defaulting to white\n", color);
         it = col_map.find(' ');
     }
 
@@ -581,9 +615,7 @@ std::pair<uint8_t, uint8_t> ProductMCDU::dataFromColFont(char color, bool fontSm
         value += 0x016b;
     }
 
-    uint8_t dataLow = value & 0xFF;
-    uint8_t dataHigh = (value >> 8) & 0xFF;
-    return {dataLow, dataHigh};
+    return {static_cast<uint8_t>(value & 0xFF), static_cast<uint8_t>((value >> 8) & 0xFF)};
 }
 
 void ProductMCDU::clear() {

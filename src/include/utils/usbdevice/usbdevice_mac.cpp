@@ -23,8 +23,7 @@ bool USBDevice::connect() {
     if (hidDevice) {
         IOHIDDeviceScheduleWithRunLoop(hidDevice, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
     }
-     
-    printf("HID device connected.\n");
+    
     connected = true;
     return true;
 }
@@ -59,7 +58,6 @@ void USBDevice::disconnect() {
     }
 
     connected = false;
-    printf("HID device disconnected.\n");
 }
 
 bool USBDevice::writeData(std::vector<uint8_t> data) {

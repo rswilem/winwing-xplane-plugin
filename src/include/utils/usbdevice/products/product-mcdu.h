@@ -2,6 +2,8 @@
 #define PRODUCT_MCDU_H
 
 #include "usbdevice.h"
+#include <map>
+#include <regex>
 
 enum class MCDULed : int {
     BACKLIGHT = 0,
@@ -22,6 +24,9 @@ class ProductMCDU: public USBDevice {
 private:
     bool didInitializeDatarefs = false;
     std::vector<std::vector<char>> page;
+    std::vector<std::vector<char>> previousPage;
+    std::regex datarefRegex;
+    std::map<std::string, std::string> cachedDatarefValues;
     void updatePage();
     void writeLineToPage(int line, int pos, const std::string &text, char color = 'W', bool fontSmall = false);
     void draw(const std::vector<std::vector<char>> *pagePtr = nullptr, int vertslew_key = 0);

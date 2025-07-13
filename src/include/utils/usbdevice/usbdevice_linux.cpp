@@ -9,6 +9,7 @@
 #include <sys/ioctl.h>
 #include <linux/hidraw.h>
 #include <errno.h>
+#include <XPLMUtilities.h>
 
 USBDevice::USBDevice(HIDDeviceHandle aHidDevice, uint16_t aVendorId, uint16_t aProductId, std::string aVendorName, std::string aProductName)
 : hidDevice(aHidDevice), vendorId(aVendorId), productId(aProductId), vendorName(aVendorName), productName(aProductName), connected(false) {}
@@ -25,7 +26,6 @@ bool USBDevice::connect() {
     }
     inputBuffer = new uint8_t[kInputReportSize];
     
-    // Start input reading thread
     connected = true;
     std::thread inputThread([this]() {
         uint8_t buffer[65];
@@ -35,7 +35,7 @@ bool USBDevice::connect() {
                 InputReportCallback(this, (int)bytesRead, buffer);
             } else if (bytesRead < 0) {
                 if (errno != EAGAIN && errno != EWOULDBLOCK) {
-                    std::cerr << "Read failed with errno: " << errno << std::endl;
+                    debug("ReadFile failed with error: %d\n", errno);
                     break;
                 }
             }
@@ -44,7 +44,6 @@ bool USBDevice::connect() {
     });
     inputThread.detach();
     
-    printf("HID device connected.\n");
     return true;
 }
 
@@ -77,19 +76,17 @@ void USBDevice::disconnect() {
         delete[] inputBuffer;
         inputBuffer = nullptr;
     }
-    
-    printf("HID device disconnected.\n");
 }
 
 bool USBDevice::writeData(std::vector<uint8_t> data) {
     if (hidDevice < 0 || !connected) {
-        std::cerr << "HID device not open\n";
+        debug("HID device not open\n");
         return false;
     }
     
     ssize_t bytesWritten = write(hidDevice, data.data(), data.size());
     if (bytesWritten != (ssize_t)data.size()) {
-        std::cerr << "Write failed with errno: " << errno << std::endl;
+        debug("Write failed: %d\n", errno);
         return false;
     }
     return true;
