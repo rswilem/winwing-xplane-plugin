@@ -10,7 +10,7 @@
 
 #define PRODUCT_NAME "winwing"
 #define FRIENDLY_NAME "Winwing"
-#define VERSION "0.0.2"
+#define VERSION "0.0.3"
 #define ALL_PLUGINS_DIRECTORY "/Resources/plugins/"
 #define PLUGIN_DIRECTORY (ALL_PLUGINS_DIRECTORY PRODUCT_NAME)
 #define BUNDLE_ID "com.ramonster." PRODUCT_NAME

@@ -55,6 +55,7 @@
     "sstream": "cpp",
     "stack": "cpp",
     "streambuf": "cpp",
-    "valarray": "cpp"
+    "valarray": "cpp",
+    "iostream": "cpp"
   }
 }

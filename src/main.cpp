@@ -46,8 +46,7 @@ PLUGIN_API int XPluginStart(char * name, char * sig, char * desc)
     
     int item = XPLMAppendMenuItem(XPLMFindPluginsMenu(), FRIENDLY_NAME, nullptr, 1);
     XPLMMenuID id = XPLMCreateMenu(FRIENDLY_NAME, XPLMFindPluginsMenu(), item, menuAction, nullptr);
-    XPLMAppendMenuItem(id, "About", (void *)"ActionAbout", 0);
-    XPLMAppendMenuItem(id, "Enable screensaver", (void *)"ActionScreensaver", 0);
+    XPLMAppendMenuItem(id, "Reload devices", (void *)"ActionReloadDevices", 0);
     
     debug("Plugin started (version %s)\n", VERSION);
 
@@ -101,12 +100,10 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
 }
 
 void menuAction(void* mRef, void* iRef) {
-    if (!strcmp((char *)iRef, "ActionScreensaver")) {
-        for (auto device : USBController::getInstance()->devices) {
-            if (auto mcdu = dynamic_cast<ProductMCDU*>(device)) {
-                mcdu->clear2(8);
-            }
-        }
+    if (!strcmp((char *)iRef, "ActionReloadDevices")) {
+        USBController::getInstance()->destroy();
+        
+        USBController::getInstance()->initialize();
     }
 }
 

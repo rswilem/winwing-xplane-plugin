@@ -320,6 +320,7 @@ template int Dataref::getCached<int>(const char* ref);
 template bool Dataref::getCached<bool>(const char* ref);
 template std::vector<int> Dataref::getCached<std::vector<int>>(const char* ref);
 template std::vector<float> Dataref::getCached<std::vector<float>>(const char* ref);
+template std::vector<unsigned char> Dataref::getCached<std::vector<unsigned char>>(const char* ref);
 template std::string Dataref::getCached<std::string>(const char* ref);
 template <typename T>
 T Dataref::getCached(const char *ref) {
@@ -334,7 +335,7 @@ T Dataref::getCached(const char *ref) {
         if constexpr (std::is_same<T, std::string>::value) {
             return "";
         }
-        else if constexpr (std::is_same<T, std::vector<int>>::value || std::is_same<T, std::vector<float>>::value) {
+        else if constexpr (std::is_same<T, std::vector<int>>::value || std::is_same<T, std::vector<float>>::value || std::is_same<T, std::vector<unsigned char>>::value) {
             return {};
         }
         else {
@@ -350,6 +351,7 @@ template int Dataref::get<int>(const char* ref);
 template bool Dataref::get<bool>(const char* ref);
 template std::vector<int> Dataref::get<std::vector<int>>(const char* ref);
 template std::vector<float> Dataref::get<std::vector<float>>(const char* ref);
+template std::vector<unsigned char> Dataref::get<std::vector<unsigned char>>(const char* ref);
 template std::string Dataref::get<std::string>(const char* ref);
 template <typename T>
 T Dataref::get(const char *ref) {
@@ -358,7 +360,7 @@ T Dataref::get(const char *ref) {
         if constexpr (std::is_same<T, std::string>::value) {
             return "";
         }
-        else if constexpr (std::is_same<T, std::vector<int>>::value || std::is_same<T, std::vector<float>>::value) {
+        else if constexpr (std::is_same<T, std::vector<int>>::value || std::is_same<T, std::vector<float>>::value || std::is_same<T, std::vector<unsigned char>>::value) {
             return {};
         }
         else {
@@ -393,6 +395,12 @@ T Dataref::get(const char *ref) {
         XPLMGetDatavf(handle, outValues.data(), 0, size);
         return outValues;
     }
+    else if constexpr (std::is_same<T, std::vector<unsigned char>>::value) {
+        int size = XPLMGetDatab(handle, nullptr, 0, 0);
+        std::vector<unsigned char> outValues(size);
+        XPLMGetDatab(handle, outValues.data(), 0, size);
+        return outValues;
+    }
     else if constexpr (std::is_same<T, std::string>::value) {
         int size = XPLMGetDatab(handle, nullptr, 0, 0);
         std::vector<char> str(size);
@@ -403,7 +411,7 @@ T Dataref::get(const char *ref) {
     if constexpr (std::is_same<T, std::string>::value) {
         return "";
     }
-    else if constexpr (std::is_same<T, std::vector<int>>::value || std::is_same<T, std::vector<float>>::value) {
+    else if constexpr (std::is_same<T, std::vector<int>>::value || std::is_same<T, std::vector<float>>::value || std::is_same<T, std::vector<unsigned char>>::value) {
         return {};
     }
     else {
@@ -416,6 +424,7 @@ template void Dataref::set<int>(const char* ref, int value, bool setCacheOnly);
 template void Dataref::set<bool>(const char* ref, bool value, bool setCacheOnly);
 template void Dataref::set<std::vector<int>>(const char* ref, std::vector<int> value, bool setCacheOnly);
 template void Dataref::set<std::vector<float>>(const char* ref, std::vector<float> value, bool setCacheOnly);
+template void Dataref::set<std::vector<unsigned char>>(const char* ref, std::vector<unsigned char> value, bool setCacheOnly);
 template void Dataref::set<std::string>(const char* ref, std::string value, bool setCacheOnly);
 template <typename T>
 void Dataref::set(const char* ref, T value, bool setCacheOnly) {
@@ -449,7 +458,10 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
         XPLMSetDatavi(handle, const_cast<int*>(value.data()), 0, static_cast<int>(value.size()));
     }
     else if constexpr (std::is_same<T, std::vector<float>>::value) {
-        XPLMSetDatavf(handle, const_cast<float*>(value.data()), 0, static_cast<float>(value.size()));
+        XPLMSetDatavf(handle, const_cast<float*>(value.data()), 0, static_cast<int>(value.size()));
+    }
+    else if constexpr (std::is_same<T, std::vector<unsigned char>>::value) {
+        XPLMSetDatab(handle, const_cast<unsigned char*>(value.data()), 0, static_cast<int>(value.size()));
     }
     else if constexpr (std::is_same<T, std::string>::value) {
         XPLMSetDatab(handle, (char *)value.c_str(), 0, (unsigned int)value.length());

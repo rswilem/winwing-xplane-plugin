@@ -14,13 +14,24 @@ void clearDatarefCache() {
 
 void setDatarefHexC(const char* ref, const uint8_t* hexD, int len) {
     const std::vector<uint8_t>& hex = std::vector<uint8_t>(hexD, hexD + len);
-    std::string s;
-    for (uint8_t c : hex) {
-        if (c == 0x00) break;
-        s += static_cast<char>(c);
-    }
     
-    Dataref::getInstance()->set<std::string>(ref, s, true);
+    // Check if this is a style dataref - if so, store as vector<unsigned char>
+    std::string refStr(ref);
+    if (refStr.find("style_line") != std::string::npos) {
+        std::vector<unsigned char> styleBytes;
+        for (uint8_t c : hex) {
+            styleBytes.push_back(c);
+        }
+        Dataref::getInstance()->set<std::vector<unsigned char>>(ref, styleBytes, true);
+    } else {
+        // For text datarefs, convert to string (stopping at null terminator)
+        std::string s;
+        for (uint8_t c : hex) {
+            if (c == 0x00) break;
+            s += static_cast<char>(c);
+        }
+        Dataref::getInstance()->set<std::string>(ref, s, true);
+    }
 }
 
 void update() {

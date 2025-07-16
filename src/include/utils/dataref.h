@@ -8,7 +8,7 @@
 #include <XPLMUtilities.h>
 #include <XPLMDataAccess.h>
 
-using DataRefValueType = std::variant<float, double, int, bool, std::string, std::vector<int>, std::vector<float>>;
+using DataRefValueType = std::variant<float, double, int, bool, std::string, std::vector<int>, std::vector<float>, std::vector<unsigned char>>;
 template <typename T> using DatarefShouldChangeCallback = std::function<bool(T)>;
 template <typename T> using DatarefMonitorChangedCallback = std::function<void(T)>;
 

@@ -39,12 +39,14 @@ The table below lists the compatibility status of various Winwing devices with t
 
 Below is a table of aircraft that are compatible with the plugin.
 
-| Aircraft     | Compatibility      | Tested |
-| ------------ | ------------------ | ------ |
-| Toliss A319  | Fully implemented  | 🟢 Yes |
-| Toliss A320  | Fully implemented  | 🟢 Yes |
-| Toliss A321  | Fully implemented  | 🔴 No  |
-| Zibo 737-800 | Partly implemented | 🔴 No  |
+| Aircraft             | Compatibility      | Tested |
+| -------------------- | ------------------ | ------ |
+| Toliss A319          | Fully implemented  | 🟢 Yes |
+| Toliss A320          | Fully implemented  | 🟢 Yes |
+| Toliss A321          | Fully implemented  | 🟢 Yes |
+| Laminar A330-300     | Fully implemented  | 🟢 Yes |
+| AeroGenesis A330-300 | Fully implemented  | 🟢 Yes |
+| Zibo 737-800         | Partly implemented | 🔴 No  |
 
 ### Known Issues
 
