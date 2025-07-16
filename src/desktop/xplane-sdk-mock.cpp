@@ -36,7 +36,7 @@ void XPLMCommandEnd(XPLMCommandRef ref) {
 
     if (registeredCommands[idx] == "AirbusFBW/MCDU1KeyBright" || registeredCommands[idx] == "AirbusFBW/MCDU1KeyDim") {
         float brightness = registeredCommands[idx] == "AirbusFBW/MCDU1KeyDim" ? 0.2 : 0.8;
-        Dataref::getInstance()->set<std::vector<float>>("AirbusFBW/MCDUIntegBrightness", {brightness, brightness, brightness, brightness}, true);
+        Dataref::getInstance()->set<float>("AirbusFBW/PanelBrightnessLevel", brightness, true);
         Dataref::getInstance()->set<std::vector<float>>("AirbusFBW/DUBrightness", {brightness, brightness, brightness, brightness, brightness, brightness, brightness, brightness}, true);
     }
 }

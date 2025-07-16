@@ -12,12 +12,12 @@ constexpr unsigned int PAGE_BYTES_PER_LINE = PAGE_CHARS_PER_LINE * PAGE_BYTES_PE
 TolissMcduProfile::TolissMcduProfile() {
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
     
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/MCDUIntegBrightness", [this](std::vector<float> brightness) {
-        if (!ledBrightnessCallback || brightness.size() < 4) {
+    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [this](float brightness) {
+        if (!ledBrightnessCallback) {
             return;
         }
         
-        uint8_t target = brightness[0] * 255.0f;
+        uint8_t target = brightness * 255.0f;
         ledBrightnessCallback(MCDULed::BACKLIGHT, target);
     });
     
@@ -32,18 +32,18 @@ TolissMcduProfile::TolissMcduProfile() {
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/MCDUIntegBrightness");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
 }
 
 TolissMcduProfile::~TolissMcduProfile() {
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
-    Dataref::getInstance()->unbind("AirbusFBW/MCDUIntegBrightness");
+    Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
 }
 
 bool TolissMcduProfile::IsEligible() {
-    return Dataref::getInstance()->exists("AirbusFBW/MCDUIntegBrightness");
+    return Dataref::getInstance()->exists("AirbusFBW/PanelBrightnessLevel");
 }
 
 const std::vector<std::string>& TolissMcduProfile::displayDatarefs() const {

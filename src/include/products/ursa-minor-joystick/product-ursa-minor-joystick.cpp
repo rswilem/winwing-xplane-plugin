@@ -27,7 +27,7 @@ void ProductUrsaMinorJoystick::disconnect() {
     
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
-    Dataref::getInstance()->unbind("AirbusFBW/MCDUIntegBrightness");
+    Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
     didInitializeDatarefs = false;
 }
 
