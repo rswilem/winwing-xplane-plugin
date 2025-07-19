@@ -26,7 +26,6 @@ void ProductUrsaMinorJoystick::disconnect() {
     USBDevice::disconnect();
     
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
-    Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
     didInitializeDatarefs = false;
 }
@@ -70,22 +69,18 @@ bool ProductUrsaMinorJoystick::setLedBrightness(uint8_t brightness) {
 
 
 void ProductUrsaMinorJoystick::initializeDatarefs() {
-    if (!Dataref::getInstance()->exists("AirbusFBW/DUBrightness")) {
+    if (!Dataref::getInstance()->exists("AirbusFBW/PanelBrightnessLevel")) {
         return;
     }
     
     didInitializeDatarefs = true;
     
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/DUBrightness", [this](std::vector<float> brightness) {
-        if (brightness.size() < 8) {
-            return;
-        }
-        
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[0] * 255.0f : 0;
+    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [this](float brightness) {
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
         setLedBrightness(target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
 }
