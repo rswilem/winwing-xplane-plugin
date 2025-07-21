@@ -389,7 +389,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cleaned_product_name=\"${PRODUCT_NAME//-mac/}\"\ncleaned_product_name=\"${cleaned_product_name//-win/}\"\ncleaned_product_name=\"${cleaned_product_name//-lin/}\"\nfolder=\"$HOME/X-Plane 12/Resources/plugins/${cleaned_product_name}\"\n\n# copy assets/\nif [ ! -d \"$folder/assets\" ]; then\n    mkdir \"$folder/assets\"\nfi\nrsync -a ./assets/ \"$folder/assets/\"\n\n";
+			shellScript = "cleaned_product_name=\"${PRODUCT_NAME//-mac/}\"\ncleaned_product_name=\"${cleaned_product_name//-win/}\"\ncleaned_product_name=\"${cleaned_product_name//-lin/}\"\nfolder=\"$HOME/X-Plane 12/Resources/plugins/${cleaned_product_name}\"\n\n[ ! -d \"$folder/assets\" ] && mkdir \"$folder/assets\"\n\n[ -d \"./assets\" ] && rsync -a --exclude=\".gitkeep\" ./assets/ \"$folder/assets/\" || true\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
