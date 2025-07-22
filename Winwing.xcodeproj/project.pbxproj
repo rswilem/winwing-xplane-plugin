@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66F91662D0332F600F84283 /* main.cpp */; };
-		F621307A2D11E74E0001E77B /* winwing.xpl in CopyFiles */ = {isa = PBXBuildFile; fileRef = D607B19909A556E400699BC3 /* winwing.xpl */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		F635AD422E05697B005D6CDC /* bridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F6827E102E05664C00382B28 /* bridge.mm */; };
 		F635AD462E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */; };
 		F635AD472E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */; };
@@ -52,19 +51,6 @@
 		F6F77ACD2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77ACC2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp */; };
 		F6F77ACE2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77ACC2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		F6C27DCD2CFBC9F80031DB0B /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "/Users/ramon/X-Plane 12/Resources/plugins/winwing/mac_x64";
-			dstSubfolderSpec = 0;
-			files = (
-				F621307A2D11E74E0001E77B /* winwing.xpl in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		D607B19909A556E400699BC3 /* winwing.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = winwing.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -297,8 +283,7 @@
 			buildPhases = (
 				D607B19609A556E400699BC3 /* Sources */,
 				D607B19709A556E400699BC3 /* Frameworks */,
-				F6AF9EBA2D06F05600530297 /* Copy assets if needed */,
-				F6C27DCD2CFBC9F80031DB0B /* CopyFiles */,
+				F6AF9EBA2D06F05600530297 /* Copy debug build and assets to X-Plane/Resources/plugins folder */,
 			);
 			buildRules = (
 			);
@@ -372,7 +357,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		F6AF9EBA2D06F05600530297 /* Copy assets if needed */ = {
+		F6AF9EBA2D06F05600530297 /* Copy debug build and assets to X-Plane/Resources/plugins folder */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -382,14 +367,14 @@
 			);
 			inputPaths = (
 			);
-			name = "Copy assets if needed";
+			name = "Copy debug build and assets to X-Plane/Resources/plugins folder";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cleaned_product_name=\"${PRODUCT_NAME//-mac/}\"\ncleaned_product_name=\"${cleaned_product_name//-win/}\"\ncleaned_product_name=\"${cleaned_product_name//-lin/}\"\nfolder=\"$HOME/X-Plane 12/Resources/plugins/${cleaned_product_name}\"\n\n[ ! -d \"$folder/assets\" ] && mkdir \"$folder/assets\"\n\n[ -d \"./assets\" ] && rsync -a --exclude=\".gitkeep\" ./assets/ \"$folder/assets/\" || true\n";
+			shellScript = "cleaned_product_name=\"${PRODUCT_NAME//-mac/}\"\ncleaned_product_name=\"${cleaned_product_name//-win/}\"\ncleaned_product_name=\"${cleaned_product_name//-lin/}\"\nfolder=\"$HOME/X-Plane 12/Resources/plugins/${cleaned_product_name}\"\n\n[ ! -d \"$folder/assets\" ] && mkdir -p \"$folder/assets\"\n\n[ -d \"./assets\" ] && rsync -a --exclude=\".gitkeep\" ./assets/ \"$folder/assets/\" || true\n\ncase \"$OSTYPE\" in\n  darwin*) os_folder=\"mac_x64\" ;;\n  linux*) os_folder=\"lin_x64\" ;;\n  msys*) os_folder=\"win_x64\" ;;\n  *) os_folder=\"unknown\" ;;\nesac\n\n[ \"$os_folder\" != \"unknown\" ] && mkdir -p \"$folder/$os_folder\" && cp \"$BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH\" \"$folder/$os_folder/\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
