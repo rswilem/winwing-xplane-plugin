@@ -17,6 +17,7 @@
 		F635AD4B2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD492E05819E005D6CDC /* usbdevice_mac.cpp */; };
 		F635AD502E058FFC005D6CDC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F635AD4F2E058FFC005D6CDC /* IOKit.framework */; platformFilters = (ios, maccatalyst, macos, tvos, xros, ); };
 		F635AD532E059872005D6CDC /* path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD522E059872005D6CDC /* path.cpp */; };
+		F63BC99A2E30D73E00ACBBB0 /* appstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9ECB2D078ED400530297 /* appstate.cpp */; };
 		F647201E2E16CF6D00C9976B /* usbdevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F647201D2E16CF6D00C9976B /* usbdevice.cpp */; };
 		F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F647201D2E16CF6D00C9976B /* usbdevice.cpp */; };
 		F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E62E1BF625003C1B73 /* usbdevice_win.cpp */; };
@@ -431,6 +432,7 @@
 				F64BE3EB2E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F64BE3EC2E1BF625003C1B73 /* usbdevice_linux.cpp in Sources */,
 				F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
+				F63BC99A2E30D73E00ACBBB0 /* appstate.cpp in Sources */,
 				F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
 				F684D2F22E1E99B0006FA09F /* PFPControlView.swift in Sources */,
 				F6F77AB32E278F530060AFC0 /* product-mcdu.cpp in Sources */,

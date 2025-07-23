@@ -1,10 +1,3 @@
-//
-//  xplane-sdk-mock.cpp
-//  Winwing
-//
-//  Created by Ramon Swilem on 04/07/2025.
-//
-
 #include <cstdio>
 #include <algorithm>
 #include <XPLMProcessing.h>
@@ -153,3 +146,10 @@ XPLMDataRef XPLMRegisterDataAccessor(
     return 0;
 }
 
+void XPLMRegisterFlightLoopCallback(XPLMFlightLoop_f inFlightLoop, float inInterval, void *inRefcon) {
+    
+}
+
+void XPLMUnregisterFlightLoopCallback(XPLMFlightLoop_f inFlightLoop, void *inRefcon) {
+    
+}
