@@ -16,6 +16,7 @@ const char* ProductUrsaMinorJoystick::classIdentifier() {
 bool ProductUrsaMinorJoystick::connect() {
     if (USBDevice::connect()) {
         setLedBrightness(0);
+        profileReady = true;
         return true;
     }
 

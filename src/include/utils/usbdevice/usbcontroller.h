@@ -49,6 +49,8 @@ public:
     static USBController* getInstance();
     void initialize();
     void destroy();
+    
+    bool allProfilesReady();
 };
 
 #endif

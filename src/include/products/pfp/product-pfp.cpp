@@ -21,24 +21,30 @@ ProductPFP::ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
 }
 
 ProductPFP::~ProductPFP() {
+    if (profile) {
+        profile->ledBrightnessCallback = nullptr;
+    }
+    
     disconnect();
 }
 
 void ProductPFP::setProfileForCurrentAircraft() {
     if (ZiboPfpProfile::IsEligible()) {
-        debug_force("Using Zibo PFP profile for PFP.\n");
+        debug("Using Zibo PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new ZiboPfpProfile();
         monitorDatarefs();
+        profileReady = true;
     }
     else if (FlightFactor777PfpProfile::IsEligible()) {
-        debug_force("Using FlightFactor 777 PFP profile for PFP.\n");
+        debug("Using FlightFactor 777 PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new FlightFactor777PfpProfile();
         monitorDatarefs();
+        profileReady = true;
     }
     else {
-        debug_force("No eligible profiles found for PFP. Incorrect aircraft?\n");
+        debug("No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());
         setLedBrightness(PFPLed::FAIL, 1);
     }
 }
@@ -48,9 +54,7 @@ const char* ProductPFP::classIdentifier() {
 }
 
 bool ProductPFP::connect() {
-    debug_force("ProductPFP::connect() called\n");
     if (USBDevice::connect()) {
-        debug_force("USBDevice::connect() succeeded, initializing PFP\n");
         uint8_t col_bg[] = {0x00, 0x00, 0x00};
         
         writeData({0xf0, 0x0, 0x1, 0x38, 0x32, 0xbb, 0x0, 0x0, 0x1e, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x32, 0xbb, 0x0, 0x0, 0x18, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x34, 0x0, 0x18, 0x0, 0xe, 0x0, 0x18, 0x0, 0x32, 0xbb, 0x0, 0x0, 0x19, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0xe, 0x0, 0x0, 0x0, 0x0});
@@ -89,7 +93,6 @@ bool ProductPFP::connect() {
         
         clear2(8);
         
-        debug_force("PFP initialization complete, checking for profile\n");
         if (!profile) {
             setProfileForCurrentAircraft();
         }
@@ -97,7 +100,6 @@ bool ProductPFP::connect() {
         return true;
     }
     
-    debug_force("USBDevice::connect() failed\n");
     return false;
 }
 
@@ -117,12 +119,13 @@ void ProductPFP::disconnect() {
     
     Dataref::getInstance()->unbind("laminar/B738/fmc/fmc_message");
     
-    USBDevice::disconnect();
     if (profile) {
+        profile->ledBrightnessCallback = nullptr;
         delete profile;
         profile = nullptr;
     }
     
+    USBDevice::disconnect();
     cachedDatarefValues.clear();
 }
 
@@ -147,8 +150,8 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
     
     if (reportId != 1 || reportLength != 25) {
 #if DEBUG
-        printf("[PFP] Ignoring reportId %d, length %d\n", reportId, reportLength);
-        printf("[PFP] Data (hex): ");
+        printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
+        printf("[%s] Data (hex): ", classIdentifier());
         for (int i = 0; i < reportLength; ++i) {
             printf("%02X ", report[i]);
         }
@@ -181,7 +184,7 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
         if (pressed && !pressedButtonIndexExists) {
             pressedButtonIndices.push_back(i);
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandBegin);
-            debug("[PFP] Button pressed: %i - %s\n", i, currentButtonDefs[i].name.c_str());
+            debug("[%s] Button pressed: %i - %s\n", classIdentifier(), i, currentButtonDefs[i].name.c_str());
         }
         else if (pressed && pressedButtonIndexExists) {
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandContinue);

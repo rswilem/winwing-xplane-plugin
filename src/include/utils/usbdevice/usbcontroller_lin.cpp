@@ -63,19 +63,16 @@ void USBController::initialize() {
 }
 
 void USBController::destroy() {
-    debug_force("Linux: Stopping monitoring thread...\n");
     shouldStopMonitoring = true;
     
     // Give the monitoring thread time to exit gracefully
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     
-    debug_force("Linux: Destroying USB devices...\n");
     for (auto ptr : devices) {
         delete ptr;
     }
     devices.clear();
     
-    debug_force("Linux: Cleaning up hidManager...\n");
     if (hidManager) {
         struct udev* udev = udev_monitor_get_udev(hidManager);
         udev_monitor_unref(hidManager);
@@ -84,7 +81,6 @@ void USBController::destroy() {
     }
     
     instance = nullptr;
-    debug_force("Linux: Destroy completed\n");
 }
 
 void USBController::enumerateDevices() {
@@ -142,7 +138,7 @@ void USBController::monitorDevices() {
             }
         }
     }
-    debug_force("Linux: Monitor thread exiting\n");
+    debug("Monitoring thread is exiting\n");
 }
 
 void USBController::DeviceAddedCallback(void* context, struct udev_device* device) {

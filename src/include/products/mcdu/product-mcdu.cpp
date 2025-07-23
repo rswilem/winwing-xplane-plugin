@@ -23,19 +23,21 @@ ProductMCDU::~ProductMCDU() {
 
 void ProductMCDU::setProfileForCurrentAircraft() {
     if (TolissMcduProfile::IsEligible()) {
-        debug("Using Toliss MCDU profile for MCDU.\n");
+        debug("Using Toliss profile for %s.\n", classIdentifier());
         clear();
         profile = new TolissMcduProfile();
         monitorDatarefs();
+        profileReady = true;
     }
     else if (LaminarMcduProfile::IsEligible()) {
-        debug("Using Laminar MCDU profile for MCDU.\n");
+        debug("Using Laminar profile for %s.\n", classIdentifier());
         clear();
         profile = new LaminarMcduProfile();
         monitorDatarefs();
+        profileReady = true;
     }
     else {
-        debug("No eligible profiles found for MCDU. Incorrect aircraft?\n");
+        debug("No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());
         setLedBrightness(MCDULed::FAIL, 1);
     }
 }
@@ -119,13 +121,13 @@ void ProductMCDU::disconnect() {
         setLedBrightness(led, 0);
     }
     
-    USBDevice::disconnect();
     if (profile) {
+        profile->ledBrightnessCallback = nullptr;
         delete profile;
         profile = nullptr;
     }
     
-    // Clear caches
+    USBDevice::disconnect();
     cachedDatarefValues.clear();
 }
 
@@ -150,8 +152,8 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
     
     if (reportId != 1 || reportLength != 25) {
 #if DEBUG
-        printf("[MCDU] Ignoring reportId %d, length %d\n", reportId, reportLength);
-        printf("[MCDU] Data (hex): ");
+        printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
+        printf("[%s] Data (hex): ", classIdentifier());
         for (int i = 0; i < reportLength; ++i) {
             printf("%02X ", report[i]);
         }
@@ -184,7 +186,7 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
         if (pressed && !pressedButtonIndexExists) {
             pressedButtonIndices.push_back(i);
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandBegin);
-            debug("[MCDU] Button pressed: %i - %s\n", i, currentButtonDefs[i].name.c_str());
+            debug("[%s] Button pressed: %i - %s\n", classIdentifier(), i, currentButtonDefs[i].name.c_str());
         }
         else if (pressed && pressedButtonIndexExists) {
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandContinue);

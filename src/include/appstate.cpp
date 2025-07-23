@@ -32,7 +32,7 @@ bool AppState::initialize() {
 
     USBController::getInstance()->initialize();
 
-    XPLMRegisterFlightLoopCallback(AppState::Update, REFRESH_INTERVAL_SECONDS, nullptr);
+    XPLMRegisterFlightLoopCallback(AppState::Update, REFRESH_INTERVAL_SECONDS_FAST, nullptr);
     
     pluginInitialized = true;
     
@@ -59,7 +59,7 @@ void AppState::deinitialize() {
 
 float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
     AppState::getInstance()->update();
-    return REFRESH_INTERVAL_SECONDS;
+    return USBController::getInstance()->allProfilesReady() ? REFRESH_INTERVAL_SECONDS_FAST : REFRESH_INTERVAL_SECONDS_SLOW;
 }
 
 void AppState::update() {

@@ -161,6 +161,11 @@ FlightFactor777PfpProfile::FlightFactor777PfpProfile() {
     }
 }
 
+FlightFactor777PfpProfile::~FlightFactor777PfpProfile() {
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/instrument_brightness");
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");    
+}
+
 bool FlightFactor777PfpProfile::IsEligible() {
     return Dataref::getInstance()->exists("1-sim/cduL/display/symbols");
 }

@@ -32,6 +32,8 @@
 		F67961962E31357E008031F1 /* usbdevice_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961942E31357E008031F1 /* usbdevice_lin.cpp */; };
 		F67961992E314228008031F1 /* ff777-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961982E314228008031F1 /* ff777-pfp-profile.cpp */; };
 		F679619A2E314228008031F1 /* ff777-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961982E314228008031F1 /* ff777-pfp-profile.cpp */; };
+		F68164E52E3161FD00319E9D /* usbcontroller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F68164E42E3161FD00319E9D /* usbcontroller.cpp */; };
+		F68164E62E3161FD00319E9D /* usbcontroller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F68164E42E3161FD00319E9D /* usbcontroller.cpp */; };
 		F6827E092E05652800382B28 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6827E042E05651E00382B28 /* ContentView.swift */; };
 		F6827E0A2E05652E00382B28 /* WinwingDesktopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6827E052E05651E00382B28 /* WinwingDesktopApp.swift */; };
 		F684D2F22E1E99B0006FA09F /* PFPControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F684D2F12E1E99B0006FA09F /* PFPControlView.swift */; };
@@ -81,6 +83,7 @@
 		F67961942E31357E008031F1 /* usbdevice_lin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_lin.cpp; sourceTree = "<group>"; };
 		F67961972E314228008031F1 /* ff777-pfp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ff777-pfp-profile.h"; sourceTree = "<group>"; };
 		F67961982E314228008031F1 /* ff777-pfp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ff777-pfp-profile.cpp"; sourceTree = "<group>"; };
+		F68164E42E3161FD00319E9D /* usbcontroller.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller.cpp; sourceTree = "<group>"; };
 		F6827DF82E0564F700382B28 /* WinwingDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WinwingDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6827E032E05651E00382B28 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F6827E042E05651E00382B28 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -180,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				F635AD432E0579E9005D6CDC /* usbcontroller.h */,
+				F68164E42E3161FD00319E9D /* usbcontroller.cpp */,
 				F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */,
 				F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */,
 				F64BE3E42E1BF625003C1B73 /* usbcontroller_win.cpp */,
@@ -411,6 +415,7 @@
 				F6F77ACD2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */,
 				F6F77AB12E278F300060AFC0 /* product-mcdu.cpp in Sources */,
 				F6F77AB22E278F300060AFC0 /* product-ursa-minor-joystick.cpp in Sources */,
+				F68164E62E3161FD00319E9D /* usbcontroller.cpp in Sources */,
 				F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */,
 				F635AD532E059872005D6CDC /* path.cpp in Sources */,
 				F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
@@ -442,6 +447,7 @@
 				F63BC99A2E30D73E00ACBBB0 /* appstate.cpp in Sources */,
 				F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
 				F684D2F22E1E99B0006FA09F /* PFPControlView.swift in Sources */,
+				F68164E52E3161FD00319E9D /* usbcontroller.cpp in Sources */,
 				F6F77AB32E278F530060AFC0 /* product-mcdu.cpp in Sources */,
 				F6F77AB42E278F530060AFC0 /* product-pfp.cpp in Sources */,
 				F6F77AB52E278F530060AFC0 /* product-ursa-minor-joystick.cpp in Sources */,

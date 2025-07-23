@@ -11,7 +11,7 @@ private:
     
 public:
     FlightFactor777PfpProfile();
-    virtual ~FlightFactor777PfpProfile() = default;
+    virtual ~FlightFactor777PfpProfile();
 
     static bool IsEligible();
     

@@ -36,6 +36,7 @@ public:
     
     HIDDeviceHandle hidDevice;
     bool connected = false;
+    bool profileReady = false;
     uint16_t vendorId;
     uint16_t productId;
     std::string vendorName;

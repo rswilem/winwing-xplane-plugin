@@ -11,7 +11,7 @@ private:
     
 public:
     ZiboPfpProfile();
-    virtual ~ZiboPfpProfile() = default;
+    virtual ~ZiboPfpProfile();
 
     static bool IsEligible();
     

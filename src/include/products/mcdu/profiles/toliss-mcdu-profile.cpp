@@ -37,9 +37,9 @@ TolissMcduProfile::TolissMcduProfile() {
 }
 
 TolissMcduProfile::~TolissMcduProfile() {
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
-    Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
+    Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
 }
 
 bool TolissMcduProfile::IsEligible() {

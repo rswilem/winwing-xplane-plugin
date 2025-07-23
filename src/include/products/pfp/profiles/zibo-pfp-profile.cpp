@@ -202,6 +202,11 @@ ZiboPfpProfile::ZiboPfpProfile() {
     }
 }
 
+ZiboPfpProfile::~ZiboPfpProfile() {
+    Dataref::getInstance()->unbind("laminar/B738/electric/instrument_brightness");
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
+}
+
 bool ZiboPfpProfile::IsEligible() {
     return Dataref::getInstance()->exists("laminar/B738/electric/instrument_brightness");
 }

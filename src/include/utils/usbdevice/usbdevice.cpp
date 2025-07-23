@@ -6,8 +6,6 @@
 #include "product-ursa-minor-joystick.h"
 
 USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) {
-    debug_force("USBDevice::Device called with vendorId: 0x%04X, productId: 0x%04X, vendor: %s, product: %s\n", vendorId, productId, vendorName.c_str(), productName.c_str());
-    
     if (vendorId != WINWING_VENDOR_ID) {
         debug("Vendor ID mismatch: 0x%04X != 0x%04X\n", vendorId, WINWING_VENDOR_ID);
         return nullptr;
@@ -20,7 +18,7 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBB36: // MCDU-32 (Captain)
         case 0xBB3E: // MCDU-32 (First Officer)
         case 0xBB3A: // MCDU-32 (Observer)
-            return new ProductPFP(hidDevice, vendorId, productId, vendorName, productName);
+            return new ProductMCDU(hidDevice, vendorId, productId, vendorName, productName);
 
         case 0xBB35: // PFP 3N (Captain)
         case 0xBB39: // PFP 3N (First Officer)

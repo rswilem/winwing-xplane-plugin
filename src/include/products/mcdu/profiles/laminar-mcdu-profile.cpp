@@ -25,8 +25,8 @@ LaminarMcduProfile::LaminarMcduProfile() {
 }
 
 LaminarMcduProfile::~LaminarMcduProfile() {
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("sim/cockpit2/electrical/instrument_brightness_ratio");
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
 }
 
 bool LaminarMcduProfile::IsEligible() {
