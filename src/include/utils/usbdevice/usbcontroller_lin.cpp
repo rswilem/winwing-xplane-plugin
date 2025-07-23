@@ -2,6 +2,7 @@
 #include "usbcontroller.h"
 #include "usbdevice.h"
 #include "config.h"
+#include "appstate.h"
 #include <XPLMUtilities.h>
 #include <iostream>
 #include <thread>
