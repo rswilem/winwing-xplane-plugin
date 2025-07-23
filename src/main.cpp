@@ -120,10 +120,10 @@ void menuAction(void* mRef, void* iRef) {
         XPLMCheckMenuItem(mainMenuId, debugLoggingMenuItemIndex, debugLoggingEnabled ? xplm_Menu_Checked : xplm_Menu_Unchecked);
         
         if (debugLoggingEnabled) {
-            debug_force("Debug logging was enabled. Currently connected devices:\n");
+            debug_force("Debug logging was enabled. Currently connected devices (%lu):\n", USBController::getInstance()->devices.size());
             
             for (auto &device : USBController::getInstance()->devices) {
-                debug_force("- (vendorId: 0x%04X, productId: 0x%04X) %s\n", device->vendorId, device->productId, device->productName.c_str());
+                debug_force("- (vendorId: 0x%04X, productId: 0x%04X, handler: %s) %s\n", device->vendorId, device->productId, device->classIdentifier(), device->productName.c_str());
             }
         }
         else {

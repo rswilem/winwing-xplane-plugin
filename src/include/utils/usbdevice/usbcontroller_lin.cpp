@@ -83,8 +83,8 @@ void USBController::destroy() {
         hidManager = nullptr;
     }
     
-    debug_force("Linux: Clearing instance...\n");
     instance = nullptr;
+    debug_force("Linux: Destroy completed\n");
 }
 
 void USBController::enumerateDevices() {
@@ -153,6 +153,24 @@ void USBController::DeviceAddedCallback(void* context, struct udev_device* devic
         return;
     }
     
+    // Check if device already exists
+    for (auto* dev : self->devices) {
+        if (dev->hidDevice >= 0) {
+            // Compare device paths or file descriptors to avoid duplicates
+            // This is similar to how Mac version checks hidDevice == device
+            char existingPath[256];
+            snprintf(existingPath, sizeof(existingPath), "/proc/self/fd/%d", dev->hidDevice);
+            char linkTarget[256];
+            ssize_t len = readlink(existingPath, linkTarget, sizeof(linkTarget) - 1);
+            if (len > 0) {
+                linkTarget[len] = '\0';
+                if (strcmp(linkTarget, devicePath) == 0) {
+                    return; // Device already exists
+                }
+            }
+        }
+    }
+    
     int fd = open(devicePath, O_RDWR | O_NONBLOCK);
     if (fd >= 0) {
         struct hidraw_devinfo info;
@@ -181,8 +199,25 @@ void USBController::DeviceRemovedCallback(void* context, struct udev_device* dev
     }
     
     for (auto it = self->devices.begin(); it != self->devices.end(); ++it) {
-        if ((*it)->hidDevice < 0) {
+        if ((*it)->hidDevice >= 0) {
+            // Check if this device matches the removed path
+            char existingPath[256];
+            snprintf(existingPath, sizeof(existingPath), "/proc/self/fd/%d", (*it)->hidDevice);
+            char linkTarget[256];
+            ssize_t len = readlink(existingPath, linkTarget, sizeof(linkTarget) - 1);
+            if (len > 0) {
+                linkTarget[len] = '\0';
+                if (strcmp(linkTarget, devicePath) == 0) {
+                    delete *it;
+                    *it = nullptr;
+                    self->devices.erase(it);
+                    break;
+                }
+            }
+        } else {
+            // Device already closed/invalid, remove it
             delete *it;
+            *it = nullptr;
             self->devices.erase(it);
             break;
         }

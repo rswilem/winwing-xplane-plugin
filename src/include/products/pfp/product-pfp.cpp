@@ -2,6 +2,9 @@
 #include "dataref.h"
 #include "appstate.h"
 #include "profiles/zibo-pfp-profile.h"
+#include "profiles/ff777-pfp-profile.h"
+#include "config.h"
+#include <XPLMUtilities.h>
 #include <algorithm>
 
 constexpr unsigned int PAGE_LINES = 14; // Header + 6 * label + 6 * cont + textbox
@@ -23,19 +26,31 @@ ProductPFP::~ProductPFP() {
 
 void ProductPFP::setProfileForCurrentAircraft() {
     if (ZiboPfpProfile::IsEligible()) {
-        debug("Using Zibo PFP profile for MCDU.\n");
+        debug_force("Using Zibo PFP profile for PFP.\n");
         clear();
         profile = new ZiboPfpProfile();
         monitorDatarefs();
     }
+    else if (FlightFactor777PfpProfile::IsEligible()) {
+        debug_force("Using FlightFactor 777 PFP profile for PFP.\n");
+        clear();
+        profile = new FlightFactor777PfpProfile();
+        monitorDatarefs();
+    }
     else {
-        debug("No eligible profiles found for PFP. Incorrect aircraft?\n");
+        debug_force("No eligible profiles found for PFP. Incorrect aircraft?\n");
         setLedBrightness(PFPLed::FAIL, 1);
     }
 }
 
+const char* ProductPFP::classIdentifier() {
+    return "Product-PFP";
+}
+
 bool ProductPFP::connect() {
+    debug_force("ProductPFP::connect() called\n");
     if (USBDevice::connect()) {
+        debug_force("USBDevice::connect() succeeded, initializing PFP\n");
         uint8_t col_bg[] = {0x00, 0x00, 0x00};
         
         writeData({0xf0, 0x0, 0x1, 0x38, 0x32, 0xbb, 0x0, 0x0, 0x1e, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x32, 0xbb, 0x0, 0x0, 0x18, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x34, 0x0, 0x18, 0x0, 0xe, 0x0, 0x18, 0x0, 0x32, 0xbb, 0x0, 0x0, 0x19, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0xe, 0x0, 0x0, 0x0, 0x0});
@@ -74,6 +89,7 @@ bool ProductPFP::connect() {
         
         clear2(8);
         
+        debug_force("PFP initialization complete, checking for profile\n");
         if (!profile) {
             setProfileForCurrentAircraft();
         }
@@ -81,6 +97,7 @@ bool ProductPFP::connect() {
         return true;
     }
     
+    debug_force("USBDevice::connect() failed\n");
     return false;
 }
 
@@ -106,7 +123,6 @@ void ProductPFP::disconnect() {
         profile = nullptr;
     }
     
-    // Clear caches
     cachedDatarefValues.clear();
 }
 
@@ -131,12 +147,12 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
     
     if (reportId != 1 || reportLength != 25) {
 #if DEBUG
-        debug("[PFP] Ignoring reportId %d, length %d\n", reportId, reportLength);
-        debug("[PFP] Data (hex): ");
+        printf("[PFP] Ignoring reportId %d, length %d\n", reportId, reportLength);
+        printf("[PFP] Data (hex): ");
         for (int i = 0; i < reportLength; ++i) {
-            debug("%02X ", report[i]);
+            printf("%02X ", report[i]);
         }
-        debug("\n");
+        printf("\n");
 #endif
         return;
     }

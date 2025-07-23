@@ -11,6 +11,7 @@ USBDevice::USBDevice(HIDDeviceHandle aHidDevice, uint16_t aVendorId, uint16_t aP
 : hidDevice(aHidDevice), vendorId(aVendorId), productId(aProductId), vendorName(aVendorName), productName(aProductName), connected(false) {}
 
 USBDevice::~USBDevice() {
+    disconnect();
 }
 
 bool USBDevice::connect() {

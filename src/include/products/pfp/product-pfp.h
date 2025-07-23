@@ -25,6 +25,7 @@ public:
     ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
     ~ProductPFP();
 
+    const char* classIdentifier() override;
     bool connect() override;
     void disconnect() override;
     void update() override;

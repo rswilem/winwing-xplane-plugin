@@ -40,6 +40,10 @@ void ProductMCDU::setProfileForCurrentAircraft() {
     }
 }
 
+const char* ProductMCDU::classIdentifier() {
+    return "Product-MCDU";
+}
+
 bool ProductMCDU::connect() {
     if (USBDevice::connect()) {
         uint8_t col_bg[] = {0x00, 0x00, 0x00};
@@ -146,12 +150,12 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
     
     if (reportId != 1 || reportLength != 25) {
 #if DEBUG
-        debug("[MCDU] Ignoring reportId %d, length %d\n", reportId, reportLength);
-        debug("[MCDU] Data (hex): ");
+        printf("[MCDU] Ignoring reportId %d, length %d\n", reportId, reportLength);
+        printf("[MCDU] Data (hex): ");
         for (int i = 0; i < reportLength; ++i) {
-            debug("%02X ", report[i]);
+            printf("%02X ", report[i]);
         }
-        debug("\n");
+        printf("\n");
 #endif
         return;
     }

@@ -9,6 +9,10 @@ ProductUrsaMinorJoystick::~ProductUrsaMinorJoystick() {
     disconnect();
 }
 
+const char* ProductUrsaMinorJoystick::classIdentifier() {
+    return "Product-UrsaMinorJoystick";
+}
+
 bool ProductUrsaMinorJoystick::connect() {
     if (USBDevice::connect()) {
         setLedBrightness(0);

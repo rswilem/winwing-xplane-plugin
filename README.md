@@ -47,6 +47,7 @@ Below is a table of aircraft that are compatible with the plugin.
 | Laminar A330-300     | Fully implemented  | 🟢 Yes |
 | AeroGenesis A330-300 | Fully implemented  | 🟢 Yes |
 | Zibo 737-800         | Partly implemented | 🔴 No  |
+| FlightFactor 777-200 | Partly implemented | 🔴 No  |
 
 ### Known Issues
 

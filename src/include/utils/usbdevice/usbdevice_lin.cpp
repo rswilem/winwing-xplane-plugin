@@ -5,6 +5,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <atomic>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -39,6 +40,9 @@ bool USBDevice::connect() {
                     debug("ReadFile failed with error: %d\n", errno);
                     break;
                 }
+            } else if (bytesRead == 0) {
+                // Device disconnected
+                break;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
@@ -67,6 +71,9 @@ void USBDevice::update() {
 
 void USBDevice::disconnect() {
     connected = false;
+    
+    // Give input thread time to exit
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     
     if (hidDevice >= 0) {
         close(hidDevice);

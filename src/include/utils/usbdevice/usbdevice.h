@@ -35,18 +35,13 @@ public:
     virtual ~USBDevice();
     
     HIDDeviceHandle hidDevice;
-#if APL
     bool connected = false;
-#elif IBM
-    bool connected = false;
-#elif LIN
-    bool connected = false;
-#endif
     uint16_t vendorId;
     uint16_t productId;
     std::string vendorName;
     std::string productName;
 
+    virtual const char *classIdentifier();
     virtual bool connect();
     virtual void disconnect();
     virtual void update();
