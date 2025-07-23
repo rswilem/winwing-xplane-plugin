@@ -27,7 +27,6 @@ void ProductMCDU::setProfileForCurrentAircraft() {
         profile = new TolissMcduProfile();
         monitorDatarefs();
     }
-    
     else if (LaminarMcduProfile::IsEligible()) {
         clear();
         profile = new LaminarMcduProfile();
@@ -141,12 +140,12 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
     
     if (reportId != 1 || reportLength != 25) {
 #if DEBUG
-        printf("[MCDU] Ignoring reportId %d, length %d\n", reportId, reportLength);
-        printf("[MCDU] Data (hex): ");
+        debug("[MCDU] Ignoring reportId %d, length %d\n", reportId, reportLength);
+        debug("[MCDU] Data (hex): ");
         for (int i = 0; i < reportLength; ++i) {
-            printf("%02X ", report[i]);
+            debug("%02X ", report[i]);
         }
-        printf("\n");
+        debug("\n");
 #endif
         return;
     }
@@ -175,6 +174,7 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
         if (pressed && !pressedButtonIndexExists) {
             pressedButtonIndices.push_back(i);
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandBegin);
+            debug("[MCDU] Button pressed: %i - %s\n", i, currentButtonDefs[i].name.c_str());
         }
         else if (pressed && pressedButtonIndexExists) {
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandContinue);

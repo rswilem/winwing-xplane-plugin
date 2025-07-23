@@ -3,14 +3,16 @@
 #endif
 
 #if DEBUG
-#define debug(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); XPLMDebugString(buffer); printf("%s", buffer); }
+#define debug(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); if (AppState::getInstance()->debuggingEnabled) { XPLMDebugString(buffer); printf("%s", buffer); } }
+#define debug_force(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); XPLMDebugString(buffer); printf("%s", buffer); }
 #else
-#define debug(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); XPLMDebugString(buffer); }
+#define debug(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); if (AppState::getInstance()->debuggingEnabled) { XPLMDebugString(buffer); } }
+#define debug_force(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); XPLMDebugString(buffer); }
 #endif
 
 #define PRODUCT_NAME "winwing"
 #define FRIENDLY_NAME "Winwing"
-#define VERSION "0.0.3"
+#define VERSION "0.0.4"
 #define ALL_PLUGINS_DIRECTORY "/Resources/plugins/"
 #define PLUGIN_DIRECTORY (ALL_PLUGINS_DIRECTORY PRODUCT_NAME)
 #define BUNDLE_ID "com.ramonster." PRODUCT_NAME

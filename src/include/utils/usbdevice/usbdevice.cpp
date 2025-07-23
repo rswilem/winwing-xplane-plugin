@@ -1,5 +1,6 @@
 #include "usbdevice.h"
 #include <XPLMUtilities.h>
+#include "appstate.h"
 #include "product-mcdu.h"
 #include "product-pfp.h"
 #include "product-ursa-minor-joystick.h"

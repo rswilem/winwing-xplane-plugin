@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F610F6342E2F8041004D29F6 /* zibo-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F610F6322E2F8041004D29F6 /* zibo-pfp-profile.cpp */; };
+		F610F6352E2F8041004D29F6 /* zibo-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F610F6322E2F8041004D29F6 /* zibo-pfp-profile.cpp */; };
 		F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66F91662D0332F600F84283 /* main.cpp */; };
 		F635AD422E05697B005D6CDC /* bridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F6827E102E05664C00382B28 /* bridge.mm */; };
 		F635AD462E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */; };
@@ -54,6 +56,9 @@
 
 /* Begin PBXFileReference section */
 		D607B19909A556E400699BC3 /* winwing.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = winwing.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
+		F610F6302E2F8041004D29F6 /* pfp-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pfp-aircraft-profile.h"; sourceTree = "<group>"; };
+		F610F6312E2F8041004D29F6 /* zibo-pfp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "zibo-pfp-profile.h"; sourceTree = "<group>"; };
+		F610F6322E2F8041004D29F6 /* zibo-pfp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "zibo-pfp-profile.cpp"; sourceTree = "<group>"; };
 		F61F8B2D2D059ED500E63C3F /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		F635AD432E0579E9005D6CDC /* usbcontroller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = usbcontroller.h; sourceTree = "<group>"; };
 		F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_mac.cpp; sourceTree = "<group>"; };
@@ -141,6 +146,15 @@
 				F6827DF82E0564F700382B28 /* WinwingDesktop.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F610F6332E2F8041004D29F6 /* profiles */ = {
+			isa = PBXGroup;
+			children = (
+				F610F6312E2F8041004D29F6 /* zibo-pfp-profile.h */,
+				F610F6322E2F8041004D29F6 /* zibo-pfp-profile.cpp */,
+			);
+			path = profiles;
 			sourceTree = "<group>";
 		};
 		F61F8B2E2D059ED500E63C3F /* include */ = {
@@ -238,6 +252,8 @@
 		F6F77AAB2E278F300060AFC0 /* pfp */ = {
 			isa = PBXGroup;
 			children = (
+				F610F6302E2F8041004D29F6 /* pfp-aircraft-profile.h */,
+				F610F6332E2F8041004D29F6 /* profiles */,
 				F6F77AA92E278F300060AFC0 /* product-pfp.h */,
 				F6F77AAA2E278F300060AFC0 /* product-pfp.cpp */,
 			);
@@ -397,6 +413,7 @@
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F6F77AC92E2796180060AFC0 /* toliss-mcdu-profile.cpp in Sources */,
 				F64BE3EA2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
+				F610F6352E2F8041004D29F6 /* zibo-pfp-profile.cpp in Sources */,
 				F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */,
 				F635AD472E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */,
 				F6AF9EC12D06F84900530297 /* dataref.cpp in Sources */,
@@ -421,6 +438,7 @@
 				F6F77AB52E278F530060AFC0 /* product-ursa-minor-joystick.cpp in Sources */,
 				F6C345512E18797400D7C987 /* dataref.cpp in Sources */,
 				F6C3455F2E187AB700D7C987 /* xplane-sdk-mock.cpp in Sources */,
+				F610F6342E2F8041004D29F6 /* zibo-pfp-profile.cpp in Sources */,
 				F6827E092E05652800382B28 /* ContentView.swift in Sources */,
 				F69FF22C2E1D13CB00F9D2D9 /* MCDUControlView.swift in Sources */,
 				F69FF22D2E1D13CB00F9D2D9 /* GenericDeviceView.swift in Sources */,

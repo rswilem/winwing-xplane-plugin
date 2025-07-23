@@ -1,6 +1,7 @@
 #if APL
 #include "usbcontroller.h"
 #include "usbdevice.h"
+#include "appstate.h"
 #include <XPLMUtilities.h>
 #include "config.h"
 #include <iostream>
@@ -131,11 +132,9 @@ void USBController::DeviceRemovedCallback(void *context, IOReturn result, void *
 
     for (auto it = self->devices.begin(); it != self->devices.end(); ++it) {
         if ((*it)->hidDevice == device) {
-            printf("Device was removed: %p\n", (void*)device);
             delete *it;
-            *it = nullptr; // Defensive: avoid dangling pointer
+            *it = nullptr;
             self->devices.erase(it);
-            // Defensive: break immediately after erase
             break;
         }
     }

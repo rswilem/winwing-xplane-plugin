@@ -145,7 +145,6 @@ void USBController::checkForDeviceChanges() {
                         USBDevice* device = USBDevice::Device(hidDevice, attributes.VendorID, attributes.ProductID, std::string(vendorNameA), std::string(productNameA));
                         if (device) {
                             devices.push_back(device);
-                            printf("New Winwing device detected: %s\n", productNameA);
                         }
                     } else {
                         CloseHandle(hidDevice);
@@ -161,7 +160,6 @@ void USBController::checkForDeviceChanges() {
     
     for (auto it = devices.begin(); it != devices.end();) {
         if ((*it)->hidDevice == INVALID_HANDLE_VALUE || !(*it)->connected) {
-            printf("Winwing device removed\n");
             delete *it;
             it = devices.erase(it);
         } else {

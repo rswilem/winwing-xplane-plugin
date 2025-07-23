@@ -1,6 +1,7 @@
 #if APL
 #include "usbdevice.h"
 #include "config.h"
+#include "appstate.h"
 #include <XPLMUtilities.h>
 #include <iostream>
 #include <CoreFoundation/CoreFoundation.h>

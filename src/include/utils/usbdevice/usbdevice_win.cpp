@@ -1,5 +1,6 @@
 #if IBM
 #include "usbdevice.h"
+#include "appstate.h"
 #include "config.h"
 #include <iostream>
 #include <thread>

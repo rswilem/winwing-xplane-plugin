@@ -10,6 +10,7 @@ AppState* AppState::instance = nullptr;
 
 AppState::AppState() {
     pluginInitialized = false;
+    debuggingEnabled = false;
 }
 
 AppState::~AppState() {
@@ -35,7 +36,7 @@ bool AppState::initialize() {
     
     pluginInitialized = true;
     
-    debug("Plugin initialized, found %lu devices.\n", USBController::getInstance()->devices.size());
+    debug_force("Plugin initialized, found %lu devices.\n", USBController::getInstance()->devices.size());
     return true;
 }
 
@@ -44,7 +45,7 @@ void AppState::deinitialize() {
         return;
     }
     
-    debug("Plugin deinitializing...\n");
+    debug_force("Plugin deinitializing...\n");
     XPLMUnregisterFlightLoopCallback(AppState::Update, nullptr);
     
     USBController::getInstance()->destroy();

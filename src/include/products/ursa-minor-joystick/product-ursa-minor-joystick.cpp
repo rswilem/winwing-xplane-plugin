@@ -2,12 +2,10 @@
 #include "dataref.h"
 
 ProductUrsaMinorJoystick::ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
-    printf("Found one ursa minor UrsaMinorJoystick.\n");
     connect();
 }
 
 ProductUrsaMinorJoystick::~ProductUrsaMinorJoystick() {
-    printf("Cleaning up joystick\n");
     disconnect();
 }
 
