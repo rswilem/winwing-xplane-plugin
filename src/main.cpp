@@ -106,6 +106,7 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
 
 void menuAction(void* mRef, void* iRef) {
     if (!strcmp((char *)iRef, "ActionReloadDevices")) {
+        debug_force("Reloading devices...\n");
         USBController::getInstance()->destroy();
         
         USBController::getInstance()->initialize();

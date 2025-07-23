@@ -23,9 +23,14 @@ ProductPFP::~ProductPFP() {
 
 void ProductPFP::setProfileForCurrentAircraft() {
     if (ZiboPfpProfile::IsEligible()) {
+        debug("Using Zibo PFP profile for MCDU.\n");
         clear();
         profile = new ZiboPfpProfile();
         monitorDatarefs();
+    }
+    else {
+        debug("No eligible profiles found for PFP. Incorrect aircraft?\n");
+        setLedBrightness(PFPLed::FAIL, 1);
     }
 }
 

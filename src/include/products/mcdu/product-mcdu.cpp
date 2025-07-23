@@ -23,14 +23,20 @@ ProductMCDU::~ProductMCDU() {
 
 void ProductMCDU::setProfileForCurrentAircraft() {
     if (TolissMcduProfile::IsEligible()) {
+        debug("Using Toliss MCDU profile for MCDU.\n");
         clear();
         profile = new TolissMcduProfile();
         monitorDatarefs();
     }
     else if (LaminarMcduProfile::IsEligible()) {
+        debug("Using Laminar MCDU profile for MCDU.\n");
         clear();
         profile = new LaminarMcduProfile();
         monitorDatarefs();
+    }
+    else {
+        debug("No eligible profiles found for MCDU. Incorrect aircraft?\n");
+        setLedBrightness(MCDULed::FAIL, 1);
     }
 }
 
@@ -62,6 +68,7 @@ bool ProductMCDU::connect() {
         setLedBrightness(MCDULed::BACKLIGHT, 128);
         setLedBrightness(MCDULed::SCREEN_BACKLIGHT, 128);
         const MCDULed ledsToSet[] = {
+            MCDULed::FAIL,
             MCDULed::FM,
             MCDULed::MCDU,
             MCDULed::FM1,
@@ -75,7 +82,6 @@ bool ProductMCDU::connect() {
             setLedBrightness(led, 0);
         }
         
-        setLedBrightness(MCDULed::FAIL, 1);
         setLedBrightness(MCDULed::MENU, 1);
         
         clear2(8);

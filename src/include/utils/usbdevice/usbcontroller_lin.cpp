@@ -4,6 +4,8 @@
 #include "config.h"
 #include <iostream>
 #include <thread>
+#include <chrono>
+#include <atomic>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -16,6 +18,7 @@
 #include <errno.h>
 
 USBController* USBController::instance = nullptr;
+static std::atomic<bool> shouldStopMonitoring{false};
 
 USBController::USBController() {
     struct udev* udev = udev_new();
@@ -34,6 +37,7 @@ USBController::USBController() {
     udev_monitor_filter_add_match_subsystem_devtype(hidManager, "hidraw", nullptr);
     udev_monitor_enable_receiving(hidManager);
     
+    shouldStopMonitoring = false;
     std::thread monitorThread([this]() {
         monitorDevices();
     });
@@ -58,17 +62,27 @@ void USBController::initialize() {
 }
 
 void USBController::destroy() {
+    debug_force("Linux: Stopping monitoring thread...\n");
+    shouldStopMonitoring = true;
+    
+    // Give the monitoring thread time to exit gracefully
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    
+    debug_force("Linux: Destroying USB devices...\n");
     for (auto ptr : devices) {
         delete ptr;
     }
     devices.clear();
     
+    debug_force("Linux: Cleaning up hidManager...\n");
     if (hidManager) {
         struct udev* udev = udev_monitor_get_udev(hidManager);
         udev_monitor_unref(hidManager);
         udev_unref(udev);
+        hidManager = nullptr;
     }
     
+    debug_force("Linux: Clearing instance...\n");
     instance = nullptr;
 }
 
@@ -106,7 +120,7 @@ void USBController::enumerateDevices() {
 
 void USBController::monitorDevices() {
     int fd = udev_monitor_get_fd(hidManager);
-    while (true) {
+    while (!shouldStopMonitoring) {
         fd_set fds;
         FD_ZERO(&fds);
         FD_SET(fd, &fds);
@@ -114,7 +128,7 @@ void USBController::monitorDevices() {
         struct timeval timeout = {1, 0};
         int ret = select(fd + 1, &fds, nullptr, nullptr, &timeout);
         
-        if (ret > 0 && FD_ISSET(fd, &fds)) {
+        if (ret > 0 && FD_ISSET(fd, &fds) && !shouldStopMonitoring) {
             struct udev_device* device = udev_monitor_receive_device(hidManager);
             if (device) {
                 const char* action = udev_device_get_action(device);
@@ -127,6 +141,7 @@ void USBController::monitorDevices() {
             }
         }
     }
+    debug_force("Linux: Monitor thread exiting\n");
 }
 
 void USBController::DeviceAddedCallback(void* context, struct udev_device* device) {
