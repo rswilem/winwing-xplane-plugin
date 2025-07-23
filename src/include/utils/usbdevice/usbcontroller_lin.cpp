@@ -2,6 +2,7 @@
 #include "usbcontroller.h"
 #include "usbdevice.h"
 #include "config.h"
+#include <XPLMUtilities.h>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -23,13 +24,13 @@ static std::atomic<bool> shouldStopMonitoring{false};
 USBController::USBController() {
     struct udev* udev = udev_new();
     if (!udev) {
-        std::cerr << "Failed to create udev context" << std::endl;
+        debug_force("Failed to create udev context");
         return;
     }
     
     hidManager = udev_monitor_new_from_netlink(udev, "udev");
     if (!hidManager) {
-        std::cerr << "Failed to create udev monitor" << std::endl;
+        debug_force("Failed to create udev monitor");
         udev_unref(udev);
         return;
     }
