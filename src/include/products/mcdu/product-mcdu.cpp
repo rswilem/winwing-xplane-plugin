@@ -147,6 +147,12 @@ void ProductMCDU::update() {
 
 void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength) {
     if (!profile) {
+        debug("[%s] No profile loaded, ignoring input\n", classIdentifier());
+        return;
+    }
+
+    if (!report || reportLength <= 0) {
+        debug("[%s] Invalid report data\n", classIdentifier());
         return;
     }
     
@@ -182,9 +188,9 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
             pressed = (buttons_hi >> (i - 64)) & 1;
         }
         
-        bool pressedButtonIndexExists = std::find(pressedButtonIndices.begin(), pressedButtonIndices.end(), i) != pressedButtonIndices.end();
+        bool pressedButtonIndexExists = pressedButtonIndices.find(i) != pressedButtonIndices.end();
         if (pressed && !pressedButtonIndexExists) {
-            pressedButtonIndices.push_back(i);
+            pressedButtonIndices.insert(i);
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandBegin);
             debug("[%s] Button pressed: %i - %s\n", classIdentifier(), i, currentButtonDefs[i].name.c_str());
         }
@@ -192,7 +198,7 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandContinue);
         }
         else if (!pressed && pressedButtonIndexExists) {
-            pressedButtonIndices.erase(std::remove(pressedButtonIndices.begin(), pressedButtonIndices.end(), i), pressedButtonIndices.end());
+            pressedButtonIndices.erase(i);
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandEnd);
         }
     }

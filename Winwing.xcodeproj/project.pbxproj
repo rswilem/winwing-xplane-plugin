@@ -45,6 +45,10 @@
 		F6AF9EC12D06F84900530297 /* dataref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBC2D06F84900530297 /* dataref.cpp */; };
 		F6AF9EC62D078DB000530297 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6AF9EC52D078DB000530297 /* Cocoa.framework */; };
 		F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9ECB2D078ED400530297 /* appstate.cpp */; };
+		F6BB75782E32634700C2B21F /* product-fcu-efis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6BB75762E32634700C2B21F /* product-fcu-efis.cpp */; };
+		F6BB75792E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6BB75722E32634700C2B21F /* toliss-fcu-efis-profile.cpp */; };
+		F6BB757A2E32634700C2B21F /* product-fcu-efis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6BB75762E32634700C2B21F /* product-fcu-efis.cpp */; };
+		F6BB757B2E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6BB75722E32634700C2B21F /* toliss-fcu-efis-profile.cpp */; };
 		F6C345512E18797400D7C987 /* dataref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBC2D06F84900530297 /* dataref.cpp */; };
 		F6C3455F2E187AB700D7C987 /* xplane-sdk-mock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C3455E2E187AAF00D7C987 /* xplane-sdk-mock.cpp */; };
 		F6F77AB02E278F300060AFC0 /* product-pfp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77AAA2E278F300060AFC0 /* product-pfp.cpp */; };
@@ -101,6 +105,11 @@
 		F6AF9EC52D078DB000530297 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		F6AF9ECA2D078ED400530297 /* appstate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = appstate.h; sourceTree = "<group>"; };
 		F6AF9ECB2D078ED400530297 /* appstate.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = appstate.cpp; sourceTree = "<group>"; };
+		F6BB75712E32634700C2B21F /* toliss-fcu-efis-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "toliss-fcu-efis-profile.h"; sourceTree = "<group>"; };
+		F6BB75722E32634700C2B21F /* toliss-fcu-efis-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "toliss-fcu-efis-profile.cpp"; sourceTree = "<group>"; };
+		F6BB75742E32634700C2B21F /* fcu-efis-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "fcu-efis-aircraft-profile.h"; sourceTree = "<group>"; };
+		F6BB75752E32634700C2B21F /* product-fcu-efis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-fcu-efis.h"; sourceTree = "<group>"; };
+		F6BB75762E32634700C2B21F /* product-fcu-efis.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-fcu-efis.cpp"; sourceTree = "<group>"; };
 		F6C3455E2E187AAF00D7C987 /* xplane-sdk-mock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "xplane-sdk-mock.cpp"; sourceTree = "<group>"; };
 		F6F77AA62E278F300060AFC0 /* product-mcdu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-mcdu.h"; sourceTree = "<group>"; };
 		F6F77AA72E278F300060AFC0 /* product-mcdu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-mcdu.cpp"; sourceTree = "<group>"; };
@@ -249,6 +258,26 @@
 			path = utils;
 			sourceTree = "<group>";
 		};
+		F6BB75732E32634700C2B21F /* profiles */ = {
+			isa = PBXGroup;
+			children = (
+				F6BB75712E32634700C2B21F /* toliss-fcu-efis-profile.h */,
+				F6BB75722E32634700C2B21F /* toliss-fcu-efis-profile.cpp */,
+			);
+			path = profiles;
+			sourceTree = "<group>";
+		};
+		F6BB75772E32634700C2B21F /* fcu-efis */ = {
+			isa = PBXGroup;
+			children = (
+				F6BB75732E32634700C2B21F /* profiles */,
+				F6BB75742E32634700C2B21F /* fcu-efis-aircraft-profile.h */,
+				F6BB75752E32634700C2B21F /* product-fcu-efis.h */,
+				F6BB75762E32634700C2B21F /* product-fcu-efis.cpp */,
+			);
+			path = "fcu-efis";
+			sourceTree = "<group>";
+		};
 		F6F77AA82E278F300060AFC0 /* mcdu */ = {
 			isa = PBXGroup;
 			children = (
@@ -283,6 +312,7 @@
 		F6F77AAF2E278F300060AFC0 /* products */ = {
 			isa = PBXGroup;
 			children = (
+				F6BB75772E32634700C2B21F /* fcu-efis */,
 				F6F77AA82E278F300060AFC0 /* mcdu */,
 				F6F77AAB2E278F300060AFC0 /* pfp */,
 				F6F77AAE2E278F300060AFC0 /* ursa-minor-joystick */,
@@ -415,6 +445,8 @@
 				F6F77ACD2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */,
 				F6F77AB12E278F300060AFC0 /* product-mcdu.cpp in Sources */,
 				F6F77AB22E278F300060AFC0 /* product-ursa-minor-joystick.cpp in Sources */,
+				F6BB757A2E32634700C2B21F /* product-fcu-efis.cpp in Sources */,
+				F6BB757B2E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */,
 				F68164E62E3161FD00319E9D /* usbcontroller.cpp in Sources */,
 				F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */,
 				F635AD532E059872005D6CDC /* path.cpp in Sources */,
@@ -444,6 +476,8 @@
 				F679619A2E314228008031F1 /* ff777-pfp-profile.cpp in Sources */,
 				F64BE3EB2E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
+				F6BB75782E32634700C2B21F /* product-fcu-efis.cpp in Sources */,
+				F6BB75792E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */,
 				F63BC99A2E30D73E00ACBBB0 /* appstate.cpp in Sources */,
 				F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
 				F684D2F22E1E99B0006FA09F /* PFPControlView.swift in Sources */,

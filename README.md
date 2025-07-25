@@ -22,18 +22,18 @@ The plugin theoretically works on Windows, but is not required there, as Winwing
 
 The table below lists the compatibility status of various Winwing devices with the plugin.
 
-| Device Name                   | Compatibility         | Tested | Roadmap / suggestions                     |
-| ----------------------------- | --------------------- | ------ | ----------------------------------------- |
-| URSA MINOR Airline Joystick L | 🟢 Partly implemented | 🟢     | Implement vibrations                      |
-| URSA MINOR Airline Joystick R | 🟠 Partly implemented | 🔴     | Implement vibrations, find the product ID |
-| MCDU-32                       | 🟢 Fully implemented  | 🟢     |                                           |
-| FCU Unit                      | 🔴 Not implemented    | 🔴     |                                           |
-| EFIS R                        | 🔴 Not implemented    | 🔴     |                                           |
-| EFIS L                        | 🔴 Not implemented    | 🔴     |                                           |
-| Panel of Autopilot 3          | 🔴 Not implemented    | 🔴     |                                           |
-| PFP 4                         | 🟠 Partly implemented | 🔴     |                                           |
-| PFP 7                         | 🟠 Partly implemented | 🔴     |                                           |
-| PFP 3N                        | 🟠 Partly implemented | 🔴     |                                           |
+| Device Name                   | Compatibility         | Tested | Roadmap / suggestions                                   |
+| ----------------------------- | --------------------- | ------ | ------------------------------------------------------- |
+| URSA MINOR Airline Joystick L | 🟢 Partly implemented | 🟢     | Implement vibrations                                    |
+| URSA MINOR Airline Joystick R | 🟠 Partly implemented | 🔴     | Implement vibrations, find the product ID               |
+| MCDU-32                       | 🟢 Fully implemented  | 🟢     |                                                         |
+| FCU Unit                      | 🟠 Partly implemented | 🔴     | Testers needed!                                         |
+| EFIS R                        | 🟠 Partly implemented | 🔴     | Testers needed!                                         |
+| EFIS L                        | 🟠 Partly implemented | 🔴     | Testers needed!                                         |
+| Panel of Autopilot 3          | 🔴 Not implemented    | 🔴     |                                                         |
+| PFP 4                         | 🟠 Partly implemented | 🔴     |                                                         |
+| PFP 7                         | 🟠 Partly implemented | 🔴     |                                                         |
+| PFP 3N                        | 🟢 Fully implemented  | 🔴     | LED should be tested. Display should works as expected. |
 
 ### Aircraft Compatibility
 

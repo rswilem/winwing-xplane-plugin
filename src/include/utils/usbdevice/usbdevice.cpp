@@ -4,6 +4,7 @@
 #include "product-mcdu.h"
 #include "product-pfp.h"
 #include "product-ursa-minor-joystick.h"
+#include "product-fcu-efis.h"
 
 USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) {
     if (vendorId != WINWING_VENDOR_ID) {
@@ -23,9 +24,15 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBB35: // PFP 3N (Captain)
         case 0xBB39: // PFP 3N (First Officer)
         case 0xBB3D: // PFP 3N (Observer)
-        case 0xBC1D: // PFP 4
-        case 0xBA01: // PFP 7
+        // case 0xBC1D: // PFP 4 (or EFIS?)
+        // case 0xBA01: // PFP 7 (or EFIS?)
             return new ProductPFP(hidDevice, vendorId, productId, vendorName, productName);
+            
+        case 0xBB10: // FCU only
+        case 0xBC1E: // FCU + EFIS-R
+        case 0xBC1D: // FCU + EFIS-L (was previously assigned to PFP 4)
+        case 0xBA01: // FCU + EFIS-L + EFIS-R (was previously assigned to PFP 7)
+            return new ProductFCUEfis(hidDevice, vendorId, productId, vendorName, productName);
             
         default:
             debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X\n", vendorId, productId);
