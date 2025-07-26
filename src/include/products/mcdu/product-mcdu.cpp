@@ -146,13 +146,7 @@ void ProductMCDU::update() {
 }
 
 void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength) {
-    if (!profile) {
-        debug("[%s] No profile loaded, ignoring input\n", classIdentifier());
-        return;
-    }
-
-    if (!report || reportLength <= 0) {
-        debug("[%s] Invalid report data\n", classIdentifier());
+    if (!connected || !profile || !report || reportLength <= 0) {
         return;
     }
     

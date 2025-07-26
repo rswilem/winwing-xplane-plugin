@@ -144,11 +144,6 @@ void ProductPFP::update() {
 }
 
 void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength) {
-    if (!profile) {
-        debug_force("[%s] No profile loaded, ignoring input\n", classIdentifier());
-        return;
-    }
-    
     if (!report || reportLength <= 0) {
         debug_force("[%s] Invalid report data\n", classIdentifier());
         return;
@@ -165,10 +160,15 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
 #endif
         return;
     }
+    
+    if (!profile) {
+        debug_force("[%s] No profile loaded, ignoring input\n", classIdentifier());
+        return;
+    }
 
     // Ensure we have enough bytes for button data
     if (reportLength < 13) {
-        debug("[%s] Report too short for button data: %d\n", classIdentifier(), reportLength);
+        debug_force("[%s] Report too short for button data: %d\n", classIdentifier(), reportLength);
         return;
     }
 
