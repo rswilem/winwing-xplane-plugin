@@ -405,7 +405,9 @@ T Dataref::get(const char *ref) {
         int size = XPLMGetDatab(handle, nullptr, 0, 0);
         std::vector<char> str(size);
         XPLMGetDatab(handle, str.data(), 0, size);
-        return std::string(str.data(), size);
+        std::string out = std::string(str.data(), size);
+        out.erase(std::remove(out.begin(), out.end(), '\0'), out.end());
+        return out;
     }
     
     if constexpr (std::is_same<T, std::string>::value) {
