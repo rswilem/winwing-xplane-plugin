@@ -17,7 +17,7 @@ TolissMcduProfile::TolissMcduProfile() {
             return;
         }
         
-        uint8_t target = brightness * 255.0f;
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
         ledBrightnessCallback(MCDULed::BACKLIGHT, target);
     });
     
@@ -201,7 +201,7 @@ const std::vector<MCDUButtonDef>& TolissMcduProfile::buttonDefs() const {
         {14, "PERF", "AirbusFBW/MCDU1Perf"},
         {15, "INIT", "AirbusFBW/MCDU1Init"},
         {16, "DATA", "AirbusFBW/MCDU1Data"},
-        {17, "EMPTY_TOP_RIGHT", "toliss_airbus/iscs_open"},
+        {17, "EMPTY_TOP_RIGHT", "AirbusFBW/CaptChronoButton"},
         {18, "BRT", "AirbusFBW/MCDU1KeyBright"},
         {19, "FPLN", "AirbusFBW/MCDU1Fpln"},
         {20, "RADNAV", "AirbusFBW/MCDU1RadNav"},
