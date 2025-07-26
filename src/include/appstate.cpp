@@ -11,6 +11,7 @@ AppState* AppState::instance = nullptr;
 AppState::AppState() {
     pluginInitialized = false;
     debuggingEnabled = false;
+    fastUpdate = false;
 }
 
 AppState::~AppState() {
@@ -58,8 +59,14 @@ void AppState::deinitialize() {
 }
 
 float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
-    AppState::getInstance()->update();
-    return USBController::getInstance()->allProfilesReady() ? REFRESH_INTERVAL_SECONDS_FAST : REFRESH_INTERVAL_SECONDS_SLOW;
+    auto appstate = AppState::getInstance();
+    
+    appstate->update();
+    if (appstate->fastUpdate) {
+        return REFRESH_INTERVAL_SECONDS_FAST;
+    }
+    
+    return USBController::getInstance()->allProfilesReady() ? REFRESH_INTERVAL_SECONDS_NORMAL : REFRESH_INTERVAL_SECONDS_SLOW;
 }
 
 void AppState::update() {

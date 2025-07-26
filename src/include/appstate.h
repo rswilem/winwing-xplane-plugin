@@ -25,6 +25,7 @@ public:
     static float Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
     
     bool pluginInitialized;
+    bool fastUpdate;
     bool debuggingEnabled;
     
     static AppState* getInstance();
