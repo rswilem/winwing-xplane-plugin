@@ -1,5 +1,7 @@
 #include "product-ursa-minor-joystick.h"
 #include "dataref.h"
+#include "appstate.h"
+#include <algorithm>
 
 ProductUrsaMinorJoystick::ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
     connect();
@@ -25,12 +27,15 @@ bool ProductUrsaMinorJoystick::connect() {
 
 void ProductUrsaMinorJoystick::disconnect() {
     setLedBrightness(0);
+    setVibration(0);
     
     USBDevice::disconnect();
     
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
+    Dataref::getInstance()->unbind("sim/flightmodel/failures/onground_any");
     didInitializeDatarefs = false;
+    AppState::getInstance()->fastUpdate = false;
 }
 
 void ProductUrsaMinorJoystick::update() {
@@ -41,7 +46,22 @@ void ProductUrsaMinorJoystick::update() {
     if (!didInitializeDatarefs) {
         initializeDatarefs();
     }
+    
     USBDevice::update();
+    
+    if (Dataref::getInstance()->getCached<bool>("sim/flightmodel/failures/onground_any") && Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on")) {
+        float gForce = Dataref::getInstance()->get<float>("sim/flightmodel/forces/g_nrml");
+        float delta = fabs(gForce - lastGForce);
+        lastGForce = gForce;
+        
+        uint8_t vibration = (uint8_t)std::min(255.0f, delta * 400.0f);
+        if (vibration < 8) {
+            vibration = 0;
+        }
+
+        setVibration(vibration);
+        lastVibration = vibration;
+    }
 }
 
 bool ProductUrsaMinorJoystick::setVibration(uint8_t vibration) {
@@ -85,5 +105,14 @@ void ProductUrsaMinorJoystick::initializeDatarefs() {
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+    });
+    
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/flightmodel/failures/onground_any", [this](bool wheelsOnGround) {
+        AppState::getInstance()->fastUpdate = wheelsOnGround;
+        
+        if (!wheelsOnGround && lastVibration > 0) {
+            lastVibration = 0;
+            setVibration(lastVibration);
+        }
     });
 }

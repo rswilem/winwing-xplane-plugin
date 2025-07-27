@@ -6,6 +6,8 @@
 class ProductUrsaMinorJoystick: public USBDevice {
 private:
     bool didInitializeDatarefs = false;
+    int lastVibration;
+    float lastGForce;
 
 public:
     ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
