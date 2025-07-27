@@ -1,6 +1,7 @@
 #include "product-ursa-minor-joystick.h"
 #include "dataref.h"
 #include "appstate.h"
+#include <cmath>
 #include <algorithm>
 
 ProductUrsaMinorJoystick::ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
