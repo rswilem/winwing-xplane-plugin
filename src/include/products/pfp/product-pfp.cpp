@@ -183,7 +183,7 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
     
     for (int i = 0; i < numButtons; ++i) {
         if (i >= 96) { // 64 + 32 max buttons supported
-            debug("[%s] Button index out of range: %i\n", classIdentifier(), i);
+            debug_force("[%s] Button index out of range: %i\n", classIdentifier(), i);
             break;
         }
         
@@ -198,7 +198,7 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
         if (pressed && !pressedButtonIndexExists) {
             pressedButtonIndices.insert(i);
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandBegin);
-            debug("[%s] Button pressed: %i - %s\n", classIdentifier(), i, currentButtonDefs[i].name.c_str());
+            debug_force("[%s] Button pressed: %i - %s\n", classIdentifier(), i, currentButtonDefs[i].name.c_str());
         }
         else if (pressed && pressedButtonIndexExists) {
             Dataref::getInstance()->executeCommand(currentButtonDefs[i].dataref.c_str(), xplm_CommandContinue);

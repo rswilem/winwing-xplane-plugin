@@ -100,7 +100,7 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
     
     ssize_t bytesWritten = write(hidDevice, data.data(), data.size());
     if (bytesWritten != (ssize_t)data.size()) {
-        debug("HID write failed.\n", kr);
+        debug("HID write failed.\n");
         return false;
     }
     
