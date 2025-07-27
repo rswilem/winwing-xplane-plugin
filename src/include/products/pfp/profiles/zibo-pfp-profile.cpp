@@ -78,7 +78,6 @@ std::vector<std::string> ZiboPfpProfile::datarefsList = {
 };
 
 std::vector<PFPButtonDef> ZiboPfpProfile::buttonsList = {
-    // Zibo 737 FMC LSK/RSK buttons
     {0, "LSK1L", "laminar/B738/button/fmc1_1L"},
     {1, "LSK2L", "laminar/B738/button/fmc1_2L"},
     {2, "LSK3L", "laminar/B738/button/fmc1_3L"},
@@ -96,63 +95,60 @@ std::vector<PFPButtonDef> ZiboPfpProfile::buttonsList = {
     {14, "CLB", "laminar/B738/button/fmc1_clb"},
     {15, "CRZ", "laminar/B738/button/fmc1_crz"},
     {16, "DES", "laminar/B738/button/fmc1_des"},
-    {17, "UNUSED1", ""},
-    {18, "BRT", ""},
+    {17, "BRT-", ""},
+    {18, "BRT+", ""},
     {19, "MENU", "laminar/B738/button/fmc1_menu"},
     {20, "LEGS", "laminar/B738/button/fmc1_legs"},
     {21, "DEPARR", "laminar/B738/button/fmc1_dep_app"},
     {22, "HOLD", "laminar/B738/button/fmc1_hold"},
     {23, "PROG", "laminar/B738/button/fmc1_prog"},
     {24, "EXEC", "laminar/B738/button/fmc1_exec"},
-    {25, "DIM", ""},
-    {26, "N1LIMIT", "laminar/B738/button/fmc1_n1_lim"},
-    {27, "FIX", "laminar/B738/button/fmc1_fix"},
-    {28, "PREV_PAGE", "laminar/B738/button/fmc1_prev_page"},
-    {29, "NEXT_PAGE", "laminar/B738/button/fmc1_next_page"},
-    {30, "UNUSED2", ""},
-    {31, "UNUSED3", ""},
-    {32, "KEY1", "laminar/B738/button/fmc1_1"},
-    {33, "KEY2", "laminar/B738/button/fmc1_2"},
-    {34, "KEY3", "laminar/B738/button/fmc1_3"},
-    {35, "KEY4", "laminar/B738/button/fmc1_4"},
-    {36, "KEY5", "laminar/B738/button/fmc1_5"},
-    {37, "KEY6", "laminar/B738/button/fmc1_6"},
-    {38, "KEY7", "laminar/B738/button/fmc1_7"},
-    {39, "KEY8", "laminar/B738/button/fmc1_8"},
-    {40, "KEY9", "laminar/B738/button/fmc1_9"},
-    {41, "PERIOD", "laminar/B738/button/fmc1_period"},
-    {42, "KEY0", "laminar/B738/button/fmc1_0"},
-    {43, "PLUSMINUS", "laminar/B738/button/fmc1_minus"},
-    {44, "KEYA", "laminar/B738/button/fmc1_A"},
-    {45, "KEYB", "laminar/B738/button/fmc1_B"},
-    {46, "KEYC", "laminar/B738/button/fmc1_C"},
-    {47, "KEYD", "laminar/B738/button/fmc1_D"},
-    {48, "KEYE", "laminar/B738/button/fmc1_E"},
-    {49, "KEYF", "laminar/B738/button/fmc1_F"},
-    {50, "KEYG", "laminar/B738/button/fmc1_G"},
-    {51, "KEYH", "laminar/B738/button/fmc1_H"},
-    {52, "KEYI", "laminar/B738/button/fmc1_I"},
-    {53, "KEYJ", "laminar/B738/button/fmc1_J"},
-    {54, "KEYK", "laminar/B738/button/fmc1_K"},
-    {55, "KEYL", "laminar/B738/button/fmc1_L"},
-    {56, "KEYM", "laminar/B738/button/fmc1_M"},
-    {57, "KEYN", "laminar/B738/button/fmc1_N"},
-    {58, "KEYO", "laminar/B738/button/fmc1_O"},
-    {59, "KEYP", "laminar/B738/button/fmc1_P"},
-    {60, "KEYQ", "laminar/B738/button/fmc1_Q"},
-    {61, "KEYR", "laminar/B738/button/fmc1_R"},
-    {62, "KEYS", "laminar/B738/button/fmc1_S"},
-    {63, "KEYT", "laminar/B738/button/fmc1_T"},
-    {64, "KEYU", "laminar/B738/button/fmc1_U"},
-    {65, "KEYV", "laminar/B738/button/fmc1_V"},
-    {66, "KEYW", "laminar/B738/button/fmc1_W"},
-    {67, "KEYX", "laminar/B738/button/fmc1_X"},
-    {68, "KEYY", "laminar/B738/button/fmc1_Y"},
-    {69, "KEYZ", "laminar/B738/button/fmc1_Z"},
-    {70, "SPACE", "laminar/B738/button/fmc1_SP"},
-    {71, "DEL", "laminar/B738/button/fmc1_del"},
-    {72, "SLASH", "laminar/B738/button/fmc1_slash"},
-    {73, "CLR", "laminar/B738/button/fmc1_clr"},
+    {25, "N1LIMIT", "laminar/B738/button/fmc1_n1_lim"},
+    {26, "FIX", "laminar/B738/button/fmc1_fix"},
+    {27, "PREV_PAGE", "laminar/B738/button/fmc1_prev_page"},
+    {28, "NEXT_PAGE", "laminar/B738/button/fmc1_next_page"},
+    {29, "KEY1", "laminar/B738/button/fmc1_1"},
+    {30, "KEY2", "laminar/B738/button/fmc1_2"},
+    {31, "KEY3", "laminar/B738/button/fmc1_3"},
+    {32, "KEY4", "laminar/B738/button/fmc1_4"},
+    {33, "KEY5", "laminar/B738/button/fmc1_5"},
+    {34, "KEY6", "laminar/B738/button/fmc1_6"},
+    {35, "KEY7", "laminar/B738/button/fmc1_7"},
+    {36, "KEY8", "laminar/B738/button/fmc1_8"},
+    {37, "KEY9", "laminar/B738/button/fmc1_9"},
+    {38, "PERIOD", "laminar/B738/button/fmc1_period"},
+    {39, "KEY0", "laminar/B738/button/fmc1_0"},
+    {40, "PLUSMINUS", "laminar/B738/button/fmc1_minus"},
+    {41, "KEYA", "laminar/B738/button/fmc1_A"},
+    {42, "KEYB", "laminar/B738/button/fmc1_B"},
+    {43, "KEYC", "laminar/B738/button/fmc1_C"},
+    {44, "KEYD", "laminar/B738/button/fmc1_D"},
+    {45, "KEYE", "laminar/B738/button/fmc1_E"},
+    {46, "KEYF", "laminar/B738/button/fmc1_F"},
+    {47, "KEYG", "laminar/B738/button/fmc1_G"},
+    {48, "KEYH", "laminar/B738/button/fmc1_H"},
+    {49, "KEYI", "laminar/B738/button/fmc1_I"},
+    {50, "KEYJ", "laminar/B738/button/fmc1_J"},
+    {51, "KEYK", "laminar/B738/button/fmc1_K"},
+    {52, "KEYL", "laminar/B738/button/fmc1_L"},
+    {53, "KEYM", "laminar/B738/button/fmc1_M"},
+    {54, "KEYN", "laminar/B738/button/fmc1_N"},
+    {55, "KEYO", "laminar/B738/button/fmc1_O"},
+    {56, "KEYP", "laminar/B738/button/fmc1_P"},
+    {57, "KEYQ", "laminar/B738/button/fmc1_Q"},
+    {58, "KEYR", "laminar/B738/button/fmc1_R"},
+    {59, "KEYS", "laminar/B738/button/fmc1_S"},
+    {60, "KEYT", "laminar/B738/button/fmc1_T"},
+    {61, "KEYU", "laminar/B738/button/fmc1_U"},
+    {62, "KEYV", "laminar/B738/button/fmc1_V"},
+    {63, "KEYW", "laminar/B738/button/fmc1_W"},
+    {64, "KEYX", "laminar/B738/button/fmc1_X"},
+    {65, "KEYY", "laminar/B738/button/fmc1_Y"},
+    {66, "KEYZ", "laminar/B738/button/fmc1_Z"},
+    {67, "SPACE", "laminar/B738/button/fmc1_SP"},
+    {68, "DEL", "laminar/B738/button/fmc1_del"},
+    {69, "SLASH", "laminar/B738/button/fmc1_slash"},
+    {70, "CLR", "laminar/B738/button/fmc1_clr"}
 };
 
 std::map<char, int> ZiboPfpProfile::colors = {
@@ -171,35 +167,32 @@ std::map<char, int> ZiboPfpProfile::colors = {
 };
 
 ZiboPfpProfile::ZiboPfpProfile() {
-    // Initialize LED brightness monitoring
-    if (Dataref::getInstance()->exists("laminar/B738/electric/instrument_brightness")) {
-        const PFPLed ledsToSet[] = {
-            PFPLed::CALL,
-            PFPLed::FAIL,
-            PFPLed::MSG,
-            PFPLed::OFST,
-        };
+    const PFPLed ledsToSet[] = {
+        PFPLed::CALL,
+        PFPLed::FAIL,
+        PFPLed::MSG,
+        PFPLed::OFST,
+    };
 
-        for (auto led : ledsToSet) {
-            if (ledBrightnessCallback) {
-                ledBrightnessCallback(led, 0);
-            }
+    for (auto led : ledsToSet) {
+        if (ledBrightnessCallback) {
+            ledBrightnessCallback(led, 0);
+        }
+    }
+        
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [this](std::vector<float> brightness) {
+        if (brightness.size() < 27 || !ledBrightnessCallback) {
+            return;
         }
         
-        Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [this](std::vector<float> brightness) {
-            if (brightness.size() < 27 || !ledBrightnessCallback) {
-                return;
-            }
-            
-            uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255.0f : 0;
-            ledBrightnessCallback(PFPLed::BACKLIGHT, target);
-            ledBrightnessCallback(PFPLed::SCREEN_BACKLIGHT, target);
-        });
-        
-        Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
-            Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/instrument_brightness");
-        });
-    }
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255.0f : 0;
+        ledBrightnessCallback(PFPLed::BACKLIGHT, target);
+        ledBrightnessCallback(PFPLed::SCREEN_BACKLIGHT, target);
+    });
+    
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/instrument_brightness");
+    });
 }
 
 ZiboPfpProfile::~ZiboPfpProfile() {

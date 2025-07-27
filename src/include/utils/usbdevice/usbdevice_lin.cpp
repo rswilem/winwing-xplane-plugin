@@ -42,14 +42,12 @@ bool USBDevice::connect() {
                     break;
                 }
             } else if (bytesRead == 0) {
-                // Device disconnected
-                debug_force("Device disconnected\n");
                 break;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
-        debug_force("Input thread exiting\n");
+        debug("Input thread exiting\n");
     });
     inputThread.detach();
     
@@ -62,36 +60,10 @@ void USBDevice::InputReportCallback(void* context, int bytesRead, uint8_t* repor
         return;
     }
     
-    // Add bounds checking
-    if (bytesRead > 65) {
-        debug_force("Warning: Received oversized report (%d bytes), truncating\n", bytesRead);
-        bytesRead = 65;
-    }
-    
-    // Debug input reports
-    debug_force("Received HID report: %d bytes, first 8 bytes: %02X %02X %02X %02X %02X %02X %02X %02X\n", 
-          bytesRead, 
-          bytesRead > 0 ? report[0] : 0,
-          bytesRead > 1 ? report[1] : 0,
-          bytesRead > 2 ? report[2] : 0,
-          bytesRead > 3 ? report[3] : 0,
-          bytesRead > 4 ? report[4] : 0,
-          bytesRead > 5 ? report[5] : 0,
-          bytesRead > 6 ? report[6] : 0,
-          bytesRead > 7 ? report[7] : 0);
-    
     // Linux hidraw reports typically include report ID as first byte
     uint8_t reportId = report[0];
-    
-    try {
-        // On Linux hidraw, the report ID is included in the data, but the PFP expects
-        // the report data without the report ID (like on macOS). So we pass report+1
-        // and reduce the length by 1 to skip the report ID byte.
-        if (bytesRead > 0) {
-            self->didReceiveData(reportId, report + 1, bytesRead - 1);
-        }
-    } catch (...) {
-        debug_force("Exception in didReceiveData, report ID: %d, length: %d\n", reportId, bytesRead);
+    if (bytesRead > 0) {
+        self->didReceiveData(reportId, report, bytesRead);
     }
 }
 
@@ -102,7 +74,6 @@ void USBDevice::update() {
 }
 
 void USBDevice::disconnect() {
-    debug_force("Disconnecting device\n");
     connected = false;
     
     // Give input thread time to exit
@@ -118,62 +89,21 @@ void USBDevice::disconnect() {
         inputBuffer = nullptr;
     }
     
-    debug_force("Device disconnected\n");
+    debug("Device disconnected\n");
 }
 
 bool USBDevice::writeData(std::vector<uint8_t> data) {
-    if (hidDevice < 0 || !connected) {
-        debug_force("HID device not open or not connected\n");
+    if (hidDevice < 0 || !connected || data.empty()) {
+        debug("HID device not open, not connected, or empty data\n");
         return false;
     }
     
-    if (data.empty()) {
-        debug_force("Warning: Attempting to write empty data\n");
-        return false;
-    }
-    
-    // Add debug output for initialization and display data
-    if (data.size() > 0) {
-        if (data[0] == 0xf0) {
-            debug_force("Writing PFP initialization command, length: %zu, cmd: 0x%02X\n", data.size(), data.size() > 3 ? data[3] : 0);
-        } else if (data[0] == 0xf2) {
-            debug_force("Writing PFP display data, length: %zu\n", data.size());
-        } else if (data[0] == 0x02) {
-            debug_force("Writing PFP LED command, length: %zu\n", data.size());
-        } else {
-            debug_force("Writing unknown PFP command: 0x%02X, length: %zu\n", data[0], data.size());
-        }
-        
-        // Debug: Print first 16 bytes of data
-        debug_force("Data bytes: ");
-        for (size_t i = 0; i < std::min(data.size(), (size_t)16); i++) {
-            debug_force("%02X ", data[i]);
-        }
-        debug_force("\n");
-    }
-    
-    // Some Linux systems might require different handling for different report types
-    // Let's first try the standard write() approach
     ssize_t bytesWritten = write(hidDevice, data.data(), data.size());
     if (bytesWritten != (ssize_t)data.size()) {
-        debug_force("Standard write failed: expected %zu bytes, wrote %zd bytes, error: %d (%s)\n", 
-              data.size(), bytesWritten, errno, strerror(errno));
-        
-        // For PFP devices on Linux, try using feature reports for initialization commands
-        if (data[0] == 0xf0) {
-            debug_force("Trying HIDIOCSFEATURE for initialization command\n");
-            if (ioctl(hidDevice, HIDIOCSFEATURE(data.size()), data.data()) >= 0) {
-                debug_force("HIDIOCSFEATURE succeeded for initialization\n");
-                return true;
-            } else {
-                debug_force("HIDIOCSFEATURE failed: %d (%s)\n", errno, strerror(errno));
-            }
-        }
-        
+        debug("HID write failed.\n", kr);
         return false;
     }
     
-    debug_force("Successfully wrote %zd bytes using standard write()\n", bytesWritten);
     return true;
 }
 #endif

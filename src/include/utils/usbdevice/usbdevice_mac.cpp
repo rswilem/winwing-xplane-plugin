@@ -63,11 +63,11 @@ void USBDevice::disconnect() {
 }
 
 bool USBDevice::writeData(std::vector<uint8_t> data) {
-    if (!hidDevice || !connected) {
-        debug("HID device not open\n");
+    if (!hidDevice || !connected || data.empty()) {
+        debug("HID device not open, not connected, or empty data\n");
         return false;
     }
-    // Use the first byte as the report ID (common for HID output reports)
+    
     uint8_t reportID = data[0];
     IOReturn kr = IOHIDDeviceSetReport(hidDevice, kIOHIDReportTypeOutput, reportID, data.data(), data.size());
     if (kr != kIOReturnSuccess) {
