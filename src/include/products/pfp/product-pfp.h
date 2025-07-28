@@ -13,11 +13,11 @@ private:
     std::vector<std::vector<char>> page;
     std::vector<std::vector<char>> previousPage;
     std::map<std::string, std::string> cachedDatarefValues;
+    std::set<int> pressedButtonIndices;
     
     void updatePage();
     void draw(const std::vector<std::vector<char>> *pagePtr = nullptr);
     std::pair<uint8_t, uint8_t> dataFromColFont(char color, bool fontSmall = false);
-    std::set<int> pressedButtonIndices;
     
     void setProfileForCurrentAircraft();
     void monitorDatarefs();

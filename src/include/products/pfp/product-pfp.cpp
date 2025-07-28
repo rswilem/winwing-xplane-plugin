@@ -16,6 +16,7 @@ ProductPFP::ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
     profile = nullptr;
     page = std::vector<std::vector<char>>(PAGE_LINES, std::vector<char>(PAGE_BYTES_PER_LINE, ' '));
     previousPage = std::vector<std::vector<char>>(PAGE_LINES, std::vector<char>(PAGE_BYTES_PER_LINE, ' '));
+    pressedButtonIndices = {};
     
     connect();
 }
@@ -141,8 +142,7 @@ void ProductPFP::update() {
 }
 
 void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength) {
-    if (!report || reportLength <= 0) {
-        debug_force("[%s] Invalid report data\n", classIdentifier());
+    if (!connected || !profile || !report || reportLength <= 0) {
         return;
     }
     
@@ -155,11 +155,6 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
         }
         printf("\n");
 #endif
-        return;
-    }
-    
-    if (!profile) {
-        debug_force("[%s] No profile loaded, ignoring input\n", classIdentifier());
         return;
     }
     

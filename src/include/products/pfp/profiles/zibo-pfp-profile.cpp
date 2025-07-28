@@ -211,7 +211,7 @@ const std::map<char, int>& ZiboPfpProfile::colorMap() const {
         {' ', 0x0042},  // Space = white
         {'W', 0x0042},  // White fallback
     };
-    
+
     return colMap;
 }
 

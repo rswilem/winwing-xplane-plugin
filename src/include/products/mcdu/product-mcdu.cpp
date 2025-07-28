@@ -13,6 +13,7 @@ ProductMCDU::ProductMCDU(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t 
     profile = nullptr;
     page = std::vector<std::vector<char>>(PAGE_LINES, std::vector<char>(PAGE_BYTES_PER_LINE, ' '));
     previousPage = std::vector<std::vector<char>>(PAGE_LINES, std::vector<char>(PAGE_BYTES_PER_LINE, ' '));
+    pressedButtonIndices = {};
     
     connect();
 }
