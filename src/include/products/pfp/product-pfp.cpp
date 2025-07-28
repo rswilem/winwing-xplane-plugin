@@ -146,7 +146,7 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
         return;
     }
     
-    if (reportId != 1 || reportLength != 25) {
+    if (reportId != 1 || reportLength < 13) { // We only handle report #1 for now.
 #if DEBUG
         printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
         printf("[%s] Data (hex): ", classIdentifier());
@@ -162,13 +162,7 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
         debug_force("[%s] No profile loaded, ignoring input\n", classIdentifier());
         return;
     }
-
-    // Ensure we have enough bytes for button data
-    if (reportLength < 13) {
-        debug_force("[%s] Report too short for button data: %d\n", classIdentifier(), reportLength);
-        return;
-    }
-
+    
     uint64_t buttons_lo = 0;
     uint32_t buttons_hi = 0;
     for (int i = 0; i < 8; ++i) {

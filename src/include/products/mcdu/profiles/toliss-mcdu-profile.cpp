@@ -179,6 +179,7 @@ const std::vector<std::string>& TolissMcduProfile::displayDatarefs() const {
         "AirbusFBW/MCDU1spw", // scratchpad
         "AirbusFBW/MCDU1spa" // scratchpad
     };
+    
     return datarefs;
 }
 
@@ -259,6 +260,7 @@ const std::vector<MCDUButtonDef>& TolissMcduProfile::buttonDefs() const {
         {72, "OVERFLY", "AirbusFBW/MCDU1KeyOverfly"},
         {73, "Clear", "AirbusFBW/MCDU1KeyClear"},
     };
+    
     return buttons;
 }
 
@@ -275,6 +277,7 @@ const std::map<char, int>& TolissMcduProfile::colorMap() const {
         {'E', 0x0108},
         {' ', 0x0042},
     };
+    
     return colMap;
 }
 

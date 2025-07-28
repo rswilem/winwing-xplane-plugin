@@ -150,7 +150,7 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
         return;
     }
     
-    if (reportId != 1 || reportLength != 25) {
+    if (reportId != 1 || reportLength < 13) { // We only handle report #1 for now.
 #if DEBUG
         printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
         printf("[%s] Data (hex): ", classIdentifier());

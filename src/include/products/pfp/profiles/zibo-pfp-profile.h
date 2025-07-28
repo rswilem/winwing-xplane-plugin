@@ -5,9 +5,6 @@
 
 class ZiboPfpProfile : public PfpAircraftProfile {
 private:
-    static std::vector<std::string> datarefsList;
-    static std::vector<PFPButtonDef> buttonsList;
-    static std::map<char, int> colors;
     
 public:
     ZiboPfpProfile();
