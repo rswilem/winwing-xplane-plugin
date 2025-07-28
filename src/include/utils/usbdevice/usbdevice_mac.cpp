@@ -40,13 +40,20 @@ void USBDevice::InputReportCallback(void* context, IOReturn result, void* sender
         return;
     }
     
-    self->didReceiveData(reportID, report, (int)reportLength);
+    InputEvent event;
+    event.reportId = reportID;
+    event.reportData.assign(report, report + reportLength);
+    event.reportLength = (int)reportLength;
+    
+    self->processOnMainThread(event);
 }
 
 void USBDevice::update() {
     if (!connected) {
         return;
     }
+    
+    processQueuedEvents();
 }
 
 void USBDevice::disconnect() {

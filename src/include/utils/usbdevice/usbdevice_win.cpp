@@ -55,15 +55,20 @@ void USBDevice::InputReportCallback(void* context, DWORD bytesRead, uint8_t* rep
         return;
     }
     
-    // Windows HID reports typically include report ID as first byte
-    uint8_t reportId = report[0];
-    self->didReceiveData(reportId, report, (int)bytesRead);
+    InputEvent event;
+    event.reportId = report[0];
+    event.reportData.assign(report, report + bytesRead);
+    event.reportLength = (int)bytesRead;
+    
+    self->processOnMainThread(event);
 }
 
 void USBDevice::update() {
     if (!connected) {
         return;
     }
+    
+    processQueuedEvents();
 }
 
 void USBDevice::disconnect() {

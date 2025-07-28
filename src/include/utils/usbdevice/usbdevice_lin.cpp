@@ -60,17 +60,20 @@ void USBDevice::InputReportCallback(void* context, int bytesRead, uint8_t* repor
         return;
     }
     
-    // Linux hidraw reports typically include report ID as first byte
-    uint8_t reportId = report[0];
-    if (bytesRead > 0) {
-        self->didReceiveData(reportId, report, bytesRead);
-    }
+    InputEvent event;
+    event.reportId = report[0];
+    event.reportData.assign(report, report + bytesRead);
+    event.reportLength = bytesRead;
+    
+    self->processOnMainThread(event);
 }
 
 void USBDevice::update() {
     if (!connected) {
         return;
     }
+    
+    processQueuedEvents();
 }
 
 void USBDevice::disconnect() {

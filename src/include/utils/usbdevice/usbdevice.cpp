@@ -52,3 +52,18 @@ const char *USBDevice::classIdentifier() {
 void USBDevice::didReceiveData(int reportId, uint8_t* report, int reportLength) {
     // noop, expect override
 }
+
+void USBDevice::processOnMainThread(const InputEvent& event) {
+    std::lock_guard<std::mutex> lock(eventQueueMutex);
+    eventQueue.push(event);
+}
+
+void USBDevice::processQueuedEvents() {
+    std::lock_guard<std::mutex> lock(eventQueueMutex);
+    while (!eventQueue.empty()) {
+        InputEvent event = eventQueue.front();
+        eventQueue.pop();
+        
+        didReceiveData(event.reportId, event.reportData.data(), event.reportLength);
+    }
+}

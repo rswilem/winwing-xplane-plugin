@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <queue>
+#include <mutex>
 
 #if APL
 #include <IOKit/hid/IOHIDLib.h>
@@ -19,9 +21,20 @@ typedef HANDLE HIDDeviceHandle;
 typedef int HIDDeviceHandle;
 #endif
 
+struct InputEvent {
+    int reportId;
+    std::vector<uint8_t> reportData;
+    int reportLength;
+};
+
 class USBDevice {
 private:
     uint8_t* inputBuffer = nullptr;
+    std::queue<InputEvent> eventQueue;
+    std::mutex eventQueueMutex;
+
+    void processQueuedEvents();
+
 #if APL
     static void InputReportCallback(void* context, IOReturn result, void* sender, IOHIDReportType type, uint32_t reportID, uint8_t* report, CFIndex reportLength);
 #elif IBM
@@ -47,7 +60,9 @@ public:
     virtual void disconnect();
     virtual void update();
     virtual void didReceiveData(int reportId, uint8_t* report, int reportLength);
-
+    
+    void processOnMainThread(const InputEvent& event);
+    
     bool writeData(std::vector<uint8_t> data);
     
     static USBDevice *Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
