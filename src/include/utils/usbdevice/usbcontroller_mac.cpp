@@ -117,10 +117,12 @@ void USBController::DeviceAddedCallback(void *context, IOReturn result, void *se
     productNameStr.erase(0, productNameStr.find_first_not_of(" \t\n\r"));
     productNameStr.erase(productNameStr.find_last_not_of(" \t\n\r") + 1);
 
-    USBDevice *newDevice = USBDevice::Device(device, vendorId, productId, vendorNameStr, productNameStr);
-    if (newDevice) {
-        self->devices.push_back(newDevice);
-    }
+    AppState::getInstance()->executeAfter(0, [self, device, vendorId, productId, vendorNameStr, productNameStr]() {
+        USBDevice *newDevice = USBDevice::Device(device, vendorId, productId, vendorNameStr, productNameStr);
+        if (newDevice) {
+            self->devices.push_back(newDevice);
+        }
+    });
 }
 
 void USBController::DeviceRemovedCallback(void *context, IOReturn result, void *sender, IOHIDDeviceRef device) {

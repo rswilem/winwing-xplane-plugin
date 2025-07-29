@@ -84,6 +84,27 @@ void USBController::destroy() {
     instance = nullptr;
 }
 
+USBDevice* USBController::createDeviceFromPath(const std::string& devicePath) {
+    int fd = open(devicePath.c_str(), O_RDWR | O_NONBLOCK);
+    if (fd < 0) {
+        return nullptr;
+    }
+    
+    struct hidraw_devinfo info;
+    if (ioctl(fd, HIDIOCGRAWINFO, &info) < 0 || info.vendor != WINWING_VENDOR_ID) {
+        close(fd);
+        return nullptr;
+    }
+    
+    char name[256] = {};
+    if (ioctl(fd, HIDIOCGRAWNAME(sizeof(name)), name) < 0) {
+        close(fd);
+        return nullptr;
+    }
+    
+    return USBDevice::Device(fd, info.vendor, info.product, "Winwing", std::string(name));
+}
+
 void USBController::enumerateDevices() {
     DIR* dir = opendir("/dev");
     if (!dir) {
@@ -94,23 +115,12 @@ void USBController::enumerateDevices() {
     while ((entry = readdir(dir)) != nullptr) {
         if (strncmp(entry->d_name, "hidraw", 6) == 0) {
             std::string devicePath = "/dev/" + std::string(entry->d_name);
-            int fd = open(devicePath.c_str(), O_RDWR | O_NONBLOCK);
-            if (fd >= 0) {
-                struct hidraw_devinfo info;
-                if (ioctl(fd, HIDIOCGRAWINFO, &info) >= 0 && info.vendor == WINWING_VENDOR_ID) {
-                    char name[256] = {};
-                    if (ioctl(fd, HIDIOCGRAWNAME(sizeof(name)), name) >= 0) {
-                        USBDevice* device = USBDevice::Device(fd, info.vendor, info.product, "Winwing", std::string(name));
-                        if (device) {
-                            devices.push_back(device);
-                        }
-                    } else {
-                        close(fd);
-                    }
-                } else {
-                    close(fd);
+            AppState::getInstance()->executeAfter(0, [this, devicePath]() {
+                USBDevice* device = createDeviceFromPath(devicePath);
+                if (device) {
+                    devices.push_back(device);
                 }
-            }
+            });
         }
     }
     closedir(dir);
@@ -168,23 +178,12 @@ void USBController::DeviceAddedCallback(void* context, struct udev_device* devic
         }
     }
     
-    int fd = open(devicePath, O_RDWR | O_NONBLOCK);
-    if (fd >= 0) {
-        struct hidraw_devinfo info;
-        if (ioctl(fd, HIDIOCGRAWINFO, &info) >= 0 && info.vendor == WINWING_VENDOR_ID) {
-            char name[256] = {};
-            if (ioctl(fd, HIDIOCGRAWNAME(sizeof(name)), name) >= 0) {
-                USBDevice* newDevice = USBDevice::Device(fd, info.vendor, info.product, "Winwing", std::string(name));
-                if (newDevice) {
-                    self->devices.push_back(newDevice);
-                }
-            } else {
-                close(fd);
-            }
-        } else {
-            close(fd);
+    AppState::getInstance()->executeAfter(0, [self, devicePath]() {
+        USBDevice* newDevice = self->createDeviceFromPath(std::string(devicePath));
+        if (newDevice) {
+            self->devices.push_back(newDevice);
         }
-    }
+    });
 }
 
 void USBController::DeviceRemovedCallback(void* context, struct udev_device* device) {

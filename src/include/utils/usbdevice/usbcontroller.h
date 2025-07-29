@@ -2,6 +2,8 @@
 #define USBCONTROLLER_H
 
 #include <vector>
+#include <functional>
+#include <string>
 #include "usbdevice.h"
 
 #if APL
@@ -15,7 +17,7 @@ typedef IOHIDDeviceRef HIDDeviceHandle;
 #include <hidsdi.h>
 #include <setupapi.h>
 #include <dbt.h>
-typedef void* HIDManagerHandle;  // Not used in polling approach
+typedef void* HIDManagerHandle;
 typedef HANDLE HIDDeviceHandle;
 #elif LIN
 #include <libudev.h>
@@ -37,11 +39,14 @@ private:
 #elif IBM
     void checkForDeviceChanges();
     void enumerateDevices();
+    void enumerateHidDevices(std::function<void(HANDLE, const std::string&)> deviceHandler);
+    USBDevice* createDeviceFromHandle(HANDLE hidDevice);
 #elif LIN
     static void DeviceAddedCallback(void *context, struct udev_device *device);
     static void DeviceRemovedCallback(void *context, struct udev_device *device);
     void monitorDevices();
     void enumerateDevices();
+    USBDevice* createDeviceFromPath(const std::string& devicePath);
 #endif
 
 public:

@@ -21,11 +21,7 @@ ProductPFP::ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
     connect();
 }
 
-ProductPFP::~ProductPFP() {
-    if (profile) {
-        profile->ledBrightnessCallback = nullptr;
-    }
-    
+ProductPFP::~ProductPFP() {    
     disconnect();
 }
 
