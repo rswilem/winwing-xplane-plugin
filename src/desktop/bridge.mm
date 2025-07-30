@@ -10,8 +10,30 @@
 #include <string>
 #include <cstring>
 
+// Forward declaration for mock dataref creation function
+typedef void* XPLMDataRef;
+typedef int XPLMDataTypeID;
+#define xplmType_Data 32
+#define xplmType_Float 2
+#define xplmType_Int 1
+#define xplmType_FloatArray 8
+#define xplmType_IntArray 16
+
+XPLMDataRef XPLMFindDataRef(const char* name);
+XPLMDataRef createMockDataRefWithInference(const char* name, XPLMDataTypeID preferredType);
+void clearAllMockDataRefs();
+
+
+// Helper function to ensure dataref exists before setting
+void ensureDatarefExists(const char* ref, XPLMDataTypeID preferredType) {
+    if (!XPLMFindDataRef(ref)) {
+        createMockDataRefWithInference(ref, preferredType);
+    }
+}
+
 void clearDatarefCache() {
     Dataref::getInstance()->clearCache();
+    clearAllMockDataRefs();
 }
 
 void setDatarefHexC(const char* ref, const uint8_t* hexD, int len) {
@@ -20,23 +42,68 @@ void setDatarefHexC(const char* ref, const uint8_t* hexD, int len) {
     // Check if this is a style dataref - if so, store as vector<unsigned char>
     std::string refStr(ref);
     if (refStr.find("style_line") != std::string::npos) {
+        // Ensure dataref exists first
+        ensureDatarefExists(ref, xplmType_Data);
+        
         std::vector<unsigned char> styleBytes;
         for (uint8_t c : hex) {
             styleBytes.push_back(c);
         }
-        Dataref::getInstance()->set<std::vector<unsigned char>>(ref, styleBytes, true);
+        Dataref::getInstance()->set<std::vector<unsigned char>>(ref, styleBytes, false);
     } else {
+        // Ensure dataref exists first
+        ensureDatarefExists(ref, xplmType_Data);
+        
         // For text datarefs, convert to string (stopping at null terminator)
         std::string s;
         for (uint8_t c : hex) {
             if (c == 0x00) break;
             s += static_cast<char>(c);
         }
-        Dataref::getInstance()->set<std::string>(ref, s, true);
+        Dataref::getInstance()->set<std::string>(ref, s, false);
     }
 }
 
+void setDatarefFloat(const char* ref, float value) {
+    // Ensure dataref exists first
+    ensureDatarefExists(ref, xplmType_Float);
+    
+    Dataref::getInstance()->set<float>(ref, value, false);
+}
+
+void setDatarefInt(const char* ref, int value) {
+    // Ensure dataref exists first
+    ensureDatarefExists(ref, xplmType_Int);
+    
+    Dataref::getInstance()->set<int>(ref, value, false);
+}
+
+void setDatarefFloatVector(const char* ref, const float* values, int count) {
+    // Ensure dataref exists first
+    ensureDatarefExists(ref, xplmType_FloatArray);
+    
+    std::vector<float> floatVector(values, values + count);
+    Dataref::getInstance()->set<std::vector<float>>(ref, floatVector, false);
+}
+
+void setDatarefFloatVectorRepeated(const char* ref, float value, int count) {
+    // Ensure dataref exists first
+    ensureDatarefExists(ref, xplmType_FloatArray);
+    
+    std::vector<float> floatVector(count, value);
+    Dataref::getInstance()->set<std::vector<float>>(ref, floatVector, false);
+}
+
+void setDatarefIntVector(const char* ref, const int* values, int count) {
+    // Ensure dataref exists first
+    ensureDatarefExists(ref, xplmType_IntArray);
+    
+    std::vector<int> intVector(values, values + count);
+    Dataref::getInstance()->set<std::vector<int>>(ref, intVector, false);
+}
+
 void update() {
+    AppState::getInstance()->pluginInitialized = true;
     AppState::Update(0.0f, 0.0f, 1, nullptr);
 }
 

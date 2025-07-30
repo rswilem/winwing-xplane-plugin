@@ -107,20 +107,27 @@ struct ContentView: View {
             .frame(minWidth: 400, maxWidth: .infinity, alignment: .topLeading)
         }
         .onAppear {
-            deviceManager.refreshDevices()
-            // Auto-select first device if available
-            if !deviceManager.devices.isEmpty {
-                selectedDevice = deviceManager.devices.first
-            }
-            // Start timer to call c_update() every 2 seconds
-            refreshTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in
-                c_update()
+            update();
+            refreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+                update();
             }
         }
         .onDisappear {
             refreshTimer?.invalidate()
             refreshTimer = nil
             disconnectAll()
+        }
+    }
+    
+    private func update() {
+        c_update()
+        
+        if deviceManager.devices.isEmpty {
+            deviceManager.refreshDevices()
+        }
+        
+        if selectedDevice == nil {
+            selectedDevice = deviceManager.devices.first
         }
     }
     

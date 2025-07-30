@@ -120,6 +120,11 @@ struct PFPControlView: View {
         }
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .topLeading)
+        .onAppear(perform: viewDidAppear)
+    }
+    
+    private func viewDidAppear() {
+        setDatarefFloatVectorRepeated("laminar/B738/electric/instrument_brightness", 1.0, 20);
     }
     
     private func setBacklight() {

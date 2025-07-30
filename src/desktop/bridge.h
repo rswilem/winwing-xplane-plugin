@@ -53,6 +53,11 @@ void fcuefis_testDisplay(void* fcuefisHandle, const char* testType);
 
 void clearDatarefCache();
 void setDatarefHexC(const char* ref, const uint8_t* hex, int len);
+void setDatarefFloat(const char* ref, float value);
+void setDatarefInt(const char* ref, int value);
+void setDatarefFloatVector(const char* ref, const float* values, int count);
+void setDatarefFloatVectorRepeated(const char* ref, float value, int count);
+void setDatarefIntVector(const char* ref, const int* values, int count);
 
 #ifdef __cplusplus
 }

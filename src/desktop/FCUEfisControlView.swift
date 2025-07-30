@@ -219,13 +219,13 @@ struct FCUEfisControlView: View {
             
             Spacer()
         }
-        .onAppear {
-            // Connect device if not already connected
-            device.connect()
-        }
+        .onAppear(perform: viewDidAppear)
     }
     
-    // MARK: - Helper Methods
+    private func viewDidAppear() {
+        setDatarefFloat("AirbusFBW/PanelBrightnessLevel", 1);
+        //setDatarefFloat("AirbusFBW/FCUAltitude", "----");
+    }
     
     private func setBacklight() {
         guard let fcuefis = device.fcuEfis else { return }

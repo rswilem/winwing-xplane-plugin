@@ -122,6 +122,15 @@ struct MCDUControlView: View {
         }
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .topLeading)
+        .onAppear(perform: viewDidAppear)
+    }
+    
+    private func viewDidAppear() {
+        setDatarefFloat("AirbusFBW/PanelBrightnessLevel", 1);
+        
+        // Laminar:
+        //setDatarefFloat("sim/aircraft/view/acf_ICAO", "A333");
+        //setDatarefHex("sim/cockpit2/radios/indicators/fms_cdu1_text_line0", [0x20,0x20,0x20,0x20,0x20,0x44,0x41,0x54,0x41,0x20,0x49,0x4E,0x44,0x45,0x58,0x20,0x20,0x20,0x31,0x2F,0x32,0x20,0xE2,0x86,0x90,0xE2,0x86,0x92]);
     }
     
     private func setBacklight() {
@@ -140,7 +149,7 @@ struct MCDUControlView: View {
     }
     
     private func testDisplay(page: String) {
-        clearDatarefCache();
+        clearDatarefCache()
         
         switch page {
         case "LAMINAR_INIT":
