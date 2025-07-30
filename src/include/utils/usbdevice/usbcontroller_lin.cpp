@@ -85,7 +85,7 @@ void USBController::destroy() {
 }
 
 USBDevice* USBController::createDeviceFromPath(const std::string& devicePath) {
-    int fd = open(devicePath.c_str(), O_RDWR | O_NONBLOCK);
+    int fd = open(devicePath.c_str(), O_RDWR);
     if (fd < 0) {
         return nullptr;
     }

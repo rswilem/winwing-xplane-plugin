@@ -78,7 +78,7 @@ bool ProductPFP::connect() {
             PFPLed::CALL,
             PFPLed::FAIL,
             PFPLed::MSG,
-            PFPLed::OFST,
+            PFPLed::OFST
         };
 
         for (auto led : ledsToSet) {
@@ -104,7 +104,7 @@ void ProductPFP::disconnect() {
         PFPLed::CALL,
         PFPLed::FAIL,
         PFPLed::MSG,
-        PFPLed::OFST,
+        PFPLed::OFST
     };
 
     for (auto led : ledsToSet) {
@@ -395,5 +395,5 @@ void ProductPFP::monitorDatarefs() {
 }
 
 void ProductPFP::setLedBrightness(PFPLed led, uint8_t brightness) {
-    writeData({0x02, 0x32, 0xbb, 0, 0, 3, 0x49, static_cast<uint8_t>(led), brightness, 0, 0, 0, 0, 0});
+    writeData({0x02, 0x32, 0xbb, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(led), brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
 }

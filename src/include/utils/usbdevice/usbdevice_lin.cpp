@@ -37,13 +37,14 @@ bool USBDevice::connect() {
             if (bytesRead > 0 && connected) {
                 InputReportCallback(this, (int)bytesRead, buffer);
             } else if (bytesRead < 0) {
-                if (errno != EAGAIN && errno != EWOULDBLOCK) {
-                    debug_force("ReadFile failed with error: %d\n", errno);
-                    break;
-                }
+                // Device error or disconnected
+                debug_force("Read failed with error: %d\n", errno);
+                break;
             } else if (bytesRead == 0) {
+                // EOF - device disconnected
                 break;
             }
+
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
@@ -102,11 +103,12 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
     }
     
     ssize_t bytesWritten = write(hidDevice, data.data(), data.size());
-    if (bytesWritten != (ssize_t)data.size()) {
-        debug("HID write failed.\n");
-        return false;
+    if (bytesWritten == (ssize_t)data.size()) {
+        debug_force("Write successful via raw write()\n");
+        return true;
     }
     
-    return true;
+    debug_force("Raw write failed: %s (wrote %zd of %zu bytes)\n", strerror(errno), bytesWritten, data.size());
+    return false;
 }
 #endif

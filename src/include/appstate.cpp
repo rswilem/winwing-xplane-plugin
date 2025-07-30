@@ -37,7 +37,7 @@ bool AppState::initialize() {
     
     pluginInitialized = true;
     
-    debug_force("Plugin initialized, found %lu devices.\n", USBController::getInstance()->devices.size());
+    debug_force("Plugin initialized.\n");
     return true;
 }
 

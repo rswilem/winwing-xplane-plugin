@@ -400,7 +400,7 @@ void ProductMCDU::monitorDatarefs() {
 }
 
 void ProductMCDU::setLedBrightness(MCDULed led, uint8_t brightness) {
-    writeData({0x02, 0x32, 0xbb, 0, 0, 3, 0x49, static_cast<uint8_t>(led), brightness, 0, 0, 0, 0, 0});
+    writeData({0x02, 0x32, 0xbb, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(led), brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
 }
 
 
