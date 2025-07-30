@@ -18,11 +18,6 @@ private:
     
     void setProfileForCurrentAircraft();
     void updateDisplays();
-    void sendFCUDisplay(const std::string& speed, const std::string& heading, 
-                       const std::string& altitude, const std::string& vs);
-    void sendEfisRightDisplay(const std::string& baro);
-    void sendEfisLeftDisplay(const std::string& baro);
-    void initializeDisplays();
 
 public:
     ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
@@ -36,6 +31,13 @@ public:
     
     void setLedBrightness(FCUEfisLed led, uint8_t brightness);
     void monitorDatarefs();
+    
+    // Public methods for testing/demonstration
+    void initializeDisplays();
+    void sendFCUDisplay(const std::string& speed, const std::string& heading, 
+                       const std::string& altitude, const std::string& vs);
+    void sendEfisRightDisplay(const std::string& baro);
+    void sendEfisLeftDisplay(const std::string& baro);
 };
 
 #endif

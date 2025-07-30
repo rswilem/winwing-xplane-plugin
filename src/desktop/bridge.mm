@@ -4,6 +4,7 @@
 #include "product-ursa-minor-joystick.h"
 #include "product-mcdu.h"
 #include "product-pfp.h"
+#include "product-fcu-efis.h"
 #include <vector>
 #include <string>
 #include <cstring>
@@ -100,6 +101,14 @@ void* getPFPHandle(int deviceIndex) {
         return nullptr;
     }
     return dynamic_cast<ProductPFP*>(devices[deviceIndex]);
+}
+
+void* getFCUEfisHandle(int deviceIndex) {
+    auto& devices = USBController::getInstance()->devices;
+    if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
+        return nullptr;
+    }
+    return dynamic_cast<ProductFCUEfis*>(devices[deviceIndex]);
 }
 
 // Generic device functions via handle
@@ -213,6 +222,8 @@ const char* getDeviceType(int deviceIndex) {
         return "mcdu";
     } else if (dynamic_cast<ProductPFP*>(device)) {
         return "pfp";
+    } else if (dynamic_cast<ProductFCUEfis*>(device)) {
+        return "fcu-efis";
     }
     return "unknown";
 }
@@ -315,4 +326,50 @@ bool mcdu_setLed(int deviceIndex, int ledId, bool state) {
         return true;
     }
     return false;
+}
+
+// FCU-EFIS functions via handle
+void fcuefis_clear(void* fcuefisHandle) {
+    if (!fcuefisHandle) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    // FCU-EFIS doesn't have a clear function like MCDU/PFP
+    // Instead, we can set displays to show test values or blank
+    fcuefis->initializeDisplays();
+}
+
+bool fcuefis_setLed(void* fcuefisHandle, int ledId, uint8_t value) {
+    if (!fcuefisHandle) return false;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    fcuefis->setLedBrightness(static_cast<FCUEfisLed>(ledId), value);
+    return true;
+}
+
+void fcuefis_setLedBrightness(void* fcuefisHandle, int ledId, uint8_t brightness) {
+    if (!fcuefisHandle) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    fcuefis->setLedBrightness(static_cast<FCUEfisLed>(ledId), brightness);
+}
+
+void fcuefis_testDisplay(void* fcuefisHandle, const char* testType) {
+    if (!fcuefisHandle || !testType) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    
+    std::string test(testType);
+    if (test == "SPEED") {
+        fcuefis->sendFCUDisplay("250", "088", "12000", "1800");
+    } else if (test == "HEADING") {
+        fcuefis->sendFCUDisplay("120", "360", "35000", "2400");
+    } else if (test == "ALTITUDE") {
+        fcuefis->sendFCUDisplay("180", "270", "41000", "0000");
+    } else if (test == "VS") {
+        fcuefis->sendFCUDisplay("160", "180", "25000", "3000");
+    } else if (test == "EFIS_R") {
+        fcuefis->sendEfisRightDisplay("1013");
+    } else if (test == "EFIS_L") {
+        fcuefis->sendEfisLeftDisplay("1013");
+    } else if (test == "ALL") {
+        fcuefis->sendFCUDisplay("888", "888", "88888", "8888");
+        fcuefis->sendEfisRightDisplay("8888");
+        fcuefis->sendEfisLeftDisplay("8888");
+    }
 }

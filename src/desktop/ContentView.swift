@@ -134,6 +134,8 @@ struct ContentView: View {
                 MCDUControlView(device: device)
             case .pfp:
                 PFPControlView(device: device)
+            case .fcuEfis:
+                FCUEfisControlView(device: device)
             case .unknown:
                 GenericDeviceView(device: device)
             }

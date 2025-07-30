@@ -61,6 +61,7 @@
 		F6F77AC92E2796180060AFC0 /* toliss-mcdu-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77AC52E2796180060AFC0 /* toliss-mcdu-profile.cpp */; };
 		F6F77ACD2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77ACC2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp */; };
 		F6F77ACE2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77ACC2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp */; };
+		F6FBC55F2E3A3E15004E5F42 /* FCUEfisControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -122,6 +123,7 @@
 		F6F77AC52E2796180060AFC0 /* toliss-mcdu-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "toliss-mcdu-profile.cpp"; sourceTree = "<group>"; };
 		F6F77ACB2E27AA1C0060AFC0 /* laminar-mcdu-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "laminar-mcdu-profile.h"; sourceTree = "<group>"; };
 		F6F77ACC2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "laminar-mcdu-profile.cpp"; sourceTree = "<group>"; };
+		F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCUEfisControlView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -227,6 +229,7 @@
 				F69FF22A2E1D13CB00F9D2D9 /* JoystickControlView.swift */,
 				F69FF22B2E1D13CB00F9D2D9 /* MCDUControlView.swift */,
 				F684D2F12E1E99B0006FA09F /* PFPControlView.swift */,
+				F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */,
 				F6827E122E05678E00382B28 /* bridge.h */,
 				F6827E102E05664C00382B28 /* bridge.mm */,
 				F6C3455E2E187AAF00D7C987 /* xplane-sdk-mock.cpp */,
@@ -489,6 +492,7 @@
 				F6C3455F2E187AB700D7C987 /* xplane-sdk-mock.cpp in Sources */,
 				F610F6342E2F8041004D29F6 /* zibo-pfp-profile.cpp in Sources */,
 				F6827E092E05652800382B28 /* ContentView.swift in Sources */,
+				F6FBC55F2E3A3E15004E5F42 /* FCUEfisControlView.swift in Sources */,
 				F69FF22C2E1D13CB00F9D2D9 /* MCDUControlView.swift in Sources */,
 				F69FF22D2E1D13CB00F9D2D9 /* GenericDeviceView.swift in Sources */,
 				F6F77ACE2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */,

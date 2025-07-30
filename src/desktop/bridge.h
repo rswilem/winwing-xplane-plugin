@@ -22,6 +22,7 @@ void* getDeviceHandle(int deviceIndex);
 void* getJoystickHandle(int deviceIndex);
 void* getMCDUHandle(int deviceIndex);
 void* getPFPHandle(int deviceIndex);
+void* getFCUEfisHandle(int deviceIndex);
 
 // Generic device functions via handle
 bool device_connect(void* deviceHandle);
@@ -43,6 +44,12 @@ void pfp_clear2(void* pfpHandle, int displayId);
 void pfp_clear(void* pfpHandle);
 bool pfp_setLed(void* pfpHandle, int ledId, uint8_t value);
 void pfp_setLedBrightness(void* pfpHandle, int ledId, uint8_t brightness);
+
+// FCU-EFIS functions via handle
+void fcuefis_clear(void* fcuefisHandle);
+bool fcuefis_setLed(void* fcuefisHandle, int ledId, uint8_t value);
+void fcuefis_setLedBrightness(void* fcuefisHandle, int ledId, uint8_t brightness);
+void fcuefis_testDisplay(void* fcuefisHandle, const char* testType);
 
 void clearDatarefCache();
 void setDatarefHexC(const char* ref, const uint8_t* hex, int len);

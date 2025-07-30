@@ -30,6 +30,8 @@ func c_getJoystickHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
 func c_getMCDUHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
 @_silgen_name("getPFPHandle")
 func c_getPFPHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
+@_silgen_name("getFCUEfisHandle")
+func c_getFCUEfisHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
 
 // Generic device functions via handle
 @_silgen_name("device_connect")
@@ -65,10 +67,21 @@ func c_pfp_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) ->
 @_silgen_name("pfp_setLedBrightness")
 func c_pfp_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ brightness: UInt8) -> Void
 
+// FCU-EFIS functions via handle
+@_silgen_name("fcuefis_clear")
+func c_fcuefis_clear(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("fcuefis_setLed")
+func c_fcuefis_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) -> Bool
+@_silgen_name("fcuefis_setLedBrightness")
+func c_fcuefis_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ brightness: UInt8) -> Void
+@_silgen_name("fcuefis_testDisplay")
+func c_fcuefis_testDisplay(_ handle: UnsafeRawPointer, _ testType: UnsafePointer<CChar>) -> Void
+
 enum DeviceType: String, CaseIterable {
     case joystick = "joystick"
     case mcdu = "mcdu"
     case pfp = "pfp"
+    case fcuEfis = "fcu-efis"
     case unknown = "unknown"
 }
 
@@ -84,6 +97,7 @@ struct WinwingDevice: Identifiable, Equatable, Hashable {
     private let joystickHandle: UnsafeRawPointer?
     private let mcduHandle: UnsafeRawPointer?
     private let pfpHandle: UnsafeRawPointer?
+    private let fcuEfisHandle: UnsafeRawPointer?
     
     init(id: Int, name: String, type: DeviceType, productId: UInt16, isConnected: Bool) {
         self.id = id
@@ -97,6 +111,7 @@ struct WinwingDevice: Identifiable, Equatable, Hashable {
         self.joystickHandle = c_getJoystickHandle(Int32(id))
         self.mcduHandle = c_getMCDUHandle(Int32(id))
         self.pfpHandle = c_getPFPHandle(Int32(id))
+        self.fcuEfisHandle = c_getFCUEfisHandle(Int32(id))
     }
     
     static func == (lhs: WinwingDevice, rhs: WinwingDevice) -> Bool {
@@ -148,6 +163,12 @@ struct WinwingDevice: Identifiable, Equatable, Hashable {
     var pfp: PFPWrapper? {
         guard let handle = pfpHandle else { return nil }
         return PFPWrapper(handle: handle)
+    }
+    
+    // FCU-EFIS wrapper methods
+    var fcuEfis: FCUEfisWrapper? {
+        guard let handle = fcuEfisHandle else { return nil }
+        return FCUEfisWrapper(handle: handle)
     }
 }
 
@@ -305,6 +326,109 @@ struct PFPWrapper {
     
     func setScreenBacklight(_ brightness: UInt8) {
         setLedBrightness(.screenBacklight, brightness: brightness)
+    }
+}
+
+// Swift wrapper for FCU-EFIS functions
+struct FCUEfisWrapper {
+    private let handle: UnsafeRawPointer
+    
+    // LED IDs based on the C++ enum
+    enum LEDId: Int {
+        // FCU LEDs
+        case backlight = 0
+        case screenBacklight = 1
+        case locGreen = 3
+        case ap1Green = 5
+        case ap2Green = 7
+        case athrGreen = 9
+        case expedGreen = 11
+        case apprGreen = 13
+        case flagGreen = 17
+        case expedYellow = 30
+        
+        // EFIS Right LEDs (100-199)
+        case efisrBacklight = 100
+        case efisrScreenBacklight = 101
+        case efisrFlagGreen = 102
+        case efisrFdGreen = 103
+        case efisrLsGreen = 104
+        case efisrCstrGreen = 105
+        case efisrWptGreen = 106
+        case efisrVordGreen = 107
+        case efisrNdbGreen = 108
+        case efisrArptGreen = 109
+        
+        // EFIS Left LEDs (200-299)
+        case efislBacklight = 200
+        case efislScreenBacklight = 201
+        case efislFlagGreen = 202
+        case efislFdGreen = 203
+        case efislLsGreen = 204
+        case efislCstrGreen = 205
+        case efislWptGreen = 206
+        case efislVordGreen = 207
+        case efislNdbGreen = 208
+        case efislArptGreen = 209
+    }
+    
+    init(handle: UnsafeRawPointer) {
+        self.handle = handle
+    }
+    
+    func clear() {
+        c_fcuefis_clear(handle)
+    }
+    
+    @discardableResult
+    func setLed(_ ledId: LEDId, value: UInt8) -> Bool {
+        return c_fcuefis_setLed(handle, Int32(ledId.rawValue), value)
+    }
+    
+    @discardableResult
+    func setLed(_ ledId: LEDId, state: Bool) -> Bool {
+        return setLed(ledId, value: state ? 255 : 0)
+    }
+    
+    @discardableResult
+    func setLed(_ ledId: Int, value: UInt8) -> Bool {
+        return c_fcuefis_setLed(handle, Int32(ledId), value)
+    }
+    
+    @discardableResult
+    func setLed(_ ledId: Int, state: Bool) -> Bool {
+        return setLed(ledId, value: state ? 255 : 0)
+    }
+    
+    func setLedBrightness(_ ledId: LEDId, brightness: UInt8) {
+        c_fcuefis_setLedBrightness(handle, Int32(ledId.rawValue), brightness)
+    }
+    
+    func setLedBrightness(_ ledId: Int, brightness: UInt8) {
+        c_fcuefis_setLedBrightness(handle, Int32(ledId), brightness)
+    }
+    
+    func testDisplay(_ testType: String) {
+        testType.withCString { cString in
+            c_fcuefis_testDisplay(handle, cString)
+        }
+    }
+    
+    // Convenience methods for common LEDs
+    func setBacklight(_ brightness: UInt8) {
+        setLedBrightness(.backlight, brightness: brightness)
+    }
+    
+    func setScreenBacklight(_ brightness: UInt8) {
+        setLedBrightness(.screenBacklight, brightness: brightness)
+    }
+    
+    func setEfisRightBacklight(_ brightness: UInt8) {
+        setLedBrightness(.efisrBacklight, brightness: brightness)
+    }
+    
+    func setEfisLeftBacklight(_ brightness: UInt8) {
+        setLedBrightness(.efislBacklight, brightness: brightness)
     }
 }
 
