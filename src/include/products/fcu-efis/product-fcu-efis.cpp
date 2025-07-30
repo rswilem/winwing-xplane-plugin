@@ -11,6 +11,71 @@
 #include <iomanip>
 #include <sstream>
 
+uint8_t swapNibbles(uint8_t value) {
+    return ((value & 0x0F) << 4) | ((value & 0xF0) >> 4);
+}
+
+std::string fixStringLength(const std::string& value, int length) {
+    std::string result = value;
+    if (result.length() > length) {
+        result = result.substr(0, length);
+    }
+    while (result.length() < length) {
+        result = "0" + result;
+    }
+    return result;
+}
+
+std::vector<uint8_t> encodeString(int numSegments, const std::string& str) {
+    std::vector<uint8_t> data(numSegments, 0);
+    
+    for (int i = 0; i < std::min(numSegments, static_cast<int>(str.length())); i++) {
+        char c = std::toupper(str[i]);
+        auto it = SEGMENT_REPRESENTATIONS.find(c);
+        if (it != SEGMENT_REPRESENTATIONS.end()) {
+            data[numSegments - 1 - i] = it->second;
+        }
+    }
+    
+    return data;
+}
+
+std::vector<uint8_t> encodeStringSwapped(int numSegments, const std::string& str) {
+    std::vector<uint8_t> data = encodeString(numSegments, str);
+    data.push_back(0);  // Add extra byte
+    
+    // Fix weird segment mapping
+    for (int i = 0; i < data.size(); i++) {
+        data[i] = swapNibbles(data[i]);
+    }
+    
+    for (int i = 0; i < data.size() - 1; i++) {
+        data[numSegments - i] = (data[numSegments - i] & 0x0F) | (data[numSegments - 1 - i] & 0xF0);
+        data[numSegments - 1 - i] = data[numSegments - 1 - i] & 0x0F;
+    }
+    
+    return data;
+}
+
+std::vector<uint8_t> encodeStringEfis(int numSegments, const std::string& str) {
+    std::vector<uint8_t> data = encodeString(numSegments, str);
+    std::vector<uint8_t> result(numSegments, 0);
+    
+    // Fix weird segment mapping for EFIS displays
+    for (int i = 0; i < data.size(); i++) {
+        result[i] |= (data[i] & 0x08) ? 0x01 : 0;  // Upper left -> bit 0
+        result[i] |= (data[i] & 0x04) ? 0x02 : 0;  // Middle -> bit 1
+        result[i] |= (data[i] & 0x02) ? 0x04 : 0;  // Lower left -> bit 2
+        result[i] |= (data[i] & 0x10) ? 0x08 : 0;  // Bottom -> bit 3
+        result[i] |= (data[i] & 0x80) ? 0x10 : 0;  // Top -> bit 4
+        result[i] |= (data[i] & 0x40) ? 0x20 : 0;  // Upper right -> bit 5
+        result[i] |= (data[i] & 0x20) ? 0x40 : 0;  // Lower right -> bit 6
+        result[i] |= (data[i] & 0x01) ? 0x80 : 0;  // Dot -> bit 7
+    }
+    
+    return result;
+}
+
 ProductFCUEfis::ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) 
     : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
     profile = nullptr;
@@ -45,23 +110,6 @@ const char* ProductFCUEfis::classIdentifier() {
 
 bool ProductFCUEfis::connect() {
     if (USBDevice::connect()) {
-        /*def winwing_fcu_set_led(ep, led, brightness):
-         if led.value < 100: # FCU
-             data = [0x02, 0x10, 0xbb, 0, 0, 3, 0x49, led.value, brightness, 0,0,0,0,0]
-         elif led.value < 200 and device_config & DEVICEMASK.EFISR: # EFIS_R
-             data = [0x02, 0x0e, 0xbf, 0, 0, 3, 0x49, led.value - 100, brightness, 0,0,0,0,0]
-         elif led.value >= 200 and led.value < 300 and device_config & DEVICEMASK.EFISL: # EFIS_L
-             data = [0x02, 0x0d, 0xbf, 0, 0, 3, 0x49, led.value - 200, brightness, 0,0,0,0,0]
-         if 'data' in locals():
-           cmd = bytes(data)
-           ep.write(cmd)
-
-
-     def lcd_init(ep):
-         data = [0xf0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0] # init packet
-         cmd = bytes(data)
-         ep.write(cmd)
-         */
         initializeDisplays();
         
         // Set initial LED brightness
@@ -173,108 +221,214 @@ void ProductFCUEfis::updateDisplays() {
 }
 
 void ProductFCUEfis::initializeDisplays() {
-    // Initialize FCU display
-    std::vector<uint8_t> initCmd = {0x10, 0x3c, 0x00, 0x00, 0x32, 0x00, 0x14, 0x00, 0x00, 0x00};
-    writeData(initCmd);
-    
-    // Initialize EFIS Right display  
-    initCmd = {0x10, 0x3d, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00};
-    writeData(initCmd);
-    
-    // Initialize EFIS Left display
-    initCmd = {0x10, 0x3e, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00};
+    // Initialize displays with proper init sequence
+    std::vector<uint8_t> initCmd = {
+        0xF0, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
     writeData(initCmd);
 }
 
 void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string& heading, 
                                    const std::string& altitude, const std::string& vs) {
-    std::vector<uint8_t> data = {0x10, 0x3c};
+    // Encode strings to 7-segment data
+    auto speedData = encodeString(3, fixStringLength(speed, 3));
+    auto headingData = encodeStringSwapped(3, fixStringLength(heading, 3));
+    auto altitudeData = encodeStringSwapped(5, fixStringLength(altitude, 5));
+    auto vsData = encodeStringSwapped(4, fixStringLength(vs, 4));
     
-    // Convert and add speed (5 digits)
-    std::string speedStr = speed.substr(0, 5);
-    speedStr.resize(5, ' ');
-    for (char c : speedStr) {
-        data.push_back(static_cast<uint8_t>(c));
+    // Create flag bytes array
+    std::vector<uint8_t> flagBytes(17, 0);
+    
+    // Set flags based on display data
+    if (displayData.spdMach) flagBytes[static_cast<int>(DisplayByteIndex::H3)] |= 0x04;
+    if (displayData.spdManaged) flagBytes[static_cast<int>(DisplayByteIndex::H3)] |= 0x02;
+    if (!displayData.spdMach) flagBytes[static_cast<int>(DisplayByteIndex::H3)] |= 0x08; // SPD
+    
+    if (displayData.hdgTrk) flagBytes[static_cast<int>(DisplayByteIndex::H0)] |= 0x40; // TRK
+    else flagBytes[static_cast<int>(DisplayByteIndex::H0)] |= 0x80; // HDG
+    if (displayData.hdgManaged) flagBytes[static_cast<int>(DisplayByteIndex::H0)] |= 0x10;
+    if (displayData.latMode) flagBytes[static_cast<int>(DisplayByteIndex::H0)] |= 0x20; // LAT
+    
+    if (displayData.altIndication) flagBytes[static_cast<int>(DisplayByteIndex::A4)] |= 0x10; // ALT
+    if (displayData.altManaged) flagBytes[static_cast<int>(DisplayByteIndex::V1)] |= 0x10;
+    
+    if (displayData.vsMode) flagBytes[static_cast<int>(DisplayByteIndex::A5)] |= 0x04; // V/S
+    if (displayData.fpaMode) flagBytes[static_cast<int>(DisplayByteIndex::A5)] |= 0x01; // FPA
+    if (displayData.hdgTrk) flagBytes[static_cast<int>(DisplayByteIndex::A5)] |= 0x02; // TRK
+    if (!displayData.hdgTrk) flagBytes[static_cast<int>(DisplayByteIndex::A5)] |= 0x08; // HDG
+    
+    if (displayData.vsHorizontalLine) flagBytes[static_cast<int>(DisplayByteIndex::A0)] |= 0x10;
+    if (displayData.vsVerticalLine) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x10;
+    if (displayData.lvlChange) flagBytes[static_cast<int>(DisplayByteIndex::A2)] |= 0x10;
+    if (displayData.lvlChangeLeft) flagBytes[static_cast<int>(DisplayByteIndex::A3)] |= 0x10;
+    if (displayData.lvlChangeRight) flagBytes[static_cast<int>(DisplayByteIndex::A1)] |= 0x10;
+    
+    if (displayData.vsIndication) flagBytes[static_cast<int>(DisplayByteIndex::V0)] |= 0x40;
+    if (displayData.fpaIndication) flagBytes[static_cast<int>(DisplayByteIndex::V0)] |= 0x80;
+    if (displayData.fpaComma) flagBytes[static_cast<int>(DisplayByteIndex::V3)] |= 0x10;
+    if (displayData.machComma) flagBytes[static_cast<int>(DisplayByteIndex::S1)] |= 0x01;
+    
+    static uint8_t packageNumber = 1;
+    
+    // First request - send display data
+    std::vector<uint8_t> data1 = {
+        0xF0, 0x00, packageNumber, 0x31, 0x10, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00,
+        0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
+    
+    // Add speed data (3 bytes)
+    data1.push_back(speedData[2]);
+    data1.push_back(speedData[1] | flagBytes[static_cast<int>(DisplayByteIndex::S1)]);
+    data1.push_back(speedData[0]);
+    
+    // Add heading data (4 bytes)
+    data1.push_back(headingData[3] | flagBytes[static_cast<int>(DisplayByteIndex::H3)]);
+    data1.push_back(headingData[2]);
+    data1.push_back(headingData[1]);
+    data1.push_back(headingData[0] | flagBytes[static_cast<int>(DisplayByteIndex::H0)]);
+    
+    // Add altitude data (6 bytes)
+    data1.push_back(altitudeData[5] | flagBytes[static_cast<int>(DisplayByteIndex::A5)]);
+    data1.push_back(altitudeData[4] | flagBytes[static_cast<int>(DisplayByteIndex::A4)]);
+    data1.push_back(altitudeData[3] | flagBytes[static_cast<int>(DisplayByteIndex::A3)]);
+    data1.push_back(altitudeData[2] | flagBytes[static_cast<int>(DisplayByteIndex::A2)]);
+    data1.push_back(altitudeData[1] | flagBytes[static_cast<int>(DisplayByteIndex::A1)]);
+    data1.push_back(altitudeData[0] | vsData[4] | flagBytes[static_cast<int>(DisplayByteIndex::A0)]);
+    
+    // Add vertical speed data (4 bytes)
+    data1.push_back(vsData[3] | flagBytes[static_cast<int>(DisplayByteIndex::V3)]);
+    data1.push_back(vsData[2] | flagBytes[static_cast<int>(DisplayByteIndex::V2)]);
+    data1.push_back(vsData[1] | flagBytes[static_cast<int>(DisplayByteIndex::V1)]);
+    data1.push_back(vsData[0] | flagBytes[static_cast<int>(DisplayByteIndex::V0)]);
+    
+    // Pad to 64 bytes
+    while (data1.size() < 64) {
+        data1.push_back(0x00);
     }
     
-    // Convert and add heading (3 digits)  
-    std::string headingStr = heading.substr(0, 3);
-    headingStr.resize(3, ' ');
-    for (char c : headingStr) {
-        data.push_back(static_cast<uint8_t>(c));
+    writeData(data1);
+    
+    // Second request - commit display data
+    std::vector<uint8_t> data2 = {
+        0xF0, 0x00, packageNumber, 0x11, 0x10, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00
+    };
+    
+    // Pad to 64 bytes
+    while (data2.size() < 64) {
+        data2.push_back(0x00);
     }
     
-    // Convert and add altitude (5 digits)
-    std::string altitudeStr = altitude.substr(0, 5);
-    altitudeStr.resize(5, ' ');
-    for (char c : altitudeStr) {
-        data.push_back(static_cast<uint8_t>(c));
-    }
+    writeData(data2);
     
-    // Convert and add vertical speed (4 digits with +/- sign)
-    std::string vsStr = vs;
-    if (vsStr.length() > 0 && vsStr[0] != '+' && vsStr[0] != '-') {
-        vsStr = "+" + vsStr;
-    }
-    vsStr = vsStr.substr(0, 5);
-    vsStr.resize(5, ' ');
-    for (char c : vsStr) {
-        data.push_back(static_cast<uint8_t>(c));
-    }
-    
-    // Pad to required length
-    while (data.size() < 64) {
-        data.push_back(0x00);
-    }
-    
-    writeData(data);
+    // Increment package number for next call
+    packageNumber++;
+    if (packageNumber == 0) packageNumber = 1;  // Avoid 0
 }
 
 void ProductFCUEfis::sendEfisRightDisplay(const std::string& baro) {
-    std::vector<uint8_t> data = {0x10, 0x3d};
+    auto baroData = encodeStringEfis(4, fixStringLength(baro, 4));
     
-    // Convert and add barometric pressure (7 characters max)
-    std::string baroStr = baro.substr(0, 7);
-    baroStr.resize(7, ' ');
-    for (char c : baroStr) {
-        data.push_back(static_cast<uint8_t>(c));
-    }
+    // Create flag bytes array
+    std::vector<uint8_t> flagBytes(17, 0);
     
-    // Pad to required length
+    // Set EFIS Right flags
+    if (displayData.efisRQnh) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B0)] |= 0x02;
+    if (displayData.efisRQfe) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B0)] |= 0x01;
+    if (displayData.efisRHpaDec) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B2)] |= 0x80;
+    
+    static uint8_t packageNumber = 1;
+    
+    // EFIS Right display protocol
+    std::vector<uint8_t> data = {
+        0xF0, 0x00, packageNumber, 0x1A, 0x0E, 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00,
+        0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
+    
+    // Add barometric data
+    data.push_back(baroData[3]);
+    data.push_back(baroData[2] | flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B2)]);
+    data.push_back(baroData[1]);
+    data.push_back(baroData[0]);
+    data.push_back(flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B0)]);
+    
+    // Add second command
+    data.insert(data.end(), {0x0E, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
+    
+    // Pad to 64 bytes
     while (data.size() < 64) {
         data.push_back(0x00);
     }
     
     writeData(data);
+    
+    // Increment package number for next call
+    packageNumber++;
+    if (packageNumber == 0) packageNumber = 1;  // Avoid 0
 }
 
 void ProductFCUEfis::sendEfisLeftDisplay(const std::string& baro) {
-    std::vector<uint8_t> data = {0x10, 0x3e};
+    auto baroData = encodeStringEfis(4, fixStringLength(baro, 4));
     
-    // Convert and add barometric pressure (7 characters max)
-    std::string baroStr = baro.substr(0, 7);
-    baroStr.resize(7, ' ');
-    for (char c : baroStr) {
-        data.push_back(static_cast<uint8_t>(c));
-    }
+    // Create flag bytes array
+    std::vector<uint8_t> flagBytes(17, 0);
     
-    // Pad to required length
+    // Set EFIS Left flags
+    if (displayData.efisLQnh) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)] |= 0x02;
+    if (displayData.efisLQfe) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)] |= 0x01;
+    if (displayData.efisLHpaDec) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B2)] |= 0x80;
+    
+    static uint8_t packageNumber = 1;
+    
+    // EFIS Left display protocol
+    std::vector<uint8_t> data = {
+        0xF0, 0x00, packageNumber, 0x1A, 0x0D, 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00,
+        0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
+    
+    // Add barometric data
+    data.push_back(baroData[3]);
+    data.push_back(baroData[2] | flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B2)]);
+    data.push_back(baroData[1]);
+    data.push_back(baroData[0]);
+    data.push_back(flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)]);
+    
+    // Add second command
+    data.insert(data.end(), {0x0E, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
+    
+    // Pad to 64 bytes
     while (data.size() < 64) {
         data.push_back(0x00);
     }
     
     writeData(data);
+    
+    // Increment package number for next call
+    packageNumber++;
+    if (packageNumber == 0) packageNumber = 1;  // Avoid 0
 }
 
 void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
-    std::vector<uint8_t> data = {0x20, static_cast<uint8_t>(led), brightness};
+    std::vector<uint8_t> data;
     
-    // Pad to required length
-    while (data.size() < 64) {
-        data.push_back(0x00);
+    int ledValue = static_cast<int>(led);
+    
+    if (ledValue < 100) {
+        // FCU LEDs
+        data = {0x02, 0x10, 0xBB, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
+    } else if (ledValue < 200) {
+        // EFIS Right LEDs
+        data = {0x02, 0x0E, 0xBF, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue - 100), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
+    } else if (ledValue < 300) {
+        // EFIS Left LEDs
+        data = {0x02, 0x0D, 0xBF, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue - 200), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
     }
     
-    writeData(data);
+    if (!data.empty()) {
+        writeData(data);
+    }
 }
 
 void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLength) {

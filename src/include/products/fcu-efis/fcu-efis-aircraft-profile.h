@@ -5,6 +5,36 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include <unordered_map>
+
+// 7-segment display character representations
+// Bit mapping: 0x80=Top, 0x40=Upper Right, 0x20=Lower Right, 0x10=Bottom, 0x08=Upper Left, 0x04=Middle, 0x02=Lower Left, 0x01=Dot
+static const std::unordered_map<char, uint8_t> SEGMENT_REPRESENTATIONS = {
+    {'0', 0xFA}, {'1', 0x60}, {'2', 0xD6}, {'3', 0xF4}, {'4', 0x6C},
+    {'5', 0xBC}, {'6', 0xBE}, {'7', 0xE0}, {'8', 0xFE}, {'9', 0xFC},
+    {'A', 0xEE}, {'B', 0xFE}, {'C', 0x9A}, {'D', 0x76}, {'E', 0x9E},
+    {'F', 0x8E}, {'G', 0xBE}, {'H', 0x6E}, {'I', 0x60}, {'J', 0x70},
+    {'K', 0x0E}, {'L', 0x1A}, {'M', 0xA6}, {'N', 0x26}, {'O', 0xFA},
+    {'P', 0xCE}, {'Q', 0xEC}, {'R', 0x06}, {'S', 0xBC}, {'T', 0x1E},
+    {'U', 0x7A}, {'V', 0x32}, {'W', 0x58}, {'X', 0x6E}, {'Y', 0x7C},
+    {'Z', 0xD6}, {'-', 0x04}, {'#', 0x36}, {'/', 0x60}, {'\\', 0xA0}, {' ', 0x00}
+};
+
+enum class DisplayByteIndex : int {
+    H0 = 0, H3 = 1, A0 = 2, A1 = 3, A2 = 4, A3 = 5, A4 = 6, A5 = 7,
+    V2 = 8, V3 = 9, V0 = 10, V1 = 11, S1 = 12,
+    EFISR_B0 = 13, EFISR_B2 = 14, EFISL_B0 = 15, EFISL_B2 = 16
+};
+
+struct DisplayFlag {
+    std::string name;
+    DisplayByteIndex byteIndex;
+    uint8_t mask;
+    bool defaultValue;
+    
+    DisplayFlag(const std::string& n, DisplayByteIndex idx, uint8_t m, bool def = false)
+        : name(n), byteIndex(idx), mask(m), defaultValue(def) {}
+};
 
 struct FCUEfisButtonDef {
     int id;
@@ -12,7 +42,6 @@ struct FCUEfisButtonDef {
     std::string dataref;
     int value = -1;  // Optional: for buttons that set specific values (-1 means use command)
 };
-
 enum class FCUEfisLed : int {
     // FCU LEDs
     BACKLIGHT = 0,
@@ -71,6 +100,21 @@ struct FCUDisplayData {
     bool efisLQnh = false;
     bool efisRHpaDec = false;
     bool efisLHpaDec = false;
+    
+    // Additional display flags for proper 7-segment display
+    bool latMode = false;
+    bool altIndication = true;
+    bool vsHorizontalLine = true;
+    bool vsVerticalLine = false;
+    bool lvlChange = true;
+    bool lvlChangeLeft = true;
+    bool lvlChangeRight = true;
+    bool vsIndication = false;
+    bool fpaIndication = false;
+    bool fpaComma = false;
+    bool machComma = false;
+    bool efisRQfe = false;
+    bool efisLQfe = false;
 };
 
 class FCUEfisAircraftProfile {
