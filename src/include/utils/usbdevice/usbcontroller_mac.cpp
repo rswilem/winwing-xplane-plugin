@@ -81,6 +81,15 @@ void USBController::destroy() {
     instance = nullptr;
 }
 
+bool USBController::deviceExistsWithHIDDevice(IOHIDDeviceRef device) {
+    for (auto* dev : devices) {
+        if (dev->hidDevice == device) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void USBController::DeviceAddedCallback(void *context, IOReturn result, void *sender, IOHIDDeviceRef device) {
     if (result != kIOReturnSuccess || !context || !device) {
         return;
@@ -118,6 +127,10 @@ void USBController::DeviceAddedCallback(void *context, IOReturn result, void *se
     productNameStr.erase(productNameStr.find_last_not_of(" \t\n\r") + 1);
 
     AppState::getInstance()->executeAfter(0, [self, device, vendorId, productId, vendorNameStr, productNameStr]() {
+        if (self->deviceExistsWithHIDDevice(device)) {
+            return;
+        }
+        
         USBDevice *newDevice = USBDevice::Device(device, vendorId, productId, vendorNameStr, productNameStr);
         if (newDevice) {
             self->devices.push_back(newDevice);

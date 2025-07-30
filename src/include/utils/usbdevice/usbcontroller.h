@@ -36,17 +36,22 @@ private:
 #if APL
     static void DeviceAddedCallback(void *context, IOReturn result, void *sender, IOHIDDeviceRef device);
     static void DeviceRemovedCallback(void *context, IOReturn result, void *sender, IOHIDDeviceRef device);
+    bool deviceExistsWithHIDDevice(IOHIDDeviceRef device);
 #elif IBM
     void checkForDeviceChanges();
     void enumerateDevices();
     void enumerateHidDevices(std::function<void(HANDLE, const std::string&)> deviceHandler);
     USBDevice* createDeviceFromHandle(HANDLE hidDevice);
+    bool deviceExistsWithHandle(HANDLE hidDevice);
+    void addDeviceFromHandle(HANDLE hidDevice);
 #elif LIN
     static void DeviceAddedCallback(void *context, struct udev_device *device);
     static void DeviceRemovedCallback(void *context, struct udev_device *device);
     void monitorDevices();
     void enumerateDevices();
     USBDevice* createDeviceFromPath(const std::string& devicePath);
+    bool deviceExistsAtPath(const std::string& devicePath);
+    void addDeviceFromPath(const std::string& devicePath);
 #endif
 
 public:

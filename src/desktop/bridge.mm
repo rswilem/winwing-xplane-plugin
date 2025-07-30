@@ -1,5 +1,6 @@
 #include "bridge.h"
 #include "usbcontroller.h"
+#include "appstate.h"
 #include "dataref.h"
 #include "product-ursa-minor-joystick.h"
 #include "product-mcdu.h"
@@ -36,13 +37,7 @@ void setDatarefHexC(const char* ref, const uint8_t* hexD, int len) {
 }
 
 void update() {
-    for (const auto& device : USBController::getInstance()->devices) {
-        if (device->connected) {
-            device->update();
-        }
-    }
-    
-    //Dataref::getInstance()->update();
+    AppState::Update(0.0f, 0.0f, 1, nullptr);
 }
 
 void disconnectAll() {

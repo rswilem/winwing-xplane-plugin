@@ -32,7 +32,6 @@ public:
     void setLedBrightness(FCUEfisLed led, uint8_t brightness);
     void monitorDatarefs();
     
-    // Public methods for testing/demonstration
     void initializeDisplays();
     void sendFCUDisplay(const std::string& speed, const std::string& heading, 
                        const std::string& altitude, const std::string& vs);

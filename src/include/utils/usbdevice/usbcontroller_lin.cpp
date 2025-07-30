@@ -105,6 +105,37 @@ USBDevice* USBController::createDeviceFromPath(const std::string& devicePath) {
     return USBDevice::Device(fd, info.vendor, info.product, "Winwing", std::string(name));
 }
 
+bool USBController::deviceExistsAtPath(const std::string& devicePath) {
+    for (auto* dev : devices) {
+        if (dev->hidDevice >= 0) {
+            char existingPath[256];
+            snprintf(existingPath, sizeof(existingPath), "/proc/self/fd/%d", dev->hidDevice);
+            char linkTarget[256];
+            ssize_t len = readlink(existingPath, linkTarget, sizeof(linkTarget) - 1);
+            if (len > 0) {
+                linkTarget[len] = '\0';
+                if (strcmp(linkTarget, devicePath.c_str()) == 0) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void USBController::addDeviceFromPath(const std::string& devicePath) {
+    AppState::getInstance()->executeAfter(0, [this, devicePath]() {
+        if (deviceExistsAtPath(devicePath)) {
+            return;
+        }
+        
+        USBDevice* device = createDeviceFromPath(devicePath);
+        if (device) {
+            devices.push_back(device);
+        }
+    });
+}
+
 void USBController::enumerateDevices() {
     DIR* dir = opendir("/dev");
     if (!dir) {
@@ -115,12 +146,7 @@ void USBController::enumerateDevices() {
     while ((entry = readdir(dir)) != nullptr) {
         if (strncmp(entry->d_name, "hidraw", 6) == 0) {
             std::string devicePath = "/dev/" + std::string(entry->d_name);
-            AppState::getInstance()->executeAfter(0, [this, devicePath]() {
-                USBDevice* device = createDeviceFromPath(devicePath);
-                if (device) {
-                    devices.push_back(device);
-                }
-            });
+            addDeviceFromPath(devicePath);
         }
     }
     closedir(dir);
@@ -160,30 +186,7 @@ void USBController::DeviceAddedCallback(void* context, struct udev_device* devic
         return;
     }
     
-    // Check if device already exists
-    for (auto* dev : self->devices) {
-        if (dev->hidDevice >= 0) {
-            // Compare device paths or file descriptors to avoid duplicates
-            // This is similar to how Mac version checks hidDevice == device
-            char existingPath[256];
-            snprintf(existingPath, sizeof(existingPath), "/proc/self/fd/%d", dev->hidDevice);
-            char linkTarget[256];
-            ssize_t len = readlink(existingPath, linkTarget, sizeof(linkTarget) - 1);
-            if (len > 0) {
-                linkTarget[len] = '\0';
-                if (strcmp(linkTarget, devicePath) == 0) {
-                    return; // Device already exists
-                }
-            }
-        }
-    }
-    
-    AppState::getInstance()->executeAfter(0, [self, devicePath]() {
-        USBDevice* newDevice = self->createDeviceFromPath(std::string(devicePath));
-        if (newDevice) {
-            self->devices.push_back(newDevice);
-        }
-    });
+    self->addDeviceFromPath(std::string(devicePath));
 }
 
 void USBController::DeviceRemovedCallback(void* context, struct udev_device* device) {

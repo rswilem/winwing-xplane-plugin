@@ -75,6 +75,29 @@ USBDevice* USBController::createDeviceFromHandle(HANDLE hidDevice) {
     return USBDevice::Device(hidDevice, attributes.VendorID, attributes.ProductID, std::string(vendorNameA), std::string(productNameA));
 }
 
+bool USBController::deviceExistsWithHandle(HANDLE hidDevice) {
+    for (auto* dev : devices) {
+        if (dev->hidDevice == hidDevice) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void USBController::addDeviceFromHandle(HANDLE hidDevice) {
+    AppState::getInstance()->executeAfter(0, [this, hidDevice]() {
+        if (deviceExistsWithHandle(hidDevice)) {
+            CloseHandle(hidDevice);
+            return;
+        }
+        
+        USBDevice* device = createDeviceFromHandle(hidDevice);
+        if (device) {
+            devices.push_back(device);
+        }
+    });
+}
+
 void USBController::enumerateHidDevices(std::function<void(HANDLE, const std::string&)> deviceHandler) {
     HDEVINFO deviceInfoSet = SetupDiGetClassDevs(&GUID_DEVINTERFACE_HID, nullptr, nullptr, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
     if (deviceInfoSet == INVALID_HANDLE_VALUE) {
@@ -104,12 +127,7 @@ void USBController::enumerateHidDevices(std::function<void(HANDLE, const std::st
 
 void USBController::enumerateDevices() {
     enumerateHidDevices([this](HANDLE hidDevice, const std::string& devicePath) {
-        AppState::getInstance()->executeAfter(0, [this, hidDevice]() {
-            USBDevice* device = createDeviceFromHandle(hidDevice);
-            if (device) {
-                devices.push_back(device);
-            }
-        });
+        addDeviceFromHandle(hidDevice);
     });
 }
 
@@ -121,25 +139,7 @@ void USBController::checkForDeviceChanges() {
         attributes.Size = sizeof(attributes);
         if (HidD_GetAttributes(hidDevice, &attributes) && attributes.VendorID == WINWING_VENDOR_ID) {
             currentDevicePaths.push_back(devicePath);
-            
-            bool isNewDevice = true;
-            for (auto* existingDevice : devices) {
-                if (existingDevice->hidDevice != INVALID_HANDLE_VALUE) {
-                    isNewDevice = false;
-                    break;
-                }
-            }
-            
-            if (isNewDevice) {
-                AppState::getInstance()->executeAfter(0, [this, hidDevice]() {
-                    USBDevice* device = createDeviceFromHandle(hidDevice);
-                    if (device) {
-                        devices.push_back(device);
-                    }
-                });
-            } else {
-                CloseHandle(hidDevice);
-            }
+            addDeviceFromHandle(hidDevice);
         } else {
             CloseHandle(hidDevice);
         }
