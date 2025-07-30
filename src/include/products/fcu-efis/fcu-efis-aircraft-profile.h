@@ -6,6 +6,7 @@
 #include <functional>
 #include <map>
 #include <unordered_map>
+#include <cstdint>
 
 // 7-segment display character representations
 // Bit mapping: 0x80=Top, 0x40=Upper Right, 0x20=Lower Right, 0x10=Bottom, 0x08=Upper Left, 0x04=Middle, 0x02=Lower Left, 0x01=Dot
