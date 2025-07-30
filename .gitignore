@@ -11,6 +11,7 @@ CMakeFiles
 CMakeScripts
 Testing
 Makefile
+!src/linux_shell/Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
