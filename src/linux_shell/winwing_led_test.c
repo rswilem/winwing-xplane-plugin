@@ -13,15 +13,11 @@
 #define WINWING_VENDOR_ID 0x4098
 #define PFP_LED_BACKLIGHT         0
 #define PFP_LED_SCREEN_BACKLIGHT  1
-#define PFP_LED_CALL              8
-#define PFP_LED_FAIL              9
-#define PFP_LED_MSG               10
-#define PFP_LED_OFST              11
-#define PFP_LED_UNKNOWN1          12
-#define PFP_LED_UNKNOWN2          13
-#define PFP_LED_UNKNOWN3          14
-#define PFP_LED_UNKNOWN4          15
-#define PFP_LED_UNKNOWN5          16
+#define PFP_LED_CALL              3
+#define PFP_LED_FAIL              4
+#define PFP_LED_MSG               5
+#define PFP_LED_OFST              6
+#define PFP_LED_EXEC              7
 
 static int device_fd = -1;
 static int current_led = PFP_LED_CALL;
@@ -30,11 +26,7 @@ static int led_rotation[] = {
   PFP_LED_FAIL,
   PFP_LED_MSG,
   PFP_LED_OFST,
-  PFP_LED_UNKNOWN1,
-  PFP_LED_UNKNOWN2,
-  PFP_LED_UNKNOWN3,
-  PFP_LED_UNKNOWN4,
-  PFP_LED_UNKNOWN5
+  PFP_LED_EXEC
 };
 static const int num_leds = sizeof(led_rotation) / sizeof(led_rotation[0]);
 static int current_led_index = 0;
@@ -45,11 +37,7 @@ const char* get_led_name(int led_id) {
         case PFP_LED_FAIL: return "FAIL";
         case PFP_LED_MSG: return "MSG";
         case PFP_LED_OFST: return "OFST";
-        case PFP_LED_UNKNOWN1: return "UNKNOWN1";
-        case PFP_LED_UNKNOWN2: return "UNKNOWN2";
-        case PFP_LED_UNKNOWN3: return "UNKNOWN3";
-        case PFP_LED_UNKNOWN4: return "UNKNOWN4";
-        case PFP_LED_UNKNOWN5: return "UNKNOWN5";
+        case PFP_LED_EXEC: return "EXEC";
         default: return "UNKNOWN";
     }
 }

@@ -15,15 +15,11 @@ struct PFPButtonDef {
 enum class PFPLed : int {
     BACKLIGHT = 0,
     SCREEN_BACKLIGHT = 1,
-    CALL = 8,
-    FAIL = 9,
-    MSG = 10,
-    OFST = 11,
-    UNKNOWN1 = 12,
-    UNKNOWN2 = 13,
-    UNKNOWN3 = 14,
-    UNKNOWN4 = 15,
-    UNKNOWN5 = 16
+    CALL = 3,
+    FAIL = 4,
+    MSG = 5,
+    OFST = 6,
+    EXEC = 7
 };
 
 class PfpAircraftProfile {
