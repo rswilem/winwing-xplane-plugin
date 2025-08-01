@@ -26,11 +26,7 @@ public:
     ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
     ~ProductPFP();
     
-#if DEBUG
-    static constexpr unsigned char IdentifierByte = 0x32;
-#else
     static constexpr unsigned char IdentifierByte = 0x31;
-#endif
     static constexpr unsigned int PageLines = 14; // Header + 6 * label + 6 * cont + textbox
     static constexpr unsigned int PageCharsPerLine = 24;
     static constexpr unsigned int PageBytesPerChar = 3;

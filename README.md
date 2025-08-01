@@ -22,18 +22,18 @@ The plugin theoretically works on Windows, but is not required there, as Winwing
 
 The table below lists the compatibility status of various Winwing devices with the plugin.
 
-| Device Name                   | Compatibility             | Tested | Roadmap / suggestions                                   |
-| ----------------------------- | ------------------------- | ------ | ------------------------------------------------------- |
-| URSA MINOR Airline Joystick L | 🟢 Fully implemented      | 🟢     |                                                         |
-| URSA MINOR Airline Joystick R | 🟠 Missing USB product ID | 🔴     | If anyone owns this device, please create an issue      |
-| MCDU-32                       | 🟢 Fully implemented      | 🟢     |                                                         |
-| FCU Unit                      | 🟠 Partly implemented     | 🔴     | Testers needed!                                         |
-| EFIS R                        | 🟠 Partly implemented     | 🔴     | Testers needed!                                         |
-| EFIS L                        | 🟠 Partly implemented     | 🔴     | Testers needed!                                         |
-| Panel of Autopilot 3          | 🔴 Not implemented        | 🔴     |                                                         |
-| PFP 4                         | 🟠 Partly implemented     | 🔴     |                                                         |
-| PFP 7                         | 🟠 Partly implemented     | 🔴     |                                                         |
-| PFP 3N                        | 🟢 Fully implemented      | 🔴     | LED should be tested. Display should works as expected. |
+| Device Name                   | Compatibility             | Tested | Roadmap / suggestions                              |
+| ----------------------------- | ------------------------- | ------ | -------------------------------------------------- |
+| URSA MINOR Airline Joystick L | 🟢 Fully implemented      | 🟢     |                                                    |
+| URSA MINOR Airline Joystick R | 🟠 Missing USB product ID | 🔴     | If anyone owns this device, please create an issue |
+| MCDU-32                       | 🟢 Fully implemented      | 🟢     |                                                    |
+| PFP 3N                        | 🟢 Fully implemented      | 🟢     |                                                    |
+| PFP 4                         | 🟢 Fully implemented      | 🟢     |                                                    |
+| PFP 7                         | 🟢 Fully implemented      | 🟢     |                                                    |
+| Panel of Autopilot 3          | 🔴 Not implemented        | 🔴     |                                                    |
+| FCU Unit                      | 🟠 Partly implemented     | 🔴     | Testers needed!                                    |
+| EFIS R                        | 🟠 Partly implemented     | 🔴     | Testers needed!                                    |
+| EFIS L                        | 🟠 Partly implemented     | 🔴     | Testers needed!                                    |
 
 ### Aircraft Compatibility
 
@@ -46,8 +46,9 @@ Below is a table of aircraft that are compatible with the plugin.
 | Toliss A321          | Fully implemented  | 🟢 Yes |
 | Laminar A330-300     | Fully implemented  | 🟢 Yes |
 | AeroGenesis A330-300 | Fully implemented  | 🟢 Yes |
-| Zibo 737-800         | Partly implemented | 🔴 No  |
+| Zibo 737-800         | Fully implemented  | 🟢 Yes |
 | FlightFactor 777-200 | Partly implemented | 🔴 No  |
+| SSG 747-800          | Partly implemented | 🔴 No  |
 
 ### Known Issues
 
