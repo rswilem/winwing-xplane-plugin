@@ -7,12 +7,11 @@
 
 FlightFactor777PfpProfile::FlightFactor777PfpProfile(ProductPFP *product) : PfpAircraftProfile(product) {
     const PFPLed ledsToSet[] = {
-        PFPLed::BACKLIGHT,
-        PFPLed::SCREEN_BACKLIGHT,
         PFPLed::CALL,
         PFPLed::FAIL,
         PFPLed::MSG,
         PFPLed::OFST,
+        PFPLed::EXEC
     };
     
     for (auto led : ledsToSet) {

@@ -28,6 +28,8 @@
 		F64BE3EB2E1BF625003C1B73 /* usbdevice_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E62E1BF625003C1B73 /* usbdevice_win.cpp */; };
 		F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E42E1BF625003C1B73 /* usbcontroller_win.cpp */; };
 		F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */; };
+		F64F51D82E3D1431006361D3 /* ixeg733-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64F51D72E3D1431006361D3 /* ixeg733-pfp-profile.cpp */; };
+		F64F51D92E3D1431006361D3 /* ixeg733-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64F51D72E3D1431006361D3 /* ixeg733-pfp-profile.cpp */; };
 		F674E6F52D2ACDC600CCE11F /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F674E6F32D2ACDC600CCE11F /* XPWidgets.framework */; };
 		F674E6F72D2ACDC600CCE11F /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F674E6F42D2ACDC600CCE11F /* XPLM.framework */; };
 		F67961952E31357E008031F1 /* usbdevice_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961942E31357E008031F1 /* usbdevice_lin.cpp */; };
@@ -86,6 +88,8 @@
 		F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_lin.cpp; sourceTree = "<group>"; };
 		F64BE3E42E1BF625003C1B73 /* usbcontroller_win.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_win.cpp; sourceTree = "<group>"; };
 		F64BE3E62E1BF625003C1B73 /* usbdevice_win.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_win.cpp; sourceTree = "<group>"; };
+		F64F51D62E3D1431006361D3 /* ixeg733-pfp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ixeg733-pfp-profile.h"; sourceTree = "<group>"; };
+		F64F51D72E3D1431006361D3 /* ixeg733-pfp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ixeg733-pfp-profile.cpp"; sourceTree = "<group>"; };
 		F66F91662D0332F600F84283 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F674E6F32D2ACDC600CCE11F /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = SDK_410/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
 		F674E6F42D2ACDC600CCE11F /* XPLM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPLM.framework; path = SDK_410/Libraries/Mac/XPLM.framework; sourceTree = "<group>"; };
@@ -180,6 +184,8 @@
 				F648581E2E3B713900AE7524 /* ssg748-pfp-profile.cpp */,
 				F67961972E314228008031F1 /* ff777-pfp-profile.h */,
 				F67961982E314228008031F1 /* ff777-pfp-profile.cpp */,
+				F64F51D62E3D1431006361D3 /* ixeg733-pfp-profile.h */,
+				F64F51D72E3D1431006361D3 /* ixeg733-pfp-profile.cpp */,
 			);
 			path = profiles;
 			sourceTree = "<group>";
@@ -462,6 +468,7 @@
 				F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
 				F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
 				F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
+				F64F51D82E3D1431006361D3 /* ixeg733-pfp-profile.cpp in Sources */,
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F6F77AC92E2796180060AFC0 /* toliss-mcdu-profile.cpp in Sources */,
 				F64858202E3B713900AE7524 /* ssg748-pfp-profile.cpp in Sources */,
@@ -485,6 +492,7 @@
 				F6F77AC72E2796180060AFC0 /* toliss-mcdu-profile.cpp in Sources */,
 				F679619A2E314228008031F1 /* ff777-pfp-profile.cpp in Sources */,
 				F64BE3EB2E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
+				F64F51D92E3D1431006361D3 /* ixeg733-pfp-profile.cpp in Sources */,
 				F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F6BB75782E32634700C2B21F /* product-fcu-efis.cpp in Sources */,
 				F6BB75792E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */,

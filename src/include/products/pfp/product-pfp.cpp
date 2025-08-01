@@ -4,6 +4,7 @@
 #include "profiles/zibo-pfp-profile.h"
 #include "profiles/ff777-pfp-profile.h"
 #include "profiles/ssg748-pfp-profile.h"
+#include "profiles/ixeg733-pfp-profile.h"
 #include "config.h"
 #include <XPLMUtilities.h>
 #include <algorithm>
@@ -26,21 +27,24 @@ void ProductPFP::setProfileForCurrentAircraft() {
         debug("Using Zibo PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new ZiboPfpProfile(this);
-        monitorDatarefs();
         profileReady = true;
     }
     else if (FlightFactor777PfpProfile::IsEligible()) {
         debug("Using FlightFactor 777 PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new FlightFactor777PfpProfile(this);
-        monitorDatarefs();
         profileReady = true;
     }
     else if (SSG748PfpProfile::IsEligible()) {
         debug("Using SSG 748 PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new SSG748PfpProfile(this);
-        monitorDatarefs();
+        profileReady = true;
+    }
+    else if (IXEG733PfpProfile::IsEligible()) {
+        debug("Using IXEG 733 PFP profile for %s.\n", classIdentifier());
+        clear();
+        profile = new IXEG733PfpProfile(this);
         profileReady = true;
     }
     else {
@@ -115,9 +119,6 @@ void ProductPFP::disconnect() {
     for (auto led : ledsToSet) {
         setLedBrightness(led, 0);
     }
-    
-    Dataref::getInstance()->unbind("laminar/B738/fmc/fmc_message");
-    Dataref::getInstance()->unbind("laminar/B738/indicators/fmc_exec_lights");
     
     if (profile) {
         delete profile;
@@ -390,32 +391,6 @@ void ProductPFP::clear2(unsigned char variant) {
     data.insert(data.end(), extra.begin(), extra.end());
     
     writeData(data);
-}
-
-void ProductPFP::monitorDatarefs() {
-    if (!profile) {
-        return;
-    }
-    
-    const PFPLed ledsToSet[] = {
-        PFPLed::CALL,
-        PFPLed::FAIL,
-        PFPLed::MSG,
-        PFPLed::OFST,
-        PFPLed::EXEC
-    };
-
-    for (auto led : ledsToSet) {
-        setLedBrightness(led, 0);
-    }
-    
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/fmc/fmc_message", [this](bool enabled) {
-        setLedBrightness(PFPLed::MSG, enabled ? 1 : 0);
-    });
-    
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/indicators/fmc_exec_lights", [this](bool enabled) {
-        setLedBrightness(PFPLed::EXEC, enabled ? 1 : 0);
-    });
 }
 
 void ProductPFP::setLedBrightness(PFPLed led, uint8_t brightness) {

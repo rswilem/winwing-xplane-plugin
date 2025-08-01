@@ -37,7 +37,6 @@ public:
     void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
     void writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall = false);
     
-    void monitorDatarefs();
     void setLedBrightness(MCDULed led, uint8_t brightness);
     
     void clear();

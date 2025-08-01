@@ -14,6 +14,7 @@ SSG748PfpProfile::SSG748PfpProfile(ProductPFP *product) : PfpAircraftProfile(pro
         PFPLed::FAIL,
         PFPLed::MSG,
         PFPLed::OFST,
+        PFPLed::EXEC
     };
 
     for (auto led : ledsToSet) {

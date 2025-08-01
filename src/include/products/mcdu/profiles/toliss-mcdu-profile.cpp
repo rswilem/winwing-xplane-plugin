@@ -5,6 +5,22 @@
 
 TolissMcduProfile::TolissMcduProfile(ProductMCDU *product) : McduAircraftProfile(product) {
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
+
+    const MCDULed ledsToSet[] = {
+        MCDULed::FAIL,
+        MCDULed::FM,
+        MCDULed::MCDU,
+        MCDULed::MENU,
+        MCDULed::FM1,
+        MCDULed::IND,
+        MCDULed::RDY,
+        MCDULed::STATUS,
+        MCDULed::FM2
+    };
+
+    for (auto led : ledsToSet) {
+        product->setLedBrightness(led, 0);
+    }
     
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;

@@ -5,6 +5,22 @@
 #include <algorithm>
 
 LaminarMcduProfile::LaminarMcduProfile(ProductMCDU *product) : McduAircraftProfile(product) {
+    const MCDULed ledsToSet[] = {
+        MCDULed::FAIL,
+        MCDULed::FM,
+        MCDULed::MCDU,
+        MCDULed::MENU,
+        MCDULed::FM1,
+        MCDULed::IND,
+        MCDULed::RDY,
+        MCDULed::STATUS,
+        MCDULed::FM2
+    };
+
+    for (auto led : ledsToSet) {
+        product->setLedBrightness(led, 0);
+    }
+    
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {
             return;

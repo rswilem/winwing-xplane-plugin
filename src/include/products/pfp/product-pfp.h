@@ -20,7 +20,6 @@ private:
     std::pair<uint8_t, uint8_t> dataFromColFont(char color, bool fontSmall = false);
     
     void setProfileForCurrentAircraft();
-    void monitorDatarefs();
 
 public:
     ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
