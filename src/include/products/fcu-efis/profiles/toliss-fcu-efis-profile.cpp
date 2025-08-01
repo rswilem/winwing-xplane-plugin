@@ -7,33 +7,19 @@
 #include <iomanip>
 
 TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
-    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/SupplLightLevelRehostats[0]", [product](float brightness) {
-        uint8_t target = brightness * 255.0f;
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/SupplLightLevelRehostats", [product](std::vector<float> brightness) {
+        uint8_t target = brightness[0] * 255.0f;
         product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::FLAG_GREEN, target);
         product->setLedBrightness(FCUEfisLed::EFISR_FLAG_GREEN, target);
         product->setLedBrightness(FCUEfisLed::EFISL_FLAG_GREEN, target);
-    });
-    
-    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/SupplLightLevelRehostats[1]", [product](float brightness) {
-        uint8_t target = brightness * 255.0f;
-        product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, target);
-    });
-    
-    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
-        uint8_t target = brightness * 255.0f;
-        // Only set if specific brightness controls aren't available
-        // These will be overridden by the specific controls above if they exist
-        product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, target);
+        
+        uint8_t screenBrightness = brightness[1] * 255.0f;
+        product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, screenBrightness);
+        product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, screenBrightness);
+        product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, screenBrightness);
     });
     
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AP1Engage", [product](int engaged) {
@@ -62,14 +48,6 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
     
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/APVerticalMode", [product](int vsMode) {
         product->setLedBrightness(FCUEfisLed::EXPED_YELLOW, vsMode >= 112 ? 255 : 0);
-    });
-    
-    // Monitor FLAG green LEDs for all sections
-    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
-        uint8_t flagBrightness = brightness * 255.0f;
-        product->setLedBrightness(FCUEfisLed::FLAG_GREEN, flagBrightness);
-        product->setLedBrightness(FCUEfisLed::EFISR_FLAG_GREEN, flagBrightness);
-        product->setLedBrightness(FCUEfisLed::EFISL_FLAG_GREEN, flagBrightness);
     });
     
     // Monitor EFIS Right (Captain) LED states
@@ -133,9 +111,7 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
 
 TolissFCUEfisProfile::~TolissFCUEfisProfile() {
     // Unbind brightness control datarefs
-    Dataref::getInstance()->unbind("AirbusFBW/SupplLightLevelRehostats[0]");
-    Dataref::getInstance()->unbind("AirbusFBW/SupplLightLevelRehostats[1]");
-    Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
+    Dataref::getInstance()->unbind("AirbusFBW/SupplLightLevelRehostats");
     
     // Unbind FCU datarefs
     Dataref::getInstance()->unbind("AirbusFBW/AP1Engage");
@@ -166,7 +142,7 @@ TolissFCUEfisProfile::~TolissFCUEfisProfile() {
 }
 
 bool TolissFCUEfisProfile::IsEligible() {
-    return Dataref::getInstance()->exists("AirbusFBW/PanelBrightnessLevel") &&
+    return Dataref::getInstance()->exists("AirbusFBW/SupplLightLevelRehostats") &&
            Dataref::getInstance()->exists("AirbusFBW/FCUAltitude");
 }
 
@@ -192,10 +168,6 @@ const std::vector<std::string>& TolissFCUEfisProfile::displayDatarefs() const {
         "AirbusFBW/BaroUnitFO",
         "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
         "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot",
-        
-        // Brightness control datarefs
-        "AirbusFBW/SupplLightLevelRehostats[0]",   // Panel brightness
-        "AirbusFBW/SupplLightLevelRehostats[1]"    // LCD brightness
     };
     return datarefs;
 }
