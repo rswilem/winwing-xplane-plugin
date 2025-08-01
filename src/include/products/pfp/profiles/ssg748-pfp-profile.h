@@ -1,16 +1,17 @@
-#ifndef ZIBO_PFP_PROFILE_H
-#define ZIBO_PFP_PROFILE_H
+#ifndef SSG748_PFP_PROFILE_H
+#define SSG748_PFP_PROFILE_H
 
 #include "pfp-aircraft-profile.h"
 #include <regex>
 
-class ZiboPfpProfile : public PfpAircraftProfile {
+class SSG748PfpProfile : public PfpAircraftProfile {
 private:
     std::regex datarefRegex;
+    PFPColor getColorFromCode(char colorCode, bool fontSmall) const;
     
 public:
-    ZiboPfpProfile(ProductPFP *product);
-    virtual ~ZiboPfpProfile();
+    SSG748PfpProfile(ProductPFP *product);
+    virtual ~SSG748PfpProfile();
 
     static bool IsEligible();
     

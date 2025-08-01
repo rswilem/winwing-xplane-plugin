@@ -441,7 +441,7 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
         return;
     }
     
-    if constexpr (std::is_same<T, bool>::value) {
+    if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> || std::is_same_v<T, float>) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(handle);
         if (refType == xplmType_Float) {
             XPLMSetDataf(handle, value);
@@ -449,12 +449,6 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
         else {
             XPLMSetDatai(handle, value);
         }
-    }
-    else if constexpr (std::is_same<T, int>::value) {
-        XPLMSetDatai(handle, value);
-    }
-    else if constexpr (std::is_same<T, float>::value) {
-        XPLMSetDataf(handle, value);
     }
     else if constexpr (std::is_same<T, std::vector<int>>::value) {
         XPLMSetDatavi(handle, const_cast<int*>(value.data()), 0, static_cast<int>(value.size()));

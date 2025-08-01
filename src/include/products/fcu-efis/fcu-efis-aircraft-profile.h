@@ -7,6 +7,7 @@
 #include <map>
 #include <unordered_map>
 #include <cstdint>
+#include <XPLMUtilities.h>
 
 // 7-segment display character representations
 // Bit mapping: 0x80=Top, 0x40=Upper Right, 0x20=Lower Right, 0x10=Bottom, 0x08=Upper Left, 0x04=Middle, 0x02=Lower Left, 0x01=Dot
@@ -41,7 +42,7 @@ struct FCUEfisButtonDef {
     int id;
     std::string name;
     std::string dataref;
-    int value = -1;  // Optional: for buttons that set specific values (-1 means use command)
+    int value = -1;
 };
 enum class FCUEfisLed : int {
     // FCU LEDs
@@ -118,16 +119,20 @@ struct FCUDisplayData {
     bool efisLQfe = false;
 };
 
+class ProductFCUEfis;
+
 class FCUEfisAircraftProfile {
-public:
-    FCUEfisAircraftProfile() {};
-    virtual ~FCUEfisAircraftProfile() = default;
+protected:
+    ProductFCUEfis *product;
     
-    std::function<void(FCUEfisLed led, unsigned char brightness)> ledBrightnessCallback = nullptr;
+public:
+    FCUEfisAircraftProfile(ProductFCUEfis *product) : product(product) {};
+    virtual ~FCUEfisAircraftProfile() = default;
 
     virtual const std::vector<std::string>& displayDatarefs() const = 0;
     virtual const std::vector<FCUEfisButtonDef>& buttonDefs() const = 0;
     virtual void updateDisplayData(FCUDisplayData& displayData, const std::map<std::string, std::string>& cachedDatarefValues) = 0;
+    virtual void buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) = 0;
     virtual bool hasEfisRight() const = 0;
     virtual bool hasEfisLeft() const = 0;
 };

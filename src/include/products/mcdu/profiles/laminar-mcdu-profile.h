@@ -6,10 +6,9 @@
 
 class LaminarMcduProfile : public McduAircraftProfile {
 private:
-    void writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string& text, char color = 'W', bool fontSmall = false);
     
 public:
-    LaminarMcduProfile();
+    LaminarMcduProfile(ProductMCDU *product);
     ~LaminarMcduProfile();
 
     static bool IsEligible();
@@ -17,6 +16,7 @@ public:
     const std::vector<MCDUButtonDef>& buttonDefs() const override;
     const std::map<char, int>& colorMap() const override;
     void updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) override;
+    void buttonPressed(const MCDUButtonDef *button, XPLMCommandPhase phase) override;
 };
 
 #endif

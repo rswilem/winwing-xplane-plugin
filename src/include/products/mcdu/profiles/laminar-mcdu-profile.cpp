@@ -4,19 +4,15 @@
 #include <cstring>
 #include <algorithm>
 
-constexpr unsigned int PAGE_LINES = 14;
-constexpr unsigned int PAGE_CHARS_PER_LINE = 24;
-constexpr unsigned int PAGE_BYTES_PER_CHAR = 3;
-
-LaminarMcduProfile::LaminarMcduProfile() {
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [this](std::vector<float> brightness) {
-        if (!ledBrightnessCallback || brightness.size() <= 6) {
+LaminarMcduProfile::LaminarMcduProfile(ProductMCDU *product) : McduAircraftProfile(product) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
+        if (brightness.size() <= 6) {
             return;
         }
         
         uint8_t target = Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255.0f : 0;
-        ledBrightnessCallback(MCDULed::BACKLIGHT, target);
-        ledBrightnessCallback(MCDULed::SCREEN_BACKLIGHT, target);
+        product->setLedBrightness(MCDULed::BACKLIGHT, target);
+        product->setLedBrightness(MCDULed::SCREEN_BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
@@ -156,12 +152,12 @@ const std::map<char, int>& LaminarMcduProfile::colorMap() const {
 
 void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
     // Clear the page
-    for (int i = 0; i < PAGE_LINES; ++i) {
+    for (int i = 0; i < ProductMCDU::PageLines; ++i) {
         std::fill(page[i].begin(), page[i].end(), ' ');
     }
 
     // Process lines 0-13 (we have 14 lines available, lines 0-15 from Laminar map to 0-13)
-    for (int lineNum = 0; lineNum < std::min(PAGE_LINES, (unsigned int)16); ++lineNum) {
+    for (int lineNum = 0; lineNum < std::min(ProductMCDU::PageLines, (unsigned int)16); ++lineNum) {
         // Get text content for this line
         std::string textDataref = "sim/cockpit2/radios/indicators/fms_cdu1_text_line" + std::to_string(lineNum);
         std::string styleDataref = "sim/cockpit2/radios/indicators/fms_cdu1_style_line" + std::to_string(lineNum);
@@ -216,7 +212,7 @@ void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page, const 
 #endif
 
         // Process each character in the line
-        for (int i = 0; i < text.size() && i < PAGE_CHARS_PER_LINE; ++i) {
+        for (int i = 0; i < text.size() && i < ProductMCDU::PageCharsPerLine; ++i) {
             char c = text[i];
             if (c == 0x00) {
                 continue;
@@ -259,33 +255,15 @@ void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page, const 
             }
             
             int displayLine = lineNum;
-            if (displayLine >= PAGE_LINES) {
+            if (displayLine >= ProductMCDU::PageLines) {
                 break;
             }
 
-            writeLineToPage(page, displayLine, i, std::string(1, c), color, fontSmall);
+            product->writeLineToPage(page, displayLine, i, std::string(1, c), color, fontSmall);
         }
     }
 }
 
-void LaminarMcduProfile::writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall) {
-    if (line < 0 || line >= PAGE_LINES) {
-        return;
-    }
-    if (pos < 0 || pos + text.length() > PAGE_CHARS_PER_LINE) {
-        return;
-    }
-    if (text.length() > PAGE_CHARS_PER_LINE) {
-        return;
-    }
-
-    pos = pos * PAGE_BYTES_PER_CHAR;
-    size_t textLen = text.length();
-    for (int c = 0; c < textLen; ++c) {
-        int pagePos = pos + c * PAGE_BYTES_PER_CHAR;
-        page[line][pagePos] = color;
-        page[line][pagePos + 1] = fontSmall;
-        page[line][pagePos + PAGE_BYTES_PER_CHAR - 1] = text[c];
-    }
+void LaminarMcduProfile::buttonPressed(const MCDUButtonDef *button, XPLMCommandPhase phase) {
+    Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
 }
-

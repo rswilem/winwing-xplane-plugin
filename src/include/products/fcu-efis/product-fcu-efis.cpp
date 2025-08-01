@@ -83,18 +83,13 @@ ProductFCUEfis::ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uin
 }
 
 ProductFCUEfis::~ProductFCUEfis() {
-    if (profile) {
-        profile->ledBrightnessCallback = nullptr;
-        delete profile;
-        profile = nullptr;
-    }
     disconnect();
 }
 
 void ProductFCUEfis::setProfileForCurrentAircraft() {
     if (TolissFCUEfisProfile::IsEligible()) {
         debug("Using Toliss FCU-EFIS profile for %s.\n", classIdentifier());
-        profile = new TolissFCUEfisProfile();
+        profile = new TolissFCUEfisProfile(this);
         monitorDatarefs();
         profileReady = true;
     }
@@ -127,18 +122,46 @@ bool ProductFCUEfis::connect() {
 }
 
 void ProductFCUEfis::disconnect() {
-    // Turn off all LEDs
-    setLedBrightness(FCUEfisLed::BACKLIGHT, 0);
-    setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, 0);
-    setLedBrightness(FCUEfisLed::AP1_GREEN, 0);
-    setLedBrightness(FCUEfisLed::AP2_GREEN, 0);
-    setLedBrightness(FCUEfisLed::ATHR_GREEN, 0);
-    setLedBrightness(FCUEfisLed::LOC_GREEN, 0);
-    setLedBrightness(FCUEfisLed::APPR_GREEN, 0);
-    setLedBrightness(FCUEfisLed::EXPED_GREEN, 0);
+    const FCUEfisLed ledsToSet[] = {
+        FCUEfisLed::BACKLIGHT,
+        FCUEfisLed::SCREEN_BACKLIGHT,
+        FCUEfisLed::LOC_GREEN,
+        FCUEfisLed::AP1_GREEN,
+        FCUEfisLed::AP2_GREEN,
+        FCUEfisLed::ATHR_GREEN,
+        FCUEfisLed::EXPED_GREEN,
+        FCUEfisLed::APPR_GREEN,
+        FCUEfisLed::FLAG_GREEN,
+        FCUEfisLed::EXPED_YELLOW,
+        
+        FCUEfisLed::EFISR_BACKLIGHT,
+        FCUEfisLed::EFISR_SCREEN_BACKLIGHT,
+        FCUEfisLed::EFISR_FLAG_GREEN,
+        FCUEfisLed::EFISR_FD_GREEN,
+        FCUEfisLed::EFISR_LS_GREEN,
+        FCUEfisLed::EFISR_CSTR_GREEN,
+        FCUEfisLed::EFISR_WPT_GREEN,
+        FCUEfisLed::EFISR_VORD_GREEN,
+        FCUEfisLed::EFISR_NDB_GREEN,
+        FCUEfisLed::EFISR_ARPT_GREEN,
+        
+        FCUEfisLed::EFISL_BACKLIGHT,
+        FCUEfisLed::EFISL_SCREEN_BACKLIGHT,
+        FCUEfisLed::EFISL_FLAG_GREEN,
+        FCUEfisLed::EFISL_FD_GREEN,
+        FCUEfisLed::EFISL_LS_GREEN,
+        FCUEfisLed::EFISL_CSTR_GREEN,
+        FCUEfisLed::EFISL_WPT_GREEN,
+        FCUEfisLed::EFISL_VORD_GREEN,
+        FCUEfisLed::EFISL_NDB_GREEN,
+        FCUEfisLed::EFISL_ARPT_GREEN
+    };
+    
+    for (auto led : ledsToSet) {
+        setLedBrightness(led, 0);
+    }
     
     if (profile) {
-        profile->ledBrightnessCallback = nullptr;
         delete profile;
         profile = nullptr;
     }
@@ -275,7 +298,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string&
     
     // First request - send display data
     std::vector<uint8_t> data1 = {
-        0xF0, 0x00, packageNumber, 0x31, 0x10, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00,
+        0xF0, 0x00, packageNumber, 0x31, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00,
         0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     };
     
@@ -313,7 +336,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string&
     
     // Second request - commit display data
     std::vector<uint8_t> data2 = {
-        0xF0, 0x00, packageNumber, 0x11, 0x10, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00
+        0xF0, 0x00, packageNumber, 0x11, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00
     };
     
     // Pad to 64 bytes
@@ -417,7 +440,7 @@ void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
     
     if (ledValue < 100) {
         // FCU LEDs
-        data = {0x02, 0x10, 0xBB, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
+        data = {0x02, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
     } else if (ledValue < 200) {
         // EFIS Right LEDs
         data = {0x02, 0x0E, 0xBF, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue - 100), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -450,56 +473,26 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
     
     // Parse button press data - format is specific to FCU-EFIS hardware
     // Bytes 0-11 contain button states for 96 buttons (8 bits per byte)
+    const std::vector<FCUEfisButtonDef>& currentButtonDefs = profile->buttonDefs();
+    
     for (int byteIndex = 0; byteIndex < std::min(12, reportLength); byteIndex++) {
         uint8_t buttonByte = report[byteIndex];
         
         for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
-            int buttonIndex = byteIndex * 8 + bitIndex;
-            bool isPressed = (buttonByte & (1 << bitIndex)) != 0;
+            int i = byteIndex * 8 + bitIndex;
+            bool pressed = (buttonByte & (1 << bitIndex)) != 0;
+            bool pressedButtonIndexExists = pressedButtonIndices.find(i) != pressedButtonIndices.end();
             
-            auto it = pressedButtonIndices.find(buttonIndex);
-            bool wasPressed = (it != pressedButtonIndices.end());
-            
-            if (isPressed && !wasPressed) {
-                // Button pressed
-                pressedButtonIndices.insert(buttonIndex);
-                
-                // Find button definition by ID
-                const auto& buttons = profile->buttonDefs();
-                auto buttonIt = std::find_if(buttons.begin(), buttons.end(), 
-                    [buttonIndex](const FCUEfisButtonDef& btn) { return btn.id == buttonIndex; });
-                
-                if (buttonIt != buttons.end() && !buttonIt->dataref.empty()) {
-                    if (buttonIt->value >= 0) {
-                        // Set specific dataref value
-                        Dataref::getInstance()->set<int>(buttonIt->dataref.c_str(), buttonIt->value);
-                        debug("[%s] Button pressed: %d - Set %s = %d\n", classIdentifier(), buttonIndex, buttonIt->dataref.c_str(), buttonIt->value);
-                    } else {
-                        // Execute command
-                        Dataref::getInstance()->executeCommand(buttonIt->dataref.c_str(), xplm_CommandBegin);
-                        debug("[%s] Button pressed: %d - %s\n", classIdentifier(), buttonIndex, buttonIt->dataref.c_str());
-                    }
-                }
-            } else if (isPressed && wasPressed) {
-                // Button held - only for commands, not for value-setting buttons
-                const auto& buttons = profile->buttonDefs();
-                auto buttonIt = std::find_if(buttons.begin(), buttons.end(), 
-                    [buttonIndex](const FCUEfisButtonDef& btn) { return btn.id == buttonIndex; });
-                
-                if (buttonIt != buttons.end() && !buttonIt->dataref.empty() && buttonIt->value < 0) {
-                    Dataref::getInstance()->executeCommand(buttonIt->dataref.c_str(), xplm_CommandContinue);
-                }
-            } else if (!isPressed && wasPressed) {
-                // Button released - only for commands, not for value-setting buttons
-                pressedButtonIndices.erase(buttonIndex);
-                
-                const auto& buttons = profile->buttonDefs();
-                auto buttonIt = std::find_if(buttons.begin(), buttons.end(), 
-                    [buttonIndex](const FCUEfisButtonDef& btn) { return btn.id == buttonIndex; });
-                
-                if (buttonIt != buttons.end() && !buttonIt->dataref.empty() && buttonIt->value < 0) {
-                    Dataref::getInstance()->executeCommand(buttonIt->dataref.c_str(), xplm_CommandEnd);
-                }
+            if (pressed && !pressedButtonIndexExists) {
+                pressedButtonIndices.insert(i);
+                profile->buttonPressed(&currentButtonDefs[i], xplm_CommandBegin);
+            }
+            else if (pressed && pressedButtonIndexExists) {
+                profile->buttonPressed(&currentButtonDefs[i], xplm_CommandContinue);
+            }
+            else if (!pressed && pressedButtonIndexExists) {
+                pressedButtonIndices.erase(i);
+                profile->buttonPressed(&currentButtonDefs[i], xplm_CommandEnd);
             }
         }
     }
@@ -509,12 +502,5 @@ void ProductFCUEfis::monitorDatarefs() {
     if (!profile) {
         return;
     }
-    
-    // Set up LED brightness callback
-    profile->ledBrightnessCallback = [this](FCUEfisLed led, uint8_t brightness) {
-        setLedBrightness(led, brightness);
-    };
-    
-    // The profile handles dataref monitoring internally via monitorExistingDataref
-    // No need to manually subscribe to datarefs here
 }
+

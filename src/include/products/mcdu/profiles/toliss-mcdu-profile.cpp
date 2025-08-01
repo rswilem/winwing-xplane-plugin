@@ -1,36 +1,26 @@
 #include "toliss-mcdu-profile.h"
 #include "product-mcdu.h"
 #include "dataref.h"
-#include <cstring>
 #include <algorithm>
 
-constexpr unsigned int PAGE_LINES = 14;
-constexpr unsigned int PAGE_CHARS_PER_LINE = 24;
-constexpr unsigned int PAGE_BYTES_PER_CHAR = 3;
-constexpr unsigned int PAGE_BYTES_PER_LINE = PAGE_CHARS_PER_LINE * PAGE_BYTES_PER_CHAR;
-
-TolissMcduProfile::TolissMcduProfile() {
+TolissMcduProfile::TolissMcduProfile(ProductMCDU *product) : McduAircraftProfile(product) {
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
     
-    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [this](float brightness) {
-        if (!ledBrightnessCallback) {
-            return;
-        }
-        
+    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
-        ledBrightnessCallback(MCDULed::BACKLIGHT, target);
+        product->setLedBrightness(MCDULed::BACKLIGHT, target);
     });
     
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/DUBrightness", [this](std::vector<float> brightness) {
-        if (!ledBrightnessCallback || brightness.size() < 8) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/DUBrightness", [product](std::vector<float> brightness) {
+        if (brightness.size() < 8) {
             return;
         }
         
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255.0f : 0;
-        ledBrightnessCallback(MCDULed::SCREEN_BACKLIGHT, target);
+        product->setLedBrightness(MCDULed::SCREEN_BACKLIGHT, target);
     });
     
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
@@ -282,11 +272,11 @@ const std::map<char, int>& TolissMcduProfile::colorMap() const {
 }
 
 void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
-    std::array<int, PAGE_BYTES_PER_LINE> spw_line{};
-    std::array<int, PAGE_BYTES_PER_LINE> spa_line{};
+    std::array<int, ProductMCDU::PageBytesPerLine> spw_line{};
+    std::array<int, ProductMCDU::PageBytesPerLine> spa_line{};
 
     // Clear the page
-    for (int i = 0; i < PAGE_LINES; ++i) {
+    for (int i = 0; i < ProductMCDU::PageLines; ++i) {
         std::fill(page[i].begin(), page[i].end(), ' ');
     }
 
@@ -298,8 +288,8 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const s
         }
         
         bool isScratchpad = (ref.size() >= 3 && (ref.substr(ref.size() - 3) == "spw" || ref.substr(ref.size() - 3) == "spa"));
-        std::smatch match;
         
+        std::smatch match;
         if (!std::regex_match(ref, match, datarefRegex) && !isScratchpad) {
             continue;
         }
@@ -344,12 +334,12 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const s
             }
 
             if (type.find("title") != std::string::npos || type.find("stitle") != std::string::npos) {
-                writeLineToPage(page, 0, i, std::string(1, c), targetColor, fontSmall);
+                product->writeLineToPage(page, 0, i, std::string(1, c), targetColor, fontSmall);
             } else if (type.find("label") != std::string::npos) {
                 unsigned char lbl_line = (match[4].str().empty() ? 1 : std::stoi(match[4])) * 2 - 1;
-                writeLineToPage(page, lbl_line, i, std::string(1, c), targetColor, fontSmall);
+                product->writeLineToPage(page, lbl_line, i, std::string(1, c), targetColor, fontSmall);
             } else if (type.find("cont") != std::string::npos || type.find("scont") != std::string::npos) {
-                writeLineToPage(page, line, i, std::string(1, c), targetColor, fontSmall);
+                product->writeLineToPage(page, line, i, std::string(1, c), targetColor, fontSmall);
             } else if (isScratchpad) {
                 if (ref.size() >= 3 && ref.substr(ref.size() - 3) == "spw") {
                     spw_line[i] = c;
@@ -362,14 +352,13 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const s
         }
     }
 
-    // Process scratchpad data
-    for (int i = 0; i < PAGE_CHARS_PER_LINE; ++i) {
+    for (int i = 0; i < ProductMCDU::PageCharsPerLine; ++i) {
         if (spw_line[i] == 0) {
             std::fill(spw_line.begin() + i, spw_line.end(), 0);
             break;
         }
     }
-    for (int i = 0; i < PAGE_CHARS_PER_LINE; ++i) {
+    for (int i = 0; i < ProductMCDU::PageCharsPerLine; ++i) {
         if (spa_line[i] == 0) {
             std::fill(spa_line.begin() + i, spa_line.end(), 0);
             break;
@@ -378,7 +367,7 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const s
 
     // Merge spw and spa into line 13
     int vertSlewType = Dataref::getInstance()->getCached<int>("AirbusFBW/MCDU1VertSlewKeys");
-    for (int i = 0; i < PAGE_CHARS_PER_LINE; ++i) {
+    for (int i = 0; i < ProductMCDU::PageCharsPerLine; ++i) {
         bool smallFont = false;
         char dispChar = ' ';
         char dispColor = 'w';
@@ -390,10 +379,10 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const s
             dispColor = 'a';
         }
 
-        if (vertSlewType > 0 && i >= PAGE_CHARS_PER_LINE - 2) {
-            if (i == PAGE_CHARS_PER_LINE - 2 && (vertSlewType == 1 || vertSlewType == 2)) {
+        if (vertSlewType > 0 && i >= ProductMCDU::PageCharsPerLine - 2) {
+            if (i == ProductMCDU::PageCharsPerLine - 2 && (vertSlewType == 1 || vertSlewType == 2)) {
                 dispChar = 30; // Up character
-            } else if (i == PAGE_CHARS_PER_LINE - 1 && (vertSlewType == 1 || vertSlewType == 3)) {
+            } else if (i == ProductMCDU::PageCharsPerLine - 1 && (vertSlewType == 1 || vertSlewType == 3)) {
                 dispChar = 31; // Down character
             }
             
@@ -401,27 +390,10 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const s
             smallFont = true;
         }
                 
-        writeLineToPage(page, 13, i, std::string(1, dispChar), dispColor, smallFont);
+        product->writeLineToPage(page, 13, i, std::string(1, dispChar), dispColor, smallFont);
     }
 }
 
-void TolissMcduProfile::writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall) {
-    if (line < 0 || line >= PAGE_LINES) {
-        return;
-    }
-    if (pos < 0 || pos + text.length() > PAGE_CHARS_PER_LINE) {
-        return;
-    }
-    if (text.length() > PAGE_CHARS_PER_LINE) {
-        return;
-    }
-
-    pos = pos * PAGE_BYTES_PER_CHAR;
-    size_t textLen = text.length();
-    for (int c = 0; c < textLen; ++c) {
-        int pagePos = pos + c * PAGE_BYTES_PER_CHAR;
-        page[line][pagePos] = color;
-        page[line][pagePos + 1] = fontSmall;
-        page[line][pagePos + PAGE_BYTES_PER_CHAR - 1] = text[c];
-    }
+void TolissMcduProfile::buttonPressed(const MCDUButtonDef *button, XPLMCommandPhase phase) {
+    Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
 }

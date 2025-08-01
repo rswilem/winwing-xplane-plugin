@@ -5,11 +5,8 @@
 #include "mcdu-aircraft-profile.h"
 #include <map>
 #include <set>
-#include <regex>
-#include <memory>
 
 class ProductMCDU: public USBDevice {
-    
 private:
     McduAircraftProfile *profile;
     std::vector<std::vector<char>> page;
@@ -26,12 +23,19 @@ private:
 public:
     ProductMCDU(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
     ~ProductMCDU();
+    
+    static constexpr unsigned char IdentifierByte = 0x32;
+    static constexpr unsigned int PageLines = 14; // Header + 6 * label + 6 * cont + textbox
+    static constexpr unsigned int PageCharsPerLine = 24;
+    static constexpr unsigned int PageBytesPerChar = 3;
+    static constexpr unsigned int PageBytesPerLine = PageCharsPerLine * PageBytesPerChar;
 
     const char* classIdentifier() override;
     bool connect() override;
     void disconnect() override;
     void update() override;
     void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
+    void writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall = false);
     
     void monitorDatarefs();
     void setLedBrightness(MCDULed led, uint8_t brightness);

@@ -4,7 +4,6 @@
 #include "usbdevice.h"
 #include "fcu-efis-aircraft-profile.h"
 #include <map>
-#include <vector>
 #include <set>
 
 class ProductFCUEfis: public USBDevice {
@@ -22,7 +21,9 @@ private:
 public:
     ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
     ~ProductFCUEfis();
-
+    
+    static constexpr unsigned char IdentifierByte = 0x10;
+    
     const char* classIdentifier() override;
     bool connect() override;
     void disconnect() override;

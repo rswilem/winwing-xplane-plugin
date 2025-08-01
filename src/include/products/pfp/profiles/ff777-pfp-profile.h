@@ -10,7 +10,7 @@ private:
     static std::map<char, int> colors;
     
 public:
-    FlightFactor777PfpProfile();
+    FlightFactor777PfpProfile(ProductPFP *product);
     virtual ~FlightFactor777PfpProfile();
 
     static bool IsEligible();
@@ -19,9 +19,7 @@ public:
     const std::vector<PFPButtonDef>& buttonDefs() const override;
     const std::map<char, int>& colorMap() const override;
     void updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) override;
-    
-private:
-    void writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color = 'W', bool fontSmall = false);
+    void buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) override;
 };
 
 #endif

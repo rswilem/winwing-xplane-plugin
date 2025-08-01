@@ -20,6 +20,8 @@
 		F63BC99A2E30D73E00ACBBB0 /* appstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9ECB2D078ED400530297 /* appstate.cpp */; };
 		F647201E2E16CF6D00C9976B /* usbdevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F647201D2E16CF6D00C9976B /* usbdevice.cpp */; };
 		F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F647201D2E16CF6D00C9976B /* usbdevice.cpp */; };
+		F648581F2E3B713900AE7524 /* ssg748-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F648581E2E3B713900AE7524 /* ssg748-pfp-profile.cpp */; };
+		F64858202E3B713900AE7524 /* ssg748-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F648581E2E3B713900AE7524 /* ssg748-pfp-profile.cpp */; };
 		F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E62E1BF625003C1B73 /* usbdevice_win.cpp */; };
 		F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E42E1BF625003C1B73 /* usbcontroller_win.cpp */; };
 		F64BE3EA2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */; };
@@ -79,6 +81,8 @@
 		F635AD512E059872005D6CDC /* path.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = path.h; sourceTree = "<group>"; };
 		F635AD522E059872005D6CDC /* path.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = path.cpp; sourceTree = "<group>"; };
 		F647201D2E16CF6D00C9976B /* usbdevice.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice.cpp; sourceTree = "<group>"; };
+		F648581D2E3B713900AE7524 /* ssg748-pfp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ssg748-pfp-profile.h"; sourceTree = "<group>"; };
+		F648581E2E3B713900AE7524 /* ssg748-pfp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ssg748-pfp-profile.cpp"; sourceTree = "<group>"; };
 		F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_lin.cpp; sourceTree = "<group>"; };
 		F64BE3E42E1BF625003C1B73 /* usbcontroller_win.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_win.cpp; sourceTree = "<group>"; };
 		F64BE3E62E1BF625003C1B73 /* usbdevice_win.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_win.cpp; sourceTree = "<group>"; };
@@ -172,6 +176,8 @@
 			children = (
 				F610F6312E2F8041004D29F6 /* zibo-pfp-profile.h */,
 				F610F6322E2F8041004D29F6 /* zibo-pfp-profile.cpp */,
+				F648581D2E3B713900AE7524 /* ssg748-pfp-profile.h */,
+				F648581E2E3B713900AE7524 /* ssg748-pfp-profile.cpp */,
 				F67961972E314228008031F1 /* ff777-pfp-profile.h */,
 				F67961982E314228008031F1 /* ff777-pfp-profile.cpp */,
 			);
@@ -273,8 +279,8 @@
 		F6BB75772E32634700C2B21F /* fcu-efis */ = {
 			isa = PBXGroup;
 			children = (
-				F6BB75732E32634700C2B21F /* profiles */,
 				F6BB75742E32634700C2B21F /* fcu-efis-aircraft-profile.h */,
+				F6BB75732E32634700C2B21F /* profiles */,
 				F6BB75752E32634700C2B21F /* product-fcu-efis.h */,
 				F6BB75762E32634700C2B21F /* product-fcu-efis.cpp */,
 			);
@@ -458,6 +464,7 @@
 				F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F6F77AC92E2796180060AFC0 /* toliss-mcdu-profile.cpp in Sources */,
+				F64858202E3B713900AE7524 /* ssg748-pfp-profile.cpp in Sources */,
 				F64BE3EA2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
 				F610F6352E2F8041004D29F6 /* zibo-pfp-profile.cpp in Sources */,
 				F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */,
@@ -492,6 +499,7 @@
 				F6C3455F2E187AB700D7C987 /* xplane-sdk-mock.cpp in Sources */,
 				F610F6342E2F8041004D29F6 /* zibo-pfp-profile.cpp in Sources */,
 				F6827E092E05652800382B28 /* ContentView.swift in Sources */,
+				F648581F2E3B713900AE7524 /* ssg748-pfp-profile.cpp in Sources */,
 				F6FBC55F2E3A3E15004E5F42 /* FCUEfisControlView.swift in Sources */,
 				F69FF22C2E1D13CB00F9D2D9 /* MCDUControlView.swift in Sources */,
 				F69FF22D2E1D13CB00F9D2D9 /* GenericDeviceView.swift in Sources */,

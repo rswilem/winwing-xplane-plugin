@@ -1,15 +1,13 @@
 #include "zibo-pfp-profile.h"
-#include "product-mcdu.h"
+#include "product-pfp.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
 #include <algorithm>
 
-constexpr unsigned int PAGE_LINES = 14;
-constexpr unsigned int PAGE_CHARS_PER_LINE = 24;
-constexpr unsigned int PAGE_BYTES_PER_CHAR = 3;
-
-ZiboPfpProfile::ZiboPfpProfile() {
+ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product) {
+    datarefRegex = std::regex("laminar/B738/fmc1/Line([0-9]{2})_([A-Z]+)");
+    
     const PFPLed ledsToSet[] = {
         PFPLed::CALL,
         PFPLed::FAIL,
@@ -18,22 +16,20 @@ ZiboPfpProfile::ZiboPfpProfile() {
     };
 
     for (auto led : ledsToSet) {
-        if (ledBrightnessCallback) {
-            ledBrightnessCallback(led, 0);
-        }
+        product->setLedBrightness(led, 0);
     }
         
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [this](std::vector<float> brightness) {
-        if (brightness.size() < 27 || !ledBrightnessCallback) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> brightness) {
+        if (brightness.size() < 27) {
             return;
         }
         
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255.0f : 0;
-        ledBrightnessCallback(PFPLed::BACKLIGHT, target);
-        ledBrightnessCallback(PFPLed::SCREEN_BACKLIGHT, target);
+        product->setLedBrightness(PFPLed::BACKLIGHT, target);
+        product->setLedBrightness(PFPLed::SCREEN_BACKLIGHT, target);
     });
     
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/instrument_brightness");
     });
 }
@@ -119,7 +115,7 @@ const std::vector<std::string>& ZiboPfpProfile::displayDatarefs() const {
 }
 
 const std::vector<PFPButtonDef>& ZiboPfpProfile::buttonDefs() const {
-    static const std::vector<PFPButtonDef> buttons = {
+    static const std::vector<PFPButtonDef> sevenThreeSevenButtonLayout = {
         {0, "LSK1L", "laminar/B738/button/fmc1_1L"},
         {1, "LSK2L", "laminar/B738/button/fmc1_2L"},
         {2, "LSK3L", "laminar/B738/button/fmc1_3L"},
@@ -193,54 +189,51 @@ const std::vector<PFPButtonDef>& ZiboPfpProfile::buttonDefs() const {
         {70, "CLR", "laminar/B738/button/fmc1_clr"}
     };
     
-    return buttons;
+    return sevenThreeSevenButtonLayout;
 }
 
 const std::map<char, int>& ZiboPfpProfile::colorMap() const {
     static const std::map<char, int> colMap = {
-        // Zibo Boeing 737 FMC colors mapped to PFP display values
-        {'L', 0x0042},  // Zibo L = Large/normal text (white)
-        {'S', 0x0042},  // Zibo S = Small text (white)
-        {'M', 0x00A5},  // Zibo M = Magenta
-        {'G', 0x0084},  // Zibo G = Green
-        {'C', 0x0063},  // Zibo C = Cyan (blue)
-        {'I', 0x0042},  // Zibo I = Inverted (white for now)
-        {'X', 0x0042},  // Zibo X = Special/labels (white)
-        
-        // Fallback
-        {' ', 0x0042},  // Space = white
-        {'W', 0x0042},  // White fallback
+        {'L', 0x0042}, // L = Large/normal text (white)
+        {'S', 0x0042}, // S = Small text (white)
+        {'M', 0x00A5}, // M = Magenta
+        {'G', 0x0084}, // G = Green
+        {'C', 0x0063}, // C = Cyan (blue)
+        {'I', 0x0042}, // I = Inverted (white for now)
+        {'X', 0x0042}, // X = Special/labels (white)
+        {' ', 0x0042}, // Space = white
+        {'W', 0x0042}, // White fallback
     };
 
     return colMap;
 }
 
 void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
-    page = std::vector<std::vector<char>>(PAGE_LINES, std::vector<char>(PAGE_CHARS_PER_LINE * PAGE_BYTES_PER_CHAR, ' '));
+    page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageCharsPerLine * ProductPFP::PageBytesPerChar, ' '));
     
-    for (const auto& [dataref, text] : cachedDatarefValues) {
+    for (const auto& [ref, text] : cachedDatarefValues) {
         // Handle scratchpad datarefs specially
-        if (dataref == "laminar/B738/fmc1/Line_entry" || dataref == "laminar/B738/fmc1/Line_entry_I") {
+        if (ref == "laminar/B738/fmc1/Line_entry" || ref == "laminar/B738/fmc1/Line_entry_I") {
             if (!text.empty()) {
-                char color = (dataref == "laminar/B738/fmc1/Line_entry_I") ? 'I' : 'W';
+                char color = (ref == "laminar/B738/fmc1/Line_entry_I") ? 'I' : 'W';
                 
                 // Store scratchpad text for later display on line 13
-                for (int i = 0; i < text.size() && i < PAGE_CHARS_PER_LINE; ++i) {
+                for (int i = 0; i < text.size() && i < ProductPFP::PageCharsPerLine; ++i) {
                     char c = text[i];
                     if (c == 0x00) {
                         break; // End of string
                     }
                     if (c != 0x20) { // Skip spaces
-                        writeLineToPage(page, 13, i, std::string(1, c), color, false);
+                        product->writeLineToPage(page, 13, i, std::string(1, c), color, false);
                     }
                 }
             }
             continue;
         }
         
-        std::regex rgx("laminar/B738/fmc1/Line([0-9]{2})_([A-Z]+)");
+        
         std::smatch match;
-        if (!std::regex_match(dataref, match, rgx)) {
+        if (!std::regex_match(ref, match, datarefRegex)) {
             continue;
         }
         
@@ -261,7 +254,7 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page, const std:
         }
 
         #if DEBUG
-        printf("[PFP] %s: {", dataref.c_str());
+        printf("[PFP] %s: {", ref.c_str());
         for (unsigned char ch : text) {
             printf("0x%02X, ", static_cast<unsigned char>(ch));
         }
@@ -269,37 +262,19 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page, const std:
         #endif
 
         // Process each character in the text
-        for (int i = 0; i < text.size() && i < PAGE_CHARS_PER_LINE; ++i) {
+        for (int i = 0; i < text.size() && i < ProductPFP::PageCharsPerLine; ++i) {
             char c = text[i];
             if (c == 0x00) {
-                break; // End of string
+                break;
             }
             
             if (c != 0x20) {
-                writeLineToPage(page, displayLine, i, std::string(1, c), color, fontSmall);
+                product->writeLineToPage(page, displayLine, i, std::string(1, c), color, fontSmall);
             }
         }
     }
 }
 
-void ZiboPfpProfile::writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall) {
-    if (line < 0 || line >= PAGE_LINES) {
-        debug("Not writing line %i: Line number is out of range!\n", line);
-        return;
-    }
-    if (pos < 0 || pos + text.length() > PAGE_CHARS_PER_LINE) {
-        debug("Not writing line %i: Position number (%i) is out of range!\n", line, pos);
-        return;
-    }
-    if (text.length() > PAGE_CHARS_PER_LINE) {
-        debug("Not writing line %i: Text is too long (%lu) for line.\n", line, text.length());
-        return;
-    }
-
-    pos = pos * PAGE_BYTES_PER_CHAR;
-    for (size_t c = 0; c < text.length(); ++c) {
-        page[line][pos + c * PAGE_BYTES_PER_CHAR] = color;
-        page[line][pos + c * PAGE_BYTES_PER_CHAR + 1] = fontSmall;
-        page[line][pos + c * PAGE_BYTES_PER_CHAR + PAGE_BYTES_PER_CHAR - 1] = text[c];
-    }
+void ZiboPfpProfile::buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) {
+    Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
 }

@@ -6,9 +6,9 @@
 #include <vector>
 #include <string>
 
-class TolissFCUEfisProfile : public FCUEfisAircraftProfile {
+class TolissFCUEfisProfile : public FCUEfisAircraftProfile {    
 public:
-    TolissFCUEfisProfile();
+    TolissFCUEfisProfile(ProductFCUEfis *product);
     ~TolissFCUEfisProfile();
     
     static bool IsEligible();
@@ -19,6 +19,7 @@ public:
     void updateDisplayData(FCUDisplayData& data, const std::map<std::string, std::string>& datarefValues) override;
     bool hasEfisLeft() const override { return true; }
     bool hasEfisRight() const override { return true; }
+    void buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) override;
 };
 
 #endif // TOLISS_FCU_EFIS_PROFILE_H
