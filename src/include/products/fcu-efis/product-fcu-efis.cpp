@@ -419,7 +419,7 @@ void ProductFCUEfis::sendEfisLeftDisplay(const std::string& baro) {
     data.push_back(flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)]);
     
     // Add second command
-    data.insert(data.end(), {0x0E, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
+    data.insert(data.end(), {0x0D, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
     
     // Pad to 64 bytes
     while (data.size() < 64) {
