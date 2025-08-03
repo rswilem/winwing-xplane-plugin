@@ -5,6 +5,7 @@
 #include "mcdu-aircraft-profile.h"
 #include <map>
 #include <set>
+#include <chrono>
 
 class ProductMCDU: public USBDevice {
 private:
@@ -13,6 +14,10 @@ private:
     std::vector<std::vector<char>> previousPage;
     std::map<std::string, std::string> cachedDatarefValues;
     std::set<int> pressedButtonIndices;
+    
+    // Display update throttling
+    std::chrono::steady_clock::time_point lastDisplayUpdate;
+    static constexpr int DISPLAY_UPDATE_INTERVAL_MS = 50; // 20 FPS max for display
     
     void updatePage();
     void draw(const std::vector<std::vector<char>> *pagePtr = nullptr);

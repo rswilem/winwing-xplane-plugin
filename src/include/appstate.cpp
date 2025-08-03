@@ -11,7 +11,8 @@ AppState* AppState::instance = nullptr;
 AppState::AppState() {
     pluginInitialized = false;
     debuggingEnabled = false;
-    fastUpdate = false;
+    updateSpeed = UpdateSpeed::SLOW;
+    hasActiveProfile = false;
 }
 
 AppState::~AppState() {
@@ -63,11 +64,17 @@ float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLas
     
     appstate->update();
     
-    if (!USBController::getInstance()->allProfilesReady()) {
-        return REFRESH_INTERVAL_SECONDS_SLOW;
+    // Return appropriate refresh rate based on updateSpeed
+    switch (appstate->updateSpeed) {
+        case UpdateSpeed::SLOW:
+            return REFRESH_INTERVAL_SECONDS_SLOW;     // 5.0s - No profile loaded
+        case UpdateSpeed::NORMAL:
+            return REFRESH_INTERVAL_SECONDS_NORMAL;   // 0.4s - Aircraft in the air
+        case UpdateSpeed::FAST:
+            return REFRESH_INTERVAL_SECONDS_FAST;     // 0.1s - Wheels on ground
+        default:
+            return REFRESH_INTERVAL_SECONDS_NORMAL;
     }
-    
-    return appstate->fastUpdate ? REFRESH_INTERVAL_SECONDS_FAST : REFRESH_INTERVAL_SECONDS_NORMAL;
 }
 
 void AppState::update() {

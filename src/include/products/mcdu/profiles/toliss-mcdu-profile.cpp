@@ -1,6 +1,7 @@
 #include "toliss-mcdu-profile.h"
 #include "product-mcdu.h"
 #include "dataref.h"
+#include "config.h"
 #include <algorithm>
 
 TolissMcduProfile::TolissMcduProfile(ProductMCDU *product) : McduAircraftProfile(product) {

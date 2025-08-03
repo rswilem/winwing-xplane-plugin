@@ -92,6 +92,9 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
         profile = new TolissFCUEfisProfile(this);
         monitorDatarefs();
         profileReady = true;
+        // Profile loaded, set update speed to NORMAL
+        AppState::getInstance()->hasActiveProfile = true;
+        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
     }
     else {
         debug("No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());

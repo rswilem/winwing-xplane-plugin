@@ -1,6 +1,7 @@
 #include "toliss-fcu-efis-profile.h"
 #include "product-fcu-efis.h"
 #include "dataref.h"
+#include "appstate.h"
 #include <cstring>
 #include <algorithm>
 #include <sstream>
