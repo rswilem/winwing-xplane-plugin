@@ -435,3 +435,49 @@ void fcuefis_testDisplay(void* fcuefisHandle, const char* testType) {
         fcuefis->sendEfisLeftDisplay("8888");
     }
 }
+
+void fcuefis_efisRightTestDisplay(void* fcuefisHandle, const char* testType) {
+    if (!fcuefisHandle || !testType) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    
+    std::string test(testType);
+    if (test == "QNH_1013") {
+        // hPa: QNH mode but no decimal point
+        fcuefis->sendEfisRightDisplayWithFlags("1013", true, false);
+    } else if (test == "QNH_2992") {
+        // inHg: show decimal point to display "29.92"
+        fcuefis->sendEfisRightDisplayWithFlags("2992", true, true);
+    } else if (test == "STD") {
+        // STD: no decimal point
+        fcuefis->sendEfisRightDisplayWithFlags("STD ", false, false);
+    }
+}
+
+void fcuefis_efisLeftTestDisplay(void* fcuefisHandle, const char* testType) {
+    if (!fcuefisHandle || !testType) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    
+    std::string test(testType);
+    if (test == "QNH_1013") {
+        // hPa: QNH mode but no decimal point
+        fcuefis->sendEfisLeftDisplayWithFlags("1013", true, false);
+    } else if (test == "QNH_2992") {
+        // inHg: show decimal point to display "29.92"
+        fcuefis->sendEfisLeftDisplayWithFlags("2992", true, true);
+    } else if (test == "STD") {
+        // STD: no decimal point
+        fcuefis->sendEfisLeftDisplayWithFlags("STD ", false, false);
+    }
+}
+
+void fcuefis_efisRightClear(void* fcuefisHandle) {
+    if (!fcuefisHandle) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    fcuefis->sendEfisRightDisplay("    ");  // Clear with 4 spaces
+}
+
+void fcuefis_efisLeftClear(void* fcuefisHandle) {
+    if (!fcuefisHandle) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    fcuefis->sendEfisLeftDisplay("    ");  // Clear with 4 spaces
+}

@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
+#include <cstring>
 
 uint8_t swapNibbles(uint8_t value) {
     return ((value & 0x0F) << 4) | ((value & 0xF0) >> 4);
@@ -435,6 +436,38 @@ void ProductFCUEfis::sendEfisLeftDisplay(const std::string& baro) {
     // Increment package number for next call
     packageNumber++;
     if (packageNumber == 0) packageNumber = 1;  // Avoid 0
+}
+
+void ProductFCUEfis::sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec) {
+    // Temporarily set the flags in displayData
+    bool originalQnh = displayData.efisRQnh;
+    bool originalHpaDec = displayData.efisRHpaDec;
+    
+    displayData.efisRQnh = qnh;
+    displayData.efisRHpaDec = hpaDec;
+    
+    // Call the regular send function which uses displayData flags
+    sendEfisRightDisplay(baro);
+    
+    // Restore original flags
+    displayData.efisRQnh = originalQnh;
+    displayData.efisRHpaDec = originalHpaDec;
+}
+
+void ProductFCUEfis::sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec) {
+    // Temporarily set the flags in displayData
+    bool originalQnh = displayData.efisLQnh;
+    bool originalHpaDec = displayData.efisLHpaDec;
+    
+    displayData.efisLQnh = qnh;
+    displayData.efisLHpaDec = hpaDec;
+    
+    // Call the regular send function which uses displayData flags
+    sendEfisLeftDisplay(baro);
+    
+    // Restore original flags
+    displayData.efisLQnh = originalQnh;
+    displayData.efisLHpaDec = originalHpaDec;
 }
 
 void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {

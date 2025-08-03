@@ -12,13 +12,17 @@ struct FCUEfisControlView: View {
     @State private var backlight: Double = 0
     @State private var screenBacklight: Double = 0
     @State private var efisRightBacklight: Double = 0
+    @State private var efisRightScreenBacklight: Double = 0
     @State private var efisLeftBacklight: Double = 0
+    @State private var efisLeftScreenBacklight: Double = 0
     
     // LED states for FCU-EFIS indicators
     @State private var fcuLedStates: [Bool] = Array(repeating: false, count: 31)
     @State private var efisRightLedStates: [Bool] = Array(repeating: false, count: 10)
     @State private var efisLeftLedStates: [Bool] = Array(repeating: false, count: 10)
     @State private var selectedTestDisplay: String = "ALL"
+    @State private var efisLeftSelectedTestDisplay: String = "QNH_1013"
+    @State private var efisRightSelectedTestDisplay: String = "QNH_1013"
     
     private let fcuIndicatorLEDs: [(id: Int, name: String)] = [
         (3, "LOC"), (5, "AP1"), (7, "AP2"), (9, "ATHR"), 
@@ -85,6 +89,19 @@ struct FCUEfisControlView: View {
                     }
                     .buttonStyle(.bordered)
                 }
+              
+              HStack(alignment: .center, spacing: 16) {
+                  Text("EFIS Right Screen")
+                      .frame(width: 120, alignment: .leading)
+                  Slider(value: $efisRightScreenBacklight, in: 0...255, step: 1)
+                      .frame(width: 140)
+                  Text("\(Int(efisRightScreenBacklight))")
+                      .frame(width: 36, alignment: .trailing)
+                  Button(action: { setEfisRightScreenBacklight() }) {
+                      Text("Set")
+                  }
+                  .buttonStyle(.bordered)
+              }
                 
                 HStack(alignment: .center, spacing: 16) {
                     Text("EFIS Left")
@@ -98,6 +115,19 @@ struct FCUEfisControlView: View {
                     }
                     .buttonStyle(.bordered)
                 }
+              
+              HStack(alignment: .center, spacing: 16) {
+                  Text("EFIS Left Screen")
+                      .frame(width: 120, alignment: .leading)
+                  Slider(value: $efisLeftScreenBacklight, in: 0...255, step: 1)
+                      .frame(width: 140)
+                  Text("\(Int(efisLeftScreenBacklight))")
+                      .frame(width: 36, alignment: .trailing)
+                  Button(action: { setEfisLeftScreenBacklight() }) {
+                      Text("Set")
+                  }
+                  .buttonStyle(.bordered)
+              }
             }
             
             // Display Test Controls
@@ -105,9 +135,31 @@ struct FCUEfisControlView: View {
                 Text("Display Tests")
                     .font(.subheadline)
                     .fontWeight(.medium)
+              
+                  HStack(spacing: 12) {
+                      Picker("EFIS Left Display", selection: $efisLeftSelectedTestDisplay) {
+                          Text("QNH 1013").tag("QNH_1013")
+                          Text("QNH 29.92").tag("QNH_2992")
+                          Text("STD").tag("STD")
+                      }
+                      .pickerStyle(MenuPickerStyle())
+                      
+                      Button(action: { efisLeftTestDisplay(efisLeftSelectedTestDisplay) }) {
+                          Text("Test Display")
+                      }
+                      .buttonStyle(.borderedProminent)
+                      
+                      Button(action: { efisLeftClear() }) {
+                          Text("Clear")
+                      }
+                      .buttonStyle(.bordered)
+                      
+                      Spacer()
+                  }
+                }
                 
                 HStack(spacing: 12) {
-                    Picker("Test Display", selection: $selectedTestDisplay) {
+                    Picker("FCU Display", selection: $selectedTestDisplay) {
                         Text("All Segments").tag("ALL")
                         Text("Speed Test").tag("SPEED")
                         Text("Heading Test").tag("HEADING")
@@ -118,7 +170,7 @@ struct FCUEfisControlView: View {
                     }
                     .pickerStyle(MenuPickerStyle())
                     
-                    Button(action: { testDisplay(selectedTestDisplay) }) {
+                    Button(action: { fcuTestDisplay(selectedTestDisplay) }) {
                         Text("Test Display")
                     }
                     .buttonStyle(.borderedProminent)
@@ -130,7 +182,28 @@ struct FCUEfisControlView: View {
                     
                     Spacer()
                 }
-            }
+              
+                HStack(spacing: 12) {
+                    Picker("EFIS Right Display", selection: $efisRightSelectedTestDisplay) {
+                        Text("QNH 1013").tag("QNH_1013")
+                        Text("QNH 29.92").tag("QNH_2992")
+                        Text("STD").tag("STD")
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    
+                    Button(action: { efisRightTestDisplay(efisRightSelectedTestDisplay) }) {
+                        Text("Test Display")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    
+                    Button(action: { efisRightClear() }) {
+                        Text("Clear")
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Spacer()
+                }
+              
             
             // FCU LED Indicators
             VStack(alignment: .leading, spacing: 12) {
@@ -241,15 +314,45 @@ struct FCUEfisControlView: View {
         guard let fcuefis = device.fcuEfis else { return }
         fcuefis.setEfisRightBacklight(UInt8(efisRightBacklight))
     }
+  
+  private func setEfisRightScreenBacklight() {
+      guard let fcuefis = device.fcuEfis else { return }
+      fcuefis.setEfisRightScreenBacklight(UInt8(efisRightScreenBacklight))
+  }
     
     private func setEfisLeftBacklight() {
         guard let fcuefis = device.fcuEfis else { return }
         fcuefis.setEfisLeftBacklight(UInt8(efisLeftBacklight))
     }
+  
+  private func setEfisLeftScreenBacklight() {
+      guard let fcuefis = device.fcuEfis else { return }
+      fcuefis.setEfisLeftScreenBacklight(UInt8(efisLeftScreenBacklight))
+  }
     
-    private func testDisplay(_ testType: String) {
+    private func fcuTestDisplay(_ testType: String) {
         guard let fcuefis = device.fcuEfis else { return }
         fcuefis.testDisplay(testType)
+    }
+    
+    private func efisRightTestDisplay(_ testType: String) {
+        guard let fcuefis = device.fcuEfis else { return }
+        fcuefis.efisRightTestDisplay(testType)
+    }
+    
+    private func efisLeftTestDisplay(_ testType: String) {
+        guard let fcuefis = device.fcuEfis else { return }
+        fcuefis.efisLeftTestDisplay(testType)
+    }
+    
+    private func efisRightClear() {
+        guard let fcuefis = device.fcuEfis else { return }
+        fcuefis.efisRightClear()
+    }
+    
+    private func efisLeftClear() {
+        guard let fcuefis = device.fcuEfis else { return }
+        fcuefis.efisLeftClear()
     }
     
     private func clearDisplay() {

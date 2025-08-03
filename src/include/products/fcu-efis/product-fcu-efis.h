@@ -38,6 +38,8 @@ public:
                        const std::string& altitude, const std::string& vs);
     void sendEfisRightDisplay(const std::string& baro);
     void sendEfisLeftDisplay(const std::string& baro);
+    void sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec);
+    void sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec);
 };
 
 #endif
