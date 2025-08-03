@@ -31,8 +31,6 @@ bool AppState::initialize() {
         return false;
     }
 
-    USBController::getInstance()->initialize();
-
     XPLMRegisterFlightLoopCallback(AppState::Update, REFRESH_INTERVAL_SECONDS_FAST, nullptr);
     
     pluginInitialized = true;
@@ -72,12 +70,14 @@ float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLas
 
 void AppState::update() {
     auto now = std::chrono::steady_clock::now();
-    taskQueue.erase(std::remove_if(taskQueue.begin(), taskQueue.end(), [&](DelayedTask &task) {
-        if (now >= task.runAt) {
+    for (auto &task : taskQueue) {
+        if (now >= task.runAt && task.func) {
             task.func();
-            return true;
         }
-        return false;
+    }
+
+    taskQueue.erase(std::remove_if(taskQueue.begin(), taskQueue.end(), [&](auto &task) {
+        return now >= task.runAt;
     }), taskQueue.end());
     
     if (!pluginInitialized) {

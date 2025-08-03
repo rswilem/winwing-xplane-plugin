@@ -1,4 +1,5 @@
 #include "usbcontroller.h"
+#include "appstate.h"
 
 bool USBController::allProfilesReady() {
     for (auto& device : devices) {
@@ -8,4 +9,18 @@ bool USBController::allProfilesReady() {
     }
     
     return true;
+}
+
+
+void USBController::connectAllDevices() {
+    AppState::getInstance()->executeAfter(0, [this](){
+        enumerateDevices();
+    });
+}
+
+void USBController::disconnectAllDevices() {
+    for (auto ptr : devices) {
+        delete ptr;
+    }
+    devices.clear();
 }

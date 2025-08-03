@@ -247,7 +247,7 @@ void ProductPFP::draw(const std::vector<std::vector<char>> *pagePtr) {
             char val = p[i][j * ProductPFP::PageBytesPerChar + ProductPFP::PageBytesPerChar - 1];
             switch (val) {
                 case '#':
-                case '*': // Change to bracket
+                case '*': // Change to outlined square
                     buf.insert(buf.end(), {0xe2, 0x98, 0x90});
                     break;
                 case '<': // Change to arrow

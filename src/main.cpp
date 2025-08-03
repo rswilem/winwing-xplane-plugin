@@ -83,6 +83,7 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
             
             
             AppState::getInstance()->initialize();
+            USBController::getInstance()->connectAllDevices();
             break;
         }
             
@@ -92,7 +93,7 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
                 return;
             }
             
-            USBController::getInstance()->destroy();
+            USBController::getInstance()->disconnectAllDevices();
             break;
         }
             
@@ -112,9 +113,8 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
 void menuAction(void* mRef, void* iRef) {
     if (!strcmp((char *)iRef, "ActionReloadDevices")) {
         debug_force("Reloading devices...\n");
-        USBController::getInstance()->destroy();
-        
-        USBController::getInstance()->initialize();
+        USBController::getInstance()->disconnectAllDevices();
+        USBController::getInstance()->connectAllDevices();
     }
     else if (!strcmp((char *)iRef, "ActionToggleDebugLogging")) {
         XPLMMenuCheck currentState;

@@ -17,9 +17,7 @@ DEFINE_GUID(GUID_DEVINTERFACE_HID, 0x4D1E55B2, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00,
 
 USBController* USBController::instance = nullptr;
 
-USBController::USBController() {
-    enumerateDevices();
-    
+USBController::USBController() {    
     std::thread monitorThread([this]() {
         while (true) {
             std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -38,10 +36,6 @@ USBController* USBController::getInstance() {
         instance = new USBController();
     }
     return instance;
-}
-
-void USBController::initialize() {
-    
 }
 
 void USBController::destroy() {

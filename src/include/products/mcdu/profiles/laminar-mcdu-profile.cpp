@@ -42,9 +42,7 @@ LaminarMcduProfile::~LaminarMcduProfile() {
 }
 
 bool LaminarMcduProfile::IsEligible() {
-    std::string icao = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ICAO");
-    icao.erase(std::find(icao.begin(), icao.end(), '\0'), icao.end());
-    return Dataref::getInstance()->exists("sim/cockpit2/radios/indicators/fms_cdu1_text_line0") && icao == "A333";
+    return Dataref::getInstance()->exists("laminar/A333/ckpt_temp");
 }
 
 const std::vector<std::string>& LaminarMcduProfile::displayDatarefs() const {
