@@ -58,6 +58,7 @@
     "valarray": "cpp",
     "iostream": "cpp",
     "set": "cpp",
-    "tuple": "cpp"
+    "tuple": "cpp",
+    "cstddef": "cpp"
   }
 }

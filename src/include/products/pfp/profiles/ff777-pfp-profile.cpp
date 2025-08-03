@@ -135,26 +135,17 @@ const std::map<char, int>& FlightFactor777PfpProfile::colorMap() const {
         {'M', 0x00A5}, // Magenta text
         {'Y', 0x00E6}, // Yellow text (if used)
         {'R', 0x00FF}, // Red text (if used)
-        {' ', 0x0042}, // Space = white
     };
     
     return colMap;
 }
 
-void FlightFactor777PfpProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
+void FlightFactor777PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
     page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageCharsPerLine * ProductPFP::PageBytesPerChar, ' '));
     
-    auto symbolsIt = cachedDatarefValues.find("1-sim/cduL/display/symbols");
-    auto colorsIt = cachedDatarefValues.find("1-sim/cduL/display/symbolsColor");
-    auto sizesIt = cachedDatarefValues.find("1-sim/cduL/display/symbolsSize");
-    
-    if (symbolsIt == cachedDatarefValues.end()) {
-        return;
-    }
-    
-    const std::string& symbols = symbolsIt->second;
-    const std::string& colors = (colorsIt != cachedDatarefValues.end()) ? colorsIt->second : "";
-    const std::string& sizes = (sizesIt != cachedDatarefValues.end()) ? sizesIt->second : "";
+    std::string symbols = Dataref::getInstance()->getCached<std::string>("1-sim/cduL/display/symbols");
+    std::string colors = Dataref::getInstance()->getCached<std::string>("1-sim/cduL/display/symbolsColor");
+    std::string sizes = Dataref::getInstance()->getCached<std::string>("1-sim/cduL/display/symbolsSize");
     
     for (int line = 0; line < ProductPFP::PageLines && line * ProductPFP::PageCharsPerLine < symbols.length(); ++line) {
         for (int pos = 0; pos < ProductPFP::PageCharsPerLine; ++pos) {

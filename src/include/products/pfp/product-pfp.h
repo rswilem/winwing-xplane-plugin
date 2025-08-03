@@ -10,7 +10,7 @@ class ProductPFP : public USBDevice {
 private:
     PfpAircraftProfile *profile;
     std::vector<std::vector<char>> page;
-    std::vector<std::vector<char>> previousPage;
+    int lastUpdateCycle;
     std::map<std::string, std::string> cachedDatarefValues;
     std::set<int> pressedButtonIndices;
     

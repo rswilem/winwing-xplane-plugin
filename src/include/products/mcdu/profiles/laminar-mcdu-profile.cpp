@@ -160,30 +160,25 @@ const std::map<char, int>& LaminarMcduProfile::colorMap() const {
         {'M', 0x00A5},
         {'R', 0x00C6},
         {'Y', 0x00E7},
-        {'E', 0x0108},
-        {' ', 0x0042},
+        {'E', 0x0108}
     };
     return colMap;
 }
 
-void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
+void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page) {    
     // Clear the page
     for (int i = 0; i < ProductMCDU::PageLines; ++i) {
         std::fill(page[i].begin(), page[i].end(), ' ');
     }
 
+    auto datarefManager = Dataref::getInstance();
     // Process lines 0-13 (we have 14 lines available, lines 0-15 from Laminar map to 0-13)
     for (int lineNum = 0; lineNum < std::min(ProductMCDU::PageLines, (unsigned int)16); ++lineNum) {
         // Get text content for this line
         std::string textDataref = "sim/cockpit2/radios/indicators/fms_cdu1_text_line" + std::to_string(lineNum);
         std::string styleDataref = "sim/cockpit2/radios/indicators/fms_cdu1_style_line" + std::to_string(lineNum);
         
-        auto textIt = cachedDatarefValues.find(textDataref);
-        if (textIt == cachedDatarefValues.end()) {
-            continue;
-        }
-        
-        std::string text = textIt->second;
+        std::string text = datarefManager->getCached<std::string>(textDataref.c_str());
         if (text.empty()) {
             continue;
         }

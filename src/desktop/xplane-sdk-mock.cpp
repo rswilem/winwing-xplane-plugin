@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <variant>
 #include <cstring>
+#include <ctime>
 
 // Forward declarations for XPLM types (they are defined as void* in the actual headers)
 typedef void* XPLMCommandRef;
@@ -493,4 +494,8 @@ void XPLMRegisterFlightLoopCallback(XPLMFlightLoop_f inFlightLoop, float inInter
 
 void XPLMUnregisterFlightLoopCallback(XPLMFlightLoop_f inFlightLoop, void *inRefcon) {
     
+}
+
+int XPLMGetCycleNumber() {
+    return static_cast<int>(std::time(nullptr));
 }

@@ -272,22 +272,21 @@ const std::vector<MCDUButtonDef>& TolissMcduProfile::buttonDefs() const {
 
 const std::map<char, int>& TolissMcduProfile::colorMap() const {
     static const std::map<char, int> colMap = {
-        {'L', 0x0000},
-        {'A', 0x0021},
-        {'W', 0x0042},
-        {'B', 0x0063},
-        {'G', 0x0084},
-        {'M', 0x00A5},
-        {'R', 0x00C6},
-        {'Y', 0x00E7},
-        {'E', 0x0108},
-        {' ', 0x0042},
+        //{'L', 0x0000},
+        {'a', 0x0021},
+        {'w', 0x0042},
+        {'b', 0x0063},
+        {'g', 0x0084},
+        {'m', 0x00A5},
+        {'r', 0x00C6},
+        {'y', 0x00E7},
+        {'e', 0x0108}
     };
     
     return colMap;
 }
 
-void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
+void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
     std::array<int, ProductMCDU::PageBytesPerLine> spw_line{};
     std::array<int, ProductMCDU::PageBytesPerLine> spa_line{};
 
@@ -296,13 +295,8 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const s
         std::fill(page[i].begin(), page[i].end(), ' ');
     }
 
-    const std::vector<std::string>& currentDatarefs = displayDatarefs();
-    for (const std::string &ref : currentDatarefs) {
-        auto it = cachedDatarefValues.find(ref);
-        if (it == cachedDatarefValues.end()) {
-            continue;
-        }
-        
+    auto datarefManager = Dataref::getInstance();
+    for (const auto& ref : displayDatarefs()) {        
         bool isScratchpad = (ref.size() >= 3 && (ref.substr(ref.size() - 3) == "spw" || ref.substr(ref.size() - 3) == "spa"));
         
         std::smatch match;
@@ -319,10 +313,8 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page, const s
         unsigned char line = match[4].str().empty() ? 0 : std::stoi(match[4]) * 2;
         char color = match[6].str()[0];
         bool fontSmall = match[2] == "s" || (type == "label" && match[5] != "L") || color == 's';
-
-        // Use cached value
-        const std::string &text = it->second;
         
+        std::string text = datarefManager->getCached<std::string>(ref.c_str());
         if (text.empty()) {
             continue;
         }

@@ -25,7 +25,7 @@ struct PFPButtonDef {
     int id;
     std::string name;
     std::string dataref;
-    int value = 0;
+    double value = 0.0;
 };
 
 enum class PFPLed : int {
@@ -51,7 +51,7 @@ public:
     virtual const std::vector<std::string>& displayDatarefs() const = 0;
     virtual const std::vector<PFPButtonDef>& buttonDefs() const = 0;
     virtual const std::map<char, int>& colorMap() const = 0;
-    virtual void updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) = 0;
+    virtual void updatePage(std::vector<std::vector<char>>& page) = 0;
     virtual void buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) = 0;
 };
 

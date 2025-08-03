@@ -287,27 +287,12 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
     return buttons;
 }
 
-void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data, const std::map<std::string, std::string>& datarefValues) {
-    // Helper function to get numeric values directly from datarefs
-    auto getFloatValue = [&](const std::string& dataref) -> float {
-        try {
-            return Dataref::getInstance()->get<float>(dataref.c_str());
-        } catch (...) {
-            return 0.0f;
-        }
-    };
-    
-    auto getIntValue = [&](const std::string& dataref) -> int {
-        try {
-            return Dataref::getInstance()->get<int>(dataref.c_str());
-        } catch (...) {
-            return 0;
-        }
-    };
+void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
+    auto datarefManager = Dataref::getInstance();
     
     // Format FCU speed display - using sim/cockpit2/autopilot/airspeed_dial_kts_mach (float)
-    float speed = getFloatValue("sim/cockpit2/autopilot/airspeed_dial_kts_mach");
-    if (speed > 0 && getIntValue("AirbusFBW/SPDdashed") == 0) {
+    float speed = datarefManager->getCached<float>("sim/cockpit2/autopilot/airspeed_dial_kts_mach");
+    if (speed > 0 && datarefManager->getCached<int>("AirbusFBW/SPDdashed") == 0) {
         std::stringstream ss;
         ss << std::setfill('0') << std::setw(3) << static_cast<int>(speed);
         data.speed = ss.str();
@@ -316,8 +301,8 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data, const std::ma
     }
     
     // Format FCU heading display - using sim/cockpit/autopilot/heading_mag (float)
-    float heading = getFloatValue("sim/cockpit/autopilot/heading_mag");
-    if (heading >= 0 && getIntValue("AirbusFBW/HDGdashed") == 0) {
+    float heading = datarefManager->getCached<float>("sim/cockpit/autopilot/heading_mag");
+    if (heading >= 0 && datarefManager->getCached<int>("AirbusFBW/HDGdashed") == 0) {
         std::stringstream ss;
         ss << std::setfill('0') << std::setw(3) << static_cast<int>(heading);
         data.heading = ss.str();
@@ -326,7 +311,7 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data, const std::ma
     }
     
     // Format FCU altitude display - using sim/cockpit/autopilot/altitude (float)
-    float altitude = getFloatValue("sim/cockpit/autopilot/altitude");
+    float altitude = datarefManager->getCached<float>("sim/cockpit/autopilot/altitude");
     if (altitude >= 0) {
         std::stringstream ss;
         ss << std::setfill('0') << std::setw(5) << static_cast<int>(altitude);
@@ -336,8 +321,8 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data, const std::ma
     }
     
     // Format vertical speed display - using sim/cockpit/autopilot/vertical_velocity (float)
-    float vs = getFloatValue("sim/cockpit/autopilot/vertical_velocity");
-    if (getIntValue("AirbusFBW/VSdashed") == 0 && vs != 0) {
+    float vs = datarefManager->getCached<float>("sim/cockpit/autopilot/vertical_velocity");
+    if (datarefManager->getCached<int>("AirbusFBW/VSdashed") == 0 && vs != 0) {
         std::stringstream ss;
         if (vs > 0) {
             ss << "+" << std::setfill('0') << std::setw(4) << static_cast<int>(vs);
@@ -350,23 +335,23 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data, const std::ma
     }
     
     // Set managed mode indicators - using validated int datarefs (1 or 0)
-    data.spdManaged = (getIntValue("AirbusFBW/SPDmanaged") == 1);
-    data.hdgManaged = (getIntValue("AirbusFBW/HDGmanaged") == 1);
-    data.altManaged = (getIntValue("AirbusFBW/ALTmanaged") == 1);
+    data.spdManaged = (datarefManager->getCached<int>("AirbusFBW/SPDmanaged") == 1);
+    data.hdgManaged = (datarefManager->getCached<int>("AirbusFBW/HDGmanaged") == 1);
+    data.altManaged = (datarefManager->getCached<int>("AirbusFBW/ALTmanaged") == 1);
     
     // Speed/Mach mode - using sim/cockpit/autopilot/airspeed_is_mach (int, 1 or 0)
-    data.spdMach = (getIntValue("sim/cockpit/autopilot/airspeed_is_mach") == 1);
+    data.spdMach = (datarefManager->getCached<int>("sim/cockpit/autopilot/airspeed_is_mach") == 1);
     
     // HDG/TRK mode - using AirbusFBW/HDGTRKmode (int, HDG=0, TRK=1)
-    data.hdgTrk = (getIntValue("AirbusFBW/HDGTRKmode") == 1);
+    data.hdgTrk = (datarefManager->getCached<int>("AirbusFBW/HDGTRKmode") == 1);
     
     // VS/FPA mode - based on HDG/TRK mode (when TRK=1, we use FPA instead of VS)
-    data.vsMode = (getIntValue("AirbusFBW/HDGTRKmode") == 0); // VS mode when HDG mode
-    data.fpaMode = (getIntValue("AirbusFBW/HDGTRKmode") == 1); // FPA mode when TRK mode
+    data.vsMode = (datarefManager->getCached<int>("AirbusFBW/HDGTRKmode") == 0); // VS mode when HDG mode
+    data.fpaMode = (datarefManager->getCached<int>("AirbusFBW/HDGTRKmode") == 1); // FPA mode when TRK mode
     
     // Format EFIS barometric pressure displays - Captain side (Right display)
-    int baroStdCapt = getIntValue("AirbusFBW/BaroStdCapt"); // int, 1 or 0
-    int baroUnitCapt = getIntValue("AirbusFBW/BaroUnitCapt"); // int, 1 for hPa, 0 for inHg
+    int baroStdCapt = datarefManager->getCached<int>("AirbusFBW/BaroStdCapt"); // int, 1 or 0
+    int baroUnitCapt = datarefManager->getCached<int>("AirbusFBW/BaroUnitCapt"); // int, 1 for hPa, 0 for inHg
     
     if (baroStdCapt == 1) {
         data.efisRBaro = "  STD  ";
@@ -374,7 +359,7 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data, const std::ma
         data.efisRHpaDec = false;
     } else {
         // Get actual barometric pressure value (float, inHg)
-        float baroValue = getFloatValue("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
+        float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
         if (baroValue > 0) {
             if (baroUnitCapt == 0) {  // inHg mode
                 std::stringstream ss;
@@ -398,8 +383,8 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data, const std::ma
     }
     
     // Format EFIS barometric pressure displays - First Officer side (Left display)
-    int baroStdFO = getIntValue("AirbusFBW/BaroStdFO"); // int, 1 or 0
-    int baroUnitFO = getIntValue("AirbusFBW/BaroUnitFO"); // int, 1 for hPa, 0 for inHg
+    int baroStdFO = datarefManager->getCached<int>("AirbusFBW/BaroStdFO"); // int, 1 or 0
+    int baroUnitFO = datarefManager->getCached<int>("AirbusFBW/BaroUnitFO"); // int, 1 for hPa, 0 for inHg
     
     if (baroStdFO == 1) {
         data.efisLBaro = "  STD  ";
@@ -407,7 +392,7 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data, const std::ma
         data.efisLHpaDec = false;
     } else {
         // Get actual barometric pressure value (float, inHg)
-        float baroValue = getFloatValue("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
+        float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
         if (baroValue > 0) {
             if (baroUnitFO == 0) {  // inHg mode
                 std::stringstream ss;

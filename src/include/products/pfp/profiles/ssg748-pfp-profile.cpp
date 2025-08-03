@@ -156,35 +156,29 @@ const std::map<char, int>& SSG748PfpProfile::colorMap() const {
         {'s', 0x0042}, // s = Small/white
         {'x', 0x0042}, // x = Special/labels (white)
         {'i', 0x0042}, // i = Inverted (white for now)
-        {' ', 0x0042}, // Space = white
     };
 
     return colMap;
 }
 
-void SSG748PfpProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
+void SSG748PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
     page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageCharsPerLine * ProductPFP::PageBytesPerChar, ' '));
     
-    printf("[SSG748] Processing %zu dataref values\n", cachedDatarefValues.size());
-    
-    for (const auto& [dataref, text] : cachedDatarefValues) {
-        printf("[SSG748] Dataref: %s, Text: '%s' (length: %zu)\n", dataref.c_str(), text.c_str(), text.length());
-        
+    auto datarefManager = Dataref::getInstance();
+    for (const auto& ref : displayDatarefs()) {
         std::smatch match;
-        if (!std::regex_match(dataref, match, datarefRegex)) {
-            printf("[SSG748] Dataref doesn't match regex: %s\n", dataref.c_str());
+        if (!std::regex_match(ref, match, datarefRegex)) {
             continue;
         }
         
         int lineNum = std::stoi(match[1]);
         int lineIndex = lineNum - 1;
         
-        printf("[SSG748] Processing line %d (index %d)\n", lineNum, lineIndex);
-        
         if (lineIndex < 0 || lineIndex >= ProductPFP::PageLines) {
             continue;
         }
         
+        std::string text = datarefManager->getCached<std::string>(ref.c_str());
         if (text.empty()) {
             continue;
         }
