@@ -216,9 +216,10 @@ void ProductMCDU::draw(const std::vector<std::vector<char>> *pagePtr) {
 
             char val = p[i][j * ProductMCDU::PageBytesPerChar + ProductMCDU::PageBytesPerChar - 1];
             switch (val) {
-                case '#':
+                case '#': // Change to outlined square
                     buf.insert(buf.end(), {0xe2, 0x98, 0x90});
                     break;
+                    
                 case '<': // Change to arrow
                 case '>':
                     if (fontSmall) {
@@ -244,8 +245,14 @@ void ProductMCDU::draw(const std::vector<std::vector<char>> *pagePtr) {
                     break;
 
                 case '|': // Change to triangle (overfly)
-                    buf.insert(buf.end(), {0xc2, 0xb0});
+                    buf.insert(buf.end(), {0xce, 0x14});
                     break;
+                    
+                /*
+                 buf.insert(buf.end(), {0xe2, 0x97, 0x80}); // filled arrow left
+                 buf.insert(buf.end(), {0xe2, 0x96, 0xB6}); // filled arrow right
+                 buf.insert(buf.end(), {0xe2, 0x6C, 0x21}); // diamond outline
+                 */
                 
                 default:
                 default_case:
