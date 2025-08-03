@@ -86,12 +86,17 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
             break;
         }
             
-        case XPLM_MSG_AIRPORT_LOADED: {
-            for (auto device : USBController::getInstance()->devices) {
-                if (auto mcdu = dynamic_cast<ProductMCDU*>(device)) {
-                    mcdu->setLedBrightness(MCDULed::MENU, 0);
-                }
+        case XPLM_MSG_PLANE_UNLOADED: {
+            if ((intptr_t)params != 0) {
+                // It was not the user's plane. Ignore.
+                return;
             }
+            
+            USBController::getInstance()->destroy();
+            break;
+        }
+            
+        case XPLM_MSG_AIRPORT_LOADED: {
             break;
         }
             

@@ -210,18 +210,6 @@ void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
             }
         }
 
-#if DEBUG
-        printf("[LaminarMCDU] Line %d: text='%s', style=0x", lineNum, text.c_str());
-        if (styleBytes.empty()) {
-            printf("--------");
-        } else {
-            for (unsigned char ch : styleBytes) {
-                printf("%02X", ch);
-            }
-        }
-        printf("\n");
-#endif
-
         // Process each character in the line
         for (int i = 0; i < text.size() && i < ProductMCDU::PageCharsPerLine; ++i) {
             char c = text[i];

@@ -51,18 +51,18 @@ const std::vector<std::string>& FlightFactor777PfpProfile::displayDatarefs() con
 
 const std::vector<PFPButtonDef>& FlightFactor777PfpProfile::buttonDefs() const {
     static const std::vector<PFPButtonDef> tripleSevenButtonLayout = {
-        {0, "LSK1L", ""},
-        {1, "LSK2L", ""},
-        {2, "LSK3L", ""},
-        {3, "LSK4L", ""},
-        {4, "LSK5L", ""},
-        {5, "LSK6L", ""},
-        {6, "LSK1R", ""},
-        {7, "LSK2R", ""},
-        {8, "LSK3R", ""},
-        {9, "LSK4R", ""},
-        {10, "LSK5R", ""},
-        {11, "LSK6R", ""},
+        {0, "LSK1L", "1-sim/ckpt/cduLLK1/anim"},
+        {1, "LSK2L", "1-sim/ckpt/cduLLK2/anim"},
+        {2, "LSK3L", "1-sim/ckpt/cduLLK3/anim"},
+        {3, "LSK4L", "1-sim/ckpt/cduLLK4/anim"},
+        {4, "LSK5L", "1-sim/ckpt/cduLLK5/anim"},
+        {5, "LSK6L", "1-sim/ckpt/cduLLK6/anim"},
+        {6, "LSK1R", "1-sim/ckpt/cduLRK1/anim"},
+        {7, "LSK2R", "1-sim/ckpt/cduLRK2/anim"},
+        {8, "LSK3R", "1-sim/ckpt/cduLRK3/anim"},
+        {9, "LSK4R", "1-sim/ckpt/cduLRK4/anim"},
+        {10, "LSK5R", "1-sim/ckpt/cduLRK5/anim"},
+        {11, "LSK6R", "1-sim/ckpt/cduLRK6/anim"},
         {12, "INITREF", ""},
         {13, "RTE", ""},
         {14, "DEP/ARR", ""},
@@ -184,5 +184,9 @@ void FlightFactor777PfpProfile::updatePage(std::vector<std::vector<char>>& page)
 }
 
 void FlightFactor777PfpProfile::buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) {
-    Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
+    if (phase == xplm_CommandContinue) {
+        return;
+    }
+
+    Dataref::getInstance()->set<float>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
 }
