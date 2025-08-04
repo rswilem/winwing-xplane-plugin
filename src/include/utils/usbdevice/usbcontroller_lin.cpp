@@ -44,8 +44,6 @@ USBController::USBController() {
         monitorDevices();
     });
     monitorThread.detach();
-    
-    enumerateDevices();
 }
 
 USBController::~USBController() {
@@ -57,10 +55,6 @@ USBController* USBController::getInstance() {
         instance = new USBController();
     }
     return instance;
-}
-
-void USBController::initialize() {
-    
 }
 
 void USBController::destroy() {

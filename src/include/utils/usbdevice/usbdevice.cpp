@@ -19,8 +19,12 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBB36: // MCDU-32 (Captain)
         case 0xBB3E: // MCDU-32 (First Officer)
         case 0xBB3A: // MCDU-32 (Observer)
+#if MCDU_AS_PFP
+            return new ProductPFP(hidDevice, vendorId, productId, vendorName, productName);
+#else
             return new ProductMCDU(hidDevice, vendorId, productId, vendorName, productName);
-
+#endif
+            
         case 0xBB35: // PFP 3N (Captain)
         case 0xBB39: // PFP 3N (First Officer)
         case 0xBB3D: // PFP 3N (Observer)

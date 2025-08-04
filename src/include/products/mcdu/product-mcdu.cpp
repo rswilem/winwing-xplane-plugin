@@ -3,11 +3,12 @@
 #include "appstate.h"
 #include "toliss-mcdu-profile.h"
 #include "laminar-mcdu-profile.h"
+#include <XPLMProcessing.h>
 
 ProductMCDU::ProductMCDU(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
     profile = nullptr;
     page = std::vector<std::vector<char>>(ProductMCDU::PageLines, std::vector<char>(ProductMCDU::PageBytesPerLine, ' '));
-    previousPage = std::vector<std::vector<char>>(ProductMCDU::PageLines, std::vector<char>(ProductMCDU::PageBytesPerLine, ' '));
+    lastUpdateCycle = 0;
     pressedButtonIndices = {};
     
     connect();
@@ -22,14 +23,12 @@ void ProductMCDU::setProfileForCurrentAircraft() {
         debug("Using Toliss profile for %s.\n", classIdentifier());
         clear();
         profile = new TolissMcduProfile(this);
-        monitorDatarefs();
         profileReady = true;
     }
     else if (LaminarMcduProfile::IsEligible()) {
         debug("Using Laminar profile for %s.\n", classIdentifier());
         clear();
         profile = new LaminarMcduProfile(this);
-        monitorDatarefs();
         profileReady = true;
     }
     else {
@@ -193,30 +192,13 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
 }
 
 void ProductMCDU::updatePage() {
-    if (!profile) {
-        return;
-    }
-    
-    bool anyDatarefChanged = false;
-    const std::vector<std::string>& currentDatarefs = profile->displayDatarefs();
-    for (const std::string &ref : currentDatarefs) {
-        std::string newValue = Dataref::getInstance()->getCached<std::string>(ref.c_str());
-        auto it = cachedDatarefValues.find(ref);
-        if (it == cachedDatarefValues.end() || it->second != newValue) {
-            cachedDatarefValues[ref] = newValue;
-            anyDatarefChanged = true;
+    auto datarefManager = Dataref::getInstance();
+    for (std::string dataref : profile->displayDatarefs()) {
+        if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {
+            profile->updatePage(page);
+            lastUpdateCycle = XPLMGetCycleNumber();
+            draw();
         }
-    }
-
-    if (!anyDatarefChanged) {
-        return;
-    }
-
-    profile->updatePage(page, cachedDatarefValues);
-    
-    if (page != previousPage) {
-        previousPage = page;
-        draw();
     }
 }
 
@@ -234,9 +216,10 @@ void ProductMCDU::draw(const std::vector<std::vector<char>> *pagePtr) {
 
             char val = p[i][j * ProductMCDU::PageBytesPerChar + ProductMCDU::PageBytesPerChar - 1];
             switch (val) {
-                case '#':
+                case '#': // Change to outlined square
                     buf.insert(buf.end(), {0xe2, 0x98, 0x90});
                     break;
+                    
                 case '<': // Change to arrow
                 case '>':
                     if (fontSmall) {
@@ -260,6 +243,16 @@ void ProductMCDU::draw(const std::vector<std::vector<char>> *pagePtr) {
                 case '`': // Change to °
                     buf.insert(buf.end(), {0xc2, 0xb0});
                     break;
+
+                case '|': // Change to triangle (overfly)
+                    buf.insert(buf.end(), {0xce, 0x14});
+                    break;
+                    
+                /*
+                 buf.insert(buf.end(), {0xe2, 0x97, 0x80}); // filled arrow left
+                 buf.insert(buf.end(), {0xe2, 0x96, 0xB6}); // filled arrow right
+                 buf.insert(buf.end(), {0xe2, 0x6C, 0x21}); // diamond outline
+                 */
                 
                 default:
                 default_case:
@@ -287,11 +280,9 @@ std::pair<uint8_t, uint8_t> ProductMCDU::dataFromColFont(char color, bool fontSm
     
     const std::map<char, int>& col_map = profile->colorMap();
 
-    char upperColor = std::toupper(color);
-    auto it = col_map.find(upperColor);
+    auto it = col_map.find(color);
     if (it == col_map.end()) {
-        //debug("Unknown color '%c', defaulting to white\n", color);
-        it = col_map.find(' ');
+        return {0x42, 0x00}; // Default white
     }
 
     int value = it->second;
@@ -386,28 +377,6 @@ void ProductMCDU::clear2(unsigned char variant) {
     data.insert(data.end(), extra.begin(), extra.end());
     
     writeData(data);
-}
-
-void ProductMCDU::monitorDatarefs() {
-    if (!profile) {
-        return;
-    }
-    
-    const MCDULed ledsToSet[] = {
-        MCDULed::FAIL,
-        MCDULed::FM,
-        MCDULed::MCDU,
-        MCDULed::MENU,
-        MCDULed::FM1,
-        MCDULed::IND,
-        MCDULed::RDY,
-        MCDULed::STATUS,
-        MCDULed::FM2
-    };
-
-    for (auto led : ledsToSet) {
-        setLedBrightness(led, 0);
-    }
 }
 
 void ProductMCDU::setLedBrightness(MCDULed led, uint8_t brightness) {

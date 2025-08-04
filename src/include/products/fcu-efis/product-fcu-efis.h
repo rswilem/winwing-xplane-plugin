@@ -9,10 +9,9 @@
 class ProductFCUEfis: public USBDevice {
     
 private:
-    FCUEfisAircraftProfile* profile = nullptr;
+    FCUEfisAircraftProfile* profile;
     FCUDisplayData displayData;
-    FCUDisplayData previousDisplayData;
-    std::map<std::string, std::string> cachedDatarefValues;
+    int lastUpdateCycle;
     std::set<int> pressedButtonIndices;
     std::map<std::string, int> selectorPositions;  // Track rotary selector positions by dataref
     

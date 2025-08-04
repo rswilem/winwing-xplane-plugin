@@ -10,7 +10,7 @@ class ProductPFP : public USBDevice {
 private:
     PfpAircraftProfile *profile;
     std::vector<std::vector<char>> page;
-    std::vector<std::vector<char>> previousPage;
+    int lastUpdateCycle;
     std::map<std::string, std::string> cachedDatarefValues;
     std::set<int> pressedButtonIndices;
     
@@ -20,13 +20,16 @@ private:
     std::pair<uint8_t, uint8_t> dataFromColFont(char color, bool fontSmall = false);
     
     void setProfileForCurrentAircraft();
-    void monitorDatarefs();
 
 public:
     ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
     ~ProductPFP();
     
+#if MCDU_AS_PFP
+    static constexpr unsigned char IdentifierByte = 0x32;
+#else
     static constexpr unsigned char IdentifierByte = 0x31;
+#endif
     static constexpr unsigned int PageLines = 14; // Header + 6 * label + 6 * cont + textbox
     static constexpr unsigned int PageCharsPerLine = 24;
     static constexpr unsigned int PageBytesPerChar = 3;

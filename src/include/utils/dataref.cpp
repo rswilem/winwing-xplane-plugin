@@ -1,6 +1,7 @@
 #include "dataref.h"
 #include <XPLMUtilities.h>
 #include <XPLMDisplay.h>
+#include <XPLMProcessing.h>
 #include <cstring>
 #include "config.h"
 #include "appstate.h"
@@ -274,17 +275,21 @@ void Dataref::clearCache() {
 }
 
 void Dataref::update() {
-    for (auto& [key, data] : cachedValues) {        
+    for (auto& [key, data] : cachedValues) {
         std::visit([&](auto&& value) {
             using T = std::decay_t<decltype(value)>;
             T newValue = get<T>(key.c_str());
             bool didChange = value != newValue;
-            cachedValues[key] = newValue;
             
             if (didChange) {
+                cachedValues[key] = {
+                    .value = newValue,
+                    .lastUpdateCycleNumber = XPLMGetCycleNumber()
+                };
+                
                 executeChangedCallbacksForDataref(key.c_str());
             }
-        }, data);
+        }, data.value);
     }
 }
 
@@ -311,9 +316,18 @@ void Dataref::executeChangedCallbacksForDataref(const char* ref) {
     auto it = boundRefs.find(ref);
     if (it != boundRefs.end()) {
         for (auto callback : boundRefs[ref].changeCallbacks) {
-            callback(cachedValues[ref]);
+            callback(cachedValues[ref].value);
         }
     }
+}
+
+int Dataref::getCachedLastUpdate(const char *ref) {
+    auto it = cachedValues.find(ref);
+    if (it == cachedValues.end()) {
+        return 0;
+    }
+    
+    return it->second.lastUpdateCycleNumber;
 }
 
 template float Dataref::getCached<float>(const char* ref);
@@ -328,11 +342,14 @@ T Dataref::getCached(const char *ref) {
     auto it = cachedValues.find(ref);
     if (it == cachedValues.end()) {
         auto val = get<T>(ref);
-        cachedValues[ref] = val;
+        cachedValues[ref] = {
+            .value = val,
+            .lastUpdateCycleNumber = XPLMGetCycleNumber()
+        };
         return val;
     }
     
-    if (!std::holds_alternative<T>(it->second)) {
+    if (!std::holds_alternative<T>(it->second.value)) {
         if constexpr (std::is_same<T, std::string>::value) {
             return "";
         }
@@ -344,7 +361,7 @@ T Dataref::getCached(const char *ref) {
         }
     }
     
-    return std::get<T>(it->second);
+    return std::get<T>(it->second.value);
 }
 
 template float Dataref::get<float>(const char* ref);
@@ -436,7 +453,10 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
         return;
     }
     
-    cachedValues[ref] = value;
+    cachedValues[ref] = {
+        .value = value,
+        .lastUpdateCycleNumber = XPLMGetCycleNumber()
+    };
     
     if (setCacheOnly) {
         return;

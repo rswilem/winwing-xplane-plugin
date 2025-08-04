@@ -1,16 +1,16 @@
-#ifndef ZIBO_PFP_PROFILE_H
-#define ZIBO_PFP_PROFILE_H
+#ifndef IXEG733_PFP_PROFILE_H
+#define IXEG733_PFP_PROFILE_H
 
 #include "pfp-aircraft-profile.h"
 #include <regex>
 
-class ZiboPfpProfile : public PfpAircraftProfile {
+class IXEG733PfpProfile : public PfpAircraftProfile {
 private:
-    std::regex datarefRegex;
-    
+    std::string processIxegText(const std::vector<unsigned char> &characters);
+        
 public:
-    ZiboPfpProfile(ProductPFP *product);
-    virtual ~ZiboPfpProfile();
+    IXEG733PfpProfile(ProductPFP *product);
+    virtual ~IXEG733PfpProfile();
 
     static bool IsEligible();
     

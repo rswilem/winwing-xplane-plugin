@@ -21,6 +21,15 @@ bool USBDevice::connect() {
         inputBuffer = nullptr;
     }
     inputBuffer = new uint8_t[kInputReportSize];
+    
+    // Try to open the device - if it's already opened by the manager, this will return kIOReturnExclusiveAccess
+    // or succeed if it wasn't opened yet. Either way, we'll have an open device.
+    IOReturn result = IOHIDDeviceOpen(hidDevice, kIOHIDOptionsTypeNone);
+    if (result != kIOReturnSuccess && result != kIOReturnExclusiveAccess) {
+        debug("Failed to open HID device: %d\n", result);
+        return false;
+    }
+    
     IOHIDDeviceRegisterInputReportCallback(hidDevice, inputBuffer, kInputReportSize, &USBDevice::InputReportCallback, this);
     if (hidDevice) {
         IOHIDDeviceScheduleWithRunLoop(hidDevice, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
@@ -31,21 +40,27 @@ bool USBDevice::connect() {
 }
 
 void USBDevice::InputReportCallback(void* context, IOReturn result, void* sender, IOHIDReportType type, uint32_t reportID, uint8_t* report, CFIndex reportLength) {
-    if (result != kIOReturnSuccess || !reportLength) {
+    if (result != kIOReturnSuccess || !reportLength || !context) {
         return;
     }
     
     auto* self = static_cast<USBDevice*>(context);
-    if (!self->connected) {
+    
+    if (!self->connected || self->hidDevice != sender) {
         return;
     }
     
-    InputEvent event;
-    event.reportId = reportID;
-    event.reportData.assign(report, report + reportLength);
-    event.reportLength = (int)reportLength;
-    
-    self->processOnMainThread(event);
+    try {
+        InputEvent event;
+        event.reportId = reportID;
+        event.reportData.assign(report, report + reportLength);
+        event.reportLength = (int)reportLength;
+        
+        self->processOnMainThread(event);
+    } catch (const std::system_error& e) {
+        // Silently ignore mutex errors that occur during shutdown
+        return;
+    }
 }
 
 void USBDevice::update() {
@@ -57,16 +72,26 @@ void USBDevice::update() {
 }
 
 void USBDevice::disconnect() {
+    // Set connected to false first to prevent callback processing
+    connected = false;
+    
     if (hidDevice) {
         IOHIDDeviceUnscheduleFromRunLoop(hidDevice, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        
+        // Force run loop to process any remaining queued callbacks to drain them
+        // This ensures any pending callbacks are processed while connected=false
+        for (int i = 0; i < 10; i++) {
+            CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.001, true);
+        }
+        
+        IOHIDDeviceClose(hidDevice, kIOHIDOptionsTypeNone);
+        hidDevice = nullptr;
     }
     
     if (inputBuffer) {
         delete[] inputBuffer;
         inputBuffer = nullptr;
     }
-
-    connected = false;
 }
 
 bool USBDevice::writeData(std::vector<uint8_t> data) {

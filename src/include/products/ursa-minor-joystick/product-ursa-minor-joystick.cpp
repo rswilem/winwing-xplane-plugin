@@ -19,6 +19,7 @@ const char* ProductUrsaMinorJoystick::classIdentifier() {
 bool ProductUrsaMinorJoystick::connect() {
     if (USBDevice::connect()) {
         setLedBrightness(0);
+        setVibration(0);
         profileReady = true;
         return true;
     }
@@ -70,24 +71,6 @@ bool ProductUrsaMinorJoystick::setVibration(uint8_t vibration) {
 }
 
 bool ProductUrsaMinorJoystick::setLedBrightness(uint8_t brightness) {
-    // https://github.com/schenlap/winwing_fcu/blob/main/documentation/README.md
-
-    // Winwing HID Output Report for Backlight Control
-    // Packet structure (14 bytes):
-    // [0]  0x02      : Report ID (always 0x02 for output)
-    // [1]  0x20      : ComponentID(1) (0x20 = FCU/Panel, see device docs)
-    // [2]  0xBB      : ComponentID(0) (0xBB = Backlight/LED, see device docs)
-    // [3]  0x00      : Reserved / Unused
-    // [4]  0x00      : Reserved / Unused
-    // [5]  0x03      : Length of the data (3 bytes for backlight control)
-    // [6]  0x49      : Command ID (0x49 = Set Backlight, see device docs)
-    // [7]  0x00      : Led number
-    // [8]  brightness: Backlight value (0-255)
-    // [9]  0x00      : Reserved / Unused
-    // [10] 0x00      : Reserved / Unused
-    // [11] 0x00      : Reserved / Unused
-    // [12] 0x00      : Reserved / Unused
-    // [13] 0x00      : Reserved / Unused
     return writeData({0x02, 0x20, 0xbb, 0, 0, 3, 0x49, 0, brightness, 0, 0, 0, 0, 0});
 }
 
@@ -100,8 +83,13 @@ void ProductUrsaMinorJoystick::initializeDatarefs() {
     didInitializeDatarefs = true;
     
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [this](float brightness) {
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
+        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+        uint8_t target = hasPower ? brightness * 255.0f : 0;
         setLedBrightness(target);
+        
+        if (!hasPower) {
+            setVibration(0);
+        }
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {

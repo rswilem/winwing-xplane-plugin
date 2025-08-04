@@ -83,15 +83,21 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
             
             
             AppState::getInstance()->initialize();
+            USBController::getInstance()->connectAllDevices();
+            break;
+        }
+            
+        case XPLM_MSG_PLANE_UNLOADED: {
+            if ((intptr_t)params != 0) {
+                // It was not the user's plane. Ignore.
+                return;
+            }
+            
+            USBController::getInstance()->disconnectAllDevices();
             break;
         }
             
         case XPLM_MSG_AIRPORT_LOADED: {
-            for (auto device : USBController::getInstance()->devices) {
-                if (auto mcdu = dynamic_cast<ProductMCDU*>(device)) {
-                    mcdu->setLedBrightness(MCDULed::MENU, 0);
-                }
-            }
             break;
         }
             
@@ -107,9 +113,8 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void* params)
 void menuAction(void* mRef, void* iRef) {
     if (!strcmp((char *)iRef, "ActionReloadDevices")) {
         debug_force("Reloading devices...\n");
-        USBController::getInstance()->destroy();
-        
-        USBController::getInstance()->initialize();
+        USBController::getInstance()->disconnectAllDevices();
+        USBController::getInstance()->connectAllDevices();
     }
     else if (!strcmp((char *)iRef, "ActionToggleDebugLogging")) {
         XPLMMenuCheck currentState;

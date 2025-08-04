@@ -78,8 +78,12 @@ std::vector<uint8_t> encodeStringEfis(int numSegments, const std::string& str) {
 }
 
 ProductFCUEfis::ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) 
-    : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
+: USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
     profile = nullptr;
+    displayData = {};
+    lastUpdateCycle = 0;
+    pressedButtonIndices = {};
+    
     connect();
 }
 
@@ -175,7 +179,6 @@ void ProductFCUEfis::disconnect() {
     }
     
     USBDevice::disconnect();
-    cachedDatarefValues.clear();
 }
 
 void ProductFCUEfis::update() {
@@ -193,76 +196,16 @@ void ProductFCUEfis::update() {
 }
 
 void ProductFCUEfis::updateDisplays() {
-    if (!profile) {
-        return;
-    }
-    
-    static int updateCounter = 0;
-    updateCounter++;
-    
-    // Log every 50th update to see if we're being called
-    if (updateCounter % 50 == 0) {
-        debug_force("[ProductFCUEfis] updateDisplays called (count=%d)\n", updateCounter);
-        
-        // Only log dataref values after initial startup
-        if (updateCounter >= 100) {
-            // Log some key dataref values to see what we're reading
-            if (Dataref::getInstance()->exists("sim/cockpit2/autopilot/airspeed_dial_kts_mach")) {
-                float speed = Dataref::getInstance()->get<float>("sim/cockpit2/autopilot/airspeed_dial_kts_mach");
-                float heading = Dataref::getInstance()->get<float>("sim/cockpit/autopilot/heading_mag");
-                float altitude = Dataref::getInstance()->get<float>("sim/cockpit/autopilot/altitude");
-                float vs = Dataref::getInstance()->get<float>("sim/cockpit/autopilot/vertical_velocity");
-                
-                debug_force("[ProductFCUEfis] Raw datarefs: SPD=%.1f HDG=%.1f ALT=%.1f VS=%.1f\n", 
-                           speed, heading, altitude, vs);
-            } else {
-                debug_force("[ProductFCUEfis] Datarefs not yet available\n");
-            }
+    bool shouldUpdate = false;
+    auto datarefManager = Dataref::getInstance();
+    for (std::string dataref : profile->displayDatarefs()) {
+        if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {
+            shouldUpdate = true;
+            break;
         }
     }
     
-    bool anyDatarefChanged = false;
-    const std::vector<std::string>& currentDatarefs = profile->displayDatarefs();
-    
-    for (const std::string &ref : currentDatarefs) {
-        // For numeric datarefs, get the actual float value
-        float floatValue = 0.0f;
-        std::string newValue;
-        
-        // Check if this is a numeric dataref or a string dataref
-        if (ref.find("dashed") != std::string::npos || 
-            ref.find("managed") != std::string::npos ||
-            ref.find("Std") != std::string::npos ||
-            ref.find("Unit") != std::string::npos) {
-            // These are integer/boolean datarefs
-            int intValue = Dataref::getInstance()->get<int>(ref.c_str());
-            newValue = std::to_string(intValue);
-        } else {
-            // These are float datarefs
-            floatValue = Dataref::getInstance()->get<float>(ref.c_str());
-            // Format with fixed precision to avoid comparison issues
-            char buffer[32];
-            snprintf(buffer, sizeof(buffer), "%.2f", floatValue);
-            newValue = buffer;
-        }
-        
-        auto it = cachedDatarefValues.find(ref);
-        if (it == cachedDatarefValues.end() || it->second != newValue) {
-            // Only log significant display dataref changes
-            if (ref.find("airspeed") != std::string::npos || 
-                ref.find("heading") != std::string::npos || 
-                ref.find("altitude") != std::string::npos ||
-                ref.find("vertical") != std::string::npos) {
-                std::string oldValue = (it != cachedDatarefValues.end()) ? it->second : "N/A";
-                debug_force("[ProductFCUEfis] Display dataref changed: %s '%s' -> '%s'\n", 
-                           ref.c_str(), oldValue.c_str(), newValue.c_str());
-            }
-            cachedDatarefValues[ref] = newValue;
-            anyDatarefChanged = true;
-        }
-    }
-
-    if (!anyDatarefChanged) {
+    if (!shouldUpdate) {
         return;
     }
 
@@ -271,7 +214,7 @@ void ProductFCUEfis::updateDisplays() {
     
     // Get new display data
     FCUDisplayData newDisplayData = displayData;
-    profile->updateDisplayData(newDisplayData, cachedDatarefValues);
+    profile->updateDisplayData(newDisplayData);
     
     // Update displayData with new values immediately so all sends use correct flags
     displayData = newDisplayData;
@@ -321,6 +264,8 @@ void ProductFCUEfis::updateDisplays() {
               displayData.efisLHpaDec ? "true" : "false");
         sendEfisLeftDisplayWithFlags(displayData.efisLBaro, displayData.efisLQnh, displayData.efisLHpaDec);
     }
+    
+    lastUpdateCycle = datarefManager->getCurrentUpdateCycle();
 }
 
 void ProductFCUEfis::initializeDisplays() {

@@ -51,16 +51,22 @@ bool USBDevice::connect() {
 
 void USBDevice::InputReportCallback(void* context, DWORD bytesRead, uint8_t* report) {
     auto* self = static_cast<USBDevice*>(context);
-    if (!self->connected) {
+    if (!self || !self->connected) {
         return;
     }
     
-    InputEvent event;
-    event.reportId = report[0];
-    event.reportData.assign(report, report + bytesRead);
-    event.reportLength = (int)bytesRead;
-    
-    self->processOnMainThread(event);
+    // Try-catch around the processOnMainThread call to handle mutex issues
+    try {
+        InputEvent event;
+        event.reportId = report[0];
+        event.reportData.assign(report, report + bytesRead);
+        event.reportLength = (int)bytesRead;
+        
+        self->processOnMainThread(event);
+    } catch (const std::system_error& e) {
+        // Silently ignore mutex errors that occur during shutdown
+        return;
+    }
 }
 
 void USBDevice::update() {
@@ -73,6 +79,9 @@ void USBDevice::update() {
 
 void USBDevice::disconnect() {
     connected = false;
+    
+    // Give the reading thread a moment to see connected=false and exit
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     
     if (hidDevice != INVALID_HANDLE_VALUE) {
         CloseHandle(hidDevice);

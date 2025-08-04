@@ -5,6 +5,22 @@
 #include <algorithm>
 
 LaminarMcduProfile::LaminarMcduProfile(ProductMCDU *product) : McduAircraftProfile(product) {
+    const MCDULed ledsToSet[] = {
+        MCDULed::FAIL,
+        MCDULed::FM,
+        MCDULed::MCDU,
+        MCDULed::MENU,
+        MCDULed::FM1,
+        MCDULed::IND,
+        MCDULed::RDY,
+        MCDULed::STATUS,
+        MCDULed::FM2
+    };
+
+    for (auto led : ledsToSet) {
+        product->setLedBrightness(led, 0);
+    }
+    
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {
             return;
@@ -26,9 +42,7 @@ LaminarMcduProfile::~LaminarMcduProfile() {
 }
 
 bool LaminarMcduProfile::IsEligible() {
-    std::string icao = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ICAO");
-    icao.erase(std::find(icao.begin(), icao.end(), '\0'), icao.end());
-    return Dataref::getInstance()->exists("sim/cockpit2/radios/indicators/fms_cdu1_text_line0") && icao == "A333";
+    return Dataref::getInstance()->exists("laminar/A333/ckpt_temp");
 }
 
 const std::vector<std::string>& LaminarMcduProfile::displayDatarefs() const {
@@ -144,30 +158,25 @@ const std::map<char, int>& LaminarMcduProfile::colorMap() const {
         {'M', 0x00A5},
         {'R', 0x00C6},
         {'Y', 0x00E7},
-        {'E', 0x0108},
-        {' ', 0x0042},
+        {'E', 0x0108}
     };
     return colMap;
 }
 
-void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
+void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page) {    
     // Clear the page
     for (int i = 0; i < ProductMCDU::PageLines; ++i) {
         std::fill(page[i].begin(), page[i].end(), ' ');
     }
 
+    auto datarefManager = Dataref::getInstance();
     // Process lines 0-13 (we have 14 lines available, lines 0-15 from Laminar map to 0-13)
     for (int lineNum = 0; lineNum < std::min(ProductMCDU::PageLines, (unsigned int)16); ++lineNum) {
         // Get text content for this line
         std::string textDataref = "sim/cockpit2/radios/indicators/fms_cdu1_text_line" + std::to_string(lineNum);
         std::string styleDataref = "sim/cockpit2/radios/indicators/fms_cdu1_style_line" + std::to_string(lineNum);
         
-        auto textIt = cachedDatarefValues.find(textDataref);
-        if (textIt == cachedDatarefValues.end()) {
-            continue;
-        }
-        
-        std::string text = textIt->second;
+        std::string text = datarefManager->getCached<std::string>(textDataref.c_str());
         if (text.empty()) {
             continue;
         }
@@ -198,18 +207,6 @@ void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page, const 
                 text[i] = '?';
             }
         }
-
-#if DEBUG
-        printf("[LaminarMCDU] Line %d: text='%s', style=0x", lineNum, text.c_str());
-        if (styleBytes.empty()) {
-            printf("--------");
-        } else {
-            for (unsigned char ch : styleBytes) {
-                printf("%02X", ch);
-            }
-        }
-        printf("\n");
-#endif
 
         // Process each character in the line
         for (int i = 0; i < text.size() && i < ProductMCDU::PageCharsPerLine; ++i) {
