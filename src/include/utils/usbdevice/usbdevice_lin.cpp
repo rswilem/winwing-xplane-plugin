@@ -61,12 +61,17 @@ void USBDevice::InputReportCallback(void* context, int bytesRead, uint8_t* repor
         return;
     }
     
-    InputEvent event;
-    event.reportId = report[0];
-    event.reportData.assign(report, report + bytesRead);
-    event.reportLength = bytesRead;
-    
-    self->processOnMainThread(event);
+    try {
+        InputEvent event;
+        event.reportId = report[0];
+        event.reportData.assign(report, report + bytesRead);
+        event.reportLength = bytesRead;
+        
+        self->processOnMainThread(event);
+    } catch (const std::system_error& e) {
+        // Silently ignore mutex errors that occur during shutdown
+        return;
+    }
 }
 
 void USBDevice::update() {

@@ -7,12 +7,11 @@
 
 FlightFactor777PfpProfile::FlightFactor777PfpProfile(ProductPFP *product) : PfpAircraftProfile(product) {
     const PFPLed ledsToSet[] = {
-        PFPLed::BACKLIGHT,
-        PFPLed::SCREEN_BACKLIGHT,
         PFPLed::CALL,
         PFPLed::FAIL,
         PFPLed::MSG,
         PFPLed::OFST,
+        PFPLed::EXEC
     };
     
     for (auto led : ledsToSet) {
@@ -52,18 +51,18 @@ const std::vector<std::string>& FlightFactor777PfpProfile::displayDatarefs() con
 
 const std::vector<PFPButtonDef>& FlightFactor777PfpProfile::buttonDefs() const {
     static const std::vector<PFPButtonDef> tripleSevenButtonLayout = {
-        {0, "LSK1L", ""},
-        {1, "LSK2L", ""},
-        {2, "LSK3L", ""},
-        {3, "LSK4L", ""},
-        {4, "LSK5L", ""},
-        {5, "LSK6L", ""},
-        {6, "LSK1R", ""},
-        {7, "LSK2R", ""},
-        {8, "LSK3R", ""},
-        {9, "LSK4R", ""},
-        {10, "LSK5R", ""},
-        {11, "LSK6R", ""},
+        {0, "LSK1L", "1-sim/ckpt/cduLLK1/anim"},
+        {1, "LSK2L", "1-sim/ckpt/cduLLK2/anim"},
+        {2, "LSK3L", "1-sim/ckpt/cduLLK3/anim"},
+        {3, "LSK4L", "1-sim/ckpt/cduLLK4/anim"},
+        {4, "LSK5L", "1-sim/ckpt/cduLLK5/anim"},
+        {5, "LSK6L", "1-sim/ckpt/cduLLK6/anim"},
+        {6, "LSK1R", "1-sim/ckpt/cduLRK1/anim"},
+        {7, "LSK2R", "1-sim/ckpt/cduLRK2/anim"},
+        {8, "LSK3R", "1-sim/ckpt/cduLRK3/anim"},
+        {9, "LSK4R", "1-sim/ckpt/cduLRK4/anim"},
+        {10, "LSK5R", "1-sim/ckpt/cduLRK5/anim"},
+        {11, "LSK6R", "1-sim/ckpt/cduLRK6/anim"},
         {12, "INITREF", ""},
         {13, "RTE", ""},
         {14, "DEP/ARR", ""},
@@ -136,26 +135,17 @@ const std::map<char, int>& FlightFactor777PfpProfile::colorMap() const {
         {'M', 0x00A5}, // Magenta text
         {'Y', 0x00E6}, // Yellow text (if used)
         {'R', 0x00FF}, // Red text (if used)
-        {' ', 0x0042}, // Space = white
     };
     
     return colMap;
 }
 
-void FlightFactor777PfpProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
+void FlightFactor777PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
     page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageCharsPerLine * ProductPFP::PageBytesPerChar, ' '));
     
-    auto symbolsIt = cachedDatarefValues.find("1-sim/cduL/display/symbols");
-    auto colorsIt = cachedDatarefValues.find("1-sim/cduL/display/symbolsColor");
-    auto sizesIt = cachedDatarefValues.find("1-sim/cduL/display/symbolsSize");
-    
-    if (symbolsIt == cachedDatarefValues.end()) {
-        return;
-    }
-    
-    const std::string& symbols = symbolsIt->second;
-    const std::string& colors = (colorsIt != cachedDatarefValues.end()) ? colorsIt->second : "";
-    const std::string& sizes = (sizesIt != cachedDatarefValues.end()) ? sizesIt->second : "";
+    std::string symbols = Dataref::getInstance()->getCached<std::string>("1-sim/cduL/display/symbols");
+    std::string colors = Dataref::getInstance()->getCached<std::string>("1-sim/cduL/display/symbolsColor");
+    std::string sizes = Dataref::getInstance()->getCached<std::string>("1-sim/cduL/display/symbolsSize");
     
     for (int line = 0; line < ProductPFP::PageLines && line * ProductPFP::PageCharsPerLine < symbols.length(); ++line) {
         for (int pos = 0; pos < ProductPFP::PageCharsPerLine; ++pos) {
@@ -194,5 +184,9 @@ void FlightFactor777PfpProfile::updatePage(std::vector<std::vector<char>>& page,
 }
 
 void FlightFactor777PfpProfile::buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) {
-    Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
+    if (phase == xplm_CommandContinue) {
+        return;
+    }
+
+    Dataref::getInstance()->set<float>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
 }

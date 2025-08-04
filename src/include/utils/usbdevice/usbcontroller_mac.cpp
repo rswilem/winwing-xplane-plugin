@@ -33,8 +33,21 @@ USBController::USBController() {
     IOHIDManagerRegisterDeviceRemovalCallback(hidManager, &USBController::DeviceRemovedCallback, this);
     
     IOHIDManagerScheduleWithRunLoop(hidManager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+}
 
-    // Enumerate all currently connected devices and call DeviceAddedCallback for each
+USBController::~USBController() {
+    destroy();
+}
+
+USBController* USBController::getInstance() {
+    if (instance == nullptr) {
+        instance = new USBController();
+    }
+    
+    return instance;
+}
+
+void USBController::enumerateDevices() {
     CFSetRef deviceSet = IOHIDManagerCopyDevices(hidManager);
     if (deviceSet && CFSetGetCount(deviceSet) > 0) {
         CFIndex num = CFSetGetCount(deviceSet);
@@ -51,22 +64,6 @@ USBController::USBController() {
     }
 }
 
-USBController::~USBController() {
-    destroy();
-}
-
-USBController* USBController::getInstance() {
-    if (instance == nullptr) {
-        instance = new USBController();
-    }
-    
-    return instance;
-}
-
-void USBController::initialize() {
-    
-}
-
 void USBController::destroy() {
     for (auto ptr : devices) {
         delete ptr;
@@ -74,6 +71,7 @@ void USBController::destroy() {
     devices.clear();
     
     if (hidManager) {
+        IOHIDManagerClose(hidManager, kIOHIDOptionsTypeNone);
         CFRelease(hidManager);
         hidManager = nullptr;
     }

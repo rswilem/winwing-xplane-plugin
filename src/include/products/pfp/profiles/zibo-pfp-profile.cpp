@@ -13,12 +13,13 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
         PFPLed::FAIL,
         PFPLed::MSG,
         PFPLed::OFST,
+        PFPLed::EXEC
     };
 
     for (auto led : ledsToSet) {
         product->setLedBrightness(led, 0);
     }
-        
+    
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> brightness) {
         if (brightness.size() < 27) {
             return;
@@ -32,11 +33,21 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/instrument_brightness");
     });
+    
+    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/fmc/fmc_message", [product](bool enabled) {
+        product->setLedBrightness(PFPLed::MSG, enabled ? 1 : 0);
+    });
+    
+    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/indicators/fmc_exec_lights", [product](bool enabled) {
+        product->setLedBrightness(PFPLed::EXEC, enabled ? 1 : 0);
+    });
 }
 
 ZiboPfpProfile::~ZiboPfpProfile() {
     Dataref::getInstance()->unbind("laminar/B738/electric/instrument_brightness");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
+    Dataref::getInstance()->unbind("laminar/B738/fmc/fmc_message");
+    Dataref::getInstance()->unbind("laminar/B738/indicators/fmc_exec_lights");
 }
 
 bool ZiboPfpProfile::IsEligible() {
@@ -194,6 +205,7 @@ const std::vector<PFPButtonDef>& ZiboPfpProfile::buttonDefs() const {
 
 const std::map<char, int>& ZiboPfpProfile::colorMap() const {
     static const std::map<char, int> colMap = {
+        {'W', 0x0042}, // White fallback
         {'L', 0x0042}, // L = Large/normal text (white)
         {'S', 0x0042}, // S = Small text (white)
         {'M', 0x00A5}, // M = Magenta
@@ -201,17 +213,18 @@ const std::map<char, int>& ZiboPfpProfile::colorMap() const {
         {'C', 0x0063}, // C = Cyan (blue)
         {'I', 0x0042}, // I = Inverted (white for now)
         {'X', 0x0042}, // X = Special/labels (white)
-        {' ', 0x0042}, // Space = white
-        {'W', 0x0042}, // White fallback
     };
 
     return colMap;
 }
 
-void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) {
+void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
     page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageCharsPerLine * ProductPFP::PageBytesPerChar, ' '));
     
-    for (const auto& [ref, text] : cachedDatarefValues) {
+    auto datarefManager = Dataref::getInstance();
+    for (const auto& ref : displayDatarefs()) {
+        std::string text = datarefManager->getCached<std::string>(ref.c_str());
+        
         // Handle scratchpad datarefs specially
         if (ref == "laminar/B738/fmc1/Line_entry" || ref == "laminar/B738/fmc1/Line_entry_I") {
             if (!text.empty()) {

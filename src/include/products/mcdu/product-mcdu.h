@@ -11,7 +11,7 @@ class ProductMCDU: public USBDevice {
 private:
     McduAircraftProfile *profile;
     std::vector<std::vector<char>> page;
-    std::vector<std::vector<char>> previousPage;
+    int lastUpdateCycle;
     std::map<std::string, std::string> cachedDatarefValues;
     std::set<int> pressedButtonIndices;
     
@@ -42,7 +42,6 @@ public:
     void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
     void writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall = false);
     
-    void monitorDatarefs();
     void setLedBrightness(MCDULed led, uint8_t brightness);
     
     void clear();

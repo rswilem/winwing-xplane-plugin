@@ -41,7 +41,7 @@ void setDatarefHexC(const char* ref, const uint8_t* hexD, int len) {
     
     // Check if this is a style dataref - if so, store as vector<unsigned char>
     std::string refStr(ref);
-    if (refStr.find("style_line") != std::string::npos) {
+    if (refStr.find("style_line") != std::string::npos || refStr.find("ixeg/") != std::string::npos) {
         // Ensure dataref exists first
         ensureDatarefExists(ref, xplmType_Data);
         

@@ -40,7 +40,7 @@
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Debug (MCDU as PFP)"
       selectedDebuggerIdentifier = ""
       selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       launchStyle = "0"
@@ -58,6 +58,15 @@
          BundleIdentifier = "com.laminar-research.X-Plane"
          FilePath = "/Users/ramon/X-Plane 12/X-Plane.app">
       </PathRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "D607B19809A556E400699BC3"
+            BuildableName = "winwing.xpl"
+            BlueprintName = "winwing"
+            ReferencedContainer = "container:Winwing.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

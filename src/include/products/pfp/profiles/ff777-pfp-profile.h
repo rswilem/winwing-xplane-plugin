@@ -18,7 +18,7 @@ public:
     const std::vector<std::string>& displayDatarefs() const override;
     const std::vector<PFPButtonDef>& buttonDefs() const override;
     const std::map<char, int>& colorMap() const override;
-    void updatePage(std::vector<std::vector<char>>& page, const std::map<std::string, std::string>& cachedDatarefValues) override;
+    void updatePage(std::vector<std::vector<char>>& page) override;
     void buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) override;
 };
 

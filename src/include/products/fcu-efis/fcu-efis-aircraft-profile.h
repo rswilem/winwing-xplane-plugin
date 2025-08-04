@@ -42,7 +42,7 @@ struct FCUEfisButtonDef {
     int id;
     std::string name;
     std::string dataref;
-    int value = -1;
+    double value = -1.0;
 };
 enum class FCUEfisLed : int {
     // FCU LEDs
@@ -131,7 +131,7 @@ public:
 
     virtual const std::vector<std::string>& displayDatarefs() const = 0;
     virtual const std::vector<FCUEfisButtonDef>& buttonDefs() const = 0;
-    virtual void updateDisplayData(FCUDisplayData& displayData, const std::map<std::string, std::string>& cachedDatarefValues) = 0;
+    virtual void updateDisplayData(FCUDisplayData& displayData) = 0;
     virtual void buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) = 0;
     virtual bool hasEfisRight() const = 0;
     virtual bool hasEfisLeft() const = 0;

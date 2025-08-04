@@ -77,8 +77,12 @@ std::vector<uint8_t> encodeStringEfis(int numSegments, const std::string& str) {
 }
 
 ProductFCUEfis::ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) 
-    : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
+: USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
     profile = nullptr;
+    displayData = {};
+    lastUpdateCycle = 0;
+    pressedButtonIndices = {};
+    
     connect();
 }
 
@@ -170,7 +174,6 @@ void ProductFCUEfis::disconnect() {
     }
     
     USBDevice::disconnect();
-    cachedDatarefValues.clear();
 }
 
 void ProductFCUEfis::update() {
@@ -188,27 +191,21 @@ void ProductFCUEfis::update() {
 }
 
 void ProductFCUEfis::updateDisplays() {
-    if (!profile) {
-        return;
-    }
-    
-    bool anyDatarefChanged = false;
-    const std::vector<std::string>& currentDatarefs = profile->displayDatarefs();
-    for (const std::string &ref : currentDatarefs) {
-        std::string newValue = Dataref::getInstance()->getCached<std::string>(ref.c_str());
-        auto it = cachedDatarefValues.find(ref);
-        if (it == cachedDatarefValues.end() || it->second != newValue) {
-            cachedDatarefValues[ref] = newValue;
-            anyDatarefChanged = true;
+    bool shouldUpdate = false;
+    auto datarefManager = Dataref::getInstance();
+    for (std::string dataref : profile->displayDatarefs()) {
+        if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {
+            shouldUpdate = true;
+            break;
         }
     }
-
-    if (!anyDatarefChanged) {
+    
+    if (!shouldUpdate) {
         return;
     }
 
     FCUDisplayData newDisplayData = displayData;
-    profile->updateDisplayData(newDisplayData, cachedDatarefValues);
+    profile->updateDisplayData(newDisplayData);
     
     // Update FCU display if data changed
     if (newDisplayData.speed != displayData.speed || 

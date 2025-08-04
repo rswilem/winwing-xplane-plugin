@@ -24,6 +24,11 @@ struct BoundCommand {
     CommandExecutedCallback callback;
 };
 
+struct CachedValue {
+    DataRefValueType value;
+    int lastUpdateCycleNumber;
+};
+
 class Dataref {
 private:
     Dataref();
@@ -32,7 +37,7 @@ private:
     std::unordered_map<std::string, BoundRef> boundRefs;
     std::unordered_map<std::string, BoundCommand> boundCommands;
     std::unordered_map<std::string, XPLMDataRef> refs;
-    std::unordered_map<std::string, DataRefValueType> cachedValues;
+    std::unordered_map<std::string, CachedValue> cachedValues;
     XPLMDataRef findRef(const char* ref);
     
 public:
@@ -50,6 +55,7 @@ public:
     void update();
     bool exists(const char *ref);
     void executeChangedCallbacksForDataref(const char* ref);
+    int getCachedLastUpdate(const char *ref);
     template <typename T> T getCached(const char *ref);
     template <typename T> T get(const char *ref);
     template <typename T> void set(const char* ref, T value, bool setCacheOnly = false);

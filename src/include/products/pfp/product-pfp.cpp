@@ -4,14 +4,16 @@
 #include "profiles/zibo-pfp-profile.h"
 #include "profiles/ff777-pfp-profile.h"
 #include "profiles/ssg748-pfp-profile.h"
+#include "profiles/ixeg733-pfp-profile.h"
 #include "config.h"
-#include <XPLMUtilities.h>
 #include <algorithm>
+#include <XPLMUtilities.h>
+#include <XPLMProcessing.h>
 
 ProductPFP::ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
     profile = nullptr;
     page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageBytesPerLine, ' '));
-    previousPage = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageBytesPerLine, ' '));
+    lastUpdateCycle = 0;
     pressedButtonIndices = {};
     
     connect();
@@ -26,7 +28,6 @@ void ProductPFP::setProfileForCurrentAircraft() {
         debug("Using Zibo PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new ZiboPfpProfile(this);
-        monitorDatarefs();
         profileReady = true;
         // Profile loaded, set update speed to NORMAL
         AppState::getInstance()->hasActiveProfile = true;
@@ -36,7 +37,6 @@ void ProductPFP::setProfileForCurrentAircraft() {
         debug("Using FlightFactor 777 PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new FlightFactor777PfpProfile(this);
-        monitorDatarefs();
         profileReady = true;
         // Profile loaded, set update speed to NORMAL
         AppState::getInstance()->hasActiveProfile = true;
@@ -46,7 +46,12 @@ void ProductPFP::setProfileForCurrentAircraft() {
         debug("Using SSG 748 PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new SSG748PfpProfile(this);
-        monitorDatarefs();
+        profileReady = true;
+    }
+    else if (IXEG733PfpProfile::IsEligible()) {
+        debug("Using IXEG 733 PFP profile for %s.\n", classIdentifier());
+        clear();
+        profile = new IXEG733PfpProfile(this);
         profileReady = true;
         // Profile loaded, set update speed to NORMAL
         AppState::getInstance()->hasActiveProfile = true;
@@ -124,9 +129,6 @@ void ProductPFP::disconnect() {
     for (auto led : ledsToSet) {
         setLedBrightness(led, 0);
     }
-    
-    Dataref::getInstance()->unbind("laminar/B738/fmc/fmc_message");
-    Dataref::getInstance()->unbind("laminar/B738/indicators/fmc_exec_lights");
     
     if (profile) {
         delete profile;
@@ -209,26 +211,13 @@ void ProductPFP::didReceiveData(int reportId, uint8_t *report, int reportLength)
 }
 
 void ProductPFP::updatePage() {
-    bool anyDatarefChanged = false;
-    const std::vector<std::string>& currentDatarefs = profile->displayDatarefs();
-    for (const std::string &ref : currentDatarefs) {
-        std::string newValue = Dataref::getInstance()->getCached<std::string>(ref.c_str());
-        auto it = cachedDatarefValues.find(ref);
-        if (it == cachedDatarefValues.end() || it->second != newValue) {
-            cachedDatarefValues[ref] = newValue;
-            anyDatarefChanged = true;
+    auto datarefManager = Dataref::getInstance();
+    for (std::string dataref : profile->displayDatarefs()) {
+        if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {
+            profile->updatePage(page);
+            lastUpdateCycle = XPLMGetCycleNumber();
+            draw();
         }
-    }
-
-    if (!anyDatarefChanged) {
-        return;
-    }
-
-    profile->updatePage(page, cachedDatarefValues);
-    
-    if (page != previousPage) {
-        previousPage = page;
-        draw();
     }
 }
 
@@ -239,11 +228,9 @@ std::pair<uint8_t, uint8_t> ProductPFP::dataFromColFont(char color, bool fontSma
     
     const std::map<char, int>& col_map = profile->colorMap();
 
-    char upperColor = std::toupper(color);
-    auto it = col_map.find(upperColor);
+    auto it = col_map.find(color);
     if (it == col_map.end()) {
-        //debug("Unknown color '%c', defaulting to white\n", color);
-        it = col_map.find(' ');
+        return {0x42, 0x00}; // Default white
     }
 
     int value = it->second;
@@ -268,7 +255,8 @@ void ProductPFP::draw(const std::vector<std::vector<char>> *pagePtr) {
 
             char val = p[i][j * ProductPFP::PageBytesPerChar + ProductPFP::PageBytesPerChar - 1];
             switch (val) {
-                case '*': // Change to bracket
+                case '#':
+                case '*': // Change to outlined square
                     buf.insert(buf.end(), {0xe2, 0x98, 0x90});
                     break;
                 case '<': // Change to arrow
@@ -291,6 +279,7 @@ void ProductPFP::draw(const std::vector<std::vector<char>> *pagePtr) {
                     }
                     break;
 
+                case 0x27:
                 case '`': // Change to °
                     buf.insert(buf.end(), {0xc2, 0xb0});
                     break;
@@ -399,32 +388,6 @@ void ProductPFP::clear2(unsigned char variant) {
     data.insert(data.end(), extra.begin(), extra.end());
     
     writeData(data);
-}
-
-void ProductPFP::monitorDatarefs() {
-    if (!profile) {
-        return;
-    }
-    
-    const PFPLed ledsToSet[] = {
-        PFPLed::CALL,
-        PFPLed::FAIL,
-        PFPLed::MSG,
-        PFPLed::OFST,
-        PFPLed::EXEC
-    };
-
-    for (auto led : ledsToSet) {
-        setLedBrightness(led, 0);
-    }
-    
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/fmc/fmc_message", [this](bool enabled) {
-        setLedBrightness(PFPLed::MSG, enabled ? 1 : 0);
-    });
-    
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/indicators/fmc_exec_lights", [this](bool enabled) {
-        setLedBrightness(PFPLed::EXEC, enabled ? 1 : 0);
-    });
 }
 
 void ProductPFP::setLedBrightness(PFPLed led, uint8_t brightness) {
