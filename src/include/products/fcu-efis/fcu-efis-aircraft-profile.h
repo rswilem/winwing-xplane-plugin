@@ -38,11 +38,30 @@ struct DisplayFlag {
         : name(n), byteIndex(idx), mask(m), defaultValue(def) {}
 };
 
+enum class FCUEfisButtonType {
+    SWITCH = 0,    // Sets dataref to 1 or sends command
+    TOGGLE = 1,    // Toggles dataref between true/false or sends command
+    SEND_0 = 2,    // Sets dataref to 0
+    SEND_1 = 3,    // Sets dataref to 1
+    SEND_2 = 4,    // Sets dataref to 2
+    SEND_3 = 5,    // Sets dataref to 3
+    SEND_4 = 6,    // Sets dataref to 4
+    SEND_5 = 7,    // Sets dataref to 5
+    NONE = 8       // No action
+};
+
+enum class FCUEfisDatarefType {
+    DATA = 0,      // Regular dataref read/write
+    CMD = 1        // Command execution
+};
+
 struct FCUEfisButtonDef {
     int id;
     std::string name;
     std::string dataref;
-    int value = -1;
+    FCUEfisDatarefType datarefType = FCUEfisDatarefType::CMD;
+    FCUEfisButtonType buttonType = FCUEfisButtonType::SWITCH;
+    int value = -1;  // For SEND_X button types
 };
 enum class FCUEfisLed : int {
     // FCU LEDs

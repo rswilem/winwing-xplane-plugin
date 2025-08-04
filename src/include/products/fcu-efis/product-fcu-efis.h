@@ -14,6 +14,7 @@ private:
     FCUDisplayData previousDisplayData;
     std::map<std::string, std::string> cachedDatarefValues;
     std::set<int> pressedButtonIndices;
+    std::map<std::string, int> selectorPositions;  // Track rotary selector positions by dataref
     
     void setProfileForCurrentAircraft();
     void updateDisplays();
