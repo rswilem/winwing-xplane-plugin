@@ -8,8 +8,22 @@
 #include <iomanip>
 
 TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
+    debug_force("[TolissFCUEfisProfile] Initializing Toliss FCU EFIS profile...\n");
+    
+    debug_force("[TolissFCUEfisProfile] Attempting to monitor AirbusFBW/SupplLightLevelRehostats dataref...\n");
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/SupplLightLevelRehostats", [product](std::vector<float> brightness) {
+        debug_force("[TolissFCUEfisProfile] Brightness update: panel=%.6f, screen=%.6f, vector_size=%zu\n", 
+                   brightness.size() > 0 ? brightness[0] : 0.0f,
+                   brightness.size() > 1 ? brightness[1] : 0.0f,
+                   brightness.size());
+        
+        if (brightness.size() < 2) {
+            debug_force("[TolissFCUEfisProfile] ERROR: SupplLightLevelRehostats vector too small, expected 2 elements, got %zu\n", brightness.size());
+            return;
+        }
+        
         uint8_t target = brightness[0] * 255.0f;
+        debug_force("[TolissFCUEfisProfile] Setting panel brightness: raw=%.6f, target=%d\n", brightness[0], target);
         product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
@@ -18,6 +32,7 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
         product->setLedBrightness(FCUEfisLed::EFISL_FLAG_GREEN, target);
         
         uint8_t screenBrightness = brightness[1] * 255.0f;
+        debug_force("[TolissFCUEfisProfile] Setting screen brightness: raw=%.6f, target=%d\n", brightness[1], screenBrightness);
         product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, screenBrightness);
@@ -108,9 +123,12 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/NDShowARPTCapt", [product](int show) {
         product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, show ? 255 : 0);
     });
+    
+    debug_force("[TolissFCUEfisProfile] Toliss FCU EFIS profile initialization completed.\n");
 }
 
 TolissFCUEfisProfile::~TolissFCUEfisProfile() {
+    debug_force("[TolissFCUEfisProfile] Destroying Toliss FCU EFIS profile...\n");
     // Unbind brightness control datarefs
     Dataref::getInstance()->unbind("AirbusFBW/SupplLightLevelRehostats");
     
@@ -142,7 +160,11 @@ TolissFCUEfisProfile::~TolissFCUEfisProfile() {
 }
 
 bool TolissFCUEfisProfile::IsEligible() {
-    return Dataref::getInstance()->exists("AirbusFBW/FCUAvail");
+    debug_force("[TolissFCUEfisProfile] IsEligible() called - checking for AirbusFBW/FCUAvail dataref...\n");
+    bool eligible = Dataref::getInstance()->exists("AirbusFBW/FCUAvail");
+    debug_force("[TolissFCUEfisProfile] IsEligible() returning %s (FCUAvail dataref %s)\n", 
+               eligible ? "true" : "false", eligible ? "exists" : "does not exist");
+    return eligible;
 }
 
 const std::vector<std::string>& TolissFCUEfisProfile::displayDatarefs() const {
@@ -419,9 +441,77 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
 }
 
 void TolissFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) {
-    if (button->value >= 0) {
-        Dataref::getInstance()->set<float>(button->dataref.c_str(), button->value);
-    } else {
-        Dataref::getInstance()->executeCommand(button->dataref.c_str(), xplm_CommandBegin);
+    if (!button || button->dataref.empty()) {
+        return;
+    }
+    
+    debug_force("[TolissFCUEfisProfile] Button pressed: ID=%d, name='%s', dataref='%s', phase=%d, type=%d\n", 
+               button->id, button->name.c_str(), button->dataref.c_str(), phase, 
+               static_cast<int>(button->buttonType));
+    
+    // Only process the button press/release, not continuous
+    if (phase != xplm_CommandBegin && phase != xplm_CommandEnd) {
+        return;
+    }
+    
+    if (button->datarefType == FCUEfisDatarefType::CMD) {
+        // Send command - only on button press (CommandBegin), not release
+        if (phase == xplm_CommandBegin) {
+            debug_force("[TolissFCUEfisProfile] Sending command: %s\n", button->dataref.c_str());
+            XPLMCommandRef cmdRef = XPLMFindCommand(button->dataref.c_str());
+            if (cmdRef != nullptr) {
+                XPLMCommandOnce(cmdRef);
+            } else {
+                debug_force("[TolissFCUEfisProfile] WARNING: Command not found: %s\n", button->dataref.c_str());
+            }
+        }
+    } else if (button->datarefType == FCUEfisDatarefType::DATA) {
+        // Handle dataref operations
+        if (phase == xplm_CommandBegin) {
+            switch (button->buttonType) {
+                case FCUEfisButtonType::SWITCH:
+                    debug_force("[TolissFCUEfisProfile] Setting dataref %s to 1\n", button->dataref.c_str());
+                    Dataref::getInstance()->set<int>(button->dataref.c_str(), 1);
+                    break;
+                    
+                case FCUEfisButtonType::TOGGLE: {
+                    int currentValue = Dataref::getInstance()->get<int>(button->dataref.c_str());
+                    int newValue = currentValue ? 0 : 1;
+                    debug_force("[TolissFCUEfisProfile] Toggling dataref %s from %d to %d\n", 
+                               button->dataref.c_str(), currentValue, newValue);
+                    Dataref::getInstance()->set<int>(button->dataref.c_str(), newValue);
+                    break;
+                }
+                
+                case FCUEfisButtonType::SEND_0:
+                case FCUEfisButtonType::SEND_1:
+                case FCUEfisButtonType::SEND_2:
+                case FCUEfisButtonType::SEND_3:
+                case FCUEfisButtonType::SEND_4:
+                case FCUEfisButtonType::SEND_5: {
+                    int value = static_cast<int>(button->buttonType) - static_cast<int>(FCUEfisButtonType::SEND_0);
+                    debug_force("[TolissFCUEfisProfile] Setting dataref %s to %d\n", button->dataref.c_str(), value);
+                    Dataref::getInstance()->set<int>(button->dataref.c_str(), value);
+                    break;
+                }
+                
+                case FCUEfisButtonType::NONE:
+                default:
+                    debug_force("[TolissFCUEfisProfile] No action for button type %d\n", static_cast<int>(button->buttonType));
+                    break;
+            }
+        } else if (phase == xplm_CommandEnd && button->buttonType == FCUEfisButtonType::SWITCH) {
+            // For SWITCH type, set back to 0 on release
+            debug_force("[TolissFCUEfisProfile] Setting dataref %s back to 0 (switch release)\n", button->dataref.c_str());
+            Dataref::getInstance()->set<int>(button->dataref.c_str(), 0);
+        }
+    }
+    
+    // Handle legacy button definition with value field (backward compatibility)
+    else if (button->value >= 0) {
+        if (phase == xplm_CommandBegin) {
+            debug_force("[TolissFCUEfisProfile] Setting dataref %s to legacy value %.1f\n", button->dataref.c_str(), button->value);
+            Dataref::getInstance()->set<float>(button->dataref.c_str(), button->value);
+        }
     }
 }

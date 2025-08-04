@@ -167,6 +167,7 @@ struct FCUEfisControlView: View {
                         Text("V/S Test").tag("VS")
                         Text("EFIS Right").tag("EFIS_R")
                         Text("EFIS Left").tag("EFIS_L")
+                        Text("Managed Modes").tag("MANAGED")
                     }
                     .pickerStyle(MenuPickerStyle())
                     

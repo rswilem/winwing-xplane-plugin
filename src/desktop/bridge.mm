@@ -429,6 +429,24 @@ void fcuefis_testDisplay(void* fcuefisHandle, const char* testType) {
         fcuefis->sendEfisRightDisplay("1013");
     } else if (test == "EFIS_L") {
         fcuefis->sendEfisLeftDisplay("1013");
+    } else if (test == "MANAGED") {
+        // Test managed mode dots - temporarily set managed flags
+        auto& displayData = fcuefis->getDisplayData();
+        bool oldSpdManaged = displayData.spdManaged;
+        bool oldHdgManaged = displayData.hdgManaged;
+        bool oldAltManaged = displayData.altManaged;
+        
+        // Set all managed flags to true for testing
+        displayData.spdManaged = true;
+        displayData.hdgManaged = true;
+        displayData.altManaged = true;
+        
+        fcuefis->sendFCUDisplay("250", "180", "35000", "1800");
+        
+        // Restore original flags
+        displayData.spdManaged = oldSpdManaged;
+        displayData.hdgManaged = oldHdgManaged;
+        displayData.altManaged = oldAltManaged;
     } else if (test == "ALL") {
         fcuefis->sendFCUDisplay("888", "888", "88888", "8888");
         fcuefis->sendEfisRightDisplay("8888");

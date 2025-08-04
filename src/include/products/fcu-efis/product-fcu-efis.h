@@ -40,6 +40,9 @@ public:
     void sendEfisLeftDisplay(const std::string& baro);
     void sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec);
     void sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec);
+    
+    // Getter for display data (for testing)
+    FCUDisplayData& getDisplayData() { return displayData; }
 };
 
 #endif

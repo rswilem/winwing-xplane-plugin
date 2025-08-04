@@ -62,10 +62,10 @@ float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLas
     appstate->update();
     
     if (!USBController::getInstance()->allProfilesReady()) {
-        return REFRESH_INTERVAL_SECONDS_SLOW;
+        return REFRESH_INTERVAL_SECONDS_FAST;
     }
     
-    return appstate->fastUpdate ? REFRESH_INTERVAL_SECONDS_FAST : REFRESH_INTERVAL_SECONDS_NORMAL;
+    return appstate->fastUpdate ? REFRESH_INTERVAL_SECONDS_FAST : REFRESH_INTERVAL_SECONDS_FAST;
 }
 
 void AppState::update() {

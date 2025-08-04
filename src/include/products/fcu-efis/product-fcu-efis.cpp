@@ -92,14 +92,15 @@ ProductFCUEfis::~ProductFCUEfis() {
 }
 
 void ProductFCUEfis::setProfileForCurrentAircraft() {
+    debug_force("[ProductFCUEfis] Checking if Toliss profile is eligible...\n");
     if (TolissFCUEfisProfile::IsEligible()) {
-        debug("Using Toliss FCU-EFIS profile for %s.\n", classIdentifier());
+        debug_force("[ProductFCUEfis] Using Toliss FCU-EFIS profile for %s.\n", classIdentifier());
         profile = new TolissFCUEfisProfile(this);
         monitorDatarefs();
         profileReady = true;
     }
     else {
-        debug("No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());
+        debug_force("[ProductFCUEfis] No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());
         setLedBrightness(FCUEfisLed::FLAG_GREEN, 255);
     }
 }
@@ -499,15 +500,15 @@ void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
     
     if (ledValue < 100) {
         // FCU LEDs
-        debug("FCU LED %d brightness %d\n", ledValue, brightness);
+        debug_force("FCU LED %d brightness %d\n", ledValue, brightness);
         data = {0x02, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
     } else if (ledValue < 200) {
         // EFIS Right LEDs
-        debug("EFIS Right LED %d (adjusted: %d) brightness %d\n", ledValue, ledValue - 100, brightness);
+        debug_force("EFIS Right LED %d (adjusted: %d) brightness %d\n", ledValue, ledValue - 100, brightness);
         data = {0x02, 0x0E, 0xBF, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue - 100), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
     } else if (ledValue < 300) {
         // EFIS Left LEDs
-        debug("EFIS Left LED %d (adjusted: %d) brightness %d\n", ledValue, ledValue - 200, brightness);
+        debug_force("EFIS Left LED %d (adjusted: %d) brightness %d\n", ledValue, ledValue - 200, brightness);
         data = {0x02, 0x0D, 0xBF, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue - 200), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
     }
     
