@@ -59,9 +59,19 @@ struct FCUEfisButtonDef {
     int id;
     std::string name;
     std::string dataref;
-    FCUEfisDatarefType datarefType = FCUEfisDatarefType::CMD;
-    FCUEfisButtonType buttonType = FCUEfisButtonType::SWITCH;
-    double value = -1.0;  // For SEND_X button types - using double for compatibility
+    FCUEfisDatarefType datarefType;
+    FCUEfisButtonType buttonType;
+    double value;
+    
+    // Constructor for command buttons (default case)
+    FCUEfisButtonDef(int id, const std::string& name, const std::string& dataref)
+        : id(id), name(name), dataref(dataref), 
+          datarefType(FCUEfisDatarefType::CMD), buttonType(FCUEfisButtonType::SWITCH), value(-1.0) {}
+    
+    // Constructor for data buttons with specific values
+    FCUEfisButtonDef(int id, const std::string& name, const std::string& dataref, double value)
+        : id(id), name(name), dataref(dataref), 
+          datarefType(FCUEfisDatarefType::DATA), buttonType(FCUEfisButtonType::SWITCH), value(value) {}
 };
 enum class FCUEfisLed : int {
     // FCU LEDs

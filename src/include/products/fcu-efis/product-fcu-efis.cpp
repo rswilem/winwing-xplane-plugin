@@ -265,7 +265,9 @@ void ProductFCUEfis::updateDisplays() {
         sendEfisLeftDisplayWithFlags(displayData.efisLBaro, displayData.efisLQnh, displayData.efisLHpaDec);
     }
     
-    lastUpdateCycle = datarefManager->getCurrentUpdateCycle();
+    if (shouldUpdate) {
+        lastUpdateCycle = XPLMGetCycleNumber();
+    }
 }
 
 void ProductFCUEfis::initializeDisplays() {

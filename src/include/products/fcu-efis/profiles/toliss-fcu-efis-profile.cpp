@@ -204,8 +204,8 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {22, "VS INC", "sim/autopilot/vertical_speed_up"},
         {23, "VS PUSH", "AirbusFBW/PushVSSel"},
         {24, "VS PULL", "AirbusFBW/PullVSSel"},
-        {25, "ALT 100", "AirbusFBW/ALT100_1000", 0},        // Set to 0 for 100ft increments
-        {26, "ALT 1000", "AirbusFBW/ALT100_1000", 1},       // Set to 1 for 1000ft increments
+        {25, "ALT 100", "AirbusFBW/ALT100_1000", 0.0},        // Set to 0 for 100ft increments
+        {26, "ALT 1000", "AirbusFBW/ALT100_1000", 1.0},       // Set to 1 for 1000ft increments
         
         // Brightness control buttons
         // These are handled internally via brightness callback system
@@ -230,25 +230,25 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {40, "R_STD PULL", "toliss_airbus/copilot_baro_pull"},
         {41, "R_PRESS DEC", "sim/instruments/barometer_copilot_down"},
         {42, "R_PRESS INC", "sim/instruments/barometer_copilot_up"},
-        {43, "R_inHg", "AirbusFBW/BaroUnitFO", 0},          // Set to 0 for inHg
-        {44, "R_hPa", "AirbusFBW/BaroUnitFO", 1},           // Set to 1 for hPa
-        {45, "R_MODE LS", "AirbusFBW/NDmodeFO", 0},         // LS mode
-        {46, "R_MODE VOR", "AirbusFBW/NDmodeFO", 1},        // VOR mode
-        {47, "R_MODE NAV", "AirbusFBW/NDmodeFO", 2},        // NAV mode
-        {48, "R_MODE ARC", "AirbusFBW/NDmodeFO", 3},        // ARC mode
-        {49, "R_MODE PLAN", "AirbusFBW/NDmodeFO", 4},       // PLAN mode
-        {50, "R_RANGE 10", "AirbusFBW/NDrangeFO", 0},       // 10nm range
-        {51, "R_RANGE 20", "AirbusFBW/NDrangeFO", 1},       // 20nm range
-        {52, "R_RANGE 40", "AirbusFBW/NDrangeFO", 2},       // 40nm range
-        {53, "R_RANGE 80", "AirbusFBW/NDrangeFO", 3},       // 80nm range
-        {54, "R_RANGE 160", "AirbusFBW/NDrangeFO", 4},      // 160nm range
-        {55, "R_RANGE 320", "AirbusFBW/NDrangeFO", 5},      // 320nm range
-        {56, "R_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 2},    // VOR1
-        {57, "R_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 1},    // OFF1
-        {58, "R_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 0},    // ADF1
-        {59, "R_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 2},    // VOR2
-        {60, "R_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 1},    // OFF2
-        {61, "R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 0},    // ADF2
+        {43, "R_inHg", "AirbusFBW/BaroUnitFO", 0.0},          // Set to 0 for inHg
+        {44, "R_hPa", "AirbusFBW/BaroUnitFO", 1.0},           // Set to 1 for hPa
+        {45, "R_MODE LS", "AirbusFBW/NDmodeFO", 0.0},         // LS mode
+        {46, "R_MODE VOR", "AirbusFBW/NDmodeFO", 1.0},        // VOR mode
+        {47, "R_MODE NAV", "AirbusFBW/NDmodeFO", 2.0},        // NAV mode
+        {48, "R_MODE ARC", "AirbusFBW/NDmodeFO", 3.0},        // ARC mode
+        {49, "R_MODE PLAN", "AirbusFBW/NDmodeFO", 4.0},       // PLAN mode
+        {50, "R_RANGE 10", "AirbusFBW/NDrangeFO", 0.0},       // 10nm range
+        {51, "R_RANGE 20", "AirbusFBW/NDrangeFO", 1.0},       // 20nm range
+        {52, "R_RANGE 40", "AirbusFBW/NDrangeFO", 2.0},       // 40nm range
+        {53, "R_RANGE 80", "AirbusFBW/NDrangeFO", 3.0},       // 80nm range
+        {54, "R_RANGE 160", "AirbusFBW/NDrangeFO", 4.0},      // 160nm range
+        {55, "R_RANGE 320", "AirbusFBW/NDrangeFO", 5.0},      // 320nm range
+        {56, "R_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 2.0},    // VOR1
+        {57, "R_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 1.0},    // OFF1
+        {58, "R_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 0.0},    // ADF1
+        {59, "R_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 2.0},    // VOR2
+        {60, "R_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 1.0},    // OFF2
+        {61, "R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 0.0},    // ADF2
         // Buttons 62-63 reserved
         
         // EFIS Left (First Officer) buttons (64-95)
@@ -263,25 +263,25 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {72, "L_STD PULL", "toliss_airbus/capt_baro_pull"},
         {73, "L_PRESS DEC", "sim/instruments/barometer_down"},
         {74, "L_PRESS INC", "sim/instruments/barometer_up"},
-        {75, "L_inHg", "AirbusFBW/BaroUnitCapt", 0},        // Set to 0 for inHg
-        {76, "L_hPa", "AirbusFBW/BaroUnitCapt", 1},         // Set to 1 for hPa
-        {77, "L_MODE LS", "AirbusFBW/NDmodeCapt", 0},       // LS mode
-        {78, "L_MODE VOR", "AirbusFBW/NDmodeCapt", 1},      // VOR mode
-        {79, "L_MODE NAV", "AirbusFBW/NDmodeCapt", 2},      // NAV mode
-        {80, "L_MODE ARC", "AirbusFBW/NDmodeCapt", 3},      // ARC mode
-        {81, "L_MODE PLAN", "AirbusFBW/NDmodeCapt", 4},     // PLAN mode
-        {82, "L_RANGE 10", "AirbusFBW/NDrangeCapt", 0},     // 10nm range
-        {83, "L_RANGE 20", "AirbusFBW/NDrangeCapt", 1},     // 20nm range
-        {84, "L_RANGE 40", "AirbusFBW/NDrangeCapt", 2},     // 40nm range
-        {85, "L_RANGE 80", "AirbusFBW/NDrangeCapt", 3},     // 80nm range
-        {86, "L_RANGE 160", "AirbusFBW/NDrangeCapt", 4},    // 160nm range
-        {87, "L_RANGE 320", "AirbusFBW/NDrangeCapt", 5},    // 320nm range
-        {88, "L_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 0},      // ADF1
-        {89, "L_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 1},      // OFF1
-        {90, "L_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 2},      // VOR1
-        {91, "L_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 0},      // ADF2
-        {92, "L_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 1},      // OFF2
-        {93, "L_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 2},      // VOR2
+        {75, "L_inHg", "AirbusFBW/BaroUnitCapt", 0.0},        // Set to 0 for inHg
+        {76, "L_hPa", "AirbusFBW/BaroUnitCapt", 1.0},         // Set to 1 for hPa
+        {77, "L_MODE LS", "AirbusFBW/NDmodeCapt", 0.0},       // LS mode
+        {78, "L_MODE VOR", "AirbusFBW/NDmodeCapt", 1.0},      // VOR mode
+        {79, "L_MODE NAV", "AirbusFBW/NDmodeCapt", 2.0},      // NAV mode
+        {80, "L_MODE ARC", "AirbusFBW/NDmodeCapt", 3.0},      // ARC mode
+        {81, "L_MODE PLAN", "AirbusFBW/NDmodeCapt", 4.0},     // PLAN mode
+        {82, "L_RANGE 10", "AirbusFBW/NDrangeCapt", 0.0},     // 10nm range
+        {83, "L_RANGE 20", "AirbusFBW/NDrangeCapt", 1.0},     // 20nm range
+        {84, "L_RANGE 40", "AirbusFBW/NDrangeCapt", 2.0},     // 40nm range
+        {85, "L_RANGE 80", "AirbusFBW/NDrangeCapt", 3.0},     // 80nm range
+        {86, "L_RANGE 160", "AirbusFBW/NDrangeCapt", 4.0},    // 160nm range
+        {87, "L_RANGE 320", "AirbusFBW/NDrangeCapt", 5.0},    // 320nm range
+        {88, "L_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 0.0},      // ADF1
+        {89, "L_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 1.0},      // OFF1
+        {90, "L_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 2.0},      // VOR1
+        {91, "L_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 0.0},      // ADF2
+        {92, "L_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 1.0},      // OFF2
+        {93, "L_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 2.0},      // VOR2
         // Buttons 94-95 reserved
     };
     return buttons;
@@ -354,31 +354,32 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
     int baroUnitCapt = datarefManager->getCached<int>("AirbusFBW/BaroUnitCapt"); // int, 1 for hPa, 0 for inHg
     
     if (baroStdCapt == 1) {
-        data.efisRBaro = "  STD  ";
+        data.efisRBaro = "STD ";  // 4 characters for STD mode
         data.efisRQnh = false;
         data.efisRHpaDec = false;
     } else {
         // Get actual barometric pressure value (float, inHg)
         float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
         if (baroValue > 0) {
-            if (baroUnitCapt == 0) {  // inHg mode
+            if (baroUnitCapt == 0) {  // inHg mode - need to send as "2992" with decimal flag
+                int scaledValue = static_cast<int>(baroValue * 100);  // 29.92 -> 2992
                 std::stringstream ss;
-                ss << std::fixed << std::setprecision(2) << baroValue << "IN";
+                ss << std::setfill('0') << std::setw(4) << scaledValue;
                 data.efisRBaro = ss.str();
-                data.efisRQnh = true;
-                data.efisRHpaDec = false;
+                data.efisRQnh = true;     // QNH mode indicator
+                data.efisRHpaDec = true;  // Show decimal point
             } else {  // hPa mode (baroUnitCapt == 1)
                 int hpaValue = static_cast<int>(baroValue * 33.8639);  // Convert inHg to hPa
                 std::stringstream ss;
                 ss << std::setfill('0') << std::setw(4) << hpaValue;
                 data.efisRBaro = ss.str();
-                data.efisRQnh = false;
-                data.efisRHpaDec = true;
+                data.efisRQnh = true;     // QNH mode indicator
+                data.efisRHpaDec = false; // No decimal point for hPa
             }
         } else {
-            data.efisRBaro = "29.92IN";  // Default fallback
-            data.efisRQnh = (baroUnitCapt == 0);
-            data.efisRHpaDec = (baroUnitCapt == 1);
+            data.efisRBaro = "2992";  // Default fallback for 29.92
+            data.efisRQnh = true;
+            data.efisRHpaDec = (baroUnitCapt == 0);  // Decimal only for inHg
         }
     }
     
@@ -387,31 +388,32 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
     int baroUnitFO = datarefManager->getCached<int>("AirbusFBW/BaroUnitFO"); // int, 1 for hPa, 0 for inHg
     
     if (baroStdFO == 1) {
-        data.efisLBaro = "  STD  ";
+        data.efisLBaro = "STD ";  // 4 characters for STD mode
         data.efisLQnh = false;
         data.efisLHpaDec = false;
     } else {
         // Get actual barometric pressure value (float, inHg)
         float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
         if (baroValue > 0) {
-            if (baroUnitFO == 0) {  // inHg mode
+            if (baroUnitFO == 0) {  // inHg mode - need to send as "2992" with decimal flag
+                int scaledValue = static_cast<int>(baroValue * 100);  // 29.92 -> 2992
                 std::stringstream ss;
-                ss << std::fixed << std::setprecision(2) << baroValue << "IN";
+                ss << std::setfill('0') << std::setw(4) << scaledValue;
                 data.efisLBaro = ss.str();
-                data.efisLQnh = true;
-                data.efisLHpaDec = false;
+                data.efisLQnh = true;     // QNH mode indicator
+                data.efisLHpaDec = true;  // Show decimal point
             } else {  // hPa mode (baroUnitFO == 1)
                 int hpaValue = static_cast<int>(baroValue * 33.8639);  // Convert inHg to hPa
                 std::stringstream ss;
                 ss << std::setfill('0') << std::setw(4) << hpaValue;
                 data.efisLBaro = ss.str();
-                data.efisLQnh = false;
-                data.efisLHpaDec = true;
+                data.efisLQnh = true;     // QNH mode indicator
+                data.efisLHpaDec = false; // No decimal point for hPa
             }
         } else {
-            data.efisLBaro = "29.92IN";  // Default fallback
-            data.efisLQnh = (baroUnitFO == 0);
-            data.efisLHpaDec = (baroUnitFO == 1);
+            data.efisLBaro = "2992";  // Default fallback for 29.92
+            data.efisLQnh = true;
+            data.efisLHpaDec = (baroUnitFO == 0);  // Decimal only for inHg
         }
     }
 }
