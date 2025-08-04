@@ -231,7 +231,8 @@ void ProductFCUEfis::updateDisplays() {
         newDisplayData.spdManaged != oldDisplayData.spdManaged ||
         newDisplayData.hdgManaged != oldDisplayData.hdgManaged ||
         newDisplayData.vsMode != oldDisplayData.vsMode ||
-        newDisplayData.fpaMode != oldDisplayData.fpaMode) {
+        newDisplayData.fpaMode != oldDisplayData.fpaMode ||
+        newDisplayData.vsSign != oldDisplayData.vsSign) {
         
         debug_force("[ProductFCUEfis] FCU display data changed, sending update: SPD=%s HDG=%s ALT=%s VS=%s hdgManaged=%s\n",
               displayData.speed.c_str(), displayData.heading.c_str(), 
@@ -320,6 +321,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string&
     if (displayData.vsIndication) flagBytes[static_cast<int>(DisplayByteIndex::V0)] |= 0x40;
     if (displayData.fpaIndication) flagBytes[static_cast<int>(DisplayByteIndex::V0)] |= 0x80;
     if (displayData.fpaComma) flagBytes[static_cast<int>(DisplayByteIndex::V3)] |= 0x10;
+    if (!displayData.vsSign) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x20; // VS sign: inverted logic - bit set when negative
     if (displayData.machComma) flagBytes[static_cast<int>(DisplayByteIndex::S1)] |= 0x01;
     
     static uint8_t packageNumber = 1;

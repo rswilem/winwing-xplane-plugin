@@ -335,8 +335,18 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
     // Format FCU altitude display - using sim/cockpit/autopilot/altitude (float)
     float altitude = datarefManager->getCached<float>("sim/cockpit/autopilot/altitude");
     if (altitude >= 0) {
+        int altInt = static_cast<int>(altitude);
         std::stringstream ss;
-        ss << std::setfill('0') << std::setw(5) << static_cast<int>(altitude);
+        
+        // In TRK/FPA mode, show non-significant digits as dimmed (#) for certain altitude ranges
+        if (data.hdgTrk && data.fpaMode && altInt >= 10000) {
+            // For altitudes ≥10000ft in FPA mode, show last two digits as ## (non-significant)
+            int significantPart = (altInt / 100) * 100; // Round down to nearest 100
+            ss << std::setfill('0') << std::setw(3) << (significantPart / 100) << "##";
+        } else {
+            // Normal altitude display
+            ss << std::setfill('0') << std::setw(5) << altInt;
+        }
         data.altitude = ss.str();
     } else {
         data.altitude = "-----";
@@ -344,16 +354,67 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
     
     // Format vertical speed display - using sim/cockpit/autopilot/vertical_velocity (float)
     float vs = datarefManager->getCached<float>("sim/cockpit/autopilot/vertical_velocity");
-    if (datarefManager->getCached<int>("AirbusFBW/VSdashed") == 0 && vs != 0) {
-        std::stringstream ss;
-        if (vs > 0) {
-            ss << "+" << std::setfill('0') << std::setw(4) << static_cast<int>(vs);
+    int vsDashed = datarefManager->getCached<int>("AirbusFBW/VSdashed");
+    
+    if (vsDashed == 1) {
+        // When dashed, show 5 dashes
+        data.verticalSpeed = "-----";
+        data.vsSign = true; // Default to positive when dashed
+    } else if (data.fpaMode) {
+        // In FPA mode (TRK mode), display format +-X.X
+        // Dataref value 2000 corresponds to indication +2.0
+        if (vs != 0) {
+            // Convert dataref value to FPA display: divide by 1000
+            float fpa = vs / 1000.0f; // 2000 -> 2.0
+            
+            // Set sign flag and use absolute value for display
+            data.vsSign = (vs >= 0); // true = positive (up), false = negative (down)
+            float absFpa = std::abs(fpa);
+            
+            // Format as X.X (one digit before decimal, one after)  
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(1) << absFpa;
+            std::string fpaStr = ss.str();
+            
+            // Remove decimal point for 7-segment display and pad to 4 characters
+            std::string cleanFpa;
+            for (char c : fpaStr) {
+                if (c != '.') cleanFpa += c;
+            }
+            
+            // Ensure 4 characters: pad with leading spaces if needed
+            while (cleanFpa.length() < 4) {
+                cleanFpa = " " + cleanFpa;
+            }
+            if (cleanFpa.length() > 4) {
+                cleanFpa = cleanFpa.substr(0, 4);
+            }
+            
+            data.verticalSpeed = cleanFpa;
+            data.fpaComma = true; // Enable decimal point display
         } else {
-            ss << "-" << std::setfill('0') << std::setw(4) << static_cast<int>(std::abs(vs));
+            data.verticalSpeed = " 0 0";  // Show zero FPA as " 0.0"
+            data.fpaComma = true;
+            data.vsSign = true; // Default to positive when zero
         }
+    } else if (vs != 0) {
+        // Normal VS mode: Format absolute value, control sign via flag
+        std::stringstream ss;
+        int vsInt = static_cast<int>(std::round(vs));
+        
+        // Set sign flag and use absolute value for display
+        data.vsSign = (vsInt >= 0); // true = positive (up), false = negative (down)
+        int absVsInt = std::abs(vsInt);
+        
+        // Format as 4 digits with leading zeros, no sign character
+        ss << std::setfill('0') << std::setw(4) << absVsInt;
         data.verticalSpeed = ss.str();
+        data.fpaComma = false; // No decimal point in VS mode
     } else {
-        data.verticalSpeed = "     ";
+        // When VS is exactly 0, show 5 dashes
+        data.verticalSpeed = "-----";
+        data.fpaComma = false;
+        data.vsSign = true; // Default to positive when zero
     }
     
     // Set managed mode indicators - using validated int datarefs (1 or 0)
@@ -371,6 +432,16 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
     data.vsMode = (datarefManager->getCached<int>("AirbusFBW/HDGTRKmode") == 0); // VS mode when HDG mode
     data.fpaMode = (datarefManager->getCached<int>("AirbusFBW/HDGTRKmode") == 1); // FPA mode when TRK mode
     
+    // Set VS/FPA indication flags based on current mode
+    data.vsIndication = data.vsMode;   // fvs flag - show VS indication when in VS mode
+    data.fpaIndication = data.fpaMode; // ffpa2 flag - show FPA indication when in FPA mode
+    
+    // VS vertical line - corresponds to Python vs_vert flag (V2, 0x10)
+    data.vsVerticalLine = data.vsMode; // Show vertical line when in VS mode
+    
+    // LAT mode - defaults to true in Python, typically always on for Airbus
+    data.latMode = true;
+    
     // Format EFIS barometric pressure displays - Captain side (Right display)
     int baroStdCapt = datarefManager->getCached<int>("AirbusFBW/BaroStdCapt"); // int, 1 or 0
     int baroUnitCapt = datarefManager->getCached<int>("AirbusFBW/BaroUnitCapt"); // int, 1 for hPa, 0 for inHg
@@ -384,14 +455,14 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
         float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
         if (baroValue > 0) {
             if (baroUnitCapt == 0) {  // inHg mode - need to send as "2992" with decimal flag
-                int scaledValue = static_cast<int>(baroValue * 100);  // 29.92 -> 2992
+                int scaledValue = static_cast<int>(std::round(baroValue * 100));  // 29.92 -> 2992 with proper rounding
                 std::stringstream ss;
                 ss << std::setfill('0') << std::setw(4) << scaledValue;
                 data.efisRBaro = ss.str();
                 data.efisRQnh = true;     // QNH mode indicator
                 data.efisRHpaDec = true;  // Show decimal point
             } else {  // hPa mode (baroUnitCapt == 1)
-                int hpaValue = static_cast<int>(baroValue * 33.8639);  // Convert inHg to hPa
+                int hpaValue = static_cast<int>(std::round(baroValue * 33.8639));  // Convert inHg to hPa with proper rounding
                 std::stringstream ss;
                 ss << std::setfill('0') << std::setw(4) << hpaValue;
                 data.efisRBaro = ss.str();
@@ -418,14 +489,14 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
         float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
         if (baroValue > 0) {
             if (baroUnitFO == 0) {  // inHg mode - need to send as "2992" with decimal flag
-                int scaledValue = static_cast<int>(baroValue * 100);  // 29.92 -> 2992
+                int scaledValue = static_cast<int>(std::round(baroValue * 100));  // 29.92 -> 2992 with proper rounding
                 std::stringstream ss;
                 ss << std::setfill('0') << std::setw(4) << scaledValue;
                 data.efisLBaro = ss.str();
                 data.efisLQnh = true;     // QNH mode indicator
                 data.efisLHpaDec = true;  // Show decimal point
             } else {  // hPa mode (baroUnitFO == 1)
-                int hpaValue = static_cast<int>(baroValue * 33.8639);  // Convert inHg to hPa
+                int hpaValue = static_cast<int>(std::round(baroValue * 33.8639));  // Convert inHg to hPa with proper rounding
                 std::stringstream ss;
                 ss << std::setfill('0') << std::setw(4) << hpaValue;
                 data.efisLBaro = ss.str();

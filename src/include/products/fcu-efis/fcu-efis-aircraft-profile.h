@@ -144,6 +144,7 @@ struct FCUDisplayData {
     bool fpaIndication = false;
     bool fpaComma = false;
     bool machComma = false;
+    bool vsSign = true;  // true = positive (up), false = negative (down)
     bool efisRQfe = false;
     bool efisLQfe = false;
 };

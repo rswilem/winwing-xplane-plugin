@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(vt title:*)",
+      "Bash(grep:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(xcodebuild:*)"
+    ],
+    "deny": []
+  }
+}
