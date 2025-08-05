@@ -102,3 +102,7 @@ xcuserdata/
 !*.xcworkspace/contents.xcworkspacedata
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
+
+# Claude Code configuration files
+CLAUDE.md
+.claude/

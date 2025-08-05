@@ -18,38 +18,28 @@ The plugin theoretically works on Windows, but is not required there, as Winwing
 - The plugin will automatically detect your Winwing devices.
 - There are no user-configurable settings at this time.
 
-### Devices Compatibility
+### Compatibility Matrix
 
-The table below lists the compatibility status of various Winwing devices with the plugin.
+The matrix below shows device and aircraft compatibility. Devices are listed vertically, aircraft horizontally.
 
-| Device Name                   | Compatibility             | Tested | Roadmap / suggestions                               |
-| ----------------------------- | ------------------------- | ------ | --------------------------------------------------- |
-| URSA MINOR Airline Joystick L | 🟢 Fully implemented      | 🟢     |                                                     |
-| URSA MINOR Airline Joystick R | 🟠 Missing USB product ID | 🔴     | If anyone owns this device, please create an issue. |
-| MCDU-32                       | 🟢 Fully implemented      | 🟢     |                                                     |
-| PFP 3N                        | 🟢 Fully implemented      | 🟢     |                                                     |
-| PFP 4                         | 🟢 Fully implemented      | 🟢     |                                                     |
-| PFP 7                         | 🟢 Fully implemented      | 🟢     |                                                     |
-| Panel of Autopilot 3          | 🔴 Not implemented        | 🔴     |                                                     |
-| FCU Unit                      | 🟠 Partly implemented     | 🔴     |                                                     |
-| EFIS R                        | 🟠 Partly implemented     | 🔴     |                                                     |
-| EFIS L                        | 🟠 Partly implemented     | 🔴     |                                                     |
+| Device                    | Status | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 777 | SSG 747 | Notes                                         |
+| ------------------------- | ------ | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | --------------------------------------------- |
+| **URSA MINOR Joystick L** | 🟢     | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                             |
+| **URSA MINOR Joystick R** | 🟠     | 🔴          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Missing USB product ID - need device owner    |
+| **MCDU-32**               | 🟢     | 🟢          | 🟢           | 🟢               | 🔴       | 🔴       | 🔴     | 🔴      | FF777: Need FMC button info, SSG: Dual FMC    |
+| **PFP 3N**                | 🟢     | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                             |
+| **PFP 4**                 | 🟢     | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                             |
+| **PFP 7**                 | 🟢     | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                             |
+| **Panel of Autopilot 3**  | 🔴     | 🔴          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Not implemented                               |
+| **FCU-EFIS (FCU Unit)**   | 🟢     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss                  |
+| **FCU-EFIS (EFIS R)**     | 🟠     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss - but not tested |
+| **FCU-EFIS (EFIS L)**     | 🟢     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss                  |
 
-### Aircraft Compatibility
+#### Legend
 
-Below is a table of aircraft that are compatible with the plugin.
-
-| Aircraft             | Compatibility         | Notes                                                                         |
-| -------------------- | --------------------- | ----------------------------------------------------------------------------- |
-| Toliss A319          | 🟢 Fully implemented  |                                                                               |
-| Toliss A320          | 🟢 Fully implemented  |                                                                               |
-| Toliss A321          | 🟢 Fully implemented  |                                                                               |
-| Laminar A330-300     | 🟢 Fully implemented  |                                                                               |
-| AeroGenesis A330-300 | 🟢 Fully implemented  |                                                                               |
-| Zibo 737-800         | 🟢 Fully implemented  |                                                                               |
-| FlightFactor 777-200 | 🟠 Partly implemented | Need information on how to send FMC button presses.                           |
-| SSG 747-800          | 🟠 Partly implemented | Both FMCs need to display the same text in order for their dataref to update. |
-| IXEG 737-300         | 🟢 Fully implemented  |                                                                               |
+- 🟢 **Fully implemented** - All features working
+- 🟠 **Partly implemented** - Some limitations or missing features
+- 🔴 **Not implemented** - No support
 
 ### Known Issues
 
