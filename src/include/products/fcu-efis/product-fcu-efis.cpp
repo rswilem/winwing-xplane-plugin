@@ -92,15 +92,12 @@ ProductFCUEfis::~ProductFCUEfis() {
 }
 
 void ProductFCUEfis::setProfileForCurrentAircraft() {
-    debug_force("[ProductFCUEfis] Checking if Toliss profile is eligible...\n");
     if (TolissFCUEfisProfile::IsEligible()) {
-        debug_force("[ProductFCUEfis] Using Toliss FCU-EFIS profile for %s.\n", classIdentifier());
         profile = new TolissFCUEfisProfile(this);
         monitorDatarefs();
         profileReady = true;
     }
     else {
-        debug_force("[ProductFCUEfis] No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());
         setLedBrightness(FCUEfisLed::FLAG_GREEN, 255);
     }
 }
@@ -121,8 +118,8 @@ bool ProductFCUEfis::connect() {
         setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, 180);
         setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, 180);
         
-        setLedBrightness(FCUEfisLed::EXPED_GREEN, 1);
-        setLedBrightness(FCUEfisLed::EXPED_YELLOW, 1);
+        setLedBrightness(FCUEfisLed::EXPED_GREEN, 0);    // EXPED indicator - off by default
+        setLedBrightness(FCUEfisLed::EXPED_YELLOW, 255); // EXPED backlight - on by default
         
         if (!profile) {
             setProfileForCurrentAircraft();
@@ -231,13 +228,8 @@ void ProductFCUEfis::updateDisplays() {
         newDisplayData.spdManaged != oldDisplayData.spdManaged ||
         newDisplayData.hdgManaged != oldDisplayData.hdgManaged ||
         newDisplayData.vsMode != oldDisplayData.vsMode ||
-        newDisplayData.fpaMode != oldDisplayData.fpaMode ||
-        newDisplayData.vsSign != oldDisplayData.vsSign) {
+        newDisplayData.fpaMode != oldDisplayData.fpaMode) {
         
-        debug_force("[ProductFCUEfis] FCU display data changed, sending update: SPD=%s HDG=%s ALT=%s VS=%s hdgManaged=%s\n",
-              displayData.speed.c_str(), displayData.heading.c_str(), 
-              displayData.altitude.c_str(), displayData.verticalSpeed.c_str(),
-              displayData.hdgManaged ? "true" : "false");
         
         sendFCUDisplay(displayData.speed, displayData.heading, 
                       displayData.altitude, displayData.verticalSpeed);
@@ -248,10 +240,6 @@ void ProductFCUEfis::updateDisplays() {
         (newDisplayData.efisRBaro != oldDisplayData.efisRBaro ||
          newDisplayData.efisRQnh != oldDisplayData.efisRQnh ||
          newDisplayData.efisRHpaDec != oldDisplayData.efisRHpaDec)) {
-        debug_force("[ProductFCUEfis] EFIS Right display data changed, sending update: BARO=%s QNH=%s HPADEC=%s\n",
-              displayData.efisRBaro.c_str(), 
-              displayData.efisRQnh ? "true" : "false", 
-              displayData.efisRHpaDec ? "true" : "false");
         sendEfisRightDisplayWithFlags(displayData.efisRBaro, displayData.efisRQnh, displayData.efisRHpaDec);
     }
     
@@ -260,10 +248,6 @@ void ProductFCUEfis::updateDisplays() {
         (newDisplayData.efisLBaro != oldDisplayData.efisLBaro ||
          newDisplayData.efisLQnh != oldDisplayData.efisLQnh ||
          newDisplayData.efisLHpaDec != oldDisplayData.efisLHpaDec)) {
-        debug_force("[ProductFCUEfis] EFIS Left display data changed, sending update: BARO=%s QNH=%s HPADEC=%s\n",
-              displayData.efisLBaro.c_str(), 
-              displayData.efisLQnh ? "true" : "false", 
-              displayData.efisLHpaDec ? "true" : "false");
         sendEfisLeftDisplayWithFlags(displayData.efisLBaro, displayData.efisLQnh, displayData.efisLHpaDec);
     }
     
@@ -313,15 +297,15 @@ void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string&
     if (!displayData.hdgTrk) flagBytes[static_cast<int>(DisplayByteIndex::A5)] |= 0x08; // HDG
     
     if (displayData.vsHorizontalLine) flagBytes[static_cast<int>(DisplayByteIndex::A0)] |= 0x10;
-    if (displayData.vsVerticalLine) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x10;
+    if (displayData.vsVerticalLine) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x20; // Move to different bit
     if (displayData.lvlChange) flagBytes[static_cast<int>(DisplayByteIndex::A2)] |= 0x10;
     if (displayData.lvlChangeLeft) flagBytes[static_cast<int>(DisplayByteIndex::A3)] |= 0x10;
     if (displayData.lvlChangeRight) flagBytes[static_cast<int>(DisplayByteIndex::A1)] |= 0x10;
     
     if (displayData.vsIndication) flagBytes[static_cast<int>(DisplayByteIndex::V0)] |= 0x40;
     if (displayData.fpaIndication) flagBytes[static_cast<int>(DisplayByteIndex::V0)] |= 0x80;
-    if (displayData.fpaComma) flagBytes[static_cast<int>(DisplayByteIndex::V3)] |= 0x10;
-    if (!displayData.vsSign) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x20; // VS sign: inverted logic - bit set when negative
+    if (displayData.fpaComma) flagBytes[static_cast<int>(DisplayByteIndex::V3)] |= 0x10; // Decimal after 1st digit for X.XX format
+    if (displayData.vsSign) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x10; // VS sign: true = positive, false = negative (per Python impl)
     if (displayData.machComma) flagBytes[static_cast<int>(DisplayByteIndex::S1)] |= 0x01;
     
     static uint8_t packageNumber = 1;
@@ -502,15 +486,12 @@ void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
     
     if (ledValue < 100) {
         // FCU LEDs
-        debug_force("FCU LED %d brightness %d\n", ledValue, brightness);
         data = {0x02, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
     } else if (ledValue < 200) {
         // EFIS Right LEDs
-        debug_force("EFIS Right LED %d (adjusted: %d) brightness %d\n", ledValue, ledValue - 100, brightness);
         data = {0x02, 0x0E, 0xBF, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue - 100), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
     } else if (ledValue < 300) {
         // EFIS Left LEDs
-        debug_force("EFIS Left LED %d (adjusted: %d) brightness %d\n", ledValue, ledValue - 200, brightness);
         data = {0x02, 0x0D, 0xBF, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(ledValue - 200), brightness, 0x00, 0x00, 0x00, 0x00, 0x00};
     }
     
@@ -589,7 +570,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
             // Skip if no button definition found or if button has empty dataref
             if (!buttonDef) {
                 if (pressed && !pressedButtonIndexExists) {
-                    debug_force("[ProductFCUEfis] UNMAPPED BUTTON: Hardware index %d pressed but no button definition found\n", hardwareButtonIndex);
                 }
                 continue;
             }
@@ -632,7 +612,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
             
             if (!buttonDef) {
                 if (pressed && !pressedButtonIndexExists) {
-                    debug_force("[ProductFCUEfis] UNMAPPED BUTTON: Hardware index %d pressed but no button definition found\n", hardwareButtonIndex);
                 }
                 continue;
             }
@@ -675,7 +654,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
             
             if (!buttonDef) {
                 if (pressed && !pressedButtonIndexExists) {
-                    debug_force("[ProductFCUEfis] UNMAPPED BUTTON: Hardware index %d pressed but no button definition found\n", hardwareButtonIndex);
                 }
                 continue;
             }
@@ -708,9 +686,7 @@ void ProductFCUEfis::monitorDatarefs() {
     const std::vector<std::string>& datarefs = profile->displayDatarefs();
     for (const std::string& ref : datarefs) {
         if (Dataref::getInstance()->exists(ref.c_str())) {
-            debug_force("[ProductFCUEfis] Display dataref exists: %s\n", ref.c_str());
         } else {
-            debug_force("[ProductFCUEfis] WARNING: Display dataref does not exist: %s\n", ref.c_str());
         }
     }
 }
