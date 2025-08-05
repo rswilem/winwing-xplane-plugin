@@ -1,8 +1,10 @@
 #include "product-mcdu.h"
 #include "dataref.h"
 #include "appstate.h"
+#include "config.h"
 #include "toliss-mcdu-profile.h"
 #include "laminar-mcdu-profile.h"
+#include <chrono>
 #include <XPLMProcessing.h>
 
 ProductMCDU::ProductMCDU(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
@@ -10,6 +12,7 @@ ProductMCDU::ProductMCDU(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t 
     page = std::vector<std::vector<char>>(ProductMCDU::PageLines, std::vector<char>(ProductMCDU::PageBytesPerLine, ' '));
     lastUpdateCycle = 0;
     pressedButtonIndices = {};
+    lastDisplayUpdate = std::chrono::steady_clock::now();
     
     connect();
 }
@@ -20,19 +23,31 @@ ProductMCDU::~ProductMCDU() {
 
 void ProductMCDU::setProfileForCurrentAircraft() {
     if (TolissMcduProfile::IsEligible()) {
-        debug("Using Toliss profile for %s.\n", classIdentifier());
+        debug("MCDU: Using Toliss profile for %s.\n", classIdentifier());
         clear();
         profile = new TolissMcduProfile(this);
         profileReady = true;
+        // Profile loaded, set update speed to NORMAL
+        AppState::getInstance()->hasActiveProfile = true;
+        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
     }
     else if (LaminarMcduProfile::IsEligible()) {
-        debug("Using Laminar profile for %s.\n", classIdentifier());
+        debug("MCDU: Using Laminar profile for %s.\n", classIdentifier());
         clear();
         profile = new LaminarMcduProfile(this);
         profileReady = true;
+        // Profile loaded, set update speed to NORMAL
+        AppState::getInstance()->hasActiveProfile = true;
+        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
     }
     else {
-        debug("No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());
+        static int profileCheckCount = 0;
+        profileCheckCount++;
+        // Log every 50 checks
+        if (profileCheckCount % 50 == 1) {
+            debug("MCDU: No eligible profiles found for %s. Has the aircraft finished loading?\n",
+                       classIdentifier());
+        }
         setLedBrightness(MCDULed::FAIL, 1);
     }
 }
@@ -135,11 +150,23 @@ void ProductMCDU::update() {
         return;
     }
     
+    // Always process button inputs immediately
     USBDevice::update();
-    updatePage();
+    
+    // Throttle display updates to reduce blocking
+    auto now = std::chrono::steady_clock::now();
+    auto timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastDisplayUpdate).count();
+    
+    if (timeSinceLastUpdate >= DISPLAY_UPDATE_INTERVAL_MS) {
+        updatePage();
+        lastDisplayUpdate = now;
+    }
 }
 
 void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength) {
+    static uint64_t lastButtonState_lo = 0;
+    static uint32_t lastButtonState_hi = 0;
+    
     if (!connected || !profile || !report || reportLength <= 0) {
         return;
     }
@@ -165,6 +192,14 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
         buttons_hi |= ((uint32_t)report[i+9]) << (8 * i);
     }
     
+    // Skip processing if button state hasn't changed
+    if (buttons_lo == lastButtonState_lo && buttons_hi == lastButtonState_hi) {
+        return; // No button state change, don't waste CPU cycles
+    }
+    
+    lastButtonState_lo = buttons_lo;
+    lastButtonState_hi = buttons_hi;
+    
     const std::vector<MCDUButtonDef>& currentButtonDefs = profile->buttonDefs();
     size_t numButtons = currentButtonDefs.size();
     
@@ -181,9 +216,8 @@ void ProductMCDU::didReceiveData(int reportId, uint8_t *report, int reportLength
             pressedButtonIndices.insert(i);
             profile->buttonPressed(&currentButtonDefs[i], xplm_CommandBegin);
         }
-        else if (pressed && pressedButtonIndexExists) {
-            profile->buttonPressed(&currentButtonDefs[i], xplm_CommandContinue);
-        }
+        // Skip CommandContinue calls to prevent flooding X-Plane with continuous commands
+        // MCDU buttons are typically single-action, not continuous-action
         else if (!pressed && pressedButtonIndexExists) {
             pressedButtonIndices.erase(i);
             profile->buttonPressed(&currentButtonDefs[i], xplm_CommandEnd);

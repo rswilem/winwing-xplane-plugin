@@ -37,7 +37,10 @@ void ProductUrsaMinorJoystick::disconnect() {
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
     Dataref::getInstance()->unbind("sim/flightmodel/failures/onground_any");
     didInitializeDatarefs = false;
-    AppState::getInstance()->fastUpdate = false;
+    // Reset update speed when disconnecting
+    if (AppState::getInstance()->hasActiveProfile) {
+        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
+    }
 }
 
 void ProductUrsaMinorJoystick::update() {
@@ -97,7 +100,10 @@ void ProductUrsaMinorJoystick::initializeDatarefs() {
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/flightmodel/failures/onground_any", [this](bool wheelsOnGround) {
-        AppState::getInstance()->fastUpdate = wheelsOnGround;
+        // Set update speed based on wheels on ground status
+        if (AppState::getInstance()->hasActiveProfile) {
+            AppState::getInstance()->updateSpeed = wheelsOnGround ? UpdateSpeed::FAST : UpdateSpeed::NORMAL;
+        }
         
         if (!wheelsOnGround && lastVibration > 0) {
             lastVibration = 0;
