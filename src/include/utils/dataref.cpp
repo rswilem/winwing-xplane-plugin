@@ -5,6 +5,7 @@
 #include <cstring>
 #include "config.h"
 #include "appstate.h"
+#include <chrono>
 
 using namespace std;
 
@@ -485,8 +486,17 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
 }
 
 void Dataref::executeCommand(const char *command, XPLMCommandPhase phase) {
+    auto findStart = std::chrono::high_resolution_clock::now();
     XPLMCommandRef ref = XPLMFindCommand(command);
+    auto findEnd = std::chrono::high_resolution_clock::now();
+    auto findDuration = std::chrono::duration_cast<std::chrono::microseconds>(findEnd - findStart).count();
+    
+    if (findDuration > 1000) { // Log if XPLMFindCommand takes more than 1ms
+        debug_force("XPLMFindCommand('%s') took %lld μs\n", command, findDuration);
+    }
+    
     if (!ref) {
+        debug_force("Command not found: %s\n", command);
         return;
     }
     

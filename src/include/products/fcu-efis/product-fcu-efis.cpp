@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
+#include <cstring>
 
 uint8_t swapNibbles(uint8_t value) {
     return ((value & 0x0F) << 4) | ((value & 0xF0) >> 4);
@@ -92,13 +93,11 @@ ProductFCUEfis::~ProductFCUEfis() {
 
 void ProductFCUEfis::setProfileForCurrentAircraft() {
     if (TolissFCUEfisProfile::IsEligible()) {
-        debug("Using Toliss FCU-EFIS profile for %s.\n", classIdentifier());
         profile = new TolissFCUEfisProfile(this);
         monitorDatarefs();
         profileReady = true;
     }
     else {
-        debug("No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());
         setLedBrightness(FCUEfisLed::FLAG_GREEN, 255);
     }
 }
@@ -114,6 +113,13 @@ bool ProductFCUEfis::connect() {
         // Set initial LED brightness
         setLedBrightness(FCUEfisLed::BACKLIGHT, 180);
         setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, 180);
+        setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, 180);
+        setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, 180);
+        setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, 180);
+        setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, 180);
+        
+        setLedBrightness(FCUEfisLed::EXPED_GREEN, 0);    // EXPED indicator - off by default
+        setLedBrightness(FCUEfisLed::EXPED_YELLOW, 255); // EXPED backlight - on by default
         
         if (!profile) {
             setProfileForCurrentAircraft();
@@ -201,43 +207,53 @@ void ProductFCUEfis::updateDisplays() {
         return;
     }
 
+    // Save old display data for comparison
+    FCUDisplayData oldDisplayData = displayData;
+    
+    // Get new display data
     FCUDisplayData newDisplayData = displayData;
     profile->updateDisplayData(newDisplayData);
     
+    // Update displayData with new values immediately so all sends use correct flags
+    displayData = newDisplayData;
+    
     // Update FCU display if data changed
-    if (newDisplayData.speed != displayData.speed || 
-        newDisplayData.heading != displayData.heading ||
-        newDisplayData.altitude != displayData.altitude ||
-        newDisplayData.verticalSpeed != displayData.verticalSpeed ||
-        newDisplayData.spdMach != displayData.spdMach ||
-        newDisplayData.hdgTrk != displayData.hdgTrk ||
-        newDisplayData.altManaged != displayData.altManaged ||
-        newDisplayData.spdManaged != displayData.spdManaged ||
-        newDisplayData.hdgManaged != displayData.hdgManaged ||
-        newDisplayData.vsMode != displayData.vsMode ||
-        newDisplayData.fpaMode != displayData.fpaMode) {
+    if (newDisplayData.speed != oldDisplayData.speed || 
+        newDisplayData.heading != oldDisplayData.heading ||
+        newDisplayData.altitude != oldDisplayData.altitude ||
+        newDisplayData.verticalSpeed != oldDisplayData.verticalSpeed ||
+        newDisplayData.spdMach != oldDisplayData.spdMach ||
+        newDisplayData.hdgTrk != oldDisplayData.hdgTrk ||
+        newDisplayData.altManaged != oldDisplayData.altManaged ||
+        newDisplayData.spdManaged != oldDisplayData.spdManaged ||
+        newDisplayData.hdgManaged != oldDisplayData.hdgManaged ||
+        newDisplayData.vsMode != oldDisplayData.vsMode ||
+        newDisplayData.fpaMode != oldDisplayData.fpaMode) {
         
-        sendFCUDisplay(newDisplayData.speed, newDisplayData.heading, 
-                      newDisplayData.altitude, newDisplayData.verticalSpeed);
+        
+        sendFCUDisplay(displayData.speed, displayData.heading, 
+                      displayData.altitude, displayData.verticalSpeed);
     }
     
     // Update EFIS Right display if data changed
     if (profile->hasEfisRight() && 
-        (newDisplayData.efisRBaro != displayData.efisRBaro ||
-         newDisplayData.efisRQnh != displayData.efisRQnh ||
-         newDisplayData.efisRHpaDec != displayData.efisRHpaDec)) {
-        sendEfisRightDisplay(newDisplayData.efisRBaro);
+        (newDisplayData.efisRBaro != oldDisplayData.efisRBaro ||
+         newDisplayData.efisRQnh != oldDisplayData.efisRQnh ||
+         newDisplayData.efisRHpaDec != oldDisplayData.efisRHpaDec)) {
+        sendEfisRightDisplayWithFlags(displayData.efisRBaro, displayData.efisRQnh, displayData.efisRHpaDec);
     }
     
     // Update EFIS Left display if data changed
     if (profile->hasEfisLeft() && 
-        (newDisplayData.efisLBaro != displayData.efisLBaro ||
-         newDisplayData.efisLQnh != displayData.efisLQnh ||
-         newDisplayData.efisLHpaDec != displayData.efisLHpaDec)) {
-        sendEfisLeftDisplay(newDisplayData.efisLBaro);
+        (newDisplayData.efisLBaro != oldDisplayData.efisLBaro ||
+         newDisplayData.efisLQnh != oldDisplayData.efisLQnh ||
+         newDisplayData.efisLHpaDec != oldDisplayData.efisLHpaDec)) {
+        sendEfisLeftDisplayWithFlags(displayData.efisLBaro, displayData.efisLQnh, displayData.efisLHpaDec);
     }
     
-    displayData = newDisplayData;
+    if (shouldUpdate) {
+        lastUpdateCycle = XPLMGetCycleNumber();
+    }
 }
 
 void ProductFCUEfis::initializeDisplays() {
@@ -281,14 +297,15 @@ void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string&
     if (!displayData.hdgTrk) flagBytes[static_cast<int>(DisplayByteIndex::A5)] |= 0x08; // HDG
     
     if (displayData.vsHorizontalLine) flagBytes[static_cast<int>(DisplayByteIndex::A0)] |= 0x10;
-    if (displayData.vsVerticalLine) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x10;
+    if (displayData.vsVerticalLine) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x20; // Move to different bit
     if (displayData.lvlChange) flagBytes[static_cast<int>(DisplayByteIndex::A2)] |= 0x10;
     if (displayData.lvlChangeLeft) flagBytes[static_cast<int>(DisplayByteIndex::A3)] |= 0x10;
     if (displayData.lvlChangeRight) flagBytes[static_cast<int>(DisplayByteIndex::A1)] |= 0x10;
     
     if (displayData.vsIndication) flagBytes[static_cast<int>(DisplayByteIndex::V0)] |= 0x40;
     if (displayData.fpaIndication) flagBytes[static_cast<int>(DisplayByteIndex::V0)] |= 0x80;
-    if (displayData.fpaComma) flagBytes[static_cast<int>(DisplayByteIndex::V3)] |= 0x10;
+    if (displayData.fpaComma) flagBytes[static_cast<int>(DisplayByteIndex::V3)] |= 0x10; // Decimal after 1st digit for X.XX format
+    if (displayData.vsSign) flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x10; // VS sign: true = positive, false = negative (per Python impl)
     if (displayData.machComma) flagBytes[static_cast<int>(DisplayByteIndex::S1)] |= 0x01;
     
     static uint8_t packageNumber = 1;
@@ -416,7 +433,7 @@ void ProductFCUEfis::sendEfisLeftDisplay(const std::string& baro) {
     data.push_back(flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)]);
     
     // Add second command
-    data.insert(data.end(), {0x0E, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
+    data.insert(data.end(), {0x0D, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
     
     // Pad to 64 bytes
     while (data.size() < 64) {
@@ -428,6 +445,38 @@ void ProductFCUEfis::sendEfisLeftDisplay(const std::string& baro) {
     // Increment package number for next call
     packageNumber++;
     if (packageNumber == 0) packageNumber = 1;  // Avoid 0
+}
+
+void ProductFCUEfis::sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec) {
+    // Temporarily set the flags in displayData
+    bool originalQnh = displayData.efisRQnh;
+    bool originalHpaDec = displayData.efisRHpaDec;
+    
+    displayData.efisRQnh = qnh;
+    displayData.efisRHpaDec = hpaDec;
+    
+    // Call the regular send function which uses displayData flags
+    sendEfisRightDisplay(baro);
+    
+    // Restore original flags
+    displayData.efisRQnh = originalQnh;
+    displayData.efisRHpaDec = originalHpaDec;
+}
+
+void ProductFCUEfis::sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec) {
+    // Temporarily set the flags in displayData
+    bool originalQnh = displayData.efisLQnh;
+    bool originalHpaDec = displayData.efisLHpaDec;
+    
+    displayData.efisLQnh = qnh;
+    displayData.efisLHpaDec = hpaDec;
+    
+    // Call the regular send function which uses displayData flags
+    sendEfisLeftDisplay(baro);
+    
+    // Restore original flags
+    displayData.efisLQnh = originalQnh;
+    displayData.efisLHpaDec = originalHpaDec;
 }
 
 void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
@@ -448,10 +497,15 @@ void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
     
     if (!data.empty()) {
         writeData(data);
+    } else {
+        debug("No LED data generated for LED %d\n", ledValue);
     }
 }
 
 void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLength) {
+    static uint8_t lastReport[32] = {0};
+    static bool hasLastReport = false;
+    
     if (!connected || !profile || !report || reportLength <= 0) {
         return;
     }
@@ -468,28 +522,156 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
         return;
     }
     
+    // Skip processing if report data hasn't changed (reduces queue pressure)
+    // Compare only the button bytes (1-12), not the entire report
+    if (hasLastReport && reportLength >= 13) {
+        bool buttonsChanged = false;
+        for (int i = 1; i <= 12 && i < reportLength; i++) {
+            if (report[i] != lastReport[i]) {
+                buttonsChanged = true;
+                break;
+            }
+        }
+        
+        if (!buttonsChanged) {
+            return; // No button state change, skip processing
+        }
+    }
+    
+    // Cache the current report for next comparison
+    if (reportLength <= 32) {
+        memcpy(lastReport, report, reportLength);
+        hasLastReport = true;
+    }
+    
     // Parse button press data - format is specific to FCU-EFIS hardware
-    // Bytes 0-11 contain button states for 96 buttons (8 bits per byte)
+    // Python reference shows: bytes 1-4 for FCU, bytes 5-8 for EFIS-L, bytes 9-12 for EFIS-R
+    // Byte 0 is skipped (likely report ID or status byte)
     const std::vector<FCUEfisButtonDef>& currentButtonDefs = profile->buttonDefs();
     
-    for (int byteIndex = 0; byteIndex < std::min(12, reportLength); byteIndex++) {
+    // Process FCU buttons (bytes 1-4 = buttons 0-31)
+    for (int byteIndex = 1; byteIndex <= 4 && byteIndex < reportLength; byteIndex++) {
         uint8_t buttonByte = report[byteIndex];
         
         for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
-            int i = byteIndex * 8 + bitIndex;
+            int hardwareButtonIndex = (byteIndex - 1) * 8 + bitIndex;  // Subtract 1 to start at button 0
             bool pressed = (buttonByte & (1 << bitIndex)) != 0;
-            bool pressedButtonIndexExists = pressedButtonIndices.find(i) != pressedButtonIndices.end();
+            bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
+            
+            // Find button definition with matching ID (hardware index matches button ID)
+            const FCUEfisButtonDef* buttonDef = nullptr;
+            for (const auto& btn : currentButtonDefs) {
+                if (btn.id == hardwareButtonIndex) {
+                    buttonDef = &btn;
+                    break;
+                }
+            }
+            
+            // Skip if no button definition found or if button has empty dataref
+            if (!buttonDef) {
+                if (pressed && !pressedButtonIndexExists) {
+                }
+                continue;
+            }
+            
+            if (buttonDef->dataref.empty()) {
+                continue;
+            }
             
             if (pressed && !pressedButtonIndexExists) {
-                pressedButtonIndices.insert(i);
-                profile->buttonPressed(&currentButtonDefs[i], xplm_CommandBegin);
+                pressedButtonIndices.insert(hardwareButtonIndex);
+                profile->buttonPressed(buttonDef, xplm_CommandBegin);
             }
             else if (pressed && pressedButtonIndexExists) {
-                profile->buttonPressed(&currentButtonDefs[i], xplm_CommandContinue);
+                profile->buttonPressed(buttonDef, xplm_CommandContinue);
             }
             else if (!pressed && pressedButtonIndexExists) {
-                pressedButtonIndices.erase(i);
-                profile->buttonPressed(&currentButtonDefs[i], xplm_CommandEnd);
+                pressedButtonIndices.erase(hardwareButtonIndex);
+                profile->buttonPressed(buttonDef, xplm_CommandEnd);
+            }
+        }
+    }
+    
+    // Process EFIS-R buttons (bytes 9-12 = buttons 32-63)
+    for (int byteIndex = 9; byteIndex <= 12 && byteIndex < reportLength; byteIndex++) {
+        uint8_t buttonByte = report[byteIndex];
+        
+        for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
+            int hardwareButtonIndex = 32 + (byteIndex - 9) * 8 + bitIndex;  // EFIS-R starts at button 32
+            bool pressed = (buttonByte & (1 << bitIndex)) != 0;
+            bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
+            
+            // Find button definition with matching ID
+            const FCUEfisButtonDef* buttonDef = nullptr;
+            for (const auto& btn : currentButtonDefs) {
+                if (btn.id == hardwareButtonIndex) {
+                    buttonDef = &btn;
+                    break;
+                }
+            }
+            
+            if (!buttonDef) {
+                if (pressed && !pressedButtonIndexExists) {
+                }
+                continue;
+            }
+            
+            if (buttonDef->dataref.empty()) {
+                continue;
+            }
+            
+            if (pressed && !pressedButtonIndexExists) {
+                pressedButtonIndices.insert(hardwareButtonIndex);
+                profile->buttonPressed(buttonDef, xplm_CommandBegin);
+            }
+            else if (pressed && pressedButtonIndexExists) {
+                profile->buttonPressed(buttonDef, xplm_CommandContinue);
+            }
+            else if (!pressed && pressedButtonIndexExists) {
+                pressedButtonIndices.erase(hardwareButtonIndex);
+                profile->buttonPressed(buttonDef, xplm_CommandEnd);
+            }
+        }
+    }
+    
+    // Process EFIS-L buttons (bytes 5-8 = buttons 64-95)
+    for (int byteIndex = 5; byteIndex <= 8 && byteIndex < reportLength; byteIndex++) {
+        uint8_t buttonByte = report[byteIndex];
+        
+        for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
+            int hardwareButtonIndex = 64 + (byteIndex - 5) * 8 + bitIndex;  // EFIS-L starts at button 64
+            bool pressed = (buttonByte & (1 << bitIndex)) != 0;
+            bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
+            
+            // Find button definition with matching ID
+            const FCUEfisButtonDef* buttonDef = nullptr;
+            for (const auto& btn : currentButtonDefs) {
+                if (btn.id == hardwareButtonIndex) {
+                    buttonDef = &btn;
+                    break;
+                }
+            }
+            
+            if (!buttonDef) {
+                if (pressed && !pressedButtonIndexExists) {
+                }
+                continue;
+            }
+            
+            if (buttonDef->dataref.empty()) {
+                continue;
+            }
+            
+            if (pressed && !pressedButtonIndexExists) {
+                pressedButtonIndices.insert(hardwareButtonIndex);
+                profile->buttonPressed(buttonDef, xplm_CommandBegin);
+            }
+            else if (pressed && pressedButtonIndexExists) {
+                profile->buttonPressed(buttonDef, xplm_CommandContinue);
+            }
+            else if (!pressed && pressedButtonIndexExists) {
+                pressedButtonIndices.erase(hardwareButtonIndex);
+                profile->buttonPressed(buttonDef, xplm_CommandEnd);
             }
         }
     }
@@ -498,6 +680,14 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
 void ProductFCUEfis::monitorDatarefs() {
     if (!profile) {
         return;
+    }
+    
+    // Ensure all display datarefs exist and are accessible
+    const std::vector<std::string>& datarefs = profile->displayDatarefs();
+    for (const std::string& ref : datarefs) {
+        if (Dataref::getInstance()->exists(ref.c_str())) {
+        } else {
+        }
     }
 }
 

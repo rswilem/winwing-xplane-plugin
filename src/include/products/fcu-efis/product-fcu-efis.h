@@ -13,6 +13,7 @@ private:
     FCUDisplayData displayData;
     int lastUpdateCycle;
     std::set<int> pressedButtonIndices;
+    std::map<std::string, int> selectorPositions;  // Track rotary selector positions by dataref
     
     void setProfileForCurrentAircraft();
     void updateDisplays();
@@ -37,6 +38,11 @@ public:
                        const std::string& altitude, const std::string& vs);
     void sendEfisRightDisplay(const std::string& baro);
     void sendEfisLeftDisplay(const std::string& baro);
+    void sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec);
+    void sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec);
+    
+    // Getter for display data (for testing)
+    FCUDisplayData& getDisplayData() { return displayData; }
 };
 
 #endif
