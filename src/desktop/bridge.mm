@@ -429,9 +429,73 @@ void fcuefis_testDisplay(void* fcuefisHandle, const char* testType) {
         fcuefis->sendEfisRightDisplay("1013");
     } else if (test == "EFIS_L") {
         fcuefis->sendEfisLeftDisplay("1013");
+    } else if (test == "MANAGED") {
+        // Test managed mode dots - temporarily set managed flags
+        auto& displayData = fcuefis->getDisplayData();
+        bool oldSpdManaged = displayData.spdManaged;
+        bool oldHdgManaged = displayData.hdgManaged;
+        bool oldAltManaged = displayData.altManaged;
+        
+        // Set all managed flags to true for testing
+        displayData.spdManaged = true;
+        displayData.hdgManaged = true;
+        displayData.altManaged = true;
+        
+        fcuefis->sendFCUDisplay("250", "180", "35000", "1800");
+        
+        // Restore original flags
+        displayData.spdManaged = oldSpdManaged;
+        displayData.hdgManaged = oldHdgManaged;
+        displayData.altManaged = oldAltManaged;
     } else if (test == "ALL") {
         fcuefis->sendFCUDisplay("888", "888", "88888", "8888");
         fcuefis->sendEfisRightDisplay("8888");
         fcuefis->sendEfisLeftDisplay("8888");
     }
+}
+
+void fcuefis_efisRightTestDisplay(void* fcuefisHandle, const char* testType) {
+    if (!fcuefisHandle || !testType) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    
+    std::string test(testType);
+    if (test == "QNH_1013") {
+        // hPa: QNH mode but no decimal point
+        fcuefis->sendEfisRightDisplayWithFlags("1013", true, false);
+    } else if (test == "QNH_2992") {
+        // inHg: show decimal point to display "29.92"
+        fcuefis->sendEfisRightDisplayWithFlags("2992", true, true);
+    } else if (test == "STD") {
+        // STD: no decimal point
+        fcuefis->sendEfisRightDisplayWithFlags("STD ", false, false);
+    }
+}
+
+void fcuefis_efisLeftTestDisplay(void* fcuefisHandle, const char* testType) {
+    if (!fcuefisHandle || !testType) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    
+    std::string test(testType);
+    if (test == "QNH_1013") {
+        // hPa: QNH mode but no decimal point
+        fcuefis->sendEfisLeftDisplayWithFlags("1013", true, false);
+    } else if (test == "QNH_2992") {
+        // inHg: show decimal point to display "29.92"
+        fcuefis->sendEfisLeftDisplayWithFlags("2992", true, true);
+    } else if (test == "STD") {
+        // STD: no decimal point
+        fcuefis->sendEfisLeftDisplayWithFlags("STD ", false, false);
+    }
+}
+
+void fcuefis_efisRightClear(void* fcuefisHandle) {
+    if (!fcuefisHandle) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    fcuefis->sendEfisRightDisplay("    ");  // Clear with 4 spaces
+}
+
+void fcuefis_efisLeftClear(void* fcuefisHandle) {
+    if (!fcuefisHandle) return;
+    auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
+    fcuefis->sendEfisLeftDisplay("    ");  // Clear with 4 spaces
 }

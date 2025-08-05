@@ -62,14 +62,13 @@ float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLas
     
     appstate->update();
     
-    // Return appropriate refresh rate based on updateSpeed
     switch (appstate->updateSpeed) {
         case UpdateSpeed::SLOW:
-            return REFRESH_INTERVAL_SECONDS_SLOW;     // 5.0s - No profile loaded
+            return REFRESH_INTERVAL_SECONDS_SLOW;
         case UpdateSpeed::NORMAL:
-            return REFRESH_INTERVAL_SECONDS_NORMAL;   // 0.4s - Aircraft in the air
+            return REFRESH_INTERVAL_SECONDS_NORMAL;
         case UpdateSpeed::FAST:
-            return REFRESH_INTERVAL_SECONDS_FAST;     // 0.1s - Wheels on ground
+            return REFRESH_INTERVAL_SECONDS_FAST;
         default:
             return REFRESH_INTERVAL_SECONDS_NORMAL;
     }

@@ -70,12 +70,20 @@ func c_pfp_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ bright
 // FCU-EFIS functions via handle
 @_silgen_name("fcuefis_clear")
 func c_fcuefis_clear(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("fcuefis_efisRightClear")
+func c_fcuefis_efisRightClear(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("fcuefis_efisLeftClear")
+func c_fcuefis_efisLeftClear(_ handle: UnsafeRawPointer) -> Void
 @_silgen_name("fcuefis_setLed")
 func c_fcuefis_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) -> Bool
 @_silgen_name("fcuefis_setLedBrightness")
 func c_fcuefis_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ brightness: UInt8) -> Void
 @_silgen_name("fcuefis_testDisplay")
 func c_fcuefis_testDisplay(_ handle: UnsafeRawPointer, _ testType: UnsafePointer<CChar>) -> Void
+@_silgen_name("fcuefis_efisRightTestDisplay")
+func c_fcuefis_efisRightTestDisplay(_ handle: UnsafeRawPointer, _ testType: UnsafePointer<CChar>) -> Void
+@_silgen_name("fcuefis_efisLeftTestDisplay")
+func c_fcuefis_efisLeftTestDisplay(_ handle: UnsafeRawPointer, _ testType: UnsafePointer<CChar>) -> Void
 
 enum DeviceType: String, CaseIterable {
     case joystick = "joystick"
@@ -414,6 +422,26 @@ struct FCUEfisWrapper {
         }
     }
     
+    func efisRightTestDisplay(_ testType: String) {
+        testType.withCString { cString in
+            c_fcuefis_efisRightTestDisplay(handle, cString)
+        }
+    }
+    
+    func efisLeftTestDisplay(_ testType: String) {
+        testType.withCString { cString in
+            c_fcuefis_efisLeftTestDisplay(handle, cString)
+        }
+    }
+    
+    func efisRightClear() {
+        c_fcuefis_efisRightClear(handle)
+    }
+    
+    func efisLeftClear() {
+        c_fcuefis_efisLeftClear(handle)
+    }
+    
     // Convenience methods for common LEDs
     func setBacklight(_ brightness: UInt8) {
         setLedBrightness(.backlight, brightness: brightness)
@@ -426,10 +454,18 @@ struct FCUEfisWrapper {
     func setEfisRightBacklight(_ brightness: UInt8) {
         setLedBrightness(.efisrBacklight, brightness: brightness)
     }
+  
+  func setEfisRightScreenBacklight(_ brightness: UInt8) {
+    setLedBrightness(.efisrScreenBacklight, brightness: brightness)
+  }
     
     func setEfisLeftBacklight(_ brightness: UInt8) {
         setLedBrightness(.efislBacklight, brightness: brightness)
     }
+  
+  func setEfisLeftScreenBacklight(_ brightness: UInt8) {
+    setLedBrightness(.efislScreenBacklight, brightness: brightness)
+  }
 }
 
 @MainActor
