@@ -55,9 +55,13 @@ void ProductUrsaMinorJoystick::update() {
         float delta = fabs(gForce - lastGForce);
         lastGForce = gForce;
         
-        uint8_t vibration = (uint8_t)std::min(255.0f, delta * 400.0f);
-        if (vibration < 8) {
+        uint8_t vibration = (uint8_t)std::min(255.0f, delta * 800.0f);
+        if (vibration < 6) {
             vibration = 0;
+        }
+
+        if (lastVibration == vibration) {
+            return;
         }
 
         setVibration(vibration);
