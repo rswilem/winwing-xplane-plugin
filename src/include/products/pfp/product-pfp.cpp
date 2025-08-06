@@ -29,18 +29,12 @@ void ProductPFP::setProfileForCurrentAircraft() {
         clear();
         profile = new ZiboPfpProfile(this);
         profileReady = true;
-        // Profile loaded, set update speed to NORMAL
-        AppState::getInstance()->hasActiveProfile = true;
-        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
     }
     else if (FlightFactor777PfpProfile::IsEligible()) {
         debug("Using FlightFactor 777 PFP profile for %s.\n", classIdentifier());
         clear();
         profile = new FlightFactor777PfpProfile(this);
         profileReady = true;
-        // Profile loaded, set update speed to NORMAL
-        AppState::getInstance()->hasActiveProfile = true;
-        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
     }
     else if (SSG748PfpProfile::IsEligible()) {
         debug("Using SSG 748 PFP profile for %s.\n", classIdentifier());
@@ -53,9 +47,6 @@ void ProductPFP::setProfileForCurrentAircraft() {
         clear();
         profile = new IXEG733PfpProfile(this);
         profileReady = true;
-        // Profile loaded, set update speed to NORMAL
-        AppState::getInstance()->hasActiveProfile = true;
-        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
     }
     else {
         debug("No eligible profiles found for %s. Has the aircraft finished loading?\n", classIdentifier());

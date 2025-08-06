@@ -27,18 +27,12 @@ void ProductMCDU::setProfileForCurrentAircraft() {
         clear();
         profile = new TolissMcduProfile(this);
         profileReady = true;
-        // Profile loaded, set update speed to NORMAL
-        AppState::getInstance()->hasActiveProfile = true;
-        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
     }
     else if (LaminarMcduProfile::IsEligible()) {
         debug("MCDU: Using Laminar profile for %s.\n", classIdentifier());
         clear();
         profile = new LaminarMcduProfile(this);
         profileReady = true;
-        // Profile loaded, set update speed to NORMAL
-        AppState::getInstance()->hasActiveProfile = true;
-        AppState::getInstance()->updateSpeed = UpdateSpeed::NORMAL;
     }
     else {
         static int profileCheckCount = 0;

@@ -12,12 +12,6 @@ struct DelayedTask {
     std::function<void()> func;
 };
 
-enum class UpdateSpeed {
-    SLOW,    // 5.0s - No profile loaded
-    NORMAL,  // 0.4s - Aircraft in the air
-    FAST     // 0.1s - Wheels on ground
-};
-
 class AppState {
 private:
     AppState();
@@ -31,9 +25,7 @@ public:
     static float Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
     
     bool pluginInitialized;
-    UpdateSpeed updateSpeed;
     bool debuggingEnabled;
-    bool hasActiveProfile;
     
     static AppState* getInstance();
     bool initialize();
