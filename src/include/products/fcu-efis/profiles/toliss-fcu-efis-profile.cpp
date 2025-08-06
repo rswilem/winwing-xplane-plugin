@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iomanip>
 #include <bitset>
+#include <cmath>
 
 TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
     
