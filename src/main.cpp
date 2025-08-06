@@ -123,6 +123,7 @@ void menuAction(void* mRef, void* iRef) {
         bool debugLoggingEnabled = (currentState != xplm_Menu_Checked);
         XPLMSetMenuItemName(mainMenuId, debugLoggingMenuItemIndex, debugLoggingEnabled ? "Disable debug logging" : "Enable debug logging", 0);
         XPLMCheckMenuItem(mainMenuId, debugLoggingMenuItemIndex, debugLoggingEnabled ? xplm_Menu_Checked : xplm_Menu_Unchecked);
+        AppState::getInstance()->debuggingEnabled = debugLoggingEnabled;
         
         if (debugLoggingEnabled) {
             debug_force("Debug logging was enabled. Currently connected devices (%lu):\n", USBController::getInstance()->devices.size());
