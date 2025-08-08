@@ -82,6 +82,8 @@ bool ProductPFP::connect() {
         
         setLedBrightness(PFPLed::BACKLIGHT, 128);
         setLedBrightness(PFPLed::SCREEN_BACKLIGHT, 128);
+        setLedBrightness(PFPLed::OVERALL_LEDS_BRIGHTNESS, 255);
+        
         const PFPLed ledsToSet[] = {
             PFPLed::CALL,
             PFPLed::FAIL,

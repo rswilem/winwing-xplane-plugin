@@ -11,6 +11,7 @@ struct MCDUControlView: View {
     let device: WinwingDevice
     @State private var backlight: Double = 0
     @State private var screenBacklight: Double = 0
+    @State private var overallLedsBrightness: Double = 0
     
     // LED states for MCDU indicators
     @State private var ledStates: [Bool] = Array(repeating: false, count: 17)
@@ -54,6 +55,19 @@ struct MCDUControlView: View {
                     Text("\(Int(screenBacklight))")
                         .frame(width: 36, alignment: .trailing)
                     Button(action: { setScreenBacklight() }) {
+                        Text("Set")
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
+                HStack(alignment: .center, spacing: 16) {
+                    Text("Overall LEDs")
+                        .frame(width: 100, alignment: .leading)
+                    Slider(value: $overallLedsBrightness, in: 0...255, step: 1)
+                        .frame(width: 160)
+                    Text("\(Int(overallLedsBrightness))")
+                        .frame(width: 36, alignment: .trailing)
+                    Button(action: { setOverallLedsBrightness() }) {
                         Text("Set")
                     }
                     .buttonStyle(.bordered)
@@ -142,6 +156,11 @@ struct MCDUControlView: View {
     private func setScreenBacklight() {
         guard let mcdu = device.mcdu else { return }
         mcdu.setScreenBacklight(UInt8(screenBacklight))
+    }
+    
+    private func setOverallLedsBrightness() {
+        guard let mcdu = device.mcdu else { return }
+        mcdu.setOverallLedsBrightness(UInt8(overallLedsBrightness))
     }
     
     private func clearDisplay(_ displayId: Int) {

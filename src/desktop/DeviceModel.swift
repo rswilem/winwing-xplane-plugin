@@ -207,6 +207,7 @@ struct MCDUWrapper {
     enum LEDId: Int {
         case backlight = 0
         case screenBacklight = 1
+        case overallLedsBrightness = 2
         case fail = 8
         case fm = 9
         case mcdu = 10
@@ -266,6 +267,10 @@ struct MCDUWrapper {
     func setScreenBacklight(_ brightness: UInt8) {
         setLedBrightness(.screenBacklight, brightness: brightness)
     }
+    
+    func setOverallLedsBrightness(_ brightness: UInt8) {
+        setLedBrightness(.overallLedsBrightness, brightness: brightness)
+    }
 }
 
 // Swift wrapper for PFP functions
@@ -276,6 +281,7 @@ struct PFPWrapper {
     enum LEDId: Int {
         case backlight = 0
         case screenBacklight = 1
+        case overallLedsBrightness = 2
         case fail = 8
         case fm = 9
         case mcdu = 10
@@ -334,6 +340,10 @@ struct PFPWrapper {
     
     func setScreenBacklight(_ brightness: UInt8) {
         setLedBrightness(.screenBacklight, brightness: brightness)
+    }
+    
+    func setOverallLedsBrightness(_ brightness: UInt8) {
+        setLedBrightness(.overallLedsBrightness, brightness: brightness)
     }
 }
 

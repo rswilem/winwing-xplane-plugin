@@ -16,6 +16,7 @@ struct MCDUButtonDef {
 enum class MCDULed : int {
     BACKLIGHT = 0,
     SCREEN_BACKLIGHT = 1,
+    OVERALL_LEDS_BRIGHTNESS = 2,
     FAIL = 8,
     FM = 9,
     MCDU = 10,

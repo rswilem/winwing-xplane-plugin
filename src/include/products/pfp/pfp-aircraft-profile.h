@@ -31,6 +31,7 @@ struct PFPButtonDef {
 enum class PFPLed : int {
     BACKLIGHT = 0,
     SCREEN_BACKLIGHT = 1,
+    OVERALL_LEDS_BRIGHTNESS = 2,
     CALL = 3,
     FAIL = 4,
     MSG = 5,

@@ -77,6 +77,8 @@ bool ProductMCDU::connect() {
         
         setLedBrightness(MCDULed::BACKLIGHT, 128);
         setLedBrightness(MCDULed::SCREEN_BACKLIGHT, 128);
+        setLedBrightness(MCDULed::OVERALL_LEDS_BRIGHTNESS, 255);
+        
         const MCDULed ledsToSet[] = {
             MCDULed::FAIL,
             MCDULed::FM,
