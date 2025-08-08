@@ -4,6 +4,8 @@
 #include "appstate.h"
 #include <cstring>
 #include <algorithm>
+#include <cmath>
+#include <cfloat>
 
 ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product) {
     datarefRegex = std::regex("laminar/B738/fmc1/Line([0-9]{2})_([A-Z]+)");
