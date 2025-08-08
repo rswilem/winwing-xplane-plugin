@@ -82,8 +82,8 @@ struct MCDUControlView: View {
                 
                 HStack(spacing: 8) {
                     ForEach(1...8, id: \.self) { displayId in
-                        Button(action: { clearDisplay(displayId) }) {
-                            Text("\(displayId): \(displayId == 8 ? "Logo" : "Unknown")")
+                        Button(action: { showBackground(displayId) }) {
+                            Text("\(displayId): \(displayId == 8 ? "Logo" : "Color")")
                         }
                         .buttonStyle(.bordered)
                     }
@@ -163,9 +163,9 @@ struct MCDUControlView: View {
         mcdu.setOverallLedsBrightness(UInt8(overallLedsBrightness))
     }
     
-    private func clearDisplay(_ displayId: Int) {
+    private func showBackground(_ displayId: Int) {
         guard let mcdu = device.mcdu else { return }
-        mcdu.clear2(displayId)
+        mcdu.showBackground(displayId)
     }
     
     private func testDisplay(page: String) {

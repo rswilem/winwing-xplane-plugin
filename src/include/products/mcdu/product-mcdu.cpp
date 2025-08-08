@@ -24,13 +24,13 @@ ProductMCDU::~ProductMCDU() {
 void ProductMCDU::setProfileForCurrentAircraft() {
     if (TolissMcduProfile::IsEligible()) {
         debug("MCDU: Using Toliss profile for %s.\n", classIdentifier());
-        clear();
+        clearDisplay();
         profile = new TolissMcduProfile(this);
         profileReady = true;
     }
     else if (LaminarMcduProfile::IsEligible()) {
         debug("MCDU: Using Laminar profile for %s.\n", classIdentifier());
-        clear();
+        clearDisplay();
         profile = new LaminarMcduProfile(this);
         profileReady = true;
     }
@@ -96,7 +96,7 @@ bool ProductMCDU::connect() {
         
         setLedBrightness(MCDULed::MENU, 1);
         
-        clear2(8);
+        showBackground(8);
         
         if (!profile) {
             setProfileForCurrentAircraft();
@@ -345,7 +345,7 @@ void ProductMCDU::writeLineToPage(std::vector<std::vector<char>>& page, int line
     }
 }
 
-void ProductMCDU::clear() {
+void ProductMCDU::clearDisplay() {
     std::vector<uint8_t> blankLine = {};
     blankLine.push_back(0xf2);
     for (int i = 0; i < ProductMCDU::PageCharsPerLine; ++i) {
@@ -359,7 +359,7 @@ void ProductMCDU::clear() {
     }
 }
 
-void ProductMCDU::clear2(unsigned char variant) {
+void ProductMCDU::showBackground(unsigned char variant) {
     std::vector<uint8_t> data;
     
     switch (variant) {

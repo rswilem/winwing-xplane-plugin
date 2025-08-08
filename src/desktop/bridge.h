@@ -34,14 +34,14 @@ bool joystick_setVibration(void* joystickHandle, uint8_t vibration);
 bool joystick_setLedBrightness(void* joystickHandle, uint8_t brightness);
 
 // MCDU functions via handle  
-void mcdu_clear2(void* mcduHandle, int displayId);
-void mcdu_clear(void* mcduHandle);
+void mcdu_clearDisplay(void* mcduHandle);
+void mcdu_showBackground(void* mcduHandle, int variant);
 bool mcdu_setLed(void* mcduHandle, int ledId, uint8_t value);
 void mcdu_setLedBrightness(void* mcduHandle, int ledId, uint8_t brightness);
 
 // PFP functions via handle
-void pfp_clear2(void* pfpHandle, int displayId);
-void pfp_clear(void* pfpHandle);
+void pfp_clearDisplay(void* pfpHandle);
+void pfp_showBackground(void* pfpHandle, int variant);
 bool pfp_setLed(void* pfpHandle, int ledId, uint8_t value);
 void pfp_setLedBrightness(void* pfpHandle, int ledId, uint8_t brightness);
 

@@ -44,8 +44,8 @@ public:
     
     void setLedBrightness(PFPLed led, uint8_t brightness);
     
-    void clear();
-    void clear2(unsigned char variant);
+    void clearDisplay();
+    void showBackground(unsigned char variant);
 };
 
 #endif

@@ -55,7 +55,7 @@ struct GenericDeviceView: View {
                     .foregroundColor(.blue)
                     .padding(.top, 2)
             } else if device.type == .mcdu {
-                Text("device.mcdu?.test(), device.mcdu?.clear2(8)")
+                Text("device.mcdu?.test(), device.mcdu?.showBackground(8)")
                     .font(.caption)
                     .fontDesign(.monospaced)
                     .foregroundColor(.blue)

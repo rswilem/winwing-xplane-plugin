@@ -26,25 +26,25 @@ ProductPFP::~ProductPFP() {
 void ProductPFP::setProfileForCurrentAircraft() {
     if (ZiboPfpProfile::IsEligible()) {
         debug("Using Zibo PFP profile for %s.\n", classIdentifier());
-        clear();
+        clearDisplay();
         profile = new ZiboPfpProfile(this);
         profileReady = true;
     }
     else if (FlightFactor777PfpProfile::IsEligible()) {
         debug("Using FlightFactor 777 PFP profile for %s.\n", classIdentifier());
-        clear();
+        clearDisplay();
         profile = new FlightFactor777PfpProfile(this);
         profileReady = true;
     }
     else if (SSG748PfpProfile::IsEligible()) {
         debug("Using SSG 748 PFP profile for %s.\n", classIdentifier());
-        clear();
+        clearDisplay();
         profile = new SSG748PfpProfile(this);
         profileReady = true;
     }
     else if (IXEG733PfpProfile::IsEligible()) {
         debug("Using IXEG 733 PFP profile for %s.\n", classIdentifier());
-        clear();
+        clearDisplay();
         profile = new IXEG733PfpProfile(this);
         profileReady = true;
     }
@@ -96,7 +96,7 @@ bool ProductPFP::connect() {
             setLedBrightness(led, 0);
         }
         
-        clear2(8);
+        showBackground(8);
         
         if (!profile) {
             setProfileForCurrentAircraft();
@@ -318,7 +318,7 @@ void ProductPFP::writeLineToPage(std::vector<std::vector<char>>& page, int line,
     }
 }
 
-void ProductPFP::clear() {
+void ProductPFP::clearDisplay() {
     std::vector<uint8_t> blankLine = {};
     blankLine.push_back(0xf2);
     for (int i = 0; i < ProductPFP::PageCharsPerLine; ++i) {
@@ -332,7 +332,7 @@ void ProductPFP::clear() {
     }
 }
 
-void ProductPFP::clear2(unsigned char variant) {
+void ProductPFP::showBackground(unsigned char variant) {
     std::vector<uint8_t> data;
     
     switch (variant) {

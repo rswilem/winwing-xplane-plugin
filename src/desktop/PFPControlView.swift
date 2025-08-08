@@ -82,8 +82,8 @@ struct PFPControlView: View {
                 
                 HStack(spacing: 8) {
                     ForEach(1...8, id: \.self) { displayId in
-                        Button(action: { clearDisplay(displayId) }) {
-                            Text("\(displayId): \(displayId == 8 ? "Logo" : "Clear")")
+                        Button(action: { showBackground(displayId) }) {
+                            Text("\(displayId): \(displayId == 8 ? "Logo" : "Color")")
                         }
                         .buttonStyle(.bordered)
                     }
@@ -160,9 +160,9 @@ struct PFPControlView: View {
         pfp.setOverallLedsBrightness(UInt8(overallLedsBrightness))
     }
     
-    private func clearDisplay(_ displayId: Int) {
+    private func showBackground(_ displayId: Int) {
         guard let pfp = device.pfp else { return }
-        pfp.clear2(displayId)
+        pfp.showBackground(displayId)
     }
     
     private func testDisplay(page: String) {

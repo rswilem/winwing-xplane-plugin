@@ -48,20 +48,20 @@ func c_joystick_setVibration(_ handle: UnsafeRawPointer, _ vibration: UInt8) -> 
 func c_joystick_setLedBrightness(_ handle: UnsafeRawPointer, _ brightness: UInt8) -> Bool
 
 // MCDU functions via handle
-@_silgen_name("mcdu_clear2")
-func c_mcdu_clear2(_ handle: UnsafeRawPointer, _ displayId: Int32) -> Void
-@_silgen_name("mcdu_clear")
-func c_mcdu_clear(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("mcdu_clearDisplay")
+func c_mcdu_clearDisplay(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("mcdu_showBackground")
+func c_mcdu_showBackground(_ handle: UnsafeRawPointer, _ variant: Int32) -> Void
 @_silgen_name("mcdu_setLed")
 func c_mcdu_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) -> Bool
 @_silgen_name("mcdu_setLedBrightness")
 func c_mcdu_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ brightness: UInt8) -> Void
 
 // PFP functions via handle
-@_silgen_name("pfp_clear2")
-func c_pfp_clear2(_ handle: UnsafeRawPointer, _ displayId: Int32) -> Void
-@_silgen_name("pfp_clear")
-func c_pfp_clear(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("pfp_clearDisplay")
+func c_pfp_clearDisplay(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("pfp_showBackground")
+func c_pfp_showBackground(_ handle: UnsafeRawPointer, _ variant: Int32) -> Void
 @_silgen_name("pfp_setLed")
 func c_pfp_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) -> Bool
 @_silgen_name("pfp_setLedBrightness")
@@ -223,12 +223,12 @@ struct MCDUWrapper {
         self.handle = handle
     }
     
-    func clear() {
-        c_mcdu_clear(handle)
+    func clearDisplay() {
+        c_mcdu_clearDisplay(handle)
     }
     
-    func clear2(_ displayId: Int) {
-        c_mcdu_clear2(handle, Int32(displayId))
+    func showBackground(_ variant: Int) {
+        c_mcdu_showBackground(handle, Int32(variant))
     }
     
     @discardableResult
@@ -297,12 +297,12 @@ struct PFPWrapper {
         self.handle = handle
     }
     
-    func clear() {
-        c_pfp_clear(handle)
+    func clearDisplay() {
+        c_pfp_clearDisplay(handle)
     }
     
-    func clear2(_ displayId: Int) {
-        c_pfp_clear2(handle, Int32(displayId))
+    func showBackground(_ variant: Int) {
+        c_pfp_showBackground(handle, Int32(variant))
     }
     
     @discardableResult

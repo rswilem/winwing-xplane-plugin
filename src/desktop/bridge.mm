@@ -206,10 +206,10 @@ bool joystick_setLedBrightness(void* joystickHandle, uint8_t brightness) {
 }
 
 // MCDU functions via handle
-void mcdu_clear2(void* mcduHandle, int displayId) {
+void mcdu_showBackground(void* mcduHandle, int variant) {
     if (!mcduHandle) return;
     auto mcdu = static_cast<ProductMCDU*>(mcduHandle);
-    mcdu->clear2(displayId);
+    mcdu->showBackground(variant);
 }
 
 bool mcdu_setLed(void* mcduHandle, int ledId, uint8_t value) {
@@ -220,10 +220,10 @@ bool mcdu_setLed(void* mcduHandle, int ledId, uint8_t value) {
 }
 
 // Additional MCDU functions via handle
-void mcdu_clear(void* mcduHandle) {
+void mcdu_clearDisplay(void* mcduHandle) {
     if (!mcduHandle) return;
     auto mcdu = static_cast<ProductMCDU*>(mcduHandle);
-    mcdu->clear();
+    mcdu->clearDisplay();
 }
 
 void mcdu_setLedBrightness(void* mcduHandle, int ledId, uint8_t brightness) {
@@ -233,10 +233,10 @@ void mcdu_setLedBrightness(void* mcduHandle, int ledId, uint8_t brightness) {
 }
 
 // PFP functions via handle
-void pfp_clear2(void* pfpHandle, int displayId) {
+void pfp_showBackground(void* pfpHandle, int variant) {
     if (!pfpHandle) return;
     auto pfp = static_cast<ProductPFP*>(pfpHandle);
-    pfp->clear2(displayId);
+    pfp->showBackground(variant);
 }
 
 bool pfp_setLed(void* pfpHandle, int ledId, uint8_t value) {
@@ -246,10 +246,10 @@ bool pfp_setLed(void* pfpHandle, int ledId, uint8_t value) {
     return true;
 }
 
-void pfp_clear(void* pfpHandle) {
+void pfp_clearDisplay(void* pfpHandle) {
     if (!pfpHandle) return;
     auto pfp = static_cast<ProductPFP*>(pfpHandle);
-    pfp->clear();
+    pfp->clearDisplay();
 }
 
 void pfp_setLedBrightness(void* pfpHandle, int ledId, uint8_t brightness) {
@@ -342,7 +342,7 @@ bool mcdu_clearDisplay(int deviceIndex, int displayId) {
     
     auto mcdu = dynamic_cast<ProductMCDU*>(devices[deviceIndex]);
     if (mcdu) {
-        mcdu->clear2(displayId);
+        mcdu->showBackground(displayId);
         return true;
     }
     return false;
