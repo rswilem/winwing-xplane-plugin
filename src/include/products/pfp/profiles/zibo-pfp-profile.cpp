@@ -20,17 +20,27 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
         product->setLedBrightness(led, 0);
     }
     
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> brightness) {
-        if (brightness.size() < 27) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> screenBrightness) {
+        if (screenBrightness.size() < 11) {
             return;
         }
-        
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255.0f : 0;
-        product->setLedBrightness(PFPLed::BACKLIGHT, target);
+
+        //brightness[11] is fmc2 screen
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? screenBrightness[10] * 255.0f : 0;
         product->setLedBrightness(PFPLed::SCREEN_BACKLIGHT, target);
     });
     
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/panel_brightness", [product](std::vector<float> panelBrightness) {
+        if (panelBrightness.size() < 4) {
+            return;
+        }
+
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? panelBrightness[3] * 255.0f : 0;
+        product->setLedBrightness(PFPLed::BACKLIGHT, target);
+    });
+    
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/panel_brightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/instrument_brightness");
     });
     
@@ -45,6 +55,7 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
 
 ZiboPfpProfile::~ZiboPfpProfile() {
     Dataref::getInstance()->unbind("laminar/B738/electric/instrument_brightness");
+    Dataref::getInstance()->unbind("laminar/B738/electric/panel_brightness");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("laminar/B738/fmc/fmc_message");
     Dataref::getInstance()->unbind("laminar/B738/indicators/fmc_exec_lights");
@@ -144,8 +155,8 @@ const std::vector<PFPButtonDef>& ZiboPfpProfile::buttonDefs() const {
         {14, "CLB", "laminar/B738/button/fmc1_clb"},
         {15, "CRZ", "laminar/B738/button/fmc1_crz"},
         {16, "DES", "laminar/B738/button/fmc1_des"},
-        {17, "BRT-", ""},
-        {18, "BRT+", ""},
+        {17, "BRT-", "laminar/B738/electric/instrument_brightness[10]", -0.1},
+        {18, "BRT+", "laminar/B738/electric/instrument_brightness[10]", 0.1},
         {19, "MENU", "laminar/B738/button/fmc1_menu"},
         {20, "LEGS", "laminar/B738/button/fmc1_legs"},
         {21, "DEPARR", "laminar/B738/button/fmc1_dep_app"},
@@ -289,5 +300,28 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
 }
 
 void ZiboPfpProfile::buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) {
-    Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
+    if (std::fabs(button->value) > DBL_EPSILON) {
+        if (phase != xplm_CommandBegin) {
+            return;
+        }
+        
+        std::string ref = button->dataref;
+        size_t start = ref.find('[');
+        if (start != std::string::npos) {
+            size_t end = ref.find(']', start);
+            int index = std::stoi(ref.substr(start + 1, end - start - 1));
+            std::string baseRef = ref.substr(0, start);
+            
+            auto vec = Dataref::getInstance()->get<std::vector<float>>(baseRef.c_str());
+            if (index >= 0 && index < (int)vec.size()) {
+                vec[index] = std::clamp(vec[index] + button->value, 0.0, 1.0);
+                Dataref::getInstance()->set<std::vector<float>>(baseRef.c_str(), vec);
+            }
+        } else {
+            Dataref::getInstance()->set<float>(ref.c_str(), button->value);
+        }
+    }
+    else {
+        Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
+    }
 }

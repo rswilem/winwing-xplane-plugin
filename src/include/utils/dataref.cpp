@@ -458,6 +458,8 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
         .lastUpdateCycleNumber = XPLMGetCycleNumber()
     };
     
+    executeChangedCallbacksForDataref(ref);
+    
     if (setCacheOnly) {
         return;
     }
