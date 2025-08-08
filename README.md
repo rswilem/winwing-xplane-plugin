@@ -22,18 +22,18 @@ The plugin theoretically works on Windows, but is not required there, as Winwing
 
 The matrix below shows device and aircraft compatibility. Devices are listed vertically, aircraft horizontally.
 
-| Device                    | Status | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 777 | SSG 747 | Notes                                                                |
-| ------------------------- | ------ | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | -------------------------------------------------------------------- |
-| **URSA MINOR Joystick L** | 🟢     | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
-| **URSA MINOR Joystick R** | 🟠     | 🔴          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Missing USB product ID - please open an issue if you own this device |
-| **MCDU-32**               | 🟢     | 🟢          | 🟢           | 🟢               | 🔴       | 🔴       | 🔴     | 🔴      | FF777: Need FMC button info, SSG: Dual FMC                           |
-| **PFP 3N**                | 🟢     | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
-| **PFP 4**                 | 🟢     | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
-| **PFP 7**                 | 🟢     | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
-| **Panel of Autopilot 3**  | 🔴     | 🔴          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Not implemented                                                      |
-| **FCU-EFIS (FCU Unit)**   | 🟢     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss                                         |
-| **FCU-EFIS (EFIS R)**     | 🟠     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss - but not tested                        |
-| **FCU-EFIS (EFIS L)**     | 🟢     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss                                         |
+| Device                    | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 777 | SSG 747 | Notes                                                                |
+| ------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | -------------------------------------------------------------------- |
+| **URSA MINOR Joystick L** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
+| **URSA MINOR Joystick R** | 🟠          | 🟠           | 🟠               | 🟠       | 🟠       | 🟠     | 🟠      | Missing USB product ID - please open an issue if you own this device |
+| **MCDU-32**               | 🟢          | 🟢           | 🟢               | 🔴       | 🔴       | 🔴     | 🔴      | FF777: Need FMC button info, SSG: Dual FMC                           |
+| **PFP 3N**                | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
+| **PFP 4**                 | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
+| **PFP 7**                 | 🔴          | 🔴           | 🔴               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
+| **Panel of Autopilot 3**  | 🔴          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Not implemented                                                      |
+| **FCU-EFIS (FCU Unit)**   | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss                                         |
+| **FCU-EFIS (EFIS R)**     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss - but not tested                        |
+| **FCU-EFIS (EFIS L)**     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss                                         |
 
 #### Legend
 
