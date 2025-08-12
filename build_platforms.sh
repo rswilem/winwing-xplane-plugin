@@ -31,8 +31,12 @@ done
 
 echo "Building for platforms: \033[1m$PLATFORMS\033[0m\n"
 
+if [ ! -d "SDK" ]; then
+    echo "SDK/ folder not found. Please ensure the SDK is present in the project root."
+    exit 1
+fi
 
-SDK_VERSION=410
+SDK_VERSION=$(grep "#define kXPLM_Version" SDK/CHeaders/XPLM/XPLMDefs.h | awk '{print $3}' | tr -d '()')
 
 echo "Building with SDK version $SDK_VERSION\n"
 echo "Clean build directory? (y/n):"

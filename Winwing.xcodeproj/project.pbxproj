@@ -30,8 +30,6 @@
 		F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */; };
 		F64F51D82E3D1431006361D3 /* ixeg733-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64F51D72E3D1431006361D3 /* ixeg733-pfp-profile.cpp */; };
 		F64F51D92E3D1431006361D3 /* ixeg733-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64F51D72E3D1431006361D3 /* ixeg733-pfp-profile.cpp */; };
-		F674E6F52D2ACDC600CCE11F /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F674E6F32D2ACDC600CCE11F /* XPWidgets.framework */; };
-		F674E6F72D2ACDC600CCE11F /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F674E6F42D2ACDC600CCE11F /* XPLM.framework */; };
 		F67961952E31357E008031F1 /* usbdevice_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961942E31357E008031F1 /* usbdevice_lin.cpp */; };
 		F67961962E31357E008031F1 /* usbdevice_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961942E31357E008031F1 /* usbdevice_lin.cpp */; };
 		F67961992E314228008031F1 /* ff777-pfp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961982E314228008031F1 /* ff777-pfp-profile.cpp */; };
@@ -66,6 +64,8 @@
 		F6F77ACD2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77ACC2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp */; };
 		F6F77ACE2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77ACC2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp */; };
 		F6FBC55F2E3A3E15004E5F42 /* FCUEfisControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */; };
+		F6FF5F202E4B5CC5002508F6 /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6FF5F1F2E4B5CC5002508F6 /* XPWidgets.framework */; };
+		F6FF5F212E4B5CC5002508F6 /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6FF5F1E2E4B5CC5002508F6 /* XPLM.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -91,8 +91,6 @@
 		F64F51D62E3D1431006361D3 /* ixeg733-pfp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ixeg733-pfp-profile.h"; sourceTree = "<group>"; };
 		F64F51D72E3D1431006361D3 /* ixeg733-pfp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ixeg733-pfp-profile.cpp"; sourceTree = "<group>"; };
 		F66F91662D0332F600F84283 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		F674E6F32D2ACDC600CCE11F /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = SDK_410/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
-		F674E6F42D2ACDC600CCE11F /* XPLM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPLM.framework; path = SDK_410/Libraries/Mac/XPLM.framework; sourceTree = "<group>"; };
 		F67961942E31357E008031F1 /* usbdevice_lin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_lin.cpp; sourceTree = "<group>"; };
 		F67961972E314228008031F1 /* ff777-pfp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ff777-pfp-profile.h"; sourceTree = "<group>"; };
 		F67961982E314228008031F1 /* ff777-pfp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ff777-pfp-profile.cpp"; sourceTree = "<group>"; };
@@ -132,6 +130,8 @@
 		F6F77ACB2E27AA1C0060AFC0 /* laminar-mcdu-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "laminar-mcdu-profile.h"; sourceTree = "<group>"; };
 		F6F77ACC2E27AA1C0060AFC0 /* laminar-mcdu-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "laminar-mcdu-profile.cpp"; sourceTree = "<group>"; };
 		F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCUEfisControlView.swift; sourceTree = "<group>"; };
+		F6FF5F1E2E4B5CC5002508F6 /* XPLM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPLM.framework; path = SDK/Libraries/Mac/XPLM.framework; sourceTree = "<group>"; };
+		F6FF5F1F2E4B5CC5002508F6 /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = SDK/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,9 +139,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F674E6F52D2ACDC600CCE11F /* XPWidgets.framework in Frameworks */,
-				F674E6F72D2ACDC600CCE11F /* XPLM.framework in Frameworks */,
 				F691E46D2D0338E90000666C /* CoreFoundation.framework in Frameworks */,
+				F6FF5F202E4B5CC5002508F6 /* XPWidgets.framework in Frameworks */,
+				F6FF5F212E4B5CC5002508F6 /* XPLM.framework in Frameworks */,
 				F635AD502E058FFC005D6CDC /* IOKit.framework in Frameworks */,
 				F6AF9EC62D078DB000530297 /* Cocoa.framework in Frameworks */,
 			);
@@ -252,9 +252,9 @@
 		F691E46B2D0338E90000666C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F6FF5F1E2E4B5CC5002508F6 /* XPLM.framework */,
+				F6FF5F1F2E4B5CC5002508F6 /* XPWidgets.framework */,
 				F635AD4F2E058FFC005D6CDC /* IOKit.framework */,
-				F674E6F42D2ACDC600CCE11F /* XPLM.framework */,
-				F674E6F32D2ACDC600CCE11F /* XPWidgets.framework */,
 				F6AF9EC52D078DB000530297 /* Cocoa.framework */,
 				F691E46C2D0338E90000666C /* CoreFoundation.framework */,
 			);
@@ -666,6 +666,7 @@
 					"$(XPSDK_ROOT)/Libraries/Mac",
 					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/SDK/Libraries/Mac",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -711,7 +712,7 @@
 				);
 				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
 				SUPPORTS_MACCATALYST = YES;
-				XPSDK_ROOT = SDK_410;
+				XPSDK_ROOT = SDK;
 			};
 			name = Debug;
 		};
@@ -728,6 +729,7 @@
 					"$(XPSDK_ROOT)/Libraries/Mac",
 					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/SDK/Libraries/Mac",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"APL=1",
@@ -771,7 +773,7 @@
 				);
 				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
 				SUPPORTS_MACCATALYST = YES;
-				XPSDK_ROOT = SDK_410;
+				XPSDK_ROOT = SDK;
 			};
 			name = Release;
 		};
@@ -852,6 +854,7 @@
 					"$(XPSDK_ROOT)/Libraries/Mac",
 					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/SDK/Libraries/Mac",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -898,7 +901,7 @@
 				);
 				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
 				SUPPORTS_MACCATALYST = YES;
-				XPSDK_ROOT = SDK_410;
+				XPSDK_ROOT = SDK;
 			};
 			name = "Debug (MCDU as PFP)";
 		};
