@@ -38,40 +38,18 @@ struct DisplayFlag {
         : name(n), byteIndex(idx), mask(m), defaultValue(def) {}
 };
 
-enum class FCUEfisButtonType {
-    SWITCH = 0,    // Sets dataref to 1 or sends command
-    TOGGLE = 1,    // Toggles dataref between true/false or sends command
-    SEND_0 = 2,    // Sets dataref to 0
-    SEND_1 = 3,    // Sets dataref to 1
-    SEND_2 = 4,    // Sets dataref to 2
-    SEND_3 = 5,    // Sets dataref to 3
-    SEND_4 = 6,    // Sets dataref to 4
-    SEND_5 = 7,    // Sets dataref to 5
-    NONE = 8       // No action
-};
-
-enum class FCUEfisDatarefType {
-    DATA = 0,      // Regular dataref read/write
-    CMD = 1        // Command execution
+enum FCUEfisDatarefType: unsigned char {
+    SET_VALUE = 1,
+    TOGGLE_VALUE,
+    EXECUTE_CMD_ONCE
 };
 
 struct FCUEfisButtonDef {
     int id;
     std::string name;
     std::string dataref;
-    FCUEfisDatarefType datarefType;
-    FCUEfisButtonType buttonType;
-    double value;
-    
-    // Constructor for command buttons (default case)
-    FCUEfisButtonDef(int id, const std::string& name, const std::string& dataref)
-        : id(id), name(name), dataref(dataref), 
-          datarefType(FCUEfisDatarefType::CMD), buttonType(FCUEfisButtonType::SWITCH), value(-1.0) {}
-    
-    // Constructor for data buttons with specific values
-    FCUEfisButtonDef(int id, const std::string& name, const std::string& dataref, double value)
-        : id(id), name(name), dataref(dataref), 
-          datarefType(FCUEfisDatarefType::DATA), buttonType(FCUEfisButtonType::SWITCH), value(value) {}
+    FCUEfisDatarefType datarefType = FCUEfisDatarefType::EXECUTE_CMD_ONCE;
+    double value = 0.0;
 };
 enum class FCUEfisLed : int {
     // FCU LEDs

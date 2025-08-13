@@ -210,8 +210,8 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {0, "MACH", "toliss_airbus/ias_mach_button_push"},
         {1, "LOC", "AirbusFBW/LOCbutton"},
         {2, "TRK", "toliss_airbus/hdgtrk_button_push"},
-        {3, "AP1", "AirbusFBW/AP1Engage", -1.0},  // Toggle dataref
-        {4, "AP2", "AirbusFBW/AP2Engage", -1.0},  // Toggle dataref
+        {3, "AP1", "AirbusFBW/AP1Engage", FCUEfisDatarefType::TOGGLE_VALUE},
+        {4, "AP2", "AirbusFBW/AP2Engage", FCUEfisDatarefType::TOGGLE_VALUE},
         {5, "A/THR", "AirbusFBW/ATHRbutton"},
         {6, "EXPED", "AirbusFBW/EXPEDbutton"},
         {7, "METRIC", "toliss_airbus/metric_alt_button_push"},
@@ -232,8 +232,8 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {22, "VS INC", "sim/autopilot/vertical_speed_up"},
         {23, "VS PUSH", "AirbusFBW/PushVSSel"},
         {24, "VS PULL", "AirbusFBW/PullVSSel"},
-        {25, "ALT 100", "AirbusFBW/ALT100_1000", 0.0},        // Set to 0 for 100ft increments
-        {26, "ALT 1000", "AirbusFBW/ALT100_1000", 1.0},       // Set to 1 for 1000ft increments
+        {25, "ALT 100", "AirbusFBW/ALT100_1000", FCUEfisDatarefType::SET_VALUE, 0.0},        // Set to 0 for 100ft increments
+        {26, "ALT 1000", "AirbusFBW/ALT100_1000", FCUEfisDatarefType::SET_VALUE, 1.0},       // Set to 1 for 1000ft increments
         
         // Brightness control buttons
         // These are handled internally via brightness callback system
@@ -258,25 +258,25 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {40, "R_STD PULL", "toliss_airbus/copilot_baro_pull"},
         {41, "R_PRESS DEC", "sim/instruments/barometer_copilot_down"},
         {42, "R_PRESS INC", "sim/instruments/barometer_copilot_up"},
-        {43, "R_inHg", "AirbusFBW/BaroUnitFO", 0.0},          // Set to 0 for inHg
-        {44, "R_hPa", "AirbusFBW/BaroUnitFO", 1.0},           // Set to 1 for hPa
-        {45, "R_MODE LS", "AirbusFBW/NDmodeFO", 0.0},         // LS mode
-        {46, "R_MODE VOR", "AirbusFBW/NDmodeFO", 1.0},        // VOR mode
-        {47, "R_MODE NAV", "AirbusFBW/NDmodeFO", 2.0},        // NAV mode
-        {48, "R_MODE ARC", "AirbusFBW/NDmodeFO", 3.0},        // ARC mode
-        {49, "R_MODE PLAN", "AirbusFBW/NDmodeFO", 4.0},       // PLAN mode
-        {50, "R_RANGE 10", "AirbusFBW/NDrangeFO", 0.0},       // 10nm range
-        {51, "R_RANGE 20", "AirbusFBW/NDrangeFO", 1.0},       // 20nm range
-        {52, "R_RANGE 40", "AirbusFBW/NDrangeFO", 2.0},       // 40nm range
-        {53, "R_RANGE 80", "AirbusFBW/NDrangeFO", 3.0},       // 80nm range
-        {54, "R_RANGE 160", "AirbusFBW/NDrangeFO", 4.0},      // 160nm range
-        {55, "R_RANGE 320", "AirbusFBW/NDrangeFO", 5.0},      // 320nm range
-        {56, "R_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 2.0},    // VOR1
-        {57, "R_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 1.0},    // OFF1
-        {58, "R_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", 0.0},    // ADF1
-        {59, "R_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 2.0},    // VOR2
-        {60, "R_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 1.0},    // OFF2
-        {61, "R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", 0.0},    // ADF2
+        {43, "R_inHg", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 0.0},          // Set to 0 for inHg
+        {44, "R_hPa", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 1.0},           // Set to 1 for hPa
+        {45, "R_MODE LS", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 0.0},         // LS mode
+        {46, "R_MODE VOR", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 1.0},        // VOR mode
+        {47, "R_MODE NAV", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 2.0},        // NAV mode
+        {48, "R_MODE ARC", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 3.0},        // ARC mode
+        {49, "R_MODE PLAN", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 4.0},       // PLAN mode
+        {50, "R_RANGE 10", "AirbusFBW/NDrangeFO", FCUEfisDatarefType::SET_VALUE, 0.0},       // 10nm range
+        {51, "R_RANGE 20", "AirbusFBW/NDrangeFO", FCUEfisDatarefType::SET_VALUE, 1.0},       // 20nm range
+        {52, "R_RANGE 40", "AirbusFBW/NDrangeFO", FCUEfisDatarefType::SET_VALUE, 2.0},       // 40nm range
+        {53, "R_RANGE 80", "AirbusFBW/NDrangeFO", FCUEfisDatarefType::SET_VALUE, 3.0},       // 80nm range
+        {54, "R_RANGE 160", "AirbusFBW/NDrangeFO", FCUEfisDatarefType::SET_VALUE, 4.0},      // 160nm range
+        {55, "R_RANGE 320", "AirbusFBW/NDrangeFO", FCUEfisDatarefType::SET_VALUE, 5.0},      // 320nm range
+        {56, "R_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},    // VOR1
+        {57, "R_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},    // OFF1
+        {58, "R_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},    // ADF1
+        {59, "R_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},    // VOR2
+        {60, "R_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},    // OFF2
+        {61, "R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},    // ADF2
         // Buttons 62-63 reserved
         
         // EFIS Left (First Officer) buttons (64-95)
@@ -291,25 +291,25 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {72, "L_STD PULL", "toliss_airbus/capt_baro_pull"},
         {73, "L_PRESS DEC", "sim/instruments/barometer_down"},
         {74, "L_PRESS INC", "sim/instruments/barometer_up"},
-        {75, "L_inHg", "AirbusFBW/BaroUnitCapt", 0.0},        // Set to 0 for inHg
-        {76, "L_hPa", "AirbusFBW/BaroUnitCapt", 1.0},         // Set to 1 for hPa
-        {77, "L_MODE LS", "AirbusFBW/NDmodeCapt", 0.0},       // LS mode
-        {78, "L_MODE VOR", "AirbusFBW/NDmodeCapt", 1.0},      // VOR mode
-        {79, "L_MODE NAV", "AirbusFBW/NDmodeCapt", 2.0},      // NAV mode
-        {80, "L_MODE ARC", "AirbusFBW/NDmodeCapt", 3.0},      // ARC mode
-        {81, "L_MODE PLAN", "AirbusFBW/NDmodeCapt", 4.0},     // PLAN mode
-        {82, "L_RANGE 10", "AirbusFBW/NDrangeCapt", 0.0},     // 10nm range
-        {83, "L_RANGE 20", "AirbusFBW/NDrangeCapt", 1.0},     // 20nm range
-        {84, "L_RANGE 40", "AirbusFBW/NDrangeCapt", 2.0},     // 40nm range
-        {85, "L_RANGE 80", "AirbusFBW/NDrangeCapt", 3.0},     // 80nm range
-        {86, "L_RANGE 160", "AirbusFBW/NDrangeCapt", 4.0},    // 160nm range
-        {87, "L_RANGE 320", "AirbusFBW/NDrangeCapt", 5.0},    // 320nm range
-        {88, "L_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 0.0},      // ADF1
-        {89, "L_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 1.0},      // OFF1
-        {90, "L_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", 2.0},      // VOR1
-        {91, "L_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 0.0},      // ADF2
-        {92, "L_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 1.0},      // OFF2
-        {93, "L_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", 2.0},      // VOR2
+        {75, "L_inHg", "AirbusFBW/BaroUnitCapt", FCUEfisDatarefType::SET_VALUE, 0.0},        // Set to 0 for inHg
+        {76, "L_hPa", "AirbusFBW/BaroUnitCapt", FCUEfisDatarefType::SET_VALUE, 1.0},         // Set to 1 for hPa
+        {77, "L_MODE LS", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 0.0},       // LS mode
+        {78, "L_MODE VOR", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 1.0},      // VOR mode
+        {79, "L_MODE NAV", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 2.0},      // NAV mode
+        {80, "L_MODE ARC", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 3.0},      // ARC mode
+        {81, "L_MODE PLAN", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 4.0},     // PLAN mode
+        {82, "L_RANGE 10", "AirbusFBW/NDrangeCapt", FCUEfisDatarefType::SET_VALUE, 0.0},     // 10nm range
+        {83, "L_RANGE 20", "AirbusFBW/NDrangeCapt", FCUEfisDatarefType::SET_VALUE, 1.0},     // 20nm range
+        {84, "L_RANGE 40", "AirbusFBW/NDrangeCapt", FCUEfisDatarefType::SET_VALUE, 2.0},     // 40nm range
+        {85, "L_RANGE 80", "AirbusFBW/NDrangeCapt", FCUEfisDatarefType::SET_VALUE, 3.0},     // 80nm range
+        {86, "L_RANGE 160", "AirbusFBW/NDrangeCapt", FCUEfisDatarefType::SET_VALUE, 4.0},    // 160nm range
+        {87, "L_RANGE 320", "AirbusFBW/NDrangeCapt", FCUEfisDatarefType::SET_VALUE, 5.0},    // 320nm range
+        {88, "L_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0},      // ADF1
+        {89, "L_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0},      // OFF1
+        {90, "L_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0},      // VOR1
+        {91, "L_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0},      // ADF2
+        {92, "L_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0},      // OFF2
+        {93, "L_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0},      // VOR2
         // Buttons 94-95 reserved
     };
     return buttons;
@@ -514,17 +514,10 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
 }
 
 void TolissFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) {
-    if (!button || button->dataref.empty()) {
+    if (!button || button->dataref.empty() || phase == xplm_CommandContinue) {
         return;
     }
     
-    
-    // Only process the button press/release, not continuous
-    if (phase != xplm_CommandBegin && phase != xplm_CommandEnd) {
-        return;
-    }
-    
-    // Special handling for barometric pressure adjustment in hPa mode
     if (phase == xplm_CommandBegin && 
         (button->id == 41 || button->id == 42 || button->id == 73 || button->id == 74)) {
         // IDs: 41=R_PRESS_DEC, 42=R_PRESS_INC, 73=L_PRESS_DEC, 74=L_PRESS_INC
@@ -532,95 +525,38 @@ void TolissFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCom
         bool isRightEfis = (button->id == 41 || button->id == 42);
         bool isIncrease = (button->id == 42 || button->id == 74);
         
-        // Check if we're in hPa mode
-        auto datarefManager = Dataref::getInstance();
-        bool isBaroHPA = isRightEfis ? datarefManager->get<bool>("AirbusFBW/BaroUnitFO") : datarefManager->get<bool>("AirbusFBW/BaroUnitCapt");
-            
+        bool isBaroHPA = isRightEfis ? Dataref::getInstance()->get<bool>("AirbusFBW/BaroUnitFO") : Dataref::getInstance()->get<bool>("AirbusFBW/BaroUnitCapt");
+        
         if (isBaroHPA) { // hPa mode
-            // Get current baro value
-            std::string baroDataref = isRightEfis ? 
+            const char *baroDataref = isRightEfis ?
                 "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot" :
                 "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot";
-            
-            float currentBaro = Dataref::getInstance()->get<float>(baroDataref.c_str());
-            
-            // Convert to hPa
-            float currentHpa = currentBaro * 33.8639f;
-            
-            // Adjust by 1 hPa
-            float newHpa = isIncrease ? (currentHpa + 1.0f) : (currentHpa - 1.0f);
-            
-            // Convert back to inHg and set
+            float currentBaroHpa = Dataref::getInstance()->get<float>(baroDataref) * 33.8639f;
+            float newHpa = isIncrease ? (currentBaroHpa + 1.0f) : (currentBaroHpa - 1.0f);
             float newBaro = newHpa / 33.8639f;
-            Dataref::getInstance()->set<float>(baroDataref.c_str(), newBaro);
+            Dataref::getInstance()->set<float>(baroDataref, newBaro);
             
-            return; // Skip normal command processing
+            return;
         }
     }
     
-    // Check if this button has a specific value to send (for buttons with double value in constructor)
-    if (button->value >= 0) {
-        // This is a button with a specific value (like ALT100_1000, baro unit switches)
-        if (phase == xplm_CommandBegin) {
-            Dataref::getInstance()->set<float>(button->dataref.c_str(), button->value);
-        }
-        return; // Skip other processing
-    }
-    
-    // Special handling for toggle buttons (AP1, AP2) - marked with value = -1.0
-    if (button->value == -1.0 && button->datarefType == FCUEfisDatarefType::DATA) {
-        if (phase == xplm_CommandBegin) {
-            int currentValue = Dataref::getInstance()->getCached<int>(button->dataref.c_str());
+    if (phase == xplm_CommandBegin && (button->datarefType == FCUEfisDatarefType::SET_VALUE || button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE)) {
+        bool wantsToggle = button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE;
+        
+        if (wantsToggle) {
+            int currentValue = Dataref::getInstance()->get<int>(button->dataref.c_str());
             int newValue = currentValue ? 0 : 1;
             Dataref::getInstance()->set<int>(button->dataref.c_str(), newValue);
-            
-            // Force cache update to trigger the LED callbacks
-            Dataref::getInstance()->executeChangedCallbacksForDataref(button->dataref.c_str());
         }
-        return; // Skip other processing
+        else {
+            Dataref::getInstance()->set<float>(button->dataref.c_str(), button->value);
+        }
+        
+        Dataref::getInstance()->executeChangedCallbacksForDataref(button->dataref.c_str());
+        return;
     }
     
-    if (button->datarefType == FCUEfisDatarefType::CMD) {
-        // Send command - only on button press (CommandBegin), not release
-        if (phase == xplm_CommandBegin) {
-            XPLMCommandRef cmdRef = XPLMFindCommand(button->dataref.c_str());
-            if (cmdRef != nullptr) {
-                XPLMCommandOnce(cmdRef);
-            }
-        }
-    } else if (button->datarefType == FCUEfisDatarefType::DATA) {
-        // Handle dataref operations
-        if (phase == xplm_CommandBegin) {
-            switch (button->buttonType) {
-                case FCUEfisButtonType::SWITCH:
-                    Dataref::getInstance()->set<int>(button->dataref.c_str(), 1);
-                    break;
-                    
-                case FCUEfisButtonType::TOGGLE: {
-                    int currentValue = Dataref::getInstance()->get<int>(button->dataref.c_str());
-                    int newValue = currentValue ? 0 : 1;
-                    Dataref::getInstance()->set<int>(button->dataref.c_str(), newValue);
-                    break;
-                }
-                
-                case FCUEfisButtonType::SEND_0:
-                case FCUEfisButtonType::SEND_1:
-                case FCUEfisButtonType::SEND_2:
-                case FCUEfisButtonType::SEND_3:
-                case FCUEfisButtonType::SEND_4:
-                case FCUEfisButtonType::SEND_5: {
-                    int value = static_cast<int>(button->buttonType) - static_cast<int>(FCUEfisButtonType::SEND_0);
-                    Dataref::getInstance()->set<int>(button->dataref.c_str(), value);
-                    break;
-                }
-                
-                case FCUEfisButtonType::NONE:
-                default:
-                    break;
-            }
-        } else if (phase == xplm_CommandEnd && button->buttonType == FCUEfisButtonType::SWITCH) {
-            // For SWITCH type, set back to 0 on release
-            Dataref::getInstance()->set<int>(button->dataref.c_str(), 0);
-        }
+    if (phase == xplm_CommandBegin && button->datarefType == FCUEfisDatarefType::EXECUTE_CMD_ONCE) {
+        Dataref::getInstance()->executeCommand(button->dataref.c_str());
     }
 }
