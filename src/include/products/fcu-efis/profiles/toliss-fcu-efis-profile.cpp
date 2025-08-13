@@ -446,71 +446,69 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
     // LAT mode - defaults to true in Python, typically always on for Airbus
     data.latMode = true;
     
-    // Format EFIS barometric pressure displays - Captain side (Right display)
-    int baroStdCapt = datarefManager->getCached<int>("AirbusFBW/BaroStdCapt"); // int, 1 or 0
-    int baroUnitCapt = datarefManager->getCached<int>("AirbusFBW/BaroUnitCapt"); // int, 1 for hPa, 0 for inHg
+    bool isBaroStdCapt = datarefManager->getCached<bool>("AirbusFBW/BaroStdCapt"); // int, 1 or 0
+    bool isBaroHpaCapt = datarefManager->getCached<bool>("AirbusFBW/BaroUnitCapt"); // int, 1 for hPa, 0 for inHg
     
-    if (baroStdCapt == 1) {
-        data.efisRBaro = "STD ";  // 4 characters for STD mode
-        data.efisRQnh = false;
-        data.efisRHpaDec = false;
-    } else {
-        // Get actual barometric pressure value (float, inHg)
-        float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
-        if (baroValue > 0) {
-            if (baroUnitCapt == 0) {  // inHg mode - need to send as "2992" with decimal flag
-                int scaledValue = static_cast<int>(std::round(baroValue * 100));  // 29.92 -> 2992 with proper rounding
-                std::stringstream ss;
-                ss << std::setfill('0') << std::setw(4) << scaledValue;
-                data.efisRBaro = ss.str();
-                data.efisRQnh = true;     // QNH mode indicator
-                data.efisRHpaDec = true;  // Show decimal point
-            } else {  // hPa mode (baroUnitCapt == 1)
-                int hpaValue = static_cast<int>(std::round(baroValue * 33.8639));  // Convert inHg to hPa with proper rounding
-                std::stringstream ss;
-                ss << std::setfill('0') << std::setw(4) << hpaValue;
-                data.efisRBaro = ss.str();
-                data.efisRQnh = true;     // QNH mode indicator
-                data.efisRHpaDec = false; // No decimal point for hPa
-            }
-        } else {
-            data.efisRBaro = "2992";  // Default fallback for 29.92
-            data.efisRQnh = true;
-            data.efisRHpaDec = (baroUnitCapt == 0);  // Decimal only for inHg
-        }
-    }
-    
-    // Format EFIS barometric pressure displays - First Officer side (Left display)
-    int baroStdFO = datarefManager->getCached<int>("AirbusFBW/BaroStdFO"); // int, 1 or 0
-    int baroUnitFO = datarefManager->getCached<int>("AirbusFBW/BaroUnitFO"); // int, 1 for hPa, 0 for inHg
-    
-    if (baroStdFO == 1) {
+    if (isBaroStdCapt) {
         data.efisLBaro = "STD ";  // 4 characters for STD mode
         data.efisLQnh = false;
-        data.efisLHpaDec = false;
+        data.efisLShowInHgDecimal = false;
     } else {
         // Get actual barometric pressure value (float, inHg)
         float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
         if (baroValue > 0) {
-            if (baroUnitFO == 0) {  // inHg mode - need to send as "2992" with decimal flag
-                int scaledValue = static_cast<int>(std::round(baroValue * 100));  // 29.92 -> 2992 with proper rounding
-                std::stringstream ss;
-                ss << std::setfill('0') << std::setw(4) << scaledValue;
-                data.efisLBaro = ss.str();
-                data.efisLQnh = true;     // QNH mode indicator
-                data.efisLHpaDec = true;  // Show decimal point
-            } else {  // hPa mode (baroUnitFO == 1)
+            if (isBaroHpaCapt) {
                 int hpaValue = static_cast<int>(std::round(baroValue * 33.8639));  // Convert inHg to hPa with proper rounding
                 std::stringstream ss;
                 ss << std::setfill('0') << std::setw(4) << hpaValue;
                 data.efisLBaro = ss.str();
                 data.efisLQnh = true;     // QNH mode indicator
-                data.efisLHpaDec = false; // No decimal point for hPa
+                data.efisLShowInHgDecimal = false; // No decimal point for hPa
+            } else {
+                int scaledValue = static_cast<int>(std::round(baroValue * 100));  // 29.92 -> 2992 with proper rounding
+                std::stringstream ss;
+                ss << std::setfill('0') << std::setw(4) << scaledValue;
+                data.efisLBaro = ss.str();
+                data.efisLQnh = true;     // QNH mode indicator
+                data.efisLShowInHgDecimal = true;  // Show decimal point
             }
         } else {
             data.efisLBaro = "2992";  // Default fallback for 29.92
             data.efisLQnh = true;
-            data.efisLHpaDec = (baroUnitFO == 0);  // Decimal only for inHg
+            data.efisLShowInHgDecimal = !isBaroHpaCapt;  // Decimal only for inHg
+        }
+    }
+    
+    bool isBaroStdFO = datarefManager->getCached<bool>("AirbusFBW/BaroStdFO"); // int, 1 or 0
+    bool isBaroHpaFO = datarefManager->getCached<bool>("AirbusFBW/BaroUnitFO"); // int, 1 for hPa, 0 for inHg
+    
+    if (isBaroStdFO) {
+        data.efisRBaro = "STD ";  // 4 characters for STD mode
+        data.efisRQnh = false;
+        data.efisRShowInHgDecimal = false;
+    } else {
+        // Get actual barometric pressure value (float, inHg)
+        float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
+        if (baroValue > 0) {
+            if (isBaroHpaFO) {
+                int hpaValue = static_cast<int>(std::round(baroValue * 33.8639));  // Convert inHg to hPa with proper rounding
+                std::stringstream ss;
+                ss << std::setfill('0') << std::setw(4) << hpaValue;
+                data.efisRBaro = ss.str();
+                data.efisRQnh = true;     // QNH mode indicator
+                data.efisRShowInHgDecimal = false; // No decimal point for hPa
+            } else {
+                int scaledValue = static_cast<int>(std::round(baroValue * 100));  // 29.92 -> 2992 with proper rounding
+                std::stringstream ss;
+                ss << std::setfill('0') << std::setw(4) << scaledValue;
+                data.efisRBaro = ss.str();
+                data.efisRQnh = true;     // QNH mode indicator
+                data.efisRShowInHgDecimal = true;  // Show decimal point
+            }
+        } else {
+            data.efisRBaro = "2992";  // Default fallback for 29.92
+            data.efisRQnh = true;
+            data.efisRShowInHgDecimal = !isBaroHpaFO;  // Decimal only for inHg
         }
     }
 }
@@ -536,11 +534,9 @@ void TolissFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCom
         
         // Check if we're in hPa mode
         auto datarefManager = Dataref::getInstance();
-        int baroUnit = isRightEfis ? 
-            datarefManager->get<int>("AirbusFBW/BaroUnitFO") :
-            datarefManager->get<int>("AirbusFBW/BaroUnitCapt");
+        bool isBaroHPA = isRightEfis ? datarefManager->get<bool>("AirbusFBW/BaroUnitFO") : datarefManager->get<bool>("AirbusFBW/BaroUnitCapt");
             
-        if (baroUnit == 1) { // hPa mode
+        if (isBaroHPA) { // hPa mode
             // Get current baro value
             std::string baroDataref = isRightEfis ? 
                 "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot" :

@@ -129,8 +129,8 @@ struct FCUDisplayData {
     bool fpaMode = false;
     bool efisRQnh = false;
     bool efisLQnh = false;
-    bool efisRHpaDec = false;
-    bool efisLHpaDec = false;
+    bool efisRShowInHgDecimal = false;
+    bool efisLShowInHgDecimal = false;
     
     // Additional display flags for proper 7-segment display
     bool latMode = false;

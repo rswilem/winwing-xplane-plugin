@@ -239,16 +239,16 @@ void ProductFCUEfis::updateDisplays() {
     if (profile->hasEfisRight() && 
         (newDisplayData.efisRBaro != oldDisplayData.efisRBaro ||
          newDisplayData.efisRQnh != oldDisplayData.efisRQnh ||
-         newDisplayData.efisRHpaDec != oldDisplayData.efisRHpaDec)) {
-        sendEfisRightDisplayWithFlags(displayData.efisRBaro, displayData.efisRQnh, displayData.efisRHpaDec);
+         newDisplayData.efisRShowInHgDecimal != oldDisplayData.efisRShowInHgDecimal)) {
+        sendEfisRightDisplayWithFlags(displayData.efisRBaro, displayData.efisRQnh, displayData.efisRShowInHgDecimal);
     }
     
     // Update EFIS Left display if data changed
     if (profile->hasEfisLeft() && 
         (newDisplayData.efisLBaro != oldDisplayData.efisLBaro ||
          newDisplayData.efisLQnh != oldDisplayData.efisLQnh ||
-         newDisplayData.efisLHpaDec != oldDisplayData.efisLHpaDec)) {
-        sendEfisLeftDisplayWithFlags(displayData.efisLBaro, displayData.efisLQnh, displayData.efisLHpaDec);
+         newDisplayData.efisLShowInHgDecimal != oldDisplayData.efisLShowInHgDecimal)) {
+        sendEfisLeftDisplayWithFlags(displayData.efisLBaro, displayData.efisLQnh, displayData.efisLShowInHgDecimal);
     }
     
     if (shouldUpdate) {
@@ -374,7 +374,7 @@ void ProductFCUEfis::sendEfisRightDisplay(const std::string& baro) {
     // Set EFIS Right flags
     if (displayData.efisRQnh) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B0)] |= 0x02;
     if (displayData.efisRQfe) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B0)] |= 0x01;
-    if (displayData.efisRHpaDec) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B2)] |= 0x80;
+    if (displayData.efisRShowInHgDecimal) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B2)] |= 0x80;
     
     static uint8_t packageNumber = 1;
     
@@ -415,7 +415,7 @@ void ProductFCUEfis::sendEfisLeftDisplay(const std::string& baro) {
     // Set EFIS Left flags
     if (displayData.efisLQnh) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)] |= 0x02;
     if (displayData.efisLQfe) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)] |= 0x01;
-    if (displayData.efisLHpaDec) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B2)] |= 0x80;
+    if (displayData.efisLShowInHgDecimal) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B2)] |= 0x80;
     
     static uint8_t packageNumber = 1;
     
@@ -447,36 +447,36 @@ void ProductFCUEfis::sendEfisLeftDisplay(const std::string& baro) {
     if (packageNumber == 0) packageNumber = 1;  // Avoid 0
 }
 
-void ProductFCUEfis::sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec) {
+void ProductFCUEfis::sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool showInHgDecimal) {
     // Temporarily set the flags in displayData
     bool originalQnh = displayData.efisRQnh;
-    bool originalHpaDec = displayData.efisRHpaDec;
+    bool originalShowInHgDecimal = displayData.efisRShowInHgDecimal;
     
     displayData.efisRQnh = qnh;
-    displayData.efisRHpaDec = hpaDec;
+    displayData.efisRShowInHgDecimal = showInHgDecimal;
     
     // Call the regular send function which uses displayData flags
     sendEfisRightDisplay(baro);
     
     // Restore original flags
     displayData.efisRQnh = originalQnh;
-    displayData.efisRHpaDec = originalHpaDec;
+    displayData.efisRShowInHgDecimal = originalShowInHgDecimal;
 }
 
-void ProductFCUEfis::sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool hpaDec) {
+void ProductFCUEfis::sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool showInHgDecimal) {
     // Temporarily set the flags in displayData
     bool originalQnh = displayData.efisLQnh;
-    bool originalHpaDec = displayData.efisLHpaDec;
+    bool originalShowInHgDecimal = displayData.efisLShowInHgDecimal;
     
     displayData.efisLQnh = qnh;
-    displayData.efisLHpaDec = hpaDec;
+    displayData.efisLShowInHgDecimal = showInHgDecimal;
     
     // Call the regular send function which uses displayData flags
     sendEfisLeftDisplay(baro);
     
     // Restore original flags
     displayData.efisLQnh = originalQnh;
-    displayData.efisLHpaDec = originalHpaDec;
+    displayData.efisLShowInHgDecimal = originalShowInHgDecimal;
 }
 
 void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
