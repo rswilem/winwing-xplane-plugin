@@ -118,8 +118,8 @@ bool ProductFCUEfis::connect() {
         setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, 180);
         setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, 180);
         
-        setLedBrightness(FCUEfisLed::EXPED_GREEN, 0);    // EXPED indicator - off by default
-        setLedBrightness(FCUEfisLed::EXPED_YELLOW, 255); // EXPED backlight - on by default
+        setLedBrightness(FCUEfisLed::EXPED_GREEN, 0);
+        setLedBrightness(FCUEfisLed::EXPED_BACKLIGHT, 255);
         
         if (!profile) {
             setProfileForCurrentAircraft();
@@ -142,7 +142,7 @@ void ProductFCUEfis::disconnect() {
         FCUEfisLed::EXPED_GREEN,
         FCUEfisLed::APPR_GREEN,
         FCUEfisLed::FLAG_GREEN,
-        FCUEfisLed::EXPED_YELLOW,
+        FCUEfisLed::EXPED_BACKLIGHT,
         
         FCUEfisLed::EFISR_BACKLIGHT,
         FCUEfisLed::EFISR_SCREEN_BACKLIGHT,
@@ -236,19 +236,13 @@ void ProductFCUEfis::updateDisplays() {
     }
     
     // Update EFIS Right display if data changed
-    if (profile->hasEfisRight() && 
-        (newDisplayData.efisRBaro != oldDisplayData.efisRBaro ||
-         newDisplayData.efisRQnh != oldDisplayData.efisRQnh ||
-         newDisplayData.efisRShowInHgDecimal != oldDisplayData.efisRShowInHgDecimal)) {
-        sendEfisRightDisplayWithFlags(displayData.efisRBaro, displayData.efisRQnh, displayData.efisRShowInHgDecimal);
+    if (profile->hasEfisRight() && newDisplayData.efisRight != oldDisplayData.efisRight) {
+        sendEfisDisplayWithFlags(&displayData.efisRight, true);
     }
     
     // Update EFIS Left display if data changed
-    if (profile->hasEfisLeft() && 
-        (newDisplayData.efisLBaro != oldDisplayData.efisLBaro ||
-         newDisplayData.efisLQnh != oldDisplayData.efisLQnh ||
-         newDisplayData.efisLShowInHgDecimal != oldDisplayData.efisLShowInHgDecimal)) {
-        sendEfisLeftDisplayWithFlags(displayData.efisLBaro, displayData.efisLQnh, displayData.efisLShowInHgDecimal);
+    if (profile->hasEfisLeft() && newDisplayData.efisLeft != oldDisplayData.efisLeft) {
+        sendEfisDisplayWithFlags(&displayData.efisLeft, false);
     }
     
     if (shouldUpdate) {
@@ -267,8 +261,7 @@ void ProductFCUEfis::initializeDisplays() {
     writeData(initCmd);
 }
 
-void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string& heading, 
-                                   const std::string& altitude, const std::string& vs) {
+void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string& heading, const std::string& altitude, const std::string& vs) {
     // Encode strings to 7-segment data
     auto speedData = encodeString(3, fixStringLength(speed, 3));
     auto headingData = encodeStringSwapped(3, fixStringLength(heading, 3));
@@ -365,118 +358,44 @@ void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string&
     if (packageNumber == 0) packageNumber = 1;  // Avoid 0
 }
 
-void ProductFCUEfis::sendEfisRightDisplay(const std::string& baro) {
-    auto baroData = encodeStringEfis(4, fixStringLength(baro, 4));
-    
-    // Create flag bytes array
+void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRightSide) {
     std::vector<uint8_t> flagBytes(17, 0);
-    
-    // Set EFIS Right flags
-    if (displayData.efisRQnh) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B0)] |= 0x02;
-    if (displayData.efisRQfe) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B0)] |= 0x01;
-    if (displayData.efisRShowInHgDecimal) flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B2)] |= 0x80;
+    flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B0 : DisplayByteIndex::EFISL_B0)] |= data->showQfe ? 0x01 : 0x02;
+    if (data->unitIsInHg) { // Show comma
+        flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)] |= 0x80;
+    }
     
     static uint8_t packageNumber = 1;
     
-    // EFIS Right display protocol
-    std::vector<uint8_t> data = {
-        0xF0, 0x00, packageNumber, 0x1A, 0x0E, 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00,
+    // EFIS display protocol
+    std::vector<uint8_t> payload = {
+        0xF0, 0x00, packageNumber, 0x1A, static_cast<uint8_t>(isRightSide ? 0x0E : 0x0D), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00,
         0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     };
     
     // Add barometric data
-    data.push_back(baroData[3]);
-    data.push_back(baroData[2] | flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B2)]);
-    data.push_back(baroData[1]);
-    data.push_back(baroData[0]);
-    data.push_back(flagBytes[static_cast<int>(DisplayByteIndex::EFISR_B0)]);
+    auto baroData = encodeStringEfis(4, fixStringLength(data->baro, 4));
+    payload.push_back(baroData[3]);
+    payload.push_back(baroData[2] | flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)]);
+    payload.push_back(baroData[1]);
+    payload.push_back(baroData[0]);
+    payload.push_back(flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B0 : DisplayByteIndex::EFISL_B0)]);
     
     // Add second command
-    data.insert(data.end(), {0x0E, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
-    
+    payload.insert(payload.end(), {0x0E, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
+        
     // Pad to 64 bytes
-    while (data.size() < 64) {
-        data.push_back(0x00);
+    while (payload.size() < 64) {
+        payload.push_back(0x00);
     }
     
-    writeData(data);
+    writeData(payload);
     
     // Increment package number for next call
     packageNumber++;
-    if (packageNumber == 0) packageNumber = 1;  // Avoid 0
-}
-
-void ProductFCUEfis::sendEfisLeftDisplay(const std::string& baro) {
-    auto baroData = encodeStringEfis(4, fixStringLength(baro, 4));
-    
-    // Create flag bytes array
-    std::vector<uint8_t> flagBytes(17, 0);
-    
-    // Set EFIS Left flags
-    if (displayData.efisLQnh) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)] |= 0x02;
-    if (displayData.efisLQfe) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)] |= 0x01;
-    if (displayData.efisLShowInHgDecimal) flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B2)] |= 0x80;
-    
-    static uint8_t packageNumber = 1;
-    
-    // EFIS Left display protocol
-    std::vector<uint8_t> data = {
-        0xF0, 0x00, packageNumber, 0x1A, 0x0D, 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00,
-        0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    };
-    
-    // Add barometric data
-    data.push_back(baroData[3]);
-    data.push_back(baroData[2] | flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B2)]);
-    data.push_back(baroData[1]);
-    data.push_back(baroData[0]);
-    data.push_back(flagBytes[static_cast<int>(DisplayByteIndex::EFISL_B0)]);
-    
-    // Add second command
-    data.insert(data.end(), {0x0D, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
-    
-    // Pad to 64 bytes
-    while (data.size() < 64) {
-        data.push_back(0x00);
+    if (packageNumber == 0) {
+        packageNumber = 1; // Avoid 0
     }
-    
-    writeData(data);
-    
-    // Increment package number for next call
-    packageNumber++;
-    if (packageNumber == 0) packageNumber = 1;  // Avoid 0
-}
-
-void ProductFCUEfis::sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool showInHgDecimal) {
-    // Temporarily set the flags in displayData
-    bool originalQnh = displayData.efisRQnh;
-    bool originalShowInHgDecimal = displayData.efisRShowInHgDecimal;
-    
-    displayData.efisRQnh = qnh;
-    displayData.efisRShowInHgDecimal = showInHgDecimal;
-    
-    // Call the regular send function which uses displayData flags
-    sendEfisRightDisplay(baro);
-    
-    // Restore original flags
-    displayData.efisRQnh = originalQnh;
-    displayData.efisRShowInHgDecimal = originalShowInHgDecimal;
-}
-
-void ProductFCUEfis::sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool showInHgDecimal) {
-    // Temporarily set the flags in displayData
-    bool originalQnh = displayData.efisLQnh;
-    bool originalShowInHgDecimal = displayData.efisLShowInHgDecimal;
-    
-    displayData.efisLQnh = qnh;
-    displayData.efisLShowInHgDecimal = showInHgDecimal;
-    
-    // Call the regular send function which uses displayData flags
-    sendEfisLeftDisplay(baro);
-    
-    // Restore original flags
-    displayData.efisLQnh = originalQnh;
-    displayData.efisLShowInHgDecimal = originalShowInHgDecimal;
 }
 
 void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {

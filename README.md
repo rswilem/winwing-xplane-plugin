@@ -13,6 +13,16 @@ The plugin theoretically works on Windows, but is not required there, as Winwing
 4. Start X-Plane 12.
 5. Updating can be done by replacing the `Winwing` folder or using Skunkcrafts Updater if you have it installed.
 
+### Contributing
+
+- Fork the repository.
+- Download the latest X-Plane 12 SDK from https://developer.x-plane.com/sdk/plugin-sdk-downloads/.
+- Unzip and copy the `SDK/` folder to the root of the repository.
+- Make your changes.
+- Test your changes in X-Plane 12. Datareftool plugin recommented, and make sure you uninstall FlyWithLua as it can interfere with the "Reload Plugins" functionality.
+- Commit your changes and push to your fork.
+- Create a pull request with a description of your changes.
+
 ### Usage
 
 - The plugin will automatically detect your Winwing devices.
@@ -44,6 +54,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 ### Known Issues
 
 - It seems that upon startup, the MCDU (and PFP) reverts to the default font, even if you used SimAppPro to change it. This is due to the startup message "waking" up the MCDU, which resets the font. More research is needed on the startup sequence of the MCDU to find a solution.
+- Have not yet found the proper way to show "inverted" text on the PFP, where the background is coloured and the text is black.
 
 ### Credits
 

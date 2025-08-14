@@ -150,15 +150,15 @@ const std::vector<MCDUButtonDef>& LaminarMcduProfile::buttonDefs() const {
 
 const std::map<char, int>& LaminarMcduProfile::colorMap() const {
     static const std::map<char, int> colMap = {
-        {'L', 0x0000},
-        {'A', 0x0021},
-        {'W', 0x0042},
-        {'B', 0x0063},
-        {'G', 0x0084},
-        {'M', 0x00A5},
-        {'R', 0x00C6},
-        {'Y', 0x00E7},
-        {'E', 0x0108}
+        {'L', 0x0000}, // White
+        {'A', 0x0021}, // Amber
+        {'W', 0x0042}, // White
+        {'B', 0x0063}, // Cyan
+        {'G', 0x0084}, // Green
+        {'M', 0x00A5}, // Magenta
+        {'R', 0x00C6}, // Red
+        {'Y', 0x00E7}, // Yellow
+        {'E', 0x0108} // Grey
     };
     return colMap;
 }

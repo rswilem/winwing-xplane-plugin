@@ -7,6 +7,7 @@
 #include <map>
 #include <unordered_map>
 #include <cstdint>
+#include <format>
 #include <XPLMUtilities.h>
 
 // 7-segment display character representations
@@ -62,7 +63,7 @@ enum class FCUEfisLed : int {
     EXPED_GREEN = 11,
     APPR_GREEN = 13,
     FLAG_GREEN = 17,
-    EXPED_YELLOW = 30,
+    EXPED_BACKLIGHT = 30,
     
     // EFIS Right LEDs (100-199)
     EFISR_BACKLIGHT = 100,
@@ -89,13 +90,30 @@ enum class FCUEfisLed : int {
     EFISL_ARPT_GREEN = 209
 };
 
+struct EfisDisplayValue {
+    std::string baro;
+    bool unitIsInHg;
+    bool showQfe = false;
+    
+    bool operator==(const EfisDisplayValue& other) const {
+        return showQfe == other.showQfe && baro == other.baro && unitIsInHg == other.unitIsInHg;
+    }
+    
+    void setBaro(float inHgValue, bool isBaroInHg) {
+        // Either make QNH hPa value (1013), or inHg * 100 (2992)
+        int baroValue = static_cast<int>(std::round(inHgValue * (isBaroInHg ? 100.0f : 33.8639f)));
+        unitIsInHg = isBaroInHg;
+        baro = std::format("{:04}", baroValue);
+    }
+};
+
 struct FCUDisplayData {
     std::string speed;
     std::string heading;
     std::string altitude;
     std::string verticalSpeed;
-    std::string efisRBaro;
-    std::string efisLBaro;
+    EfisDisplayValue efisLeft;
+    EfisDisplayValue efisRight;
     
     // Display flags
     bool spdMach = false;
@@ -105,10 +123,6 @@ struct FCUDisplayData {
     bool hdgManaged = false;
     bool vsMode = false;
     bool fpaMode = false;
-    bool efisRQnh = false;
-    bool efisLQnh = false;
-    bool efisRShowInHgDecimal = false;
-    bool efisLShowInHgDecimal = false;
     
     // Additional display flags for proper 7-segment display
     bool latMode = false;
@@ -123,8 +137,6 @@ struct FCUDisplayData {
     bool fpaComma = false;
     bool machComma = false;
     bool vsSign = true;  // true = positive (up), false = negative (down)
-    bool efisRQfe = false;
-    bool efisLQfe = false;
 };
 
 class ProductFCUEfis;

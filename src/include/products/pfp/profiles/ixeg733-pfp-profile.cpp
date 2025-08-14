@@ -161,31 +161,60 @@ const std::map<char, int>& IXEG733PfpProfile::colorMap() const {
     static const std::map<char, int> colMap = {
         {'W', 0x0042}, // White text
         {'G', 0x0084}, // Green text
+        {'S', 0x0084}, // Green text (Small)
+        {'I', 0x0108}, // Gray text, should be inverted (black text on green). Not sure yet how.
     };
     return colMap;
 }
 
-std::string IXEG733PfpProfile::processIxegText(const std::vector<unsigned char> &characters) {
+std::pair<std::string, std::vector<char>> IXEG733PfpProfile::processIxegText(const std::vector<unsigned char> &characters) {
     std::string text;
+    std::vector<char> colors;
     
-    for (unsigned char c : characters) {
+    bool inInvertedMode = false;
+    bool inSmallMode = false;
+    
+    for (size_t i = 0; i < characters.size(); ++i) {
+        unsigned char c = characters[i];
+        
         if (c == 0x00) {
             break;
         }
         
         if (c == 0xA3) {
-            // Should be "Small" text
-            // 0xA3 = small
-            // backtick CRZ wind is degrees
+            // 0xA3 = start marker for white text until next space
+            inSmallMode = true;
             continue;
         }
         
         if (c >= 0x20 && c <= 0x7E) {
-            text += static_cast<char>(c);
+            char ch = static_cast<char>(c);
+            
+            // Check for $$ at current position
+            if (!inInvertedMode && ch == '$' && i + 1 < characters.size() && 
+                characters[i + 1] >= 0x20 && characters[i + 1] <= 0x7E && 
+                static_cast<char>(characters[i + 1]) == '$') {
+                inInvertedMode = true;
+                i++; // Skip the second $
+                continue; // Don't add $$ to the output text
+            }
+            
+            // Check if we hit a space while in inverted or white mode
+            if (ch == ' ') {
+                if (inInvertedMode) {
+                    inInvertedMode = false;
+                }
+                if (inSmallMode) {
+                    inSmallMode = false;
+                }
+            }
+            
+            text += ch;
+            colors.push_back(inInvertedMode ? 'I' : (inSmallMode ? 'S' : 'G'));
         }
     }
     
-    return text;
+    return std::make_pair(text, colors);
 }
 
 void IXEG733PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
@@ -204,11 +233,12 @@ void IXEG733PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
         }
         debug_force("}\n");
         
-        std::string text = processIxegText(characters);
+        auto [text, colors] = processIxegText(characters);
         if (ref == "ixeg/733/FMC/cdu1D_title") {
             for (int i = 0; i < text.size() && i < ProductPFP::PageCharsPerLine; ++i) {
                 char c = text[i];
-                product->writeLineToPage(page, 0, i, std::string(1, c), 'G', false);
+                char color = i < colors.size() ? colors[i] : 'G';
+                product->writeLineToPage(page, 0, i, std::string(1, c), color, color == 'S');
             }
             continue;
         }
@@ -218,7 +248,8 @@ void IXEG733PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
             if (startPos > 0) {
                 for (int i = 0; i < text.size() && (startPos + i) < ProductPFP::PageCharsPerLine; ++i) {
                     char c = text[i];
-                    product->writeLineToPage(page, 0, startPos + i, std::string(1, c), 'G', false);
+                    char color = i < colors.size() ? colors[i] : 'G';
+                    product->writeLineToPage(page, 0, startPos + i, std::string(1, c), color, color == 'S');
                 }
             }
             continue;
@@ -227,7 +258,8 @@ void IXEG733PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
         if (ref == "ixeg/733/FMC/cdu1D_scrpad") {
             for (int i = 0; i < text.size() && i < ProductPFP::PageCharsPerLine; ++i) {
                 char c = text[i];
-                product->writeLineToPage(page, 13, i, std::string(1, c), 'G', false);
+                char color = i < colors.size() ? colors[i] : 'G';
+                product->writeLineToPage(page, 13, i, std::string(1, c), color, color == 'S');
             }
             continue;
         }
@@ -259,7 +291,8 @@ void IXEG733PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
                     
                     for (int i = 0; i < text.size() && (startPos + i) < ProductPFP::PageCharsPerLine; ++i) {
                         char c = text[i];
-                        product->writeLineToPage(page, displayLine, startPos + i, std::string(1, c), 'G', isTitle);
+                        char color = i < colors.size() ? colors[i] : 'G';
+                        product->writeLineToPage(page, displayLine, startPos + i, std::string(1, c), color, isTitle || color == 'S');
                     }
                 }
             }
@@ -272,6 +305,16 @@ void IXEG733PfpProfile::buttonPressed(const PFPButtonDef *button, XPLMCommandPha
     if (phase == xplm_CommandContinue) {
         return;
     }
-
-    Dataref::getInstance()->set<int>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
+    
+    if (std::fabs(button->value) > DBL_EPSILON) {
+        if (phase != xplm_CommandBegin) {
+            return;
+        }
+        
+        float currentValue = Dataref::getInstance()->get<float>(button->dataref.c_str());
+        Dataref::getInstance()->set<float>(button->dataref.c_str(), std::clamp(currentValue + button->value, 0.0, 1.0));
+    }
+    else {
+        Dataref::getInstance()->set<int>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
+    }
 }

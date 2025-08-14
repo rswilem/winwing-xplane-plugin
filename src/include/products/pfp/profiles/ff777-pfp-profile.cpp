@@ -129,12 +129,12 @@ const std::vector<PFPButtonDef>& FlightFactor777PfpProfile::buttonDefs() const {
 
 const std::map<char, int>& FlightFactor777PfpProfile::colorMap() const {
     static const std::map<char, int> colMap = {
-        {'W', 0x0042}, // White text
-        {'G', 0x0084}, // Green text
-        {'C', 0x0063}, // Cyan (blue) text
-        {'M', 0x00A5}, // Magenta text
-        {'Y', 0x00E6}, // Yellow text (if used)
-        {'R', 0x00FF}, // Red text (if used)
+        {'W', 0x0042}, // White
+        {'G', 0x0084}, // Green
+        {'C', 0x0063}, // Cyan
+        {'M', 0x00A5}, // Magenta
+        {'Y', 0x00E7}, // Yellow
+        {'R', 0x00C6}, // Red
     };
     
     return colMap;

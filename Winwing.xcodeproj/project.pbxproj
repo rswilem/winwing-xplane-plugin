@@ -947,12 +947,13 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
+					"$(PROJECT_DIR)/SDK/Libraries/Mac",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"MCDU_AS_PFP=1",
 					"DEBUG=1",
 					"$(inherited)",
 				);
@@ -982,7 +983,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				XPSDK_ROOT = SDK_410;
+				XPSDK_ROOT = SDK;
 			};
 			name = "Debug (MCDU as PFP)";
 		};
@@ -1028,7 +1029,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
+					"$(PROJECT_DIR)/SDK/Libraries/Mac",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1063,7 +1064,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				XPSDK_ROOT = SDK_410;
+				XPSDK_ROOT = SDK;
 			};
 			name = Debug;
 		};
@@ -1110,7 +1111,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
+					"$(PROJECT_DIR)/SDK/Libraries/Mac",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1138,7 +1139,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = src/desktop/bridge.h;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				XPSDK_ROOT = SDK_410;
+				XPSDK_ROOT = SDK;
 			};
 			name = Release;
 		};

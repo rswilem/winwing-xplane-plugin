@@ -273,14 +273,14 @@ const std::vector<MCDUButtonDef>& TolissMcduProfile::buttonDefs() const {
 
 const std::map<char, int>& TolissMcduProfile::colorMap() const {
     static const std::map<char, int> colMap = {
-        {'a', 0x0021},
-        {'w', 0x0042},
-        {'b', 0x0063},
-        {'g', 0x0084},
-        {'m', 0x00A5},
-        {'r', 0x00C6},
-        {'y', 0x00E7},
-        {'e', 0x0108}
+        {'a', 0x0021}, // Amber
+        {'w', 0x0042}, // White
+        {'b', 0x0063}, // Cyan
+        {'g', 0x0084}, // Green
+        {'m', 0x00A5}, // Magenta
+        {'r', 0x00C6}, // Red
+        {'y', 0x00E7}, // Yellow
+        {'e', 0x0108} // Grey
     };
     
     return colMap;

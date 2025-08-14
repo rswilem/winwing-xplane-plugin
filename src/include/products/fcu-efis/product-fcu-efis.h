@@ -34,12 +34,8 @@ public:
     void monitorDatarefs();
     
     void initializeDisplays();
-    void sendFCUDisplay(const std::string& speed, const std::string& heading, 
-                       const std::string& altitude, const std::string& vs);
-    void sendEfisRightDisplay(const std::string& baro);
-    void sendEfisLeftDisplay(const std::string& baro);
-    void sendEfisRightDisplayWithFlags(const std::string& baro, bool qnh, bool showInHgDecimal);
-    void sendEfisLeftDisplayWithFlags(const std::string& baro, bool qnh, bool showInHgDecimal);
+    void sendFCUDisplay(const std::string& speed, const std::string& heading, const std::string& altitude, const std::string& vs);
+    void sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRightSide);
     
     // Getter for display data (for testing)
     FCUDisplayData& getDisplayData() { return displayData; }

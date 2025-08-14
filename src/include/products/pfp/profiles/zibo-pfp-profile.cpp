@@ -218,14 +218,14 @@ const std::vector<PFPButtonDef>& ZiboPfpProfile::buttonDefs() const {
 
 const std::map<char, int>& ZiboPfpProfile::colorMap() const {
     static const std::map<char, int> colMap = {
-        {'W', 0x0042}, // White fallback
-        {'L', 0x0042}, // L = Large/normal text (white)
-        {'S', 0x0042}, // S = Small text (white)
-        {'M', 0x00A5}, // M = Magenta
-        {'G', 0x0084}, // G = Green
-        {'C', 0x0063}, // C = Cyan (blue)
-        {'I', 0x0042}, // I = Inverted (white for now)
-        {'X', 0x0042}, // X = Special/labels (white)
+        {'W', 0x0042}, // White
+        {'L', 0x0042}, // White
+        {'S', 0x0042}, // White, small
+        {'M', 0x00A5}, // Magenta
+        {'G', 0x0084}, // Green
+        {'C', 0x0063}, // Cyan
+        {'I', 0x0042}, // White (should be inverted)
+        {'X', 0x0042}, // White (should be special labels)
     };
 
     return colMap;

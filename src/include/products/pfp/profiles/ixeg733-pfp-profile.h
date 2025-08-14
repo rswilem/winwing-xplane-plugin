@@ -6,7 +6,7 @@
 
 class IXEG733PfpProfile : public PfpAircraftProfile {
 private:
-    std::string processIxegText(const std::vector<unsigned char> &characters);
+    std::pair<std::string, std::vector<char>> processIxegText(const std::vector<unsigned char> &characters);
         
 public:
     IXEG733PfpProfile(ProductPFP *product);

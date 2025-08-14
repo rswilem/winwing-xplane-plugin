@@ -5,7 +5,6 @@
 #include <XPLMUtilities.h>
 #include <cstring>
 #include <algorithm>
-#include <sstream>
 #include <iomanip>
 #include <bitset>
 #include <cmath>
@@ -23,6 +22,7 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
         product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
+        product->setLedBrightness(FCUEfisLed::EXPED_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::FLAG_GREEN, target);
         product->setLedBrightness(FCUEfisLed::EFISR_FLAG_GREEN, target);
         product->setLedBrightness(FCUEfisLed::EFISL_FLAG_GREEN, target);
@@ -65,12 +65,8 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
     });
     
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/APVerticalMode", [product](int vsMode) {
-        // EXPED_GREEN is the indicator - on when EXPED mode is active (bit 4)
-        bool expedEnabled = vsMode & 0b00010000;
+        bool expedEnabled = vsMode >= 0 && vsMode & 0b00010000;
         product->setLedBrightness(FCUEfisLed::EXPED_GREEN, expedEnabled ? 255 : 0);
-        
-        // EXPED_YELLOW is the backlight - always stays on (it's just a button backlight)
-        product->setLedBrightness(FCUEfisLed::EXPED_YELLOW, 255);
     });
     
     // Monitor EFIS Right (Captain) LED states
@@ -246,7 +242,7 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         // {30, "LOC_LED", "AirbusFBW/LOCilluminated"},  // Monitored via LED callback
         // Button 31 reserved
         
-        // EFIS Right (Captain) buttons (32-63)
+        // EFIS Right (FO) buttons (32-63)
         {32, "R_FD", "toliss_airbus/fd2_push"},
         {33, "R_LS", "toliss_airbus/dispcommands/CoLSButtonPush"},
         {34, "R_CSTR", "toliss_airbus/dispcommands/CoCstrPushButton"},
@@ -279,7 +275,7 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {61, "R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},    // ADF2
         // Buttons 62-63 reserved
         
-        // EFIS Left (First Officer) buttons (64-95)
+        // EFIS Left (Pilot) buttons (64-95)
         {64, "L_FD", "toliss_airbus/fd1_push"},
         {65, "L_LS", "toliss_airbus/dispcommands/CaptLSButtonPush"},
         {66, "L_CSTR", "toliss_airbus/dispcommands/CaptCstrPushButton"},
@@ -446,69 +442,29 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
     // LAT mode - defaults to true in Python, typically always on for Airbus
     data.latMode = true;
     
-    bool isBaroStdCapt = datarefManager->getCached<bool>("AirbusFBW/BaroStdCapt"); // int, 1 or 0
-    bool isBaroHpaCapt = datarefManager->getCached<bool>("AirbusFBW/BaroUnitCapt"); // int, 1 for hPa, 0 for inHg
-    
-    if (isBaroStdCapt) {
-        data.efisLBaro = "STD ";  // 4 characters for STD mode
-        data.efisLQnh = false;
-        data.efisLShowInHgDecimal = false;
-    } else {
-        // Get actual barometric pressure value (float, inHg)
-        float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
-        if (baroValue > 0) {
-            if (isBaroHpaCapt) {
-                int hpaValue = static_cast<int>(std::round(baroValue * 33.8639));  // Convert inHg to hPa with proper rounding
-                std::stringstream ss;
-                ss << std::setfill('0') << std::setw(4) << hpaValue;
-                data.efisLBaro = ss.str();
-                data.efisLQnh = true;     // QNH mode indicator
-                data.efisLShowInHgDecimal = false; // No decimal point for hPa
-            } else {
-                int scaledValue = static_cast<int>(std::round(baroValue * 100));  // 29.92 -> 2992 with proper rounding
-                std::stringstream ss;
-                ss << std::setfill('0') << std::setw(4) << scaledValue;
-                data.efisLBaro = ss.str();
-                data.efisLQnh = true;     // QNH mode indicator
-                data.efisLShowInHgDecimal = true;  // Show decimal point
-            }
-        } else {
-            data.efisLBaro = "2992";  // Default fallback for 29.92
-            data.efisLQnh = true;
-            data.efisLShowInHgDecimal = !isBaroHpaCapt;  // Decimal only for inHg
+    for (int i = 0; i < 2; i++) {
+        bool isCaptain = i == 0;
+        
+        bool isStd = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroStdCapt" : "AirbusFBW/BaroStdFO"); // int, 1 or 0
+        bool isBaroInHg = datarefManager->getCached<int>(isCaptain ? "AirbusFBW/BaroUnitCapt" : "AirbusFBW/BaroUnitFO") == 0; // int, 1 for hPa, 0 for inHg
+        float baroValue = datarefManager->getCached<float>(isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
+        
+        EfisDisplayValue value = {
+            .baro = "STD ", // Four characters
+            .unitIsInHg = false
+        };
+        
+        if (!isStd && baroValue > 0) {
+            value.setBaro(baroValue, isBaroInHg);
         }
-    }
-    
-    bool isBaroStdFO = datarefManager->getCached<bool>("AirbusFBW/BaroStdFO"); // int, 1 or 0
-    bool isBaroHpaFO = datarefManager->getCached<bool>("AirbusFBW/BaroUnitFO"); // int, 1 for hPa, 0 for inHg
-    
-    if (isBaroStdFO) {
-        data.efisRBaro = "STD ";  // 4 characters for STD mode
-        data.efisRQnh = false;
-        data.efisRShowInHgDecimal = false;
-    } else {
-        // Get actual barometric pressure value (float, inHg)
-        float baroValue = datarefManager->getCached<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
-        if (baroValue > 0) {
-            if (isBaroHpaFO) {
-                int hpaValue = static_cast<int>(std::round(baroValue * 33.8639));  // Convert inHg to hPa with proper rounding
-                std::stringstream ss;
-                ss << std::setfill('0') << std::setw(4) << hpaValue;
-                data.efisRBaro = ss.str();
-                data.efisRQnh = true;     // QNH mode indicator
-                data.efisRShowInHgDecimal = false; // No decimal point for hPa
-            } else {
-                int scaledValue = static_cast<int>(std::round(baroValue * 100));  // 29.92 -> 2992 with proper rounding
-                std::stringstream ss;
-                ss << std::setfill('0') << std::setw(4) << scaledValue;
-                data.efisRBaro = ss.str();
-                data.efisRQnh = true;     // QNH mode indicator
-                data.efisRShowInHgDecimal = true;  // Show decimal point
-            }
-        } else {
-            data.efisRBaro = "2992";  // Default fallback for 29.92
-            data.efisRQnh = true;
-            data.efisRShowInHgDecimal = !isBaroHpaFO;  // Decimal only for inHg
+        
+        if (isCaptain) {
+            debug_force("EFIS data for captain-left: =%s=(unitIsInHg:%i) - std:%i - raw:%.0f\n", value.baro.c_str(), value.unitIsInHg, isStd, baroValue);
+            data.efisLeft = value;
+        }
+        else {
+            debug_force("EFIS data for fo-right: =%s=(unitIsInHg:%i) - std:%i - raw:%.0f\n", value.baro.c_str(), value.unitIsInHg, isStd, baroValue);
+            data.efisRight = value;
         }
     }
 }
@@ -518,27 +474,36 @@ void TolissFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCom
         return;
     }
     
-    if (phase == xplm_CommandBegin && 
-        (button->id == 41 || button->id == 42 || button->id == 73 || button->id == 74)) {
-        // IDs: 41=R_PRESS_DEC, 42=R_PRESS_INC, 73=L_PRESS_DEC, 74=L_PRESS_INC
-        
-        bool isRightEfis = (button->id == 41 || button->id == 42);
-        bool isIncrease = (button->id == 42 || button->id == 74);
-        
-        bool isBaroHPA = isRightEfis ? Dataref::getInstance()->get<bool>("AirbusFBW/BaroUnitFO") : Dataref::getInstance()->get<bool>("AirbusFBW/BaroUnitCapt");
-        
-        if (isBaroHPA) { // hPa mode
-            const char *baroDataref = isRightEfis ?
-                "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot" :
-                "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot";
-            float currentBaroHpa = Dataref::getInstance()->get<float>(baroDataref) * 33.8639f;
-            float newHpa = isIncrease ? (currentBaroHpa + 1.0f) : (currentBaroHpa - 1.0f);
-            float newBaro = newHpa / 33.8639f;
-            Dataref::getInstance()->set<float>(baroDataref, newBaro);
-            
-            return;
-        }
-    }
+    /*
+     39
+     40
+     {41, "R_PRESS DEC", "sim/instruments/barometer_copilot_down"},
+     {42, "R_PRESS INC", "sim/instruments/barometer_copilot_up"},
+     
+     {71, "L_STD PUSH", "toliss_airbus/capt_baro_push"},
+      {72, "L_STD PULL", "toliss_airbus/capt_baro_pull"},
+     {73, "L_PRESS DEC", "sim/instruments/barometer_down"},
+     {74, "L_PRESS INC", "sim/instruments/barometer_up"},*/
+    
+//    if (phase == xplm_CommandBegin &&
+//        (button->id == 41 || button->id == 42 || button->id == 73 || button->id == 74)) {
+//        // IDs: 41=R_PRESS_DEC, 42=R_PRESS_INC, 73=L_PRESS_DEC, 74=L_PRESS_INC
+//        
+//        bool isRightEfis = (button->id == 41 || button->id == 42);
+//        bool isIncrease = (button->id == 42 || button->id == 74);
+//        
+//        bool isBaroHPA = isRightEfis ? Dataref::getInstance()->get<bool>("AirbusFBW/BaroUnitFO") : Dataref::getInstance()->get<bool>("AirbusFBW/BaroUnitCapt");
+//        if (isBaroHPA) { // hPa mode
+//            const char *baroDataref = isRightEfis ?
+//                "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot" :
+//                "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot";
+//            float currentBaroHpa = Dataref::getInstance()->get<float>(baroDataref) * 33.8639;
+//            float newHpa = isIncrease ? (currentBaroHpa + 1.0f) : (currentBaroHpa - 1.0f);
+//            float newBaro = newHpa / 33.8639f;
+//            Dataref::getInstance()->set<float>(baroDataref, newBaro);
+//            return;
+//        }
+//    }
     
     if (phase == xplm_CommandBegin && (button->datarefType == FCUEfisDatarefType::SET_VALUE || button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE)) {
         bool wantsToggle = button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE;
@@ -551,12 +516,9 @@ void TolissFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCom
         else {
             Dataref::getInstance()->set<float>(button->dataref.c_str(), button->value);
         }
-        
-        Dataref::getInstance()->executeChangedCallbacksForDataref(button->dataref.c_str());
         return;
     }
-    
-    if (phase == xplm_CommandBegin && button->datarefType == FCUEfisDatarefType::EXECUTE_CMD_ONCE) {
+    else if (phase == xplm_CommandBegin && button->datarefType == FCUEfisDatarefType::EXECUTE_CMD_ONCE) {
         Dataref::getInstance()->executeCommand(button->dataref.c_str());
     }
 }
