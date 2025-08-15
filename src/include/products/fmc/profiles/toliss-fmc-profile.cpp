@@ -1,31 +1,17 @@
-#include "toliss-mcdu-profile.h"
-#include "product-mcdu.h"
+#include "toliss-fmc-profile.h"
+#include "product-fmc.h"
 #include "dataref.h"
 #include "config.h"
 #include <algorithm>
 
-TolissMcduProfile::TolissMcduProfile(ProductMCDU *product) : McduAircraftProfile(product) {
+TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
 
-    const MCDULed ledsToSet[] = {
-        MCDULed::FAIL,
-        MCDULed::FM,
-        MCDULed::MCDU,
-        MCDULed::MENU,
-        MCDULed::FM1,
-        MCDULed::IND,
-        MCDULed::RDY,
-        MCDULed::STATUS,
-        MCDULed::FM2
-    };
-
-    for (auto led : ledsToSet) {
-        product->setLedBrightness(led, 0);
-    }
+    product->setAllLedsEnabled(false);
     
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
-        product->setLedBrightness(MCDULed::BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/DUBrightness", [product](std::vector<float> brightness) {
@@ -34,7 +20,7 @@ TolissMcduProfile::TolissMcduProfile(ProductMCDU *product) : McduAircraftProfile
         }
         
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255.0f : 0;
-        product->setLedBrightness(MCDULed::SCREEN_BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
@@ -43,17 +29,17 @@ TolissMcduProfile::TolissMcduProfile(ProductMCDU *product) : McduAircraftProfile
     });
 }
 
-TolissMcduProfile::~TolissMcduProfile() {
+TolissFMCProfile::~TolissFMCProfile() {
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
     Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
 }
 
-bool TolissMcduProfile::IsEligible() {
+bool TolissFMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("AirbusFBW/PanelBrightnessLevel");
 }
 
-const std::vector<std::string>& TolissMcduProfile::displayDatarefs() const {
+const std::vector<std::string>& TolissFMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         //"AirbusFBW/MCDU1titleb",
         "AirbusFBW/MCDU1titleg",
@@ -190,8 +176,8 @@ const std::vector<std::string>& TolissMcduProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::vector<MCDUButtonDef>& TolissMcduProfile::buttonDefs() const {
-    static const std::vector<MCDUButtonDef> buttons = {
+const std::vector<FMCButtonDef>& TolissFMCProfile::buttonDefs() const {
+    static const std::vector<FMCButtonDef> buttons = {
         {0, "LSK1L", "AirbusFBW/MCDU1LSK1L"},
         {1, "LSK2L", "AirbusFBW/MCDU1LSK2L"},
         {2, "LSK3L", "AirbusFBW/MCDU1LSK3L"},
@@ -271,29 +257,78 @@ const std::vector<MCDUButtonDef>& TolissMcduProfile::buttonDefs() const {
     return buttons;
 }
 
-const std::map<char, int>& TolissMcduProfile::colorMap() const {
-    static const std::map<char, int> colMap = {
-        {'a', 0x0021}, // Amber
-        {'w', 0x0042}, // White
-        {'b', 0x0063}, // Cyan
-        {'g', 0x0084}, // Green
-        {'m', 0x00A5}, // Magenta
-        {'r', 0x00C6}, // Red
-        {'y', 0x00E7}, // Yellow
-        {'e', 0x0108} // Grey
+const std::map<char, FMCTextColor>& TolissFMCProfile::colorMap() const {
+    static const std::map<char, FMCTextColor> colMap = {
+        {'a', FMCTextColor::COLOR_AMBER},
+        {'w', FMCTextColor::COLOR_WHITE},
+        {'b', FMCTextColor::COLOR_CYAN},
+        {'g', FMCTextColor::COLOR_GREEN},
+        {'m', FMCTextColor::COLOR_MAGENTA},
+        {'r', FMCTextColor::COLOR_RED},
+        {'y', FMCTextColor::COLOR_RED},
+        {'e', FMCTextColor::COLOR_GREY},
     };
     
     return colMap;
 }
 
-void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
-    std::array<int, ProductMCDU::PageBytesPerLine> spw_line{};
-    std::array<int, ProductMCDU::PageBytesPerLine> spa_line{};
+void TolissFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
+    switch (character) {
+        case '#':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
+            break;
+            
+        case '<':
+            if (isFontSmall) {
+                buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_LEFT.begin(), FMCSpecialCharacter::ARROW_LEFT.end());
+            }
+            else {
+                buffer->push_back(character);
+            }
+            break;
 
-    // Clear the page
-    for (int i = 0; i < ProductMCDU::PageLines; ++i) {
-        std::fill(page[i].begin(), page[i].end(), ' ');
+        case '>':
+            if (isFontSmall) {
+                buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_RIGHT.begin(), FMCSpecialCharacter::ARROW_RIGHT.end());
+            }
+            else {
+                buffer->push_back(character);
+            }
+            break;
+
+        case 30: // Up arrow
+            if (isFontSmall) {
+                buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_UP.begin(), FMCSpecialCharacter::ARROW_UP.end());
+            }
+            break;
+
+        case 31: // Down arrow
+            if (isFontSmall) {
+                buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_DOWN.begin(), FMCSpecialCharacter::ARROW_DOWN.end());
+            }
+            else {
+                buffer->push_back(character);
+            }
+            break;
+            
+        case '`':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
+            break;
+
+        case '|':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::TRIANGLE.begin(), FMCSpecialCharacter::TRIANGLE.end());
+            break;
+        
+        default:
+            buffer->push_back(character);
+            break;
     }
+}
+
+void TolissFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+    std::array<int, ProductFMC::PageBytesPerLine> spw_line{};
+    std::array<int, ProductFMC::PageBytesPerLine> spa_line{};
+    page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
 
     auto datarefManager = Dataref::getInstance();
     for (const auto& ref : displayDatarefs()) {        
@@ -303,7 +338,7 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
         if (!std::regex_match(ref, match, datarefRegex) && !isScratchpad) {
             continue;
         }
-        
+         
         unsigned char mcduIndex = std::stoi(match[1]);
         if (mcduIndex != 1) {
             continue;
@@ -360,13 +395,13 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
         }
     }
 
-    for (int i = 0; i < ProductMCDU::PageCharsPerLine; ++i) {
+    for (int i = 0; i < ProductFMC::PageCharsPerLine; ++i) {
         if (spw_line[i] == 0) {
             std::fill(spw_line.begin() + i, spw_line.end(), 0);
             break;
         }
     }
-    for (int i = 0; i < ProductMCDU::PageCharsPerLine; ++i) {
+    for (int i = 0; i < ProductFMC::PageCharsPerLine; ++i) {
         if (spa_line[i] == 0) {
             std::fill(spa_line.begin() + i, spa_line.end(), 0);
             break;
@@ -375,7 +410,7 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
 
     // Merge spw and spa into line 13
     int vertSlewType = Dataref::getInstance()->getCached<int>("AirbusFBW/MCDU1VertSlewKeys");
-    for (int i = 0; i < ProductMCDU::PageCharsPerLine; ++i) {
+    for (int i = 0; i < ProductFMC::PageCharsPerLine; ++i) {
         bool smallFont = false;
         char dispChar = ' ';
         char dispColor = 'w';
@@ -387,10 +422,10 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
             dispColor = 'a';
         }
 
-        if (vertSlewType > 0 && i >= ProductMCDU::PageCharsPerLine - 2) {
-            if (i == ProductMCDU::PageCharsPerLine - 2 && (vertSlewType == 1 || vertSlewType == 2)) {
+        if (vertSlewType > 0 && i >= ProductFMC::PageCharsPerLine - 2) {
+            if (i == ProductFMC::PageCharsPerLine - 2 && (vertSlewType == 1 || vertSlewType == 2)) {
                 dispChar = 30; // Up character
-            } else if (i == ProductMCDU::PageCharsPerLine - 1 && (vertSlewType == 1 || vertSlewType == 3)) {
+            } else if (i == ProductFMC::PageCharsPerLine - 1 && (vertSlewType == 1 || vertSlewType == 3)) {
                 dispChar = 31; // Down character
             }
             
@@ -402,6 +437,6 @@ void TolissMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
     }
 }
 
-void TolissMcduProfile::buttonPressed(const MCDUButtonDef *button, XPLMCommandPhase phase) {
+void TolissFMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) {
     Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
 }

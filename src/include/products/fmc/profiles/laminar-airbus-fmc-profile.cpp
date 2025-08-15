@@ -1,25 +1,11 @@
-#include "laminar-mcdu-profile.h"
-#include "product-mcdu.h"
+#include "laminar-airbus-fmc-profile.h"
+#include "product-fmc.h"
 #include "dataref.h"
 #include <cstring>
 #include <algorithm>
 
-LaminarMcduProfile::LaminarMcduProfile(ProductMCDU *product) : McduAircraftProfile(product) {
-    const MCDULed ledsToSet[] = {
-        MCDULed::FAIL,
-        MCDULed::FM,
-        MCDULed::MCDU,
-        MCDULed::MENU,
-        MCDULed::FM1,
-        MCDULed::IND,
-        MCDULed::RDY,
-        MCDULed::STATUS,
-        MCDULed::FM2
-    };
-
-    for (auto led : ledsToSet) {
-        product->setLedBrightness(led, 0);
-    }
+LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
+    product->setAllLedsEnabled(false);
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {
@@ -27,25 +13,28 @@ LaminarMcduProfile::LaminarMcduProfile(ProductMCDU *product) : McduAircraftProfi
         }
         
         uint8_t target = Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255.0f : 0;
-        product->setLedBrightness(MCDULed::BACKLIGHT, target);
-        product->setLedBrightness(MCDULed::SCREEN_BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/instrument_brightness_ratio");
     });
+    
+    product->setLedBrightness(FMCLed::BACKLIGHT, 128);
+    product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 128);
 }
 
-LaminarMcduProfile::~LaminarMcduProfile() {
+LaminarFMCProfile::~LaminarFMCProfile() {
     Dataref::getInstance()->unbind("sim/cockpit2/electrical/instrument_brightness_ratio");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
 }
 
-bool LaminarMcduProfile::IsEligible() {
+bool LaminarFMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("laminar/A333/ckpt_temp");
 }
 
-const std::vector<std::string>& LaminarMcduProfile::displayDatarefs() const {
+const std::vector<std::string>& LaminarFMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         // Text content for lines 0-15
         "sim/cockpit2/radios/indicators/fms_cdu1_text_line0",
@@ -68,8 +57,8 @@ const std::vector<std::string>& LaminarMcduProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::vector<MCDUButtonDef>& LaminarMcduProfile::buttonDefs() const {
-    static const std::vector<MCDUButtonDef> buttons = {
+const std::vector<FMCButtonDef>& LaminarFMCProfile::buttonDefs() const {
+    static const std::vector<FMCButtonDef> buttons = {
         {0, "LSK1L", "sim/FMS/ls_1l"},
         {1, "LSK2L", "sim/FMS/ls_2l"},
         {2, "LSK3L", "sim/FMS/ls_3l"},
@@ -148,31 +137,70 @@ const std::vector<MCDUButtonDef>& LaminarMcduProfile::buttonDefs() const {
     return buttons;
 }
 
-const std::map<char, int>& LaminarMcduProfile::colorMap() const {
-    static const std::map<char, int> colMap = {
-        {'L', 0x0000}, // White
-        {'A', 0x0021}, // Amber
-        {'W', 0x0042}, // White
-        {'B', 0x0063}, // Cyan
-        {'G', 0x0084}, // Green
-        {'M', 0x00A5}, // Magenta
-        {'R', 0x00C6}, // Red
-        {'Y', 0x00E7}, // Yellow
-        {'E', 0x0108} // Grey
+const std::map<char, FMCTextColor>& LaminarFMCProfile::colorMap() const {
+    static const std::map<char, FMCTextColor> colMap = {
+        {0x00, FMCTextColor::COLOR_WHITE},
+        {0x01, FMCTextColor::COLOR_CYAN},
+        {0x04, FMCTextColor::COLOR_GREEN},
+        {0x06, FMCTextColor::COLOR_AMBER}
     };
     return colMap;
 }
 
-void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page) {    
-    // Clear the page
-    for (int i = 0; i < ProductMCDU::PageLines; ++i) {
-        std::fill(page[i].begin(), page[i].end(), ' ');
+void LaminarFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
+    switch (character) {
+        case '#':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
+            break;
+
+        case '<':
+            if (isFontSmall) {
+                buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_LEFT.begin(), FMCSpecialCharacter::ARROW_LEFT.end());
+            }
+            else {
+                buffer->push_back(character);
+            }
+            break;
+
+        case '>':
+            if (isFontSmall) {
+                buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_RIGHT.begin(), FMCSpecialCharacter::ARROW_RIGHT.end());
+            }
+            else {
+                buffer->push_back(character);
+            }
+            break;
+
+        case 30: // Up arrow
+            if (isFontSmall) {
+                buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_UP.begin(), FMCSpecialCharacter::ARROW_UP.end());
+            }
+            break;
+
+        case 31: // Down arrow
+            if (isFontSmall) {
+                buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_DOWN.begin(), FMCSpecialCharacter::ARROW_DOWN.end());
+            }
+            else {
+                buffer->push_back(character);
+            }
+            break;
+
+        case '`':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
+            break;
+        
+        default:
+            buffer->push_back(character);
+            break;
     }
+}
+
+void LaminarFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+    page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
 
     auto datarefManager = Dataref::getInstance();
-    // Process lines 0-13 (we have 14 lines available, lines 0-15 from Laminar map to 0-13)
-    for (int lineNum = 0; lineNum < std::min(ProductMCDU::PageLines, (unsigned int)16); ++lineNum) {
-        // Get text content for this line
+    for (int lineNum = 0; lineNum < std::min(ProductFMC::PageLines, (unsigned int)16); ++lineNum) {
         std::string textDataref = "sim/cockpit2/radios/indicators/fms_cdu1_text_line" + std::to_string(lineNum);
         std::string styleDataref = "sim/cockpit2/radios/indicators/fms_cdu1_style_line" + std::to_string(lineNum);
         
@@ -181,17 +209,16 @@ void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
             continue;
         }
         
-        // Get style bytes directly from dataref system, not from cached string values
-        std::vector<unsigned char> styleBytes = Dataref::getInstance()->get<std::vector<unsigned char>>(styleDataref.c_str());
+        std::vector<unsigned char> styleBytes = datarefManager->getCached<std::vector<unsigned char>>(styleDataref.c_str());
 
         // Replace all special characters with placeholders
         const std::vector<std::pair<std::string, unsigned char>> symbols = {
-            { "\u2190", '<' }, // Left arrow
-            { "\u2192", '>' }, // Right arrow
-            { "\u2191", 30 }, // Up arrow
-            { "\u2193", 31 }, // Down arrow
-            { "\u2610", '#' }, // Ballot box
-            { "\u00B0", 96 }
+            { "\u2190", '<' },
+            { "\u2192", '>' },
+            { "\u2191", 30 },
+            { "\u2193", 31 },
+            { "\u2610", '#' },
+            { "\u00B0", '`' }
         };
         
         for (const auto& symbol : symbols) {
@@ -201,66 +228,33 @@ void LaminarMcduProfile::updatePage(std::vector<std::vector<char>>& page) {
               pos += 1;
             }
         }
-        // Replace any remaining non-ASCII characters with '?'
+        
         for (size_t i = 0; i < text.size(); ++i) {
             if (static_cast<unsigned char>(text[i]) > 127) {
                 text[i] = '?';
             }
         }
 
-        // Process each character in the line
-        for (int i = 0; i < text.size() && i < ProductMCDU::PageCharsPerLine; ++i) {
+        for (int i = 0; i < text.size() && i < ProductFMC::PageCharsPerLine; ++i) {
             char c = text[i];
             if (c == 0x00) {
                 continue;
             }
 
-            // Default color and font settings
-            char color = 'W'; // Default to white
             bool fontSmall = false;
-
-            // Parse style information if available
             unsigned char styleByte = (i < styleBytes.size()) ? styleBytes[i] : 0x00;
-            switch (styleByte & 0x0F) {
-                case 0x01:
-                    color = 'B';
-                    break;
-                    
-                case 0x04:
-                    color = 'G';
-                    break;
-                    /*        {'L', 0x0000},
-                     {'A', 0x0021},
-                     {'W', 0x0042},
-                     {'B', 0x0063},
-                     {'G', 0x0084},
-                     {'M', 0x00A5},
-                     {'R', 0x00C6},
-                     {'Y', 0x00E7},
-                     {'E', 0x0108},*/
-                    
-                case 0x06:
-                    color = 'A';
-                    break;
-                    
-                case 0x07:
-                    fontSmall = (styleByte & 0xF0) == 0x00;
-                    break;
-                    
-                default:
-                    break;
-            }
+            fontSmall = (styleByte & 0xF0) == 0x00;
             
             int displayLine = lineNum;
-            if (displayLine >= ProductMCDU::PageLines) {
+            if (displayLine >= ProductFMC::PageLines) {
                 break;
             }
 
-            product->writeLineToPage(page, displayLine, i, std::string(1, c), color, fontSmall);
+            product->writeLineToPage(page, displayLine, i, std::string(1, c), (styleByte & 0x0F), fontSmall);
         }
     }
 }
 
-void LaminarMcduProfile::buttonPressed(const MCDUButtonDef *button, XPLMCommandPhase phase) {
+void LaminarFMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) {
     Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
 }

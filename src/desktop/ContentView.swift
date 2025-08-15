@@ -137,10 +137,8 @@ struct ContentView: View {
             switch device.type {
             case .joystick:
                 JoystickControlView(device: device)
-            case .mcdu:
-                MCDUControlView(device: device)
-            case .pfp:
-                PFPControlView(device: device)
+            case .fmc:
+                FMCControlView(device: device)
             case .fcuEfis:
                 FCUEfisControlView(device: device)
             case .unknown:

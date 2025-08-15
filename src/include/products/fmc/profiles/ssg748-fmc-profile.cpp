@@ -1,25 +1,15 @@
-#include "ssg748-pfp-profile.h"
-#include "product-pfp.h"
+#include "ssg748-fmc-profile.h"
+#include "product-fmc.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
 #include <algorithm>
 #include <regex>
 
-SSG748PfpProfile::SSG748PfpProfile(ProductPFP *product) : PfpAircraftProfile(product) {
+SSG748FMCProfile::SSG748FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     datarefRegex = std::regex("SSG/UFMC/LINE_([0-9]+)");
-    
-    const PFPLed ledsToSet[] = {
-        PFPLed::CALL,
-        PFPLed::FAIL,
-        PFPLed::MSG,
-        PFPLed::OFST,
-        PFPLed::EXEC
-    };
 
-    for (auto led : ledsToSet) {
-        product->setLedBrightness(led, 0);
-    }
+    product->setAllLedsEnabled(false);
         
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("ssg/LGT/mcdu_brt_sw", [product](std::vector<float> brightness) {
         if (brightness.size() < 27) {
@@ -27,8 +17,8 @@ SSG748PfpProfile::SSG748PfpProfile(ProductPFP *product) : PfpAircraftProfile(pro
         }
         
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255.0f : 0;
-        product->setLedBrightness(PFPLed::BACKLIGHT, target);
-        product->setLedBrightness(PFPLed::SCREEN_BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
@@ -36,16 +26,16 @@ SSG748PfpProfile::SSG748PfpProfile(ProductPFP *product) : PfpAircraftProfile(pro
     });
 }
 
-SSG748PfpProfile::~SSG748PfpProfile() {
+SSG748FMCProfile::~SSG748FMCProfile() {
     Dataref::getInstance()->unbind("ssg/LGT/mcdu_brt_sw");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
 }
 
-bool SSG748PfpProfile::IsEligible() {
+bool SSG748FMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("SSG/748/simtime");
 }
 
-const std::vector<std::string>& SSG748PfpProfile::displayDatarefs() const {
+const std::vector<std::string>& SSG748FMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         "SSG/UFMC/LINE_1",
         "SSG/UFMC/LINE_2",
@@ -66,10 +56,10 @@ const std::vector<std::string>& SSG748PfpProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::vector<PFPButtonDef>& SSG748PfpProfile::buttonDefs() const {
+const std::vector<FMCButtonDef>& SSG748FMCProfile::buttonDefs() const {
     //SSG/CDU/cdu1_init_sw
     //SSG/CDU/cdu1_g_sw set to 1 then 0
-    static const std::vector<PFPButtonDef> sevenFourSevenButtonLayout = {
+    static const std::vector<FMCButtonDef> sevenFourSevenButtonLayout = {
         {0, "LSK1L", "SSG/CDU/cdu1_lk1_sw"},
         {1, "LSK2L", "SSG/CDU/cdu1_lk2_sw"},
         {2, "LSK3L", "SSG/CDU/cdu1_lk3_sw"},
@@ -146,23 +136,39 @@ const std::vector<PFPButtonDef>& SSG748PfpProfile::buttonDefs() const {
     return sevenFourSevenButtonLayout;
 }
 
-const std::map<char, int>& SSG748PfpProfile::colorMap() const {
-    static const std::map<char, int> colMap = {
-        {'c', 0x0063}, // c = Cyan (blue)
-        {'g', 0x0084}, // g = Green
-        {'p', 0x00A5}, // m = Magenta
-        {'w', 0x0042}, // w = White
-        {'l', 0x0042}, // l = Large/white
-        {'s', 0x0042}, // s = Small/white
-        {'x', 0x0042}, // x = Special/labels (white)
-        {'i', 0x0042}, // i = Inverted (white for now)
+const std::map<char, FMCTextColor>& SSG748FMCProfile::colorMap() const {
+    static const std::map<char, FMCTextColor> colMap = {
+        {'c', FMCTextColor::COLOR_CYAN},
+        {'g', FMCTextColor::COLOR_GREEN},
+        {'p', FMCTextColor::COLOR_MAGENTA},
+        {'w', FMCTextColor::COLOR_WHITE},
+        {'l', FMCTextColor::COLOR_RED}, // l = Large/white
+        {'s', FMCTextColor::COLOR_GREY}, // s = Small/white
+        {'x', FMCTextColor::COLOR_RED}, // x = Special/labels (white)
+        {'i', FMCTextColor::COLOR_YELLOW}, // i = Inverted (white for now)
     };
 
     return colMap;
 }
 
-void SSG748PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
-    page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageCharsPerLine * ProductPFP::PageBytesPerChar, ' '));
+void SSG748FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
+    switch (character) {
+        case '#':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
+            break;
+            
+        case '=':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
+            break;
+        
+        default:
+            buffer->push_back(character);
+            break;
+    }
+}
+
+void SSG748FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+    page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
     
     auto datarefManager = Dataref::getInstance();
     for (const auto& ref : displayDatarefs()) {
@@ -174,7 +180,7 @@ void SSG748PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
         int lineNum = std::stoi(match[1]);
         int lineIndex = lineNum - 1;
         
-        if (lineIndex < 0 || lineIndex >= ProductPFP::PageLines) {
+        if (lineIndex < 0 || lineIndex >= ProductFMC::PageLines) {
             continue;
         }
         
@@ -182,12 +188,12 @@ void SSG748PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
         if (text.empty()) {
             continue;
         }
-        
+
         char currentColor = 'W';
         bool fontSmall = lineIndex % 2 == 1;
         int displayPos = 0;
         
-        for (int i = 0; i < text.size() && displayPos < ProductPFP::PageCharsPerLine; ++i) {
+        for (int i = 0; i < text.size() && displayPos < ProductFMC::PageCharsPerLine; ++i) {
             char c = text[i];
             if (c == 0x00) {
                 break;
@@ -201,21 +207,21 @@ void SSG748PfpProfile::updatePage(std::vector<std::vector<char>>& page) {
             }
             
             if (c == '[' && i + 1 < text.size() && text[i + 1] == ']') {
-                product->writeLineToPage(page, lineIndex, displayPos, "*", currentColor, fontSmall);
+                product->writeLineToPage(page, lineIndex, displayPos, "#", currentColor, fontSmall);
                 i++; // Skip the closing bracket
                 displayPos++;
                 continue;
             }
             
             if (c != 0x20) {
-                product->writeLineToPage(page, lineIndex, displayPos, std::string(1, c), currentColor, fontSmall);
+                product->writeLineToPage(page, lineIndex, displayPos, std::string(1, toupper(c)), currentColor, fontSmall);
             }
             displayPos++;
         }
     }
 }
 
-void SSG748PfpProfile::buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) {
+void SSG748FMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) {
     if (phase == xplm_CommandContinue) {
         return;
     }

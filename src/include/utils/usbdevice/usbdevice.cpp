@@ -1,8 +1,7 @@
 #include "usbdevice.h"
 #include <XPLMUtilities.h>
 #include "appstate.h"
-#include "product-mcdu.h"
-#include "product-pfp.h"
+#include "product-fmc.h"
 #include "product-ursa-minor-joystick.h"
 #include "product-fcu-efis.h"
 
@@ -18,23 +17,31 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
             
         case 0xBB36: // MCDU-32 (Captain)
         case 0xBB3E: // MCDU-32 (First Officer)
-        case 0xBB3A: // MCDU-32 (Observer)
-#if MCDU_AS_PFP
-            return new ProductPFP(hidDevice, vendorId, productId, vendorName, productName);
-#else
-            return new ProductMCDU(hidDevice, vendorId, productId, vendorName, productName);
-#endif
+        case 0xBB3A: { // MCDU-32 (Observer)
+            constexpr uint8_t identifierByte = 0x32;
+            return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_MCDU, identifierByte);
+        }
             
         case 0xBB35: // PFP 3N (Captain)
         case 0xBB39: // PFP 3N (First Officer)
-        case 0xBB3D: // PFP 3N (Observer)
+        case 0xBB3D: { // PFP 3N (Observer)
+            constexpr uint8_t identifierByte = 0x31;
+            return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP3N, identifierByte);
+        }
+            
         case 0xBB38: // PFP 4 (Captain)
         case 0xBB40: // PFP 4 (First Officer)
-        case 0xBB3C: // PFP 4 (Observer)
+        case 0xBB3C: { // PFP 4 (Observer)
+            constexpr uint8_t identifierByte = 0x31;
+            return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP4, identifierByte);
+        }
+            
         case 0xBB37: // PFP 7 (Captain)
         case 0xBB3F: // PFP 7 (First Officer)
-        case 0xBB3B: // PFP 7 (Observer)
-            return new ProductPFP(hidDevice, vendorId, productId, vendorName, productName);
+        case 0xBB3B: { // PFP 7 (Observer)
+            constexpr uint8_t identifierByte = 0x31;
+            return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP7, identifierByte);
+        }
             
         case 0xBB10: // FCU only
         case 0xBC1E: // FCU + EFIS-R

@@ -143,12 +143,12 @@ void USBController::DeviceRemovedCallback(void *context, IOReturn result, void *
 
     auto* self = static_cast<USBController*>(context);
 
-    for (auto it = self->devices.begin(); it != self->devices.end(); ++it) {
+    for (auto it = self->devices.begin(); it != self->devices.end(); ) {
         if ((*it)->hidDevice == device) {
             delete *it;
-            *it = nullptr;
-            self->devices.erase(it);
-            break;
+            it = self->devices.erase(it); // erase returns next valid iterator
+        } else {
+            ++it;
         }
     }
 }

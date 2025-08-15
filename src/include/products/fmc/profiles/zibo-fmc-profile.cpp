@@ -1,5 +1,5 @@
-#include "zibo-pfp-profile.h"
-#include "product-pfp.h"
+#include "zibo-fmc-profile.h"
+#include "product-fmc.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -7,20 +7,10 @@
 #include <cmath>
 #include <cfloat>
 
-ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product) {
+ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     datarefRegex = std::regex("laminar/B738/fmc1/Line([0-9]{2})_([A-Z]+)");
     
-    const PFPLed ledsToSet[] = {
-        PFPLed::CALL,
-        PFPLed::FAIL,
-        PFPLed::MSG,
-        PFPLed::OFST,
-        PFPLed::EXEC
-    };
-
-    for (auto led : ledsToSet) {
-        product->setLedBrightness(led, 0);
-    }
+    product->setAllLedsEnabled(false);
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> screenBrightness) {
         if (screenBrightness.size() < 11) {
@@ -29,7 +19,7 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
 
         //brightness[11] is fmc2 screen
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? screenBrightness[10] * 255.0f : 0;
-        product->setLedBrightness(PFPLed::SCREEN_BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/panel_brightness", [product](std::vector<float> panelBrightness) {
@@ -38,7 +28,7 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
         }
 
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? panelBrightness[3] * 255.0f : 0;
-        product->setLedBrightness(PFPLed::BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
@@ -47,15 +37,15 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/fmc/fmc_message", [product](bool enabled) {
-        product->setLedBrightness(PFPLed::MSG, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::PFP_MSG, enabled ? 1 : 0);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/indicators/fmc_exec_lights", [product](bool enabled) {
-        product->setLedBrightness(PFPLed::EXEC, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::PFP_EXEC, enabled ? 1 : 0);
     });
 }
 
-ZiboPfpProfile::~ZiboPfpProfile() {
+ZiboFMCProfile::~ZiboFMCProfile() {
     Dataref::getInstance()->unbind("laminar/B738/electric/instrument_brightness");
     Dataref::getInstance()->unbind("laminar/B738/electric/panel_brightness");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
@@ -63,11 +53,11 @@ ZiboPfpProfile::~ZiboPfpProfile() {
     Dataref::getInstance()->unbind("laminar/B738/indicators/fmc_exec_lights");
 }
 
-bool ZiboPfpProfile::IsEligible() {
+bool ZiboFMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("laminar/B738/electric/instrument_brightness");
 }
 
-const std::vector<std::string>& ZiboPfpProfile::displayDatarefs() const {
+const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         "laminar/B738/fmc1/Line00_C",
         "laminar/B738/fmc1/Line00_G",
@@ -138,8 +128,8 @@ const std::vector<std::string>& ZiboPfpProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::vector<PFPButtonDef>& ZiboPfpProfile::buttonDefs() const {
-    static const std::vector<PFPButtonDef> sevenThreeSevenButtonLayout = {
+const std::vector<FMCButtonDef>& ZiboFMCProfile::buttonDefs() const {
+    static const std::vector<FMCButtonDef> sevenThreeSevenButtonLayout = {
         {0, "LSK1L", "laminar/B738/button/fmc1_1L"},
         {1, "LSK2L", "laminar/B738/button/fmc1_2L"},
         {2, "LSK3L", "laminar/B738/button/fmc1_3L"},
@@ -216,23 +206,39 @@ const std::vector<PFPButtonDef>& ZiboPfpProfile::buttonDefs() const {
     return sevenThreeSevenButtonLayout;
 }
 
-const std::map<char, int>& ZiboPfpProfile::colorMap() const {
-    static const std::map<char, int> colMap = {
-        {'W', 0x0042}, // White
-        {'L', 0x0042}, // White
-        {'S', 0x0042}, // White, small
-        {'M', 0x00A5}, // Magenta
-        {'G', 0x0084}, // Green
-        {'C', 0x0063}, // Cyan
-        {'I', 0x0042}, // White (should be inverted)
-        {'X', 0x0042}, // White (should be special labels)
+const std::map<char, FMCTextColor>& ZiboFMCProfile::colorMap() const {
+    static const std::map<char, FMCTextColor> colMap = {
+        {'W', FMCTextColor::COLOR_WHITE},
+        {'L', FMCTextColor::COLOR_WHITE},
+        {'S', FMCTextColor::COLOR_WHITE}, // White, small
+        {'M', FMCTextColor::COLOR_MAGENTA},
+        {'G', FMCTextColor::COLOR_GREEN},
+        {'C', FMCTextColor::COLOR_CYAN},
+        {'I', FMCTextColor::COLOR_WHITE}, // White (should be inverted gray/white)
+        {'X', FMCTextColor::COLOR_WHITE}, // White (should be special labels)
     };
 
     return colMap;
 }
 
-void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
-    page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageCharsPerLine * ProductPFP::PageBytesPerChar, ' '));
+void ZiboFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
+    switch (character) {
+        case '*':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
+            break;
+
+        case '`':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
+            break;
+        
+        default:
+            buffer->push_back(character);
+            break;
+    }
+}
+
+void ZiboFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+    page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
     
     auto datarefManager = Dataref::getInstance();
     for (const auto& ref : displayDatarefs()) {
@@ -244,7 +250,7 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
                 char color = (ref == "laminar/B738/fmc1/Line_entry_I") ? 'I' : 'W';
                 
                 // Store scratchpad text for later display on line 13
-                for (int i = 0; i < text.size() && i < ProductPFP::PageCharsPerLine; ++i) {
+                for (int i = 0; i < text.size() && i < ProductFMC::PageCharsPerLine; ++i) {
                     char c = text[i];
                     if (c == 0x00) {
                         break; // End of string
@@ -279,16 +285,7 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
             continue;
         }
 
-        #if DEBUG
-        printf("[PFP] %s: {", ref.c_str());
-        for (unsigned char ch : text) {
-            printf("0x%02X, ", static_cast<unsigned char>(ch));
-        }
-        printf("}\n");
-        #endif
-
-        // Process each character in the text
-        for (int i = 0; i < text.size() && i < ProductPFP::PageCharsPerLine; ++i) {
+        for (int i = 0; i < text.size() && i < ProductFMC::PageCharsPerLine; ++i) {
             char c = text[i];
             if (c == 0x00) {
                 break;
@@ -301,7 +298,7 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
     }
 }
 
-void ZiboPfpProfile::buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) {
+void ZiboFMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) {
     if (std::fabs(button->value) > DBL_EPSILON) {
         if (phase != xplm_CommandBegin) {
             return;
