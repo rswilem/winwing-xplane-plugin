@@ -36,7 +36,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 | ------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | -------------------------------------------------------------------- |
 | **URSA MINOR Joystick L** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
 | **URSA MINOR Joystick R** | 🟠          | 🟠           | 🟠               | 🟠       | 🟠       | 🟠     | 🟠      | Missing USB product ID - please open an issue if you own this device |
-| **MCDU-32**               | 🟢          | 🟢           | 🟢               | 🔴       | 🔴       | 🔴     | 🔴      | FF777: Need FMC button info, SSG: Dual FMC                           |
+| **MCDU-32**               | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      | Fully implemented                                                    |
 | **PFP 3N**                | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      | Fully implemented                                                    |
 | **PFP 4**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      | Fully implemented                                                    |
 | **PFP 7**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      | Fully implemented                                                    |
@@ -56,6 +56,8 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - It seems that upon startup, the MCDU (and PFP) reverts to the default font, even if you used SimAppPro to change it. This is due to the startup message "waking" up the MCDU, which resets the font. More research is needed on the startup sequence of the MCDU to find a solution.
 - Have not yet found the proper way to show "inverted" text on the PFP, where the background is coloured and the text is black.
 - The SSG 747 does not expose any colour datarefs yet. Therefore, the PFP will not show the correct colours.
+- The SSG 747 has a dual FMC, but the datarefs seem to overwrite eachother.
+- Need to find a way to command the FF777 buttons.
 
 ### Credits
 
