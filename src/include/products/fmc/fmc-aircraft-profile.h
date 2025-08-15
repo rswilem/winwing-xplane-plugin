@@ -5,20 +5,7 @@
 #include <vector>
 #include <map>
 #include <XPLMUtilities.h>
-
-enum class FMCHardwareType : unsigned char {
-    HARDWARE_MCDU = 1,
-    HARDWARE_PFP3N,
-    HARDWARE_PFP4,
-    HARDWARE_PFP7,
-};
-
-struct FMCButtonDef {
-    int id;
-    std::string name;
-    std::string dataref;
-    double value = 0.0;
-};
+#include "fmc-hardware-mapping.h"
 
 enum FMCLed : unsigned char {
     BACKLIGHT = 0,
@@ -47,6 +34,7 @@ enum FMCLed : unsigned char {
 };
 
 enum FMCTextColor : int {
+    COLOR_BLACK = 0x0000,
     COLOR_AMBER = 0x0021,
     COLOR_WHITE = 0x0042,
     COLOR_CYAN = 0x0063,
@@ -55,19 +43,18 @@ enum FMCTextColor : int {
     COLOR_RED = 0x00C6,
     COLOR_YELLOW = 0x00E7,
     COLOR_GREY = 0x0108,
+    COLOR_BROWN = 0x0129,
     
-    COLOR_09 = 0x0129,
-    COLOR_10 = 0x014A,
-    COLOR_11 = 0x016B,
-    COLOR_12 = 0x018C,
-    COLOR_13 = 0x01AD,
-    COLOR_14 = 0x01CE,
-    COLOR_15 = 0x01EF,
-    COLOR_16 = 0x0210,
-    COLOR_17 = 0x0231,
-    COLOR_18 = 0x0252,
-    COLOR_19 = 0x0273,
-    COLOR_20 = 0x0294
+    COLOR_AMBER_BG = COLOR_AMBER + 0x1E,
+    COLOR_BLACK_BG = COLOR_BLACK + 0x1E,
+    COLOR_WHITE_BG = COLOR_WHITE + 0x1E,
+    COLOR_CYAN_BG = COLOR_CYAN + 0x1E,
+    COLOR_GREEN_BG = COLOR_GREEN + 0x1E,
+    COLOR_MAGENTA_BG = COLOR_MAGENTA + 0x1E,
+    COLOR_RED_BG = COLOR_RED + 0x1E,
+    COLOR_YELLOW_BG = COLOR_YELLOW + 0x1E,
+    COLOR_GREY_BG = COLOR_GREY + 0x1E,
+    COLOR_BROWN_BG = COLOR_BROWN + 0x1E,
 };
 
 struct FMCSpecialCharacter {

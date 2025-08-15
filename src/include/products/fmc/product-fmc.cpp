@@ -183,10 +183,7 @@ void ProductFMC::didReceiveData(int reportId, uint8_t *report, int reportLength)
     lastButtonStateLo = buttonsLo;
     lastButtonStateHi = buttonsHi;
     
-    const std::vector<FMCButtonDef>& currentButtonDefs = profile->buttonDefs();
-    size_t numButtons = currentButtonDefs.size();
-    
-    for (int i = 0; i < numButtons; ++i) {
+    for (int i = 0; i < 96; ++i) {
         bool pressed;
         
         if (i < 64) {
@@ -196,16 +193,34 @@ void ProductFMC::didReceiveData(int reportId, uint8_t *report, int reportLength)
         }
         
         bool pressedButtonIndexExists = pressedButtonIndices.find(i) != pressedButtonIndices.end();
+        XPLMCommandPhase command = -1;
         if (pressed && !pressedButtonIndexExists) {
-            pressedButtonIndices.insert(i);
-            profile->buttonPressed(&currentButtonDefs[i], xplm_CommandBegin);
+            command = xplm_CommandBegin;
         }
         else if (pressed && pressedButtonIndexExists) {
-            profile->buttonPressed(&currentButtonDefs[i], xplm_CommandContinue);
+            command = xplm_CommandContinue;
         }
         else if (!pressed && pressedButtonIndexExists) {
+            command = xplm_CommandEnd;
+        }
+        
+        if (command < 0) {
+            continue;
+        }
+        
+        if (command == xplm_CommandBegin) {
+            pressedButtonIndices.insert(i);
+        }
+        
+        FMCKey key = FMCHardwareMapping::ButtonIdentifierForIndex(hardwareType, i);
+        const std::vector<FMCButtonDef>& currentButtonDefs = profile->buttonDefs();
+        auto it = std::find_if(currentButtonDefs.begin(), currentButtonDefs.end(), [&](const FMCButtonDef& def) { return def.key == key; });
+        if (it != currentButtonDefs.end()) {
+            profile->buttonPressed(&*it, command);
+        }
+        
+        if (command == xplm_CommandEnd) {
             pressedButtonIndices.erase(i);
-            profile->buttonPressed(&currentButtonDefs[i], xplm_CommandEnd);
         }
     }
 }

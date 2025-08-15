@@ -11,12 +11,8 @@
 IXEG733FMCProfile::IXEG733FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
         
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("ixeg/733/rheostats/light_fmc_pt_act", [product](std::vector<float> brightness) {
-        if (brightness.size() < 27) {
-            return;
-        }
-        
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255.0f : 0;
+    Dataref::getInstance()->monitorExistingDataref<float>("ixeg/733/rheostats/light_fmc_pt_act", [product](float brightness) {
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
@@ -70,81 +66,81 @@ const std::vector<std::string>& IXEG733FMCProfile::displayDatarefs() const {
 }
 
 const std::vector<FMCButtonDef>& IXEG733FMCProfile::buttonDefs() const {
-    static const std::vector<FMCButtonDef> sevenThreeSevenButtonLayout = {
-        {0, "LSK1L", "ixeg/733/FMC/cdu1_lsk_1L"},
-        {1, "LSK2L", "ixeg/733/FMC/cdu1_lsk_2L"},
-        {2, "LSK3L", "ixeg/733/FMC/cdu1_lsk_3L"},
-        {3, "LSK4L", "ixeg/733/FMC/cdu1_lsk_4L"},
-        {4, "LSK5L", "ixeg/733/FMC/cdu1_lsk_5L"},
-        {5, "LSK6L", "ixeg/733/FMC/cdu1_lsk_6L"},
-        {6, "LSK1R", "ixeg/733/FMC/cdu1_lsk_1R"},
-        {7, "LSK2R", "ixeg/733/FMC/cdu1_lsk_2R"},
-        {8, "LSK3R", "ixeg/733/FMC/cdu1_lsk_3R"},
-        {9, "LSK4R", "ixeg/733/FMC/cdu1_lsk_4R"},
-        {10, "LSK5R", "ixeg/733/FMC/cdu1_lsk_5R"},
-        {11, "LSK6R", "ixeg/733/FMC/cdu1_lsk_6R"},
-        {12, "INITREF", "ixeg/733/FMC/cdu1_initref"},
-        {13, "RTE", "ixeg/733/FMC/cdu1_rte"},
-        {14, "CLB", "ixeg/733/FMC/cdu1_clb"},
-        {15, "CRZ", "ixeg/733/FMC/cdu1_crz"},
-        {16, "DES", "ixeg/733/FMC/cdu1_des"},
-        {17, "BRT-", "ixeg/733/rheostats/light_fmc_pt_act", -0.1},
-        {18, "BRT+", "ixeg/733/rheostats/light_fmc_pt_act", 0.1},
-        {19, "MENU", "ixeg/733/FMC/cdu1_menu"},
-        {20, "LEGS", "ixeg/733/FMC/cdu1_legs"},
-        {21, "DEPARR", "ixeg/733/FMC/cdu1_deparr"},
-        {22, "HOLD", "ixeg/733/FMC/cdu1_hold"},
-        {23, "PROG", "ixeg/733/FMC/cdu1_prog"},
-        {24, "EXEC", "ixeg/733/FMC/cdu1_exec"},
-        {25, "N1LIMIT", "ixeg/733/FMC/cdu1_n1limit"},
-        {26, "FIX", "ixeg/733/FMC/cdu1_fix"},
-        {27, "PREV_PAGE", "ixeg/733/FMC/cdu1_prev"},
-        {28, "NEXT_PAGE", "ixeg/733/FMC/cdu1_next"},
-        {29, "KEY1", "ixeg/733/FMC/cdu1_1"},
-        {30, "KEY2", "ixeg/733/FMC/cdu1_2"},
-        {31, "KEY3", "ixeg/733/FMC/cdu1_3"},
-        {32, "KEY4", "ixeg/733/FMC/cdu1_4"},
-        {33, "KEY5", "ixeg/733/FMC/cdu1_5"},
-        {34, "KEY6", "ixeg/733/FMC/cdu1_6"},
-        {35, "KEY7", "ixeg/733/FMC/cdu1_7"},
-        {36, "KEY8", "ixeg/733/FMC/cdu1_8"},
-        {37, "KEY9", "ixeg/733/FMC/cdu1_9"},
-        {38, "PERIOD", "ixeg/733/FMC/cdu1_dot"},
-        {39, "KEY0", "ixeg/733/FMC/cdu1_0"},
-        {40, "PLUSMINUS", "ixeg/733/FMC/cdu1_plus"},
-        {41, "KEYA", "ixeg/733/FMC/cdu1_A"},
-        {42, "KEYB", "ixeg/733/FMC/cdu1_B"},
-        {43, "KEYC", "ixeg/733/FMC/cdu1_C"},
-        {44, "KEYD", "ixeg/733/FMC/cdu1_D"},
-        {45, "KEYE", "ixeg/733/FMC/cdu1_E"},
-        {46, "KEYF", "ixeg/733/FMC/cdu1_F"},
-        {47, "KEYG", "ixeg/733/FMC/cdu1_G"},
-        {48, "KEYH", "ixeg/733/FMC/cdu1_H"},
-        {49, "KEYI", "ixeg/733/FMC/cdu1_I"},
-        {50, "KEYJ", "ixeg/733/FMC/cdu1_J"},
-        {51, "KEYK", "ixeg/733/FMC/cdu1_K"},
-        {52, "KEYL", "ixeg/733/FMC/cdu1_L"},
-        {53, "KEYM", "ixeg/733/FMC/cdu1_M"},
-        {54, "KEYN", "ixeg/733/FMC/cdu1_N"},
-        {55, "KEYO", "ixeg/733/FMC/cdu1_O"},
-        {56, "KEYP", "ixeg/733/FMC/cdu1_P"},
-        {57, "KEYQ", "ixeg/733/FMC/cdu1_Q"},
-        {58, "KEYR", "ixeg/733/FMC/cdu1_R"},
-        {59, "KEYS", "ixeg/733/FMC/cdu1_S"},
-        {60, "KEYT", "ixeg/733/FMC/cdu1_T"},
-        {61, "KEYU", "ixeg/733/FMC/cdu1_U"},
-        {62, "KEYV", "ixeg/733/FMC/cdu1_V"},
-        {63, "KEYW", "ixeg/733/FMC/cdu1_W"},
-        {64, "KEYX", "ixeg/733/FMC/cdu1_X"},
-        {65, "KEYY", "ixeg/733/FMC/cdu1_Y"},
-        {66, "KEYZ", "ixeg/733/FMC/cdu1_Z"},
-        {67, "SPACE", "ixeg/733/FMC/cdu1_sp"},
-        {68, "DEL", "ixeg/733/FMC/cdu1_del"},
-        {69, "SLASH", "ixeg/733/FMC/cdu1_slash"},
-        {70, "CLR", "ixeg/733/FMC/cdu2_clr"}
+    static const std::vector<FMCButtonDef> buttons = {
+        {FMCKey::LSK1L, "ixeg/733/FMC/cdu1_lsk_1L"},
+        {FMCKey::LSK2L, "ixeg/733/FMC/cdu1_lsk_2L"},
+        {FMCKey::LSK3L, "ixeg/733/FMC/cdu1_lsk_3L"},
+        {FMCKey::LSK4L, "ixeg/733/FMC/cdu1_lsk_4L"},
+        {FMCKey::LSK5L, "ixeg/733/FMC/cdu1_lsk_5L"},
+        {FMCKey::LSK6L, "ixeg/733/FMC/cdu1_lsk_6L"},
+        {FMCKey::LSK1R, "ixeg/733/FMC/cdu1_lsk_1R"},
+        {FMCKey::LSK2R, "ixeg/733/FMC/cdu1_lsk_2R"},
+        {FMCKey::LSK3R, "ixeg/733/FMC/cdu1_lsk_3R"},
+        {FMCKey::LSK4R, "ixeg/733/FMC/cdu1_lsk_4R"},
+        {FMCKey::LSK5R, "ixeg/733/FMC/cdu1_lsk_5R"},
+        {FMCKey::LSK6R, "ixeg/733/FMC/cdu1_lsk_6R"},
+        {FMCKey::INIT_REF, "ixeg/733/FMC/cdu1_initref"},
+        {FMCKey::ROUTE, "ixeg/733/FMC/cdu1_rte"},
+        {FMCKey::CLB, "ixeg/733/FMC/cdu1_clb"},
+        {FMCKey::CRZ, "ixeg/733/FMC/cdu1_crz"},
+        {FMCKey::DES, "ixeg/733/FMC/cdu1_des"},
+        {FMCKey::BRIGHTNESS_DOWN, "ixeg/733/rheostats/light_fmc_pt_act", -0.1},
+        {FMCKey::BRIGHTNESS_UP, "ixeg/733/rheostats/light_fmc_pt_act", 0.1},
+        {FMCKey::MENU, "ixeg/733/FMC/cdu1_menu"},
+        {FMCKey::LEGS, "ixeg/733/FMC/cdu1_legs"},
+        {FMCKey::DEP_ARR, "ixeg/733/FMC/cdu1_deparr"},
+        {FMCKey::HOLD, "ixeg/733/FMC/cdu1_hold"},
+        {FMCKey::PROG, "ixeg/733/FMC/cdu1_prog"},
+        {FMCKey::EXEC_OR_MCDU_EMPTY_TOP_RIGHT, "ixeg/733/FMC/cdu1_exec"},
+        {FMCKey::N1_LIMIT_OR_PERF, "ixeg/733/FMC/cdu1_n1limit"},
+        {FMCKey::AIRPORT_OR_FIX, "ixeg/733/FMC/cdu1_fix"},
+        {FMCKey::PAGE_PREV, "ixeg/733/FMC/cdu1_prev"},
+        {FMCKey::PAGE_NEXT, "ixeg/733/FMC/cdu1_next"},
+        {FMCKey::KEY1, "ixeg/733/FMC/cdu1_1"},
+        {FMCKey::KEY2, "ixeg/733/FMC/cdu1_2"},
+        {FMCKey::KEY3, "ixeg/733/FMC/cdu1_3"},
+        {FMCKey::KEY4, "ixeg/733/FMC/cdu1_4"},
+        {FMCKey::KEY5, "ixeg/733/FMC/cdu1_5"},
+        {FMCKey::KEY6, "ixeg/733/FMC/cdu1_6"},
+        {FMCKey::KEY7, "ixeg/733/FMC/cdu1_7"},
+        {FMCKey::KEY8, "ixeg/733/FMC/cdu1_8"},
+        {FMCKey::KEY9, "ixeg/733/FMC/cdu1_9"},
+        {FMCKey::PERIOD, "ixeg/733/FMC/cdu1_dot"},
+        {FMCKey::KEY0, "ixeg/733/FMC/cdu1_0"},
+        {FMCKey::PLUSMINUS, "ixeg/733/FMC/cdu1_plus"},
+        {FMCKey::KEYA, "ixeg/733/FMC/cdu1_A"},
+        {FMCKey::KEYB, "ixeg/733/FMC/cdu1_B"},
+        {FMCKey::KEYC, "ixeg/733/FMC/cdu1_C"},
+        {FMCKey::KEYD, "ixeg/733/FMC/cdu1_D"},
+        {FMCKey::KEYE, "ixeg/733/FMC/cdu1_E"},
+        {FMCKey::KEYF, "ixeg/733/FMC/cdu1_F"},
+        {FMCKey::KEYG, "ixeg/733/FMC/cdu1_G"},
+        {FMCKey::KEYH, "ixeg/733/FMC/cdu1_H"},
+        {FMCKey::KEYI, "ixeg/733/FMC/cdu1_I"},
+        {FMCKey::KEYJ, "ixeg/733/FMC/cdu1_J"},
+        {FMCKey::KEYK, "ixeg/733/FMC/cdu1_K"},
+        {FMCKey::KEYL, "ixeg/733/FMC/cdu1_L"},
+        {FMCKey::KEYM, "ixeg/733/FMC/cdu1_M"},
+        {FMCKey::KEYN, "ixeg/733/FMC/cdu1_N"},
+        {FMCKey::KEYO, "ixeg/733/FMC/cdu1_O"},
+        {FMCKey::KEYP, "ixeg/733/FMC/cdu1_P"},
+        {FMCKey::KEYQ, "ixeg/733/FMC/cdu1_Q"},
+        {FMCKey::KEYR, "ixeg/733/FMC/cdu1_R"},
+        {FMCKey::KEYS, "ixeg/733/FMC/cdu1_S"},
+        {FMCKey::KEYT, "ixeg/733/FMC/cdu1_T"},
+        {FMCKey::KEYU, "ixeg/733/FMC/cdu1_U"},
+        {FMCKey::KEYV, "ixeg/733/FMC/cdu1_V"},
+        {FMCKey::KEYW, "ixeg/733/FMC/cdu1_W"},
+        {FMCKey::KEYX, "ixeg/733/FMC/cdu1_X"},
+        {FMCKey::KEYY, "ixeg/733/FMC/cdu1_Y"},
+        {FMCKey::KEYZ, "ixeg/733/FMC/cdu1_Z"},
+        {FMCKey::SPACE, "ixeg/733/FMC/cdu1_sp"},
+        {FMCKey::OVERFLY_OR_DEL, "ixeg/733/FMC/cdu1_del"},
+        {FMCKey::SLASH, "ixeg/733/FMC/cdu1_slash"},
+        {FMCKey::CLR, "ixeg/733/FMC/cdu1_clr"}
     };
     
-    return sevenThreeSevenButtonLayout;
+    return buttons;
 }
 
 const std::map<char, FMCTextColor>& IXEG733FMCProfile::colorMap() const {
@@ -152,36 +148,20 @@ const std::map<char, FMCTextColor>& IXEG733FMCProfile::colorMap() const {
         {'W', FMCTextColor::COLOR_WHITE},
         {'G', FMCTextColor::COLOR_GREEN}, // Green text
         {'S', FMCTextColor::COLOR_GREEN}, // Green text (Small)
-        {'I', FMCTextColor::COLOR_GREY}, // Gray text, should be inverted (black text on green). Not sure yet how.
+        {'I', FMCTextColor::COLOR_GREEN_BG},
     };
     return colMap;
 }
 
 void IXEG733FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
     switch (character) {
-//        case '#':
-//        case '*': // Change to outlined square
-//            buffer.insert(buffer.end(), {0xe2, 0x98, 0x90});
-//            break;
-//            
-//        case '<': // Change to arrow
-//        case '>':
-//            if (isFontSmall) {
-//                buffer.insert(buffer.end(), {0xe2, 0x86, static_cast<unsigned char>((character == '<' ? 0x90 : 0x92))});
-//            }
-//            break;
-//
-//        case 30: // Change to up arrow
-//        case 31: // Change to down arrow
-//            if (isFontSmall) {
-//                buffer.insert(buffer.end(), {0xe2, 0x86, static_cast<unsigned char>((character == 30 ? 0x91 : 0x93))});
-//            }
-//            break;
-//
-//        case 0x27:
-//        case '`': // Change to °
-//            buffer.insert(buffer.end(), {0xc2, 0xb0});
-//            break;
+        case '#':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
+            break;
+            
+        case '`':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
+            break;
         
         default:
             buffer->push_back(character);
