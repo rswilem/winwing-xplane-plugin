@@ -459,11 +459,9 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
         }
         
         if (isCaptain) {
-            debug_force("EFIS data for captain-left: =%s=(unitIsInHg:%i-raw:%i) - std:%i - raw:%.0f\n", value.baro.c_str(), value.unitIsInHg, datarefManager->getCached<int>(isCaptain ? "AirbusFBW/BaroUnitCapt" : "AirbusFBW/BaroUnitFO"), isStd, baroValue);
             data.efisLeft = value;
         }
         else {
-            debug_force("EFIS data for fo-right: =%s=(unitIsInHg:%i-raw:%i) - std:%i - raw:%.0f\n", value.baro.c_str(), value.unitIsInHg, datarefManager->getCached<int>(isCaptain ? "AirbusFBW/BaroUnitCapt" : "AirbusFBW/BaroUnitFO"), isStd, baroValue);
             data.efisRight = value;
         }
     }
