@@ -6,6 +6,7 @@
 #include "config.h"
 #include "appstate.h"
 #include <chrono>
+#include <cfloat>
 
 using namespace std;
 
@@ -389,7 +390,7 @@ T Dataref::get(const char *ref) {
     if constexpr (std::is_same<T, bool>::value) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(handle);
         if (refType == xplmType_Float) {
-            return XPLMGetDataf(handle) > 0.0f;
+            return XPLMGetDataf(handle) > FLT_EPSILON;
         }
         else {
             return XPLMGetDatai(handle) > 0;

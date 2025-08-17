@@ -193,7 +193,7 @@ const std::vector<std::string>& TolissFCUEfisProfile::displayDatarefs() const {
         "AirbusFBW/BaroStdCapt", // int, 1 or 0
         "AirbusFBW/BaroUnitCapt", // int, 1 for hPa, 0 for inHg
         "AirbusFBW/BaroStdFO", // int, 1 or 0
-        "AirbusFBW/BaroUnitFO", // int, 0 for hPa, 1 for inHg
+        "AirbusFBW/BaroUnitFO", // int, 1 for hPa, 0 for inHg
         "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot", // float, inHg
         "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot", // float, inHg
     };
@@ -254,8 +254,8 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {40, "R_STD PULL", "toliss_airbus/copilot_baro_pull"},
         {41, "R_PRESS DEC", "sim/instruments/barometer_copilot_down"},
         {42, "R_PRESS INC", "sim/instruments/barometer_copilot_up"},
-        {43, "R_inHg", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 1.0},          // Set to 1 for inHg
-        {44, "R_hPa", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 0.0},           // Set to 0 for hPa
+        {43, "R_inHg", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 0.0},          // Set to 0 for inHg
+        {44, "R_hPa", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 1.0},           // Set to 1 for hPa
         {45, "R_MODE LS", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 0.0},         // LS mode
         {46, "R_MODE VOR", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 1.0},        // VOR mode
         {47, "R_MODE NAV", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 2.0},        // NAV mode
@@ -287,8 +287,8 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
         {72, "L_STD PULL", "toliss_airbus/capt_baro_pull"},
         {73, "L_PRESS DEC", "sim/instruments/barometer_down"},
         {74, "L_PRESS INC", "sim/instruments/barometer_up"},
-        {75, "L_inHg", "AirbusFBW/BaroUnitCapt", FCUEfisDatarefType::SET_VALUE, 1.0},        // Set to 0 for inHg
-        {76, "L_hPa", "AirbusFBW/BaroUnitCapt", FCUEfisDatarefType::SET_VALUE, 0.0},         // Set to 1 for hPa
+        {75, "L_inHg", "AirbusFBW/BaroUnitCapt", FCUEfisDatarefType::SET_VALUE, 0.0},        // Set to 0 for inHg
+        {76, "L_hPa", "AirbusFBW/BaroUnitCapt", FCUEfisDatarefType::SET_VALUE, 1.0},         // Set to 1 for hPa
         {77, "L_MODE LS", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 0.0},       // LS mode
         {78, "L_MODE VOR", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 1.0},      // VOR mode
         {79, "L_MODE NAV", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 2.0},      // NAV mode
@@ -446,7 +446,7 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
         bool isCaptain = i == 0;
         
         bool isStd = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroStdCapt" : "AirbusFBW/BaroStdFO"); // int, 1 or 0
-        bool isBaroInHg = datarefManager->getCached<int>(isCaptain ? "AirbusFBW/BaroUnitCapt" : "AirbusFBW/BaroUnitFO") == 1; // int, 0=hPa,1=inHg
+        bool isBaroHpa = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroUnitCapt" : "AirbusFBW/BaroUnitFO"); // int, 1=hPa,0=inHg
         float baroValue = datarefManager->getCached<float>(isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
         
         EfisDisplayValue value = {
@@ -455,7 +455,7 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
         };
         
         if (!isStd && baroValue > 0) {
-            value.setBaro(baroValue, isBaroInHg);
+            value.setBaro(baroValue, !isBaroHpa);
         }
         
         if (isCaptain) {
