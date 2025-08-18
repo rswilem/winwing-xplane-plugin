@@ -8,6 +8,7 @@
 #include "profiles/ssg748-fmc-profile.h"
 #include "profiles/toliss-fmc-profile.h"
 #include "profiles/zibo-fmc-profile.h"
+#include "profiles/xcrafts-fmc-profile.h"
 #include <chrono>
 #include <XPLMProcessing.h>
 
@@ -37,6 +38,12 @@ void ProductFMC::setProfileForCurrentAircraft() {
         debug("Using Laminar profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new LaminarFMCProfile(this);
+        profileReady = true;
+    }
+    else if (XCraftsFMCProfile::IsEligible()) {
+        debug("Using X-Crafts profile for %s.\n", classIdentifier());
+        clearDisplay();
+        profile = new XCraftsFMCProfile(this);
         profileReady = true;
     }
     else if (ZiboFMCProfile::IsEligible()) {

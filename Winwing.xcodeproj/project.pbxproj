@@ -30,6 +30,8 @@
 		F68164E62E3161FD00319E9D /* usbcontroller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F68164E42E3161FD00319E9D /* usbcontroller.cpp */; };
 		F6827E092E05652800382B28 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6827E042E05651E00382B28 /* ContentView.swift */; };
 		F6827E0A2E05652E00382B28 /* WinwingDesktopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6827E052E05651E00382B28 /* WinwingDesktopApp.swift */; };
+		F688808B2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F688808A2E523DE900B10AFA /* xcrafts-fmc-profile.cpp */; };
+		F688808C2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F688808A2E523DE900B10AFA /* xcrafts-fmc-profile.cpp */; };
 		F691E46D2D0338E90000666C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F691E46C2D0338E90000666C /* CoreFoundation.framework */; };
 		F69FF22D2E1D13CB00F9D2D9 /* GenericDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F69FF2292E1D13CB00F9D2D9 /* GenericDeviceView.swift */; };
 		F69FF22E2E1D13CB00F9D2D9 /* DeviceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F69FF2282E1D13CB00F9D2D9 /* DeviceModel.swift */; };
@@ -89,6 +91,8 @@
 		F6827E052E05651E00382B28 /* WinwingDesktopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinwingDesktopApp.swift; sourceTree = "<group>"; };
 		F6827E102E05664C00382B28 /* bridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = bridge.mm; sourceTree = "<group>"; };
 		F6827E122E05678E00382B28 /* bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridge.h; sourceTree = "<group>"; };
+		F68880892E523DE900B10AFA /* xcrafts-fmc-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xcrafts-fmc-profile.h"; sourceTree = "<group>"; };
+		F688808A2E523DE900B10AFA /* xcrafts-fmc-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "xcrafts-fmc-profile.cpp"; sourceTree = "<group>"; };
 		F691E46C2D0338E90000666C /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		F69FF2282E1D13CB00F9D2D9 /* DeviceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceModel.swift; sourceTree = "<group>"; };
 		F69FF2292E1D13CB00F9D2D9 /* GenericDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericDeviceView.swift; sourceTree = "<group>"; };
@@ -254,6 +258,8 @@
 				F6A149272E4F03A400FB8395 /* laminar-airbus-fmc-profile.cpp */,
 				F6A149282E4F03A400FB8395 /* toliss-fmc-profile.h */,
 				F6A149292E4F03A400FB8395 /* toliss-fmc-profile.cpp */,
+				F68880892E523DE900B10AFA /* xcrafts-fmc-profile.h */,
+				F688808A2E523DE900B10AFA /* xcrafts-fmc-profile.cpp */,
 			);
 			path = profiles;
 			sourceTree = "<group>";
@@ -443,6 +449,7 @@
 				F635AD532E059872005D6CDC /* path.cpp in Sources */,
 				F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
 				F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
+				F688808B2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */,
 				F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F64BE3EA2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
@@ -460,6 +467,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F688808C2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */,
 				F635AD462E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */,
 				F6827E0A2E05652E00382B28 /* WinwingDesktopApp.swift in Sources */,
 				F635AD4B2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
