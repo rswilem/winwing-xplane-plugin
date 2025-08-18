@@ -5,8 +5,7 @@
 #include <cstring>
 #include "config.h"
 #include "appstate.h"
-#include <chrono>
-#include <cfloat>
+#include <cmath>
 
 using namespace std;
 
@@ -283,7 +282,12 @@ void Dataref::update() {
         std::visit([&](auto&& value) {
             using T = std::decay_t<decltype(value)>;
             T newValue = get<T>(key.c_str());
-            bool didChange = value != newValue;
+            bool didChange = false;
+            if constexpr (std::is_floating_point_v<T>) {
+                didChange = std::fabs(value - newValue) > std::numeric_limits<T>::epsilon();
+            } else {
+                didChange = value != newValue;
+            }
             
             if (didChange) {
                 cachedValues[key] = {
@@ -355,7 +359,20 @@ T Dataref::getCached(const char *ref) {
     }
     
     if (!std::holds_alternative<T>(it->second.value)) {
-        if constexpr (std::is_same_v<T, std::string>) {
+        if constexpr (std::is_same_v<T, bool>) {
+            if (std::holds_alternative<int>(it->second.value)) {
+                return std::get<int>(it->second.value) > 0;
+            }
+            else if (std::holds_alternative<double>(it->second.value)) {
+                return std::get<double>(it->second.value) > std::numeric_limits<double>::epsilon();
+            }
+            else if (std::holds_alternative<float>(it->second.value)) {
+                return std::get<float>(it->second.value) > std::numeric_limits<float>::epsilon();
+            }
+            
+            return false;
+        }
+        else if constexpr (std::is_same_v<T, std::string>) {
             return "";
         }
         else if constexpr (std::is_same_v<T, std::vector<int>> || std::is_same_v<T, std::vector<float>> || std::is_same_v<T, std::vector<unsigned char>>) {
@@ -395,23 +412,26 @@ T Dataref::get(const char *ref) {
     if constexpr (std::is_same_v<T, bool>) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(handle);
         if (refType == xplmType_Float) {
-            return XPLMGetDataf(handle) > FLT_EPSILON;
+            return XPLMGetDataf(handle) > std::numeric_limits<float>::epsilon();
         }
         else if (refType == xplmType_Double) {
-            return XPLMGetDatad(handle) > DBL_EPSILON;
+            return XPLMGetDatad(handle) > std::numeric_limits<double>::epsilon();
         }
         else {
             return XPLMGetDatai(handle) > 0;
         }
     }
-    else if constexpr (std::is_same_v<T, int>) {
-        return XPLMGetDatai(handle);
-    }
-    else if constexpr (std::is_same_v<T, float>) {
-        return XPLMGetDataf(handle);
-    }
-    else if constexpr (std::is_same_v<T, double>) {
-        return XPLMGetDatad(handle);
+    else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double>) {
+        XPLMDataTypeID refType = XPLMGetDataRefTypes(handle);
+        if (refType == xplmType_Float) {
+            return XPLMGetDataf(handle);
+        }
+        else if (refType == xplmType_Double) {
+            return XPLMGetDatad(handle);
+        }
+        else {
+            return XPLMGetDatai(handle);
+        }
     }
     else if constexpr (std::is_same_v<T, std::vector<int>>) {
         int size = XPLMGetDatavi(handle, nullptr, 0, 0);
@@ -504,28 +524,20 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
 }
 
 void Dataref::executeCommand(const char *command, XPLMCommandPhase phase) {
-    auto findStart = std::chrono::high_resolution_clock::now();
-    XPLMCommandRef ref = XPLMFindCommand(command);
-    auto findEnd = std::chrono::high_resolution_clock::now();
-    auto findDuration = std::chrono::duration_cast<std::chrono::microseconds>(findEnd - findStart).count();
-    
-    if (findDuration > 1000) { // Log if XPLMFindCommand takes more than 1ms
-        debug_force("XPLMFindCommand('%s') took %lld μs\n", command, findDuration);
-    }
-    
-    if (!ref) {
+    XPLMCommandRef handle = XPLMFindCommand(command);
+    if (!handle) {
         debug_force("Command not found: %s\n", command);
         return;
     }
     
     if (phase == -1) {
-        XPLMCommandOnce(ref);
+        XPLMCommandOnce(handle);
     }
     else if (phase == xplm_CommandBegin) {
-        XPLMCommandBegin(ref);
+        XPLMCommandBegin(handle);
     }
     else if (phase == xplm_CommandEnd) {
-        XPLMCommandEnd(ref);
+        XPLMCommandEnd(handle);
     }
 }
 
