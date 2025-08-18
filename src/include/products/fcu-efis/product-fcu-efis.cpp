@@ -43,7 +43,7 @@ std::vector<uint8_t> encodeString(int numSegments, const std::string& str) {
 
 std::vector<uint8_t> encodeStringSwapped(int numSegments, const std::string& str) {
     std::vector<uint8_t> data = encodeString(numSegments, str);
-    data.push_back(0);  // Add extra byte
+    data.push_back(0); // Add extra byte
     
     // Fix weird segment mapping
     for (int i = 0; i < data.size(); i++) {
@@ -209,39 +209,30 @@ void ProductFCUEfis::updateDisplays() {
 
     // Save old display data for comparison
     FCUDisplayData oldDisplayData = displayData;
-    
-    // Get new display data
-    FCUDisplayData newDisplayData = displayData;
-    profile->updateDisplayData(newDisplayData);
-    
-    // Update displayData with new values immediately so all sends use correct flags
-    displayData = newDisplayData;
+    profile->updateDisplayData(displayData);
     
     // Update FCU display if data changed
-    if (newDisplayData.speed != oldDisplayData.speed || 
-        newDisplayData.heading != oldDisplayData.heading ||
-        newDisplayData.altitude != oldDisplayData.altitude ||
-        newDisplayData.verticalSpeed != oldDisplayData.verticalSpeed ||
-        newDisplayData.spdMach != oldDisplayData.spdMach ||
-        newDisplayData.hdgTrk != oldDisplayData.hdgTrk ||
-        newDisplayData.altManaged != oldDisplayData.altManaged ||
-        newDisplayData.spdManaged != oldDisplayData.spdManaged ||
-        newDisplayData.hdgManaged != oldDisplayData.hdgManaged ||
-        newDisplayData.vsMode != oldDisplayData.vsMode ||
-        newDisplayData.fpaMode != oldDisplayData.fpaMode) {
-        
-        
-        sendFCUDisplay(displayData.speed, displayData.heading, 
-                      displayData.altitude, displayData.verticalSpeed);
+    if (displayData.speed != oldDisplayData.speed ||
+        displayData.heading != oldDisplayData.heading ||
+        displayData.altitude != oldDisplayData.altitude ||
+        displayData.verticalSpeed != oldDisplayData.verticalSpeed ||
+        displayData.spdMach != oldDisplayData.spdMach ||
+        displayData.hdgTrk != oldDisplayData.hdgTrk ||
+        displayData.altManaged != oldDisplayData.altManaged ||
+        displayData.spdManaged != oldDisplayData.spdManaged ||
+        displayData.hdgManaged != oldDisplayData.hdgManaged ||
+        displayData.vsMode != oldDisplayData.vsMode ||
+        displayData.fpaMode != oldDisplayData.fpaMode) {
+        sendFCUDisplay(displayData.speed, displayData.heading, displayData.altitude, displayData.verticalSpeed);
     }
     
     // Update EFIS Right display if data changed
-    if (profile->hasEfisRight() && newDisplayData.efisRight != oldDisplayData.efisRight) {
+    if (profile->hasEfisRight() && displayData.efisRight != oldDisplayData.efisRight) {
         sendEfisDisplayWithFlags(&displayData.efisRight, true);
     }
     
     // Update EFIS Left display if data changed
-    if (profile->hasEfisLeft() && newDisplayData.efisLeft != oldDisplayData.efisLeft) {
+    if (profile->hasEfisLeft() && displayData.efisLeft != oldDisplayData.efisLeft) {
         sendEfisDisplayWithFlags(&displayData.efisLeft, false);
     }
     
@@ -355,7 +346,9 @@ void ProductFCUEfis::sendFCUDisplay(const std::string& speed, const std::string&
     
     // Increment package number for next call
     packageNumber++;
-    if (packageNumber == 0) packageNumber = 1;  // Avoid 0
+    if (packageNumber == 0) {
+        packageNumber = 1;
+    }
 }
 
 void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRightSide) {
@@ -394,7 +387,7 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
     // Increment package number for next call
     packageNumber++;
     if (packageNumber == 0) {
-        packageNumber = 1; // Avoid 0
+        packageNumber = 1;
     }
 }
 

@@ -12,9 +12,7 @@
 TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/SupplLightLevelRehostats", [product](std::vector<float> brightness) {
-        
         if (brightness.size() < 2) {
-            debug_force("[TolissFCUEfisProfile] ERROR: SupplLightLevelRehostats vector too small, expected 2 elements, got %zu\n", brightness.size());
             return;
         }
         
@@ -310,7 +308,7 @@ const std::vector<FCUEfisButtonDef>& TolissFCUEfisProfile::buttonDefs() const {
     return buttons;
 }
 
-void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData& data) {
+void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     auto datarefManager = Dataref::getInstance();
   
     // Set managed mode indicators - using validated int datarefs (1 or 0)
