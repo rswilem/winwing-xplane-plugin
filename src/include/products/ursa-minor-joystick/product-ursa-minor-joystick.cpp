@@ -60,12 +60,10 @@ void ProductUrsaMinorJoystick::update() {
             vibration = 0;
         }
 
-        if (lastVibration == vibration) {
-            return;
+        if (lastVibration != vibration) {
+            setVibration(vibration);
+            lastVibration = vibration;
         }
-
-        setVibration(vibration);
-        lastVibration = vibration;
     }
 }
 

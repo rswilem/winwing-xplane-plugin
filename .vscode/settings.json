@@ -60,6 +60,7 @@
     "set": "cpp",
     "tuple": "cpp",
     "cstddef": "cpp",
-    "functional": "cpp"
+    "functional": "cpp",
+    "chrono": "cpp"
   }
 }
