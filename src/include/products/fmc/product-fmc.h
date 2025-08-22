@@ -39,6 +39,7 @@ public:
     void update() override;
     void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
     void writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall = false);
+    void setFont(std::vector<std::vector<unsigned char>> font);
     
     void setAllLedsEnabled(bool enable);
     void setLedBrightness(FMCLed led, uint8_t brightness);

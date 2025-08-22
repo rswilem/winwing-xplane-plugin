@@ -70,6 +70,10 @@
 /* Begin PBXFileReference section */
 		D607B19909A556E400699BC3 /* winwing.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = winwing.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
 		F61F8B2D2D059ED500E63C3F /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		F62D2DF52E55FA4C00D307A4 /* ejet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ejet.h; sourceTree = "<group>"; };
+		F62D2DF72E55FA7B00D307A4 /* honeywell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = honeywell.h; sourceTree = "<group>"; };
+		F62D2DF82E55FA9100D307A4 /* b612.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = b612.h; sourceTree = "<group>"; };
+		F62D2DF92E55FA9100D307A4 /* boeing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boeing.h; sourceTree = "<group>"; };
 		F635AD432E0579E9005D6CDC /* usbcontroller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = usbcontroller.h; sourceTree = "<group>"; };
 		F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_mac.cpp; sourceTree = "<group>"; };
 		F635AD482E05819E005D6CDC /* usbdevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = usbdevice.h; sourceTree = "<group>"; };
@@ -185,6 +189,17 @@
 			path = include;
 			sourceTree = "<group>";
 		};
+		F62D2DF62E55FA4C00D307A4 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				F62D2DF52E55FA4C00D307A4 /* ejet.h */,
+				F62D2DF72E55FA7B00D307A4 /* honeywell.h */,
+				F62D2DF82E55FA9100D307A4 /* b612.h */,
+				F62D2DF92E55FA9100D307A4 /* boeing.h */,
+			);
+			path = fonts;
+			sourceTree = "<group>";
+		};
 		F635AD452E0579E9005D6CDC /* usbdevice */ = {
 			isa = PBXGroup;
 			children = (
@@ -269,6 +284,7 @@
 			children = (
 				F6A1492B2E4F03A400FB8395 /* fmc-aircraft-profile.h */,
 				F6A149472E4F552D00FB8395 /* fmc-hardware-mapping.h */,
+				F62D2DF62E55FA4C00D307A4 /* fonts */,
 				F6A1492A2E4F03A400FB8395 /* profiles */,
 				F6A1492C2E4F03A400FB8395 /* product-fmc.h */,
 				F6A1492D2E4F03A400FB8395 /* product-fmc.cpp */,

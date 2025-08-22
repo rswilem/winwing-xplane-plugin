@@ -196,6 +196,8 @@ private:
             case 72: return FMCKey::OVERFLY_OR_DEL;
             case 73: return FMCKey::CLR;
         }
+        
+        return FMCKey::KEY0;
     }
 
     static FMCKey getPFP3NButtonForIndex(int index) {
@@ -272,6 +274,8 @@ private:
             case 69: return FMCKey::SLASH;
             case 70: return FMCKey::CLR;
         }
+        
+        return FMCKey::KEY0;
     }
 
     static FMCKey getPFP4ButtonForIndex(int index) {
@@ -348,6 +352,8 @@ private:
             case 69: return FMCKey::SLASH;
             case 70: return FMCKey::CLR;
         }
+        
+        return FMCKey::KEY0;
     }
 
     static FMCKey getPFP7ButtonForIndex(int index) {
@@ -424,6 +430,8 @@ private:
             case 69: return FMCKey::SLASH;
             case 70: return FMCKey::CLR;
         }
+        
+        return FMCKey::KEY0;
     }
 };
 

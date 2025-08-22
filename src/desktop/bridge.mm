@@ -5,6 +5,10 @@
 #include "product-ursa-minor-joystick.h"
 #include "product-fmc.h"
 #include "product-fcu-efis.h"
+#include "b612.h"
+#include "boeing.h"
+#include "ejet.h"
+#include "honeywell.h"
 #include <vector>
 #include <string>
 #include <cstring>
@@ -221,6 +225,36 @@ void fmc_setLedBrightness(void* fmcHandle, int ledId, uint8_t brightness) {
     if (!fmcHandle) return;
     auto fmc = static_cast<ProductFMC*>(fmcHandle);
     fmc->setLedBrightness(static_cast<FMCLed>(ledId), brightness);
+}
+
+bool fmc_writeData(void* fmcHandle, const uint8_t* data, int length) {
+    if (!fmcHandle || !data || length <= 0) return false;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    std::vector<uint8_t> dataVector(data, data + length);
+    return fmc->writeData(dataVector);
+}
+
+void fmc_setFont(void* fmcHandle, int fontType) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    
+    switch (fontType) {
+        case 0: // B612
+            fmc->setFont(fmcFontB612);
+            break;
+        case 1: // Boeing
+            fmc->setFont(fmcFontBoeing);
+            break;
+        case 2: // Ejet
+            fmc->setFont(fmcFontEjet);
+            break;
+        case 3: // Honeywell
+            fmc->setFont(fmcFontHoneywell);
+            break;
+        default:
+            fmc->setFont(fmcFontB612); // Default to B612
+            break;
+    }
 }
 
 

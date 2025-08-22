@@ -4,6 +4,15 @@
 #include "fmc-aircraft-profile.h"
 #include <regex>
 
+enum class XCraftsFMCFontStyle : unsigned char {
+    Large = 1,
+    Small = 2,
+    LargeReversed = 3,
+    SmallReversed = 4,
+    LargeReversedBox = 5,
+    SmallReversedBox = 6
+};
+
 class XCraftsFMCProfile : public FMCAircraftProfile {
 private:
     std::regex datarefRegex;

@@ -418,7 +418,6 @@ void XPLMSetDatab(XPLMDataRef ref, void *inValue, int inOffset, int inLength) {
     }
     
     memcpy(dataref.dataValue.data() + inOffset, inValue, inLength);
-    printf("Set dataref '%s' data bytes (offset: %d, length: %d)\n", dataref.name.c_str(), inOffset, inLength);
 }
 
 void XPLMSetDatavi(XPLMDataRef ref, int *inValues, int inOffset, int inCount) {

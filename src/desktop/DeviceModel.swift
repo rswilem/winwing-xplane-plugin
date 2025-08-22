@@ -54,6 +54,10 @@ func c_fmc_showBackground(_ handle: UnsafeRawPointer, _ variant: Int32) -> Void
 func c_fmc_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) -> Bool
 @_silgen_name("fmc_setLedBrightness")
 func c_fmc_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ brightness: UInt8) -> Void
+@_silgen_name("fmc_writeData")
+func c_fmc_writeData(_ handle: UnsafeRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int32) -> Bool
+@_silgen_name("fmc_setFont")
+func c_fmc_setFont(_ handle: UnsafeRawPointer, _ fontType: Int32) -> Void
 
 // FCU-EFIS functions via handle
 @_silgen_name("fcuefis_clear")
@@ -249,6 +253,37 @@ struct FMCWrapper {
     
     func setOverallLedsBrightness(_ brightness: UInt8) {
         setLedBrightness(.overallLedsBrightness, brightness: brightness)
+    }
+    
+    // Write raw data to the device
+    @discardableResult
+    func writeData(_ data: [UInt8]) -> Bool {
+        return data.withUnsafeBufferPointer { bufferPointer in
+            guard let baseAddress = bufferPointer.baseAddress else { return false }
+            return c_fmc_writeData(handle, baseAddress, Int32(data.count))
+        }
+    }
+    
+    // Font types available for the FMC
+    enum FontType: Int, CaseIterable {
+        case b612 = 0
+        case boeing = 1
+        case ejet = 2
+        case honeywell = 3
+        
+        var displayName: String {
+            switch self {
+            case .b612: return "B612"
+            case .boeing: return "Boeing"
+            case .ejet: return "E-Jet"
+            case .honeywell: return "Honeywell"
+            }
+        }
+    }
+    
+    // Set the font for the FMC display
+    func setFont(_ fontType: FontType) {
+        c_fmc_setFont(handle, Int32(fontType.rawValue))
     }
 }
 

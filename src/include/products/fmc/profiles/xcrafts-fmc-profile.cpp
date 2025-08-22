@@ -2,6 +2,7 @@
 #include "product-fmc.h"
 #include "dataref.h"
 #include "appstate.h"
+#include "../fonts/ejet.h"
 #include <cstring>
 #include <algorithm>
 #include <cmath>
@@ -14,6 +15,7 @@ XCraftsFMCProfile::XCraftsFMCProfile(ProductFMC *product) : FMCAircraftProfile(p
     datarefRegex = std::regex("XCrafts/FMS/CDU_1_([0-9]{2}|ScratchPad)");
     
     product->setAllLedsEnabled(false);
+    product->setFont(fmcFontEjet);
     
     // Monitor avionics power for LED control
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [product](bool poweredOn) {
@@ -154,49 +156,26 @@ const std::map<char, FMCTextColor>& XCraftsFMCProfile::colorMap() const {
         {0x05, COLOR_RED},
         {0x06, COLOR_GREY},
         {0x07, COLOR_AMBER},
-        {0x08, COLOR_WHITE_BG},
-        {0x09, COLOR_WHITE_BG},
-        {0x0A, COLOR_WHITE_BG},
-        {0x0b, COLOR_WHITE_BG},
-        {0x0c, COLOR_WHITE_BG},
-        {0x0d, COLOR_WHITE_BG},
-        {0x0e, COLOR_WHITE_BG},
-        {0x0f, COLOR_WHITE_BG},
-        {0x10, COLOR_WHITE_BG},
-        {0x11, COLOR_WHITE_BG},
-        {0x12, COLOR_WHITE_BG},
+        {0x08, COLOR_DARKBROWN},
+        
+        {0xF0, COLOR_WHITE_BG},
+        {0xF1, COLOR_CYAN_BG},
+        {0xF2, COLOR_GREEN_BG},
+        {0xF3, COLOR_YELLOW_BG},
+        {0xF4, COLOR_MAGENTA_BG},
+        {0xF5, COLOR_RED_BG},
+        {0xF6, COLOR_GREY_BG},
+        {0xF7, COLOR_AMBER_BG},
+        {0xF8, COLOR_DARKBROWN_BG}
     };
+    
     return colors;
 }
 
 void XCraftsFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
-    switch (character) {            
-        case 'b':
-            buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_DOWN.begin(), FMCSpecialCharacter::ARROW_DOWN.end()); // Should be arrow left and right
-            break;
-            
-        case 'd':
-            buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
-            break;
-            
-        case 'v':
-            buffer->insert(buffer->end(), FMCSpecialCharacter::FILLED_ARROW_RIGHT.begin(), FMCSpecialCharacter::FILLED_ARROW_RIGHT.end());
-            break;
-            
+    switch (character) {
         case '?':
             buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
-            break;
-            
-        case '$':
-            buffer->insert(buffer->end(), FMCSpecialCharacter::FILLED_ARROW_LEFT.begin(), FMCSpecialCharacter::FILLED_ARROW_LEFT.end());
-            break;
-
-        case '@':
-            buffer->insert(buffer->end(), FMCSpecialCharacter::TRIANGLE.begin(), FMCSpecialCharacter::TRIANGLE.end()); // Should be the rotating arrows
-            break;
-            
-        case '\\':
-            buffer->insert(buffer->end(), FMCSpecialCharacter::TRIANGLE.begin(), FMCSpecialCharacter::TRIANGLE.end()); // Should be the a dot / square
             break;
         
         default:
@@ -244,30 +223,27 @@ void XCraftsFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             col = (text[2] - '0') * 10 + (text[3] - '0');
         }
         
-        int fontSize = 1;
+        XCraftsFMCFontStyle fontStyle = XCraftsFMCFontStyle::Large;
         if (text.size() >= 5) {
-            fontSize = text[4] - '0';
+            fontStyle = XCraftsFMCFontStyle(text[4] - '0');
         }
         
         // Extract color code (variable length) and find text start
         unsigned char colorCode = 0;
-        int textStartIndex = 5; // Default if no color found
-        
-        // Parse color starting from position 5, continue until we hit a non-digit or space
+        int textStartIndex = 5;
         if (text.size() > 5) {
-            int colorValue = 0;
-            int i = 5;
-            while (i < text.size() && text[i] >= '0' && text[i] <= '9') {
-                colorValue = colorValue * 10 + (text[i] - '0');
-                i++;
+            if (textStartIndex < text.size() && text[textStartIndex] >= '0' && text[textStartIndex] <= '9') {
+                colorCode = text[textStartIndex] - '0';
+                textStartIndex++;
             }
-            colorCode = colorValue;
-            
-            // Skip any space after color code
-            while (i < text.size() && text[i] == ' ') {
-                i++;
+
+            if (textStartIndex + 1 < text.size() && text[textStartIndex] == '1' && text[textStartIndex + 1] == '0') {
+                colorCode = 0xF0 + colorCode;
+                textStartIndex += 2;
             }
-            textStartIndex = i;
+            else if (fontStyle >= XCraftsFMCFontStyle::LargeReversed) {
+                colorCode = 0xF0 + colorCode;
+            }
         }
         
         // Convert to 0-based indexing and validate bounds
@@ -286,7 +262,7 @@ void XCraftsFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
                 }
                 
                 int displayCol = colIndex + (j - textStartIndex);
-                bool isSmallFont = fontSize > 1;
+                bool isSmallFont = fontStyle == XCraftsFMCFontStyle::Small || fontStyle == XCraftsFMCFontStyle::SmallReversed || fontStyle == XCraftsFMCFontStyle::SmallReversedBox;
                 product->writeLineToPage(page, lineIndex, displayCol, std::string(1, (char)c), colorCode, isSmallFont);
             }
         }
