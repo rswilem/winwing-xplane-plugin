@@ -59,6 +59,8 @@
     "iostream": "cpp",
     "set": "cpp",
     "tuple": "cpp",
-    "cstddef": "cpp"
+    "cstddef": "cpp",
+    "functional": "cpp",
+    "chrono": "cpp"
   }
 }

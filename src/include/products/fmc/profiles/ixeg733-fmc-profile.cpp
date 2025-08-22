@@ -4,6 +4,8 @@
 #include "appstate.h"
 #include <cstring>
 #include <algorithm>
+#include <cmath>
+#include <cfloat>
 #include <XPLMUtilities.h>
 #include <XPLMDataAccess.h>
 #include <XPLMProcessing.h>

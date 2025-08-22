@@ -7,8 +7,11 @@
 #include <map>
 #include <unordered_map>
 #include <cstdint>
-#include <format>
 #include <XPLMUtilities.h>
+#include <cmath>
+#include <cfloat>
+#include <sstream>
+#include <iomanip>
 
 // 7-segment display character representations
 // Bit mapping: 0x80=Top, 0x40=Upper Right, 0x20=Lower Right, 0x10=Bottom, 0x08=Upper Left, 0x04=Middle, 0x02=Lower Left, 0x01=Dot
@@ -103,7 +106,9 @@ struct EfisDisplayValue {
         // Either make QNH hPa value (1013), or inHg * 100 (2992)
         int baroValue = static_cast<int>(std::round(inHgValue * (isBaroInHg ? 100.0f : 33.8639f)));
         unitIsInHg = isBaroInHg;
-        baro = std::format("{:04}", baroValue);
+        std::ostringstream oss; 
+        oss << std::setw(4) << std::setfill('0') << baroValue;
+        baro = oss.str();
     }
 };
 
