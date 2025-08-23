@@ -32,10 +32,12 @@ public:
     static constexpr unsigned int PageBytesPerLine = PageCharsPerLine * PageBytesPerChar;
     FMCHardwareType hardwareType;
     const unsigned char identifierByte;
+    bool fontUpdatingEnabled;
 
     const char* classIdentifier() override;
     bool connect() override;
     void disconnect() override;
+    void unloadProfile();
     void update() override;
     void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
     void writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall = false);

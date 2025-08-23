@@ -19,6 +19,7 @@ ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
     lastButtonStateLo = 0;
     lastButtonStateHi = 0;
     pressedButtonIndices = {};
+    fontUpdatingEnabled = true;
     
     connect();
 }
@@ -135,12 +136,20 @@ void ProductFMC::disconnect() {
     setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
     setAllLedsEnabled(false);
     
-    if (profile) {
-        delete profile;
-        profile = nullptr;
-    }
+    unloadProfile();
     
     USBDevice::disconnect();
+}
+
+void ProductFMC::unloadProfile() {
+    profileReady = false;
+    
+    if (!profile) {
+        return;
+    }
+    
+    delete profile;
+    profile = nullptr;
 }
 
 void ProductFMC::update() {
@@ -325,6 +334,10 @@ void ProductFMC::clearDisplay() {
 }
 
 void ProductFMC::setFont(std::vector<std::vector<unsigned char>> font) {
+    if (!fontUpdatingEnabled) {
+        return;
+    }
+    
     for (auto &fontBytes : font) {
         writeData(fontBytes);
     }

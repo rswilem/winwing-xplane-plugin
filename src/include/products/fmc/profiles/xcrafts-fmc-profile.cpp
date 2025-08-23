@@ -47,19 +47,15 @@ bool XCraftsFMCProfile::IsEligible() {
 const std::vector<std::string>& XCraftsFMCProfile::displayDatarefs() const {
     static std::vector<std::string> datarefs;
     
-    // Generate all available XCrafts FMS datarefs (up to 70 as mentioned)
     if (datarefs.empty()) {
-        // Add data count dataref
         datarefs.push_back("XCrafts/FMS/data_count1");
         
-        // Add all CDU display datarefs
         for (int i = 1; i <= 70; i++) {
             char buffer[32];
             snprintf(buffer, sizeof(buffer), "XCrafts/FMS/CDU_1_%02d", i);
             datarefs.push_back(std::string(buffer));
         }
         
-        // Add scratchpad
         datarefs.push_back("XCrafts/FMS/CDU_1_ScratchPad");
     }
     
@@ -189,10 +185,7 @@ void XCraftsFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
     
     auto datarefManager = Dataref::getInstance();
     
-    // Get the number of data fields to display
     int dataCount = datarefManager->getCached<int>("XCrafts/FMS/data_count1");
-    
-    // Process each display field based on data count
     for (int i = 1; i <= std::min(dataCount, 70); i++) {
         char datarefName[32];
         snprintf(datarefName, sizeof(datarefName), "XCrafts/FMS/CDU_1_%02d", i);

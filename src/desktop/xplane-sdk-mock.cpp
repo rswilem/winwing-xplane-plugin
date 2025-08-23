@@ -62,7 +62,6 @@ void clearAllMockDataRefs() {
     registeredCommands.clear();
     mockDataRefs.clear();
     dataRefNameToIndex.clear();
-    printf("Cleared all mock datarefs\n");
 }
 
 // Utility function to create a dataref with a specific type (for testing purposes)
@@ -81,7 +80,6 @@ XPLMDataRef createMockDataRef(const char* name, XPLMDataTypeID type) {
     size_t index = mockDataRefs.size() - 1;
     dataRefNameToIndex[nameStr] = index;
     
-    printf("Created mock dataref: %s (index: %zu, type: %d)\n", name, index, type);
     return indexToDataRefHandle(index);
 }
 
@@ -267,6 +265,25 @@ float XPLMGetDataf(XPLMDataRef ref) {
     }
 }
 
+double XPLMGetDatad(XPLMDataRef ref) {
+    if (!ref) return 0.0;
+    
+    size_t index = dataRefHandleToIndex(ref);
+    if (index >= mockDataRefs.size()) return 0.0;
+    
+    MockDataRef& dataref = mockDataRefs[index];
+    switch (dataref.type) {
+        case xplmType_Float:
+            return dataref.floatValue;
+        case xplmType_Int:
+            return static_cast<double>(dataref.intValue);
+        case xplmType_Double:
+            return static_cast<double>(dataref.doubleValue);
+        default:
+            return 0.0;
+    }
+}
+
 int XPLMGetDatai(XPLMDataRef ref) {
     if (!ref) return 0;
     
@@ -357,15 +374,12 @@ void XPLMSetDatai(XPLMDataRef ref, int value) {
     switch (dataref.type) {
         case xplmType_Int:
             dataref.intValue = value;
-            printf("Set dataref '%s' (int): %d\n", dataref.name.c_str(), value);
             break;
         case xplmType_Float:
             dataref.floatValue = static_cast<float>(value);
-            printf("Set dataref '%s' (float from int): %f\n", dataref.name.c_str(), dataref.floatValue);
             break;
         case xplmType_Double:
             dataref.doubleValue = static_cast<double>(value);
-            printf("Set dataref '%s' (double from int): %f\n", dataref.name.c_str(), dataref.doubleValue);
             break;
         default:
             printf("Cannot set int value on dataref '%s' of type %d\n", dataref.name.c_str(), dataref.type);
@@ -383,15 +397,35 @@ void XPLMSetDataf(XPLMDataRef ref, float value) {
     switch (dataref.type) {
         case xplmType_Float:
             dataref.floatValue = value;
-            printf("Set dataref '%s' (float): %f\n", dataref.name.c_str(), value);
             break;
         case xplmType_Int:
             dataref.intValue = static_cast<int>(value);
-            printf("Set dataref '%s' (int from float): %d\n", dataref.name.c_str(), dataref.intValue);
             break;
         case xplmType_Double:
             dataref.doubleValue = static_cast<double>(value);
-            printf("Set dataref '%s' (double from float): %f\n", dataref.name.c_str(), dataref.doubleValue);
+            break;
+        default:
+            printf("Cannot set float value on dataref '%s' of type %d\n", dataref.name.c_str(), dataref.type);
+            break;
+    }
+}
+
+void XPLMSetDatad(XPLMDataRef ref, double value) {
+    if (!ref) return;
+    
+    size_t index = dataRefHandleToIndex(ref);
+    if (index >= mockDataRefs.size()) return;
+    
+    MockDataRef& dataref = mockDataRefs[index];
+    switch (dataref.type) {
+        case xplmType_Float:
+            dataref.floatValue = value;
+            break;
+        case xplmType_Int:
+            dataref.intValue = static_cast<int>(value);
+            break;
+        case xplmType_Double:
+            dataref.doubleValue = static_cast<double>(value);
             break;
         default:
             printf("Cannot set float value on dataref '%s' of type %d\n", dataref.name.c_str(), dataref.type);
@@ -439,7 +473,6 @@ void XPLMSetDatavi(XPLMDataRef ref, int *inValues, int inOffset, int inCount) {
     }
     
     memcpy(dataref.intArrayValue.data() + inOffset, inValues, inCount * sizeof(int));
-    printf("Set dataref '%s' int array (offset: %d, count: %d)\n", dataref.name.c_str(), inOffset, inCount);
 }
 
 void XPLMSetDatavf(XPLMDataRef ref, float *inValues, int inOffset, int inCount) {
@@ -461,7 +494,6 @@ void XPLMSetDatavf(XPLMDataRef ref, float *inValues, int inOffset, int inCount) 
     }
     
     memcpy(dataref.floatArrayValue.data() + inOffset, inValues, inCount * sizeof(float));
-    printf("Set dataref '%s' float array (offset: %d, count: %d)\n", dataref.name.c_str(), inOffset, inCount);
 }
 
 XPLMDataRef XPLMRegisterDataAccessor(

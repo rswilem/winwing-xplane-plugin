@@ -1,5 +1,6 @@
 #include "ixeg733-fmc-profile.h"
 #include "product-fmc.h"
+#include "../fonts/boeing.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -12,6 +13,7 @@
 
 IXEG733FMCProfile::IXEG733FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
+    product->setFont(fmcFontBoeing); // TODO: Font monaco
         
     Dataref::getInstance()->monitorExistingDataref<float>("ixeg/733/rheostats/light_fmc_pt_act", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
@@ -230,12 +232,6 @@ void IXEG733FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
         if (characters.empty()) {
             continue;
         }
-        
-        debug_force("[PFP] Dataref %s: {", ref.c_str());
-        for (unsigned char ch : characters) {
-            debug_force("0x%02X, ", ch);
-        }
-        debug_force("}\n");
         
         auto [text, colors] = processIxegText(characters);
         if (ref == "ixeg/733/FMC/cdu1D_title") {

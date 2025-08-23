@@ -44,7 +44,7 @@ void setDatarefHexC(const char* ref, const uint8_t* hexD, int len) {
     
     // Check if this is a style dataref - if so, store as vector<unsigned char>
     std::string refStr(ref);
-    if (refStr.find("style_line") != std::string::npos || refStr.find("ixeg/") != std::string::npos) {
+    if (refStr.find("style_line") != std::string::npos || refStr.find("ixeg/") != std::string::npos || refStr.find("XCrafts/") != std::string::npos) {
         // Ensure dataref exists first
         ensureDatarefExists(ref, xplmType_Data);
         
@@ -221,6 +221,12 @@ void fmc_clearDisplay(void* fmcHandle) {
     fmc->clearDisplay();
 }
 
+void fmc_unloadProfile(void* fmcHandle) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    fmc->unloadProfile();
+}
+
 void fmc_setLedBrightness(void* fmcHandle, int ledId, uint8_t brightness) {
     if (!fmcHandle) return;
     auto fmc = static_cast<ProductFMC*>(fmcHandle);
@@ -255,6 +261,12 @@ void fmc_setFont(void* fmcHandle, int fontType) {
             fmc->setFont(fmcFontB612); // Default to B612
             break;
     }
+}
+
+void fmc_setFontUpdatingEnabled(void* fmcHandle, bool enabled) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    fmc->fontUpdatingEnabled = enabled;
 }
 
 

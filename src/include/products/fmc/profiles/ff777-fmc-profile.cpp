@@ -1,5 +1,6 @@
 #include "ff777-fmc-profile.h"
 #include "product-fmc.h"
+#include "../fonts/boeing.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -7,6 +8,7 @@
 
 FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
+    product->setFont(fmcFontBoeing);
     
     Dataref::getInstance()->monitorExistingDataref<float>("sim/cockpit/electrical/instrument_brightness", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;

@@ -48,6 +48,8 @@ func c_joystick_setLedBrightness(_ handle: UnsafeRawPointer, _ brightness: UInt8
 // FMC functions via handle
 @_silgen_name("fmc_clearDisplay")
 func c_fmc_clearDisplay(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("fmc_unloadProfile")
+func c_fmc_unloadProfile(_ handle: UnsafeRawPointer) -> Void
 @_silgen_name("fmc_showBackground")
 func c_fmc_showBackground(_ handle: UnsafeRawPointer, _ variant: Int32) -> Void
 @_silgen_name("fmc_setLed")
@@ -58,6 +60,8 @@ func c_fmc_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ bright
 func c_fmc_writeData(_ handle: UnsafeRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int32) -> Bool
 @_silgen_name("fmc_setFont")
 func c_fmc_setFont(_ handle: UnsafeRawPointer, _ fontType: Int32) -> Void
+@_silgen_name("fmc_setFontUpdatingEnabled")
+func c_fmc_setFontUpdatingEnabled(_ handle: UnsafeRawPointer, _ enabled: Bool) -> Void
 
 // FCU-EFIS functions via handle
 @_silgen_name("fcuefis_clear")
@@ -210,6 +214,10 @@ struct FMCWrapper {
         c_fmc_clearDisplay(handle)
     }
     
+    func unloadProfile() {
+        c_fmc_unloadProfile(handle)
+    }
+    
     func showBackground(_ variant: Int) {
         c_fmc_showBackground(handle, Int32(variant))
     }
@@ -284,6 +292,11 @@ struct FMCWrapper {
     // Set the font for the FMC display
     func setFont(_ fontType: FontType) {
         c_fmc_setFont(handle, Int32(fontType.rawValue))
+    }
+    
+    // Enable or disable font updating
+    func setFontUpdatingEnabled(_ enabled: Bool) {
+        c_fmc_setFontUpdatingEnabled(handle, enabled)
     }
 }
 
