@@ -69,11 +69,17 @@
 
 /* Begin PBXFileReference section */
 		D607B19909A556E400699BC3 /* winwing.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = winwing.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
+		F603C3A12E59D1C400B73F42 /* airbus_3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = airbus_3.h; sourceTree = "<group>"; };
 		F61F8B2D2D059ED500E63C3F /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
-		F62D2DF52E55FA4C00D307A4 /* ejet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ejet.h; sourceTree = "<group>"; };
-		F62D2DF72E55FA7B00D307A4 /* honeywell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = honeywell.h; sourceTree = "<group>"; };
-		F62D2DF82E55FA9100D307A4 /* b612.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = b612.h; sourceTree = "<group>"; };
-		F62D2DF92E55FA9100D307A4 /* boeing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = boeing.h; sourceTree = "<group>"; };
+		F62304282E59DF8500EE0089 /* vga_1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_1.h; sourceTree = "<group>"; };
+		F62304292E5A212700EE0089 /* vga_4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_4.h; sourceTree = "<group>"; };
+		F623042A2E5A212700EE0089 /* vga_3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_3.h; sourceTree = "<group>"; };
+		F623042B2E5A212700EE0089 /* vga_2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_2.h; sourceTree = "<group>"; };
+		F623042D2E5A230B00EE0089 /* fonts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fonts.h; sourceTree = "<group>"; };
+		F62D2DF52E55FA4C00D307A4 /* xcrafts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xcrafts.h; sourceTree = "<group>"; };
+		F62D2DF72E55FA7B00D307A4 /* airbus_2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = airbus_2.h; sourceTree = "<group>"; };
+		F62D2DF82E55FA9100D307A4 /* airbus_1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = airbus_1.h; sourceTree = "<group>"; };
+		F62D2DF92E55FA9100D307A4 /* 737.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = 737.h; sourceTree = "<group>"; };
 		F635AD432E0579E9005D6CDC /* usbcontroller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = usbcontroller.h; sourceTree = "<group>"; };
 		F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_mac.cpp; sourceTree = "<group>"; };
 		F635AD482E05819E005D6CDC /* usbdevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = usbdevice.h; sourceTree = "<group>"; };
@@ -192,10 +198,16 @@
 		F62D2DF62E55FA4C00D307A4 /* fonts */ = {
 			isa = PBXGroup;
 			children = (
-				F62D2DF52E55FA4C00D307A4 /* ejet.h */,
-				F62D2DF72E55FA7B00D307A4 /* honeywell.h */,
-				F62D2DF82E55FA9100D307A4 /* b612.h */,
-				F62D2DF92E55FA9100D307A4 /* boeing.h */,
+				F623042D2E5A230B00EE0089 /* fonts.h */,
+				F62D2DF82E55FA9100D307A4 /* airbus_1.h */,
+				F62D2DF72E55FA7B00D307A4 /* airbus_2.h */,
+				F603C3A12E59D1C400B73F42 /* airbus_3.h */,
+				F62D2DF92E55FA9100D307A4 /* 737.h */,
+				F62D2DF52E55FA4C00D307A4 /* xcrafts.h */,
+				F62304282E59DF8500EE0089 /* vga_1.h */,
+				F623042B2E5A212700EE0089 /* vga_2.h */,
+				F623042A2E5A212700EE0089 /* vga_3.h */,
+				F62304292E5A212700EE0089 /* vga_4.h */,
 			);
 			path = fonts;
 			sourceTree = "<group>";

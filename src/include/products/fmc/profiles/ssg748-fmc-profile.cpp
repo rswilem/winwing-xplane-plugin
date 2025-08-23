@@ -1,6 +1,6 @@
 #include "ssg748-fmc-profile.h"
 #include "product-fmc.h"
-#include "../fonts/boeing.h"
+#include "fonts.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -11,7 +11,7 @@ SSG748FMCProfile::SSG748FMCProfile(ProductFMC *product) : FMCAircraftProfile(pro
     datarefRegex = std::regex("SSG/UFMC/LINE_([0-9]+)");
 
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontBoeing);
+    product->setFont(fmcFontVGA1);
         
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("ssg/LGT/mcdu_brt_sw", [product](std::vector<float> brightness) {
         if (brightness.size() < 27) {

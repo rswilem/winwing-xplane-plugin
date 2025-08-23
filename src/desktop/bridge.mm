@@ -5,10 +5,7 @@
 #include "product-ursa-minor-joystick.h"
 #include "product-fmc.h"
 #include "product-fcu-efis.h"
-#include "b612.h"
-#include "boeing.h"
-#include "ejet.h"
-#include "honeywell.h"
+#include "fonts.h"
 #include <vector>
 #include <string>
 #include <cstring>
@@ -245,20 +242,35 @@ void fmc_setFont(void* fmcHandle, int fontType) {
     auto fmc = static_cast<ProductFMC*>(fmcHandle);
     
     switch (fontType) {
-        case 0: // B612
-            fmc->setFont(fmcFontB612);
+        case 0: // AirbusVariant1
+            fmc->setFont(fmcFontAirbusVariant1);
             break;
-        case 1: // Boeing
-            fmc->setFont(fmcFontBoeing);
+        case 1: // AirbusVariant2
+            fmc->setFont(fmcFontAirbusVariant2);
             break;
-        case 2: // Ejet
-            fmc->setFont(fmcFontEjet);
+        case 2: // AirbusVariant3
+            fmc->setFont(fmcFontAirbusVariant3);
             break;
-        case 3: // Honeywell
-            fmc->setFont(fmcFontHoneywell);
+        case 3: // 737
+            fmc->setFont(fmcFont737);
+            break;
+        case 4: // X-Crafts
+            fmc->setFont(fmcFontXCrafts);
+            break;
+        case 5: // VGA 1
+            fmc->setFont(fmcFontVGA1);
+            break;
+        case 6: // VGA 2
+            fmc->setFont(fmcFontVGA2);
+            break;
+        case 7: // VGA 3
+            fmc->setFont(fmcFontVGA3);
+            break;
+        case 8: // VGA 4
+            fmc->setFont(fmcFontVGA4);
             break;
         default:
-            fmc->setFont(fmcFontB612); // Default to B612
+            fmc->setFont(fmcFontAirbusVariant1);
             break;
     }
 }

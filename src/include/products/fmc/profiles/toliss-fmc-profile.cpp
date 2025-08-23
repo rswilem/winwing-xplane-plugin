@@ -1,6 +1,6 @@
 #include "toliss-fmc-profile.h"
 #include "product-fmc.h"
-#include "../fonts/b612.h"
+#include "fonts.h"
 #include "dataref.h"
 #include "config.h"
 #include <algorithm>
@@ -9,7 +9,7 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(pro
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
 
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontB612);
+    product->setFont(fmcFontAirbusVariant1);
     
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;

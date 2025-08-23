@@ -19,9 +19,11 @@ USBController* USBController::instance = nullptr;
 
 USBController::USBController() {    
     std::thread monitorThread([this]() {
-        while (true) {
+        while (!shouldShutdown) {
             std::this_thread::sleep_for(std::chrono::seconds(2));
-            checkForDeviceChanges();
+            if (!shouldShutdown) {
+                checkForDeviceChanges();
+            }
         }
     });
     monitorThread.detach();
@@ -39,6 +41,10 @@ USBController* USBController::getInstance() {
 }
 
 void USBController::destroy() {
+    shouldShutdown = true;
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    
     for (auto ptr : devices) {
         delete ptr;
     }
@@ -79,6 +85,10 @@ bool USBController::deviceExistsWithHandle(HANDLE hidDevice) {
 }
 
 void USBController::addDeviceFromHandle(HANDLE hidDevice) {
+    if (hidDevice == INVALID_HANDLE_VALUE) {
+        return;
+    }
+    
     AppState::getInstance()->executeAfter(0, [this, hidDevice]() {
         if (deviceExistsWithHandle(hidDevice)) {
             CloseHandle(hidDevice);

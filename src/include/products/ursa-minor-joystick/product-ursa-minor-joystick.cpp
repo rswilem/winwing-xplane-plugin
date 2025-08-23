@@ -65,6 +65,10 @@ void ProductUrsaMinorJoystick::update() {
             lastVibration = vibration;
         }
     }
+    else if (lastVibration > 0) {
+        lastVibration = 0;
+        setVibration(lastVibration);
+    }
 }
 
 bool ProductUrsaMinorJoystick::setVibration(uint8_t vibration) {
@@ -95,12 +99,5 @@ void ProductUrsaMinorJoystick::initializeDatarefs() {
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
-    });
-    
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/flightmodel/failures/onground_any", [this](bool wheelsOnGround) {        
-        if (!wheelsOnGround && lastVibration > 0) {
-            lastVibration = 0;
-            setVibration(lastVibration);
-        }
     });
 }

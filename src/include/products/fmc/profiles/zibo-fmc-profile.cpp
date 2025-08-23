@@ -1,6 +1,6 @@
 #include "zibo-fmc-profile.h"
 #include "product-fmc.h"
-#include "../fonts/boeing.h"
+#include "fonts.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -12,7 +12,7 @@ ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) : FMCAircraftProfile(product
     datarefRegex = std::regex("laminar/B738/fmc1/Line([0-9]{2})_([A-Z]+)");
     
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontBoeing);
+    product->setFont(fmcFont737);
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> screenBrightness) {
         if (screenBrightness.size() < 11) {

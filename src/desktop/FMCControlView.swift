@@ -16,7 +16,7 @@ struct FMCControlView: View {
     // LED states for FMC indicators
     @State private var ledStates: [Bool] = Array(repeating: false, count: 17)
     @State private var selectedTestPage: String = "TOLISS_INIT";
-    @State private var selectedFont: FMCWrapper.FontType = .b612
+    @State private var selectedFont: FMCWrapper.FontType = .airbusVariant1
     
     private let indicatorLEDs: [(id: Int, name: String)] = [
         (8, "FAIL"), (9, "FM"), (10, "MCDU"), (11, "MENU"), 
@@ -175,7 +175,9 @@ struct FMCControlView: View {
                     Text("Fonts for the test pages are not automatically updated.\nThis is by design. In the real world, loading an aircraft profile will load the appropriate font.")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                        .lineLimit(0)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxHeight: .infinity, alignment: .top)
                     
                     Picker("Test page", selection: $selectedTestPage) {
                         Text("TOLISS_INIT").tag("TOLISS_INIT")
@@ -254,11 +256,11 @@ struct FMCControlView: View {
         fmc.unloadProfile()
         
         /* Dataref logging in cpp can be done with:
-         printf("[PFP] Dataref %s: {", datarefName);
+         printf("setDatarefHex(\"%s\",[", datarefName);
          for (unsigned char ch : text) {
-             printf("0x%02X, ", ch);
+             printf("0x%02X,", ch);
          }
-         printf("}\n");
+         printf("])\n");
          */
         
         switch selectedTestPage {

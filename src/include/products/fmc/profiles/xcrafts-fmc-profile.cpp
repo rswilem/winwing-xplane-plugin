@@ -2,7 +2,7 @@
 #include "product-fmc.h"
 #include "dataref.h"
 #include "appstate.h"
-#include "../fonts/ejet.h"
+#include "fonts.h"
 #include <cstring>
 #include <algorithm>
 #include <cmath>
@@ -15,7 +15,7 @@ XCraftsFMCProfile::XCraftsFMCProfile(ProductFMC *product) : FMCAircraftProfile(p
     datarefRegex = std::regex("XCrafts/FMS/CDU_1_([0-9]{2}|ScratchPad)");
     
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontEjet);
+    product->setFont(fmcFontXCrafts);
     
     // Monitor avionics power for LED control
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [product](bool poweredOn) {
@@ -204,42 +204,19 @@ void XCraftsFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
         // 11 01 1 8 $TCAS/XPDR
         // RR = Row (01-99), CC = Column (01-99), F = Font (1-6), S = Color (0-8)
         
-        // Extract row number
-        int row = 0;
-        if (text.size() >= 2 && text[0] >= '0' && text[0] <= '9' && text[1] >= '0' && text[1] <= '9') {
-            row = (text[0] - '0') * 10 + (text[1] - '0');
-        }
-        
-        // Extract column number
-        int col = 0;
-        if (text.size() >= 4 && text[2] >= '0' && text[2] <= '9' && text[3] >= '0' && text[3] <= '9') {
-            col = (text[2] - '0') * 10 + (text[3] - '0');
-        }
+        unsigned short row = (text[0] - '0') * 10 + (text[1] - '0');
+        unsigned short col = (text[2] - '0') * 10 + (text[3] - '0');
         
         XCraftsFMCFontStyle fontStyle = XCraftsFMCFontStyle::Large;
         if (text.size() >= 5) {
             fontStyle = XCraftsFMCFontStyle(text[4] - '0');
         }
         
-        // Extract color code (variable length) and find text start
-        unsigned char colorCode = 0;
-        int textStartIndex = 5;
-        if (text.size() > 5) {
-            if (textStartIndex < text.size() && text[textStartIndex] >= '0' && text[textStartIndex] <= '9') {
-                colorCode = text[textStartIndex] - '0';
-                textStartIndex++;
-            }
-
-            if (textStartIndex + 1 < text.size() && text[textStartIndex] == '1' && text[textStartIndex + 1] == '0') {
-                colorCode = 0xF0 + colorCode;
-                textStartIndex += 2;
-            }
-            else if (fontStyle >= XCraftsFMCFontStyle::LargeReversed) {
-                colorCode = 0xF0 + colorCode;
-            }
+        unsigned char colorCode = text[5] - '0';
+        if (fontStyle >= XCraftsFMCFontStyle::LargeReversed) {
+            colorCode = 0xF0 + colorCode;
         }
         
-        // Convert to 0-based indexing and validate bounds
         int lineIndex = row - 1;
         int colIndex = col - 1;
         
@@ -247,6 +224,7 @@ void XCraftsFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             continue;
         }
         
+        constexpr unsigned char textStartIndex = 6;
         if (text.size() > textStartIndex) {
             for (int j = textStartIndex; j < text.size() && (colIndex + (j - textStartIndex)) < ProductFMC::PageCharsPerLine; j++) {
                 unsigned char c = text[j];

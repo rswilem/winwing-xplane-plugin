@@ -274,17 +274,28 @@ struct FMCWrapper {
     
     // Font types available for the FMC
     enum FontType: Int, CaseIterable {
-        case b612 = 0
-        case boeing = 1
-        case ejet = 2
-        case honeywell = 3
+        case airbusVariant1 = 0
+        case airbusVariant2 = 1
+        case airbusVariant3 = 2
+        case b737 = 3
+        case xcrafts = 4
+        case vga1 = 5
+        case vga2 = 6
+        case vga3 = 7
+        case vga4 = 8
+        
         
         var displayName: String {
             switch self {
-            case .b612: return "B612"
-            case .boeing: return "Boeing"
-            case .ejet: return "E-Jet"
-            case .honeywell: return "Honeywell"
+            case .airbusVariant1: return "Airbus variant 1"
+            case .airbusVariant2: return "Airbus variant 2"
+            case .airbusVariant3: return "Airbus variant 3"
+            case .b737: return "737"
+            case .xcrafts: return "X-Crafts E-Jet"
+            case .vga1: return "VGA 1"
+            case .vga2: return "VGA 2"
+            case .vga3: return "VGA 3"
+            case .vga4: return "VGA 4"
             }
         }
     }
