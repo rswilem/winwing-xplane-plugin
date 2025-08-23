@@ -13,6 +13,8 @@ The plugin theoretically works on Windows, but is not required there, as Winwing
 4. Start X-Plane 12.
 5. Updating can be done by replacing the `Winwing` folder or using Skunkcrafts Updater if you have it installed.
 
+For linux, see the [Linux udev rules](#linux-udev-rules) section below to ensure proper permissions.
+
 ### Contributing
 
 - Fork the repository.
@@ -62,6 +64,35 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@zodiac1214](https://github.com/zodiac1214) for the Ursa Minor Joystick HID protocol.
 - [@CyberGuerro](https://github.com/cyberguerro) for the PFP3N HID protocol.
 - [@claaslange](https://github.com/claaslange) for the FCU-EFIS integration.
+
+### Linux udev rules
+
+To ensure Winwing panels are accessible without root and have stable device names, create a udev rules file:
+
+```bash
+sudo nano /etc/udev/rules.d/99-winwing.rules
+```
+
+```udev
+KERNEL=="hidraw*", ATTRS{idProduct}=="bc27", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-ursa-minor-l"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb36", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-mcdu32-cpt"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb3e", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-mcdu32-fo"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb3a", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-mcdu32-obs"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb35", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp3n-cpt"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb39", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp3n-fo"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb3d", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp3n-obs"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb38", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp4-cpt"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb40", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp4-fo"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb3c", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp4-obs"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb37", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp7-cpt"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb3f", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp7-fo"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb3b", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp7-obs"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb10", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bc1e", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis_r"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bc1d", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis_l"
+KERNEL=="hidraw*", ATTRS{idProduct}=="ba01", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis_lr"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bf0f", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pap3"
+```
 
 ### Demonstration
 
