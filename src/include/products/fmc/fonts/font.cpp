@@ -57,8 +57,8 @@ const std::vector<std::vector<unsigned char>> Font::GlyphData(FontVariant varian
     for (auto &row : result) {
         for (size_t i = 0; i + 1 < row.size(); i++) {
             if (row[i] == 0x32 && row[i + 1] == 0xbb) {
-                row[i] = 0xff;
-                row[i + 1] = 0xff;
+                row[i] = hardwareIdentifier;
+                row[i + 1] = 0xbb;
             }
         }
     }
