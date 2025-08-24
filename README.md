@@ -34,18 +34,18 @@ For linux, see the [Linux udev rules](#linux-udev-rules) section below to ensure
 
 The matrix below shows device and aircraft compatibility. Devices are listed vertically, aircraft horizontally.
 
-| Device                    | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 777 | SSG 747 | Notes                                                                |
-| ------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | -------------------------------------------------------------------- |
-| **URSA MINOR Joystick L** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      | Fully implemented                                                    |
-| **URSA MINOR Joystick R** | 🟠          | 🟠           | 🟠               | 🟠       | 🟠       | 🟠     | 🟠      | Missing USB product ID - please open an issue if you own this device |
-| **MCDU-32**               | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      | Fully implemented                                                    |
-| **PFP 3N**                | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      | Fully implemented                                                    |
-| **PFP 4**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      | Fully implemented                                                    |
-| **PFP 7**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      | Fully implemented                                                    |
-| **Panel of Autopilot 3**  | 🔴          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Not implemented                                                      |
-| **FCU-EFIS (FCU Unit)**   | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss                                         |
-| **FCU-EFIS (EFIS R)**     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss - but not tested                        |
-| **FCU-EFIS (EFIS L)**     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Fully implemented for Toliss                                         |
+| Device                    | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 777 | SSG 747 | Notes           |
+| ------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | --------------- |
+| **URSA MINOR Joystick L** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      |                 |
+| **URSA MINOR Joystick R** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      |                 |
+| **MCDU-32**               | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |                 |
+| **PFP 3N**                | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |                 |
+| **PFP 4**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |                 |
+| **PFP 7**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |                 |
+| **Panel of Autopilot 3**  | 🔴          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Not implemented |
+| **FCU-EFIS (FCU Unit)**   | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      |                 |
+| **FCU-EFIS (EFIS R)**     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      |                 |
+| **FCU-EFIS (EFIS L)**     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      |                 |
 
 #### Legend
 
@@ -55,11 +55,9 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 
 ### Known Issues
 
-- It seems that upon startup, the MCDU (and PFP) reverts to the default font, even if you used SimAppPro to change it. This is due to the startup message "waking" up the MCDU, which resets the font. More research is needed on the startup sequence of the MCDU to find a solution.
-- Have not yet found the proper way to show "inverted" text on the PFP, where the background is coloured and the text is black.
-- The SSG 747 does not expose any colour datarefs yet. Therefore, the PFP will not show the correct colours.
-- The SSG 747 has a dual FMC, but the datarefs seem to overwrite eachother.
-- Need to find a way to command the FF777 buttons.
+- 🟠 The SSG 747 does not expose any colour datarefs yet. Therefore, the PFP will not show the correct colours.
+- 🟠 The SSG 747 has a dual FMC, but the datarefs seem to overwrite eachother.
+- 🟠 Need to find a way to command the FF777 buttons.
 
 ### Credits
 
@@ -67,6 +65,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@zodiac1214](https://github.com/zodiac1214) for the Ursa Minor Joystick HID protocol.
 - [@CyberGuerro](https://github.com/cyberguerro) for the PFP3N HID protocol.
 - [@claaslange](https://github.com/claaslange) for the FCU-EFIS integration.
+- [@shred86](https://github.com/shred86) for identifying the Ursa Minor Joystick R.
 
 ### Linux udev rules
 
@@ -78,6 +77,7 @@ sudo nano /etc/udev/rules.d/99-winwing.rules
 
 ```udev
 KERNEL=="hidraw*", ATTRS{idProduct}=="bc27", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-ursa-minor-l"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bc28", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-ursa-minor-r"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb36", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-mcdu32-cpt"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb3e", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-mcdu32-fo"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb3a", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-mcdu32-obs"
