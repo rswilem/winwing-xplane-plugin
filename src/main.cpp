@@ -14,7 +14,6 @@
 #include "appstate.h"
 #include "dataref.h"
 #include "usbcontroller.h"
-#include "product-mcdu.h"
 
 #if IBM
 #include <windows.h>

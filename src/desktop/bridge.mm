@@ -3,9 +3,9 @@
 #include "appstate.h"
 #include "dataref.h"
 #include "product-ursa-minor-joystick.h"
-#include "product-mcdu.h"
-#include "product-pfp.h"
+#include "product-fmc.h"
 #include "product-fcu-efis.h"
+#include "font.h"
 #include <vector>
 #include <string>
 #include <cstring>
@@ -41,7 +41,7 @@ void setDatarefHexC(const char* ref, const uint8_t* hexD, int len) {
     
     // Check if this is a style dataref - if so, store as vector<unsigned char>
     std::string refStr(ref);
-    if (refStr.find("style_line") != std::string::npos || refStr.find("ixeg/") != std::string::npos) {
+    if (refStr.find("style_line") != std::string::npos || refStr.find("ixeg/") != std::string::npos || refStr.find("XCrafts/") != std::string::npos) {
         // Ensure dataref exists first
         ensureDatarefExists(ref, xplmType_Data);
         
@@ -149,20 +149,12 @@ void* getJoystickHandle(int deviceIndex) {
     return dynamic_cast<ProductUrsaMinorJoystick*>(devices[deviceIndex]);
 }
 
-void* getMCDUHandle(int deviceIndex) {
+void* getFMCHandle(int deviceIndex) {
     auto& devices = USBController::getInstance()->devices;
     if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
         return nullptr;
     }
-    return dynamic_cast<ProductMCDU*>(devices[deviceIndex]);
-}
-
-void* getPFPHandle(int deviceIndex) {
-    auto& devices = USBController::getInstance()->devices;
-    if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
-        return nullptr;
-    }
-    return dynamic_cast<ProductPFP*>(devices[deviceIndex]);
+    return dynamic_cast<ProductFMC*>(devices[deviceIndex]);
 }
 
 void* getFCUEfisHandle(int deviceIndex) {
@@ -205,58 +197,94 @@ bool joystick_setLedBrightness(void* joystickHandle, uint8_t brightness) {
     return joystick->setLedBrightness(brightness);
 }
 
-// MCDU functions via handle
-void mcdu_showBackground(void* mcduHandle, int variant) {
-    if (!mcduHandle) return;
-    auto mcdu = static_cast<ProductMCDU*>(mcduHandle);
-    mcdu->showBackground(variant);
+// FMC functions via handle
+void fmc_showBackground(void* fmcHandle, int variant) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    fmc->showBackground((FMCBackgroundVariant)variant);
 }
 
-bool mcdu_setLed(void* mcduHandle, int ledId, uint8_t value) {
-    if (!mcduHandle) return false;
-    auto mcdu = static_cast<ProductMCDU*>(mcduHandle);
-    mcdu->setLedBrightness(static_cast<MCDULed>(ledId), value);
+bool fmc_setLed(void* fmcHandle, int ledId, uint8_t value) {
+    if (!fmcHandle) return false;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    fmc->setLedBrightness(static_cast<FMCLed>(ledId), value);
     return true;
 }
 
-// Additional MCDU functions via handle
-void mcdu_clearDisplay(void* mcduHandle) {
-    if (!mcduHandle) return;
-    auto mcdu = static_cast<ProductMCDU*>(mcduHandle);
-    mcdu->clearDisplay();
+// Additional FMC functions via handle
+void fmc_clearDisplay(void* fmcHandle) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    fmc->clearDisplay();
 }
 
-void mcdu_setLedBrightness(void* mcduHandle, int ledId, uint8_t brightness) {
-    if (!mcduHandle) return;
-    auto mcdu = static_cast<ProductMCDU*>(mcduHandle);
-    mcdu->setLedBrightness(static_cast<MCDULed>(ledId), brightness);
+void fmc_unloadProfile(void* fmcHandle) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    fmc->unloadProfile();
 }
 
-// PFP functions via handle
-void pfp_showBackground(void* pfpHandle, int variant) {
-    if (!pfpHandle) return;
-    auto pfp = static_cast<ProductPFP*>(pfpHandle);
-    pfp->showBackground(variant);
+void fmc_setLedBrightness(void* fmcHandle, int ledId, uint8_t brightness) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    fmc->setLedBrightness(static_cast<FMCLed>(ledId), brightness);
 }
 
-bool pfp_setLed(void* pfpHandle, int ledId, uint8_t value) {
-    if (!pfpHandle) return false;
-    auto pfp = static_cast<ProductPFP*>(pfpHandle);
-    pfp->setLedBrightness(static_cast<PFPLed>(ledId), value);
-    return true;
+bool fmc_writeData(void* fmcHandle, const uint8_t* data, int length) {
+    if (!fmcHandle || !data || length <= 0) return false;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    std::vector<uint8_t> dataVector(data, data + length);
+    return fmc->writeData(dataVector);
 }
 
-void pfp_clearDisplay(void* pfpHandle) {
-    if (!pfpHandle) return;
-    auto pfp = static_cast<ProductPFP*>(pfpHandle);
-    pfp->clearDisplay();
+void fmc_setFont(void* fmcHandle, int fontType) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    
+    FontVariant variant;
+    switch (fontType) {
+        case 0: // AirbusVariant1
+            variant = FontVariant::FontAirbus1;
+            break;
+        case 1: // AirbusVariant2
+            variant = FontVariant::FontAirbus2;
+            break;
+        case 2: // AirbusVariant3
+            variant = FontVariant::FontAirbus3;
+            break;
+        case 3: // 737
+            variant = FontVariant::Font737;
+            break;
+        case 4: // X-Crafts
+            variant = FontVariant::FontXCrafts;
+            break;
+        case 5: // VGA 1
+            variant = FontVariant::FontVGA1;
+            break;
+        case 6: // VGA 2
+            variant = FontVariant::FontVGA2;
+            break;
+        case 7: // VGA 3
+            variant = FontVariant::FontVGA3;
+            break;
+        case 8: // VGA 4
+            variant = FontVariant::FontVGA4;
+            break;
+        default:
+            variant = FontVariant::FontAirbus1;
+            break;
+    }
+    
+    auto glyphData = Font::GlyphData(variant, fmc->identifierByte);
+    fmc->setFont(glyphData);
 }
 
-void pfp_setLedBrightness(void* pfpHandle, int ledId, uint8_t brightness) {
-    if (!pfpHandle) return;
-    auto pfp = static_cast<ProductPFP*>(pfpHandle);
-    pfp->setLedBrightness(static_cast<PFPLed>(ledId), brightness);
+void fmc_setFontUpdatingEnabled(void* fmcHandle, bool enabled) {
+    if (!fmcHandle) return;
+    auto fmc = static_cast<ProductFMC*>(fmcHandle);
+    fmc->fontUpdatingEnabled = enabled;
 }
+
 
 // Device enumeration and info functions
 int getDeviceCount() {
@@ -280,10 +308,8 @@ const char* getDeviceType(int deviceIndex) {
     auto device = devices[deviceIndex];
     if (dynamic_cast<ProductUrsaMinorJoystick*>(device)) {
         return "joystick";
-    } else if (dynamic_cast<ProductMCDU*>(device)) {
-        return "mcdu";
-    } else if (dynamic_cast<ProductPFP*>(device)) {
-        return "pfp";
+    } else if (dynamic_cast<ProductFMC*>(device)) {
+        return "fmc";
     } else if (dynamic_cast<ProductFCUEfis*>(device)) {
         return "fcu-efis";
     }
@@ -333,58 +359,58 @@ bool joystick_setLedBrightness(int deviceIndex, uint8_t brightness) {
     return false;
 }
 
-// MCDU-specific functions
-bool mcdu_clearDisplay(int deviceIndex, int displayId) {
+// FMC-specific functions
+bool fmc_clearDisplay(int deviceIndex, int displayId) {
     auto& devices = USBController::getInstance()->devices;
     if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
         return false;
     }
     
-    auto mcdu = dynamic_cast<ProductMCDU*>(devices[deviceIndex]);
-    if (mcdu) {
-        mcdu->showBackground(displayId);
+    auto fmc = dynamic_cast<ProductFMC*>(devices[deviceIndex]);
+    if (fmc) {
+        fmc->showBackground((FMCBackgroundVariant)displayId);
         return true;
     }
     return false;
 }
 
-bool mcdu_setBacklight(int deviceIndex, uint8_t brightness) {
+bool fmc_setBacklight(int deviceIndex, uint8_t brightness) {
     auto& devices = USBController::getInstance()->devices;
     if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
         return false;
     }
     
-    auto mcdu = dynamic_cast<ProductMCDU*>(devices[deviceIndex]);
-    if (mcdu) {
-        mcdu->setLedBrightness(MCDULed::BACKLIGHT, brightness);
+    auto fmc = dynamic_cast<ProductFMC*>(devices[deviceIndex]);
+    if (fmc) {
+        fmc->setLedBrightness(FMCLed::BACKLIGHT, brightness);
         return true;
     }
     return false;
 }
 
-bool mcdu_setScreenBacklight(int deviceIndex, uint8_t brightness) {
+bool fmc_setScreenBacklight(int deviceIndex, uint8_t brightness) {
     auto& devices = USBController::getInstance()->devices;
     if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
         return false;
     }
     
-    auto mcdu = dynamic_cast<ProductMCDU*>(devices[deviceIndex]);
-    if (mcdu) {
-        mcdu->setLedBrightness(MCDULed::SCREEN_BACKLIGHT, brightness);
+    auto fmc = dynamic_cast<ProductFMC*>(devices[deviceIndex]);
+    if (fmc) {
+        fmc->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, brightness);
         return true;
     }
     return false;
 }
 
-bool mcdu_setLed(int deviceIndex, int ledId, bool state) {
+bool fmc_setLed(int deviceIndex, int ledId, bool state) {
     auto& devices = USBController::getInstance()->devices;
     if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
         return false;
     }
     
-    auto mcdu = dynamic_cast<ProductMCDU*>(devices[deviceIndex]);
-    if (mcdu) {
-        mcdu->setLedBrightness(MCDULed(ledId), state ? 1 : 0);
+    auto fmc = dynamic_cast<ProductFMC*>(devices[deviceIndex]);
+    if (fmc) {
+        fmc->setLedBrightness(FMCLed(ledId), state ? 1 : 0);
         return true;
     }
     return false;
@@ -394,7 +420,7 @@ bool mcdu_setLed(int deviceIndex, int ledId, bool state) {
 void fcuefis_clear(void* fcuefisHandle) {
     if (!fcuefisHandle) return;
     auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
-    // FCU-EFIS doesn't have a clear function like MCDU/PFP
+    // FCU-EFIS doesn't have a clear function like FMC
     // Instead, we can set displays to show test values or blank
     fcuefis->initializeDisplays();
 }
@@ -426,9 +452,17 @@ void fcuefis_testDisplay(void* fcuefisHandle, const char* testType) {
     } else if (test == "VS") {
         fcuefis->sendFCUDisplay("160", "180", "25000", "3000");
     } else if (test == "EFIS_R") {
-        fcuefis->sendEfisRightDisplay("1013");
+        EfisDisplayValue efisData;
+        efisData.baro = "1013";
+        efisData.unitIsInHg = false;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, true);
     } else if (test == "EFIS_L") {
-        fcuefis->sendEfisLeftDisplay("1013");
+        EfisDisplayValue efisData;
+        efisData.baro = "1013";
+        efisData.unitIsInHg = false;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, false);
     } else if (test == "MANAGED") {
         // Test managed mode dots - temporarily set managed flags
         auto& displayData = fcuefis->getDisplayData();
@@ -449,8 +483,14 @@ void fcuefis_testDisplay(void* fcuefisHandle, const char* testType) {
         displayData.altManaged = oldAltManaged;
     } else if (test == "ALL") {
         fcuefis->sendFCUDisplay("888", "888", "88888", "8888");
-        fcuefis->sendEfisRightDisplay("8888");
-        fcuefis->sendEfisLeftDisplay("8888");
+        
+        // Send test pattern to both EFIS displays
+        EfisDisplayValue efisData;
+        efisData.baro = "8888";
+        efisData.unitIsInHg = false;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, true);  // Right
+        fcuefis->sendEfisDisplayWithFlags(&efisData, false); // Left
     }
 }
 
@@ -459,15 +499,26 @@ void fcuefis_efisRightTestDisplay(void* fcuefisHandle, const char* testType) {
     auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
     
     std::string test(testType);
+    EfisDisplayValue efisData;
+    
     if (test == "QNH_1013") {
         // hPa: QNH mode but no decimal point
-        fcuefis->sendEfisRightDisplayWithFlags("1013", true, false);
+        efisData.baro = "1013";
+        efisData.unitIsInHg = false;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, true);
     } else if (test == "QNH_2992") {
         // inHg: show decimal point to display "29.92"
-        fcuefis->sendEfisRightDisplayWithFlags("2992", true, true);
+        efisData.baro = "2992";
+        efisData.unitIsInHg = true;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, true);
     } else if (test == "STD") {
         // STD: no decimal point
-        fcuefis->sendEfisRightDisplayWithFlags("STD ", false, false);
+        efisData.baro = "STD ";
+        efisData.unitIsInHg = false;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, true);
     }
 }
 
@@ -476,26 +527,47 @@ void fcuefis_efisLeftTestDisplay(void* fcuefisHandle, const char* testType) {
     auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
     
     std::string test(testType);
+    EfisDisplayValue efisData;
+    
     if (test == "QNH_1013") {
         // hPa: QNH mode but no decimal point
-        fcuefis->sendEfisLeftDisplayWithFlags("1013", true, false);
+        efisData.baro = "1013";
+        efisData.unitIsInHg = false;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, false);
     } else if (test == "QNH_2992") {
         // inHg: show decimal point to display "29.92"
-        fcuefis->sendEfisLeftDisplayWithFlags("2992", true, true);
+        efisData.baro = "2992";
+        efisData.unitIsInHg = true;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, false);
     } else if (test == "STD") {
         // STD: no decimal point
-        fcuefis->sendEfisLeftDisplayWithFlags("STD ", false, false);
+        efisData.baro = "STD ";
+        efisData.unitIsInHg = false;
+        efisData.showQfe = false;
+        fcuefis->sendEfisDisplayWithFlags(&efisData, false);
     }
 }
 
 void fcuefis_efisRightClear(void* fcuefisHandle) {
     if (!fcuefisHandle) return;
     auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
-    fcuefis->sendEfisRightDisplay("    ");  // Clear with 4 spaces
+    
+    EfisDisplayValue efisData;
+    efisData.baro = "    ";  // Clear with 4 spaces
+    efisData.unitIsInHg = false;
+    efisData.showQfe = false;
+    fcuefis->sendEfisDisplayWithFlags(&efisData, true);
 }
 
 void fcuefis_efisLeftClear(void* fcuefisHandle) {
     if (!fcuefisHandle) return;
     auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
-    fcuefis->sendEfisLeftDisplay("    ");  // Clear with 4 spaces
+    
+    EfisDisplayValue efisData;
+    efisData.baro = "    ";  // Clear with 4 spaces
+    efisData.unitIsInHg = false;
+    efisData.showQfe = false;
+    fcuefis->sendEfisDisplayWithFlags(&efisData, false);
 }

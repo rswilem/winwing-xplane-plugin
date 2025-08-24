@@ -25,7 +25,7 @@ bool USBDevice::connect() {
     }
     inputBuffer = new uint8_t[kInputReportSize];
     
-    // Start input reading thread
+    // Start input reading thread with proper cleanup
     connected = true;
     std::thread inputThread([this]() {
         uint8_t buffer[65];
@@ -37,7 +37,7 @@ bool USBDevice::connect() {
             } else if (!result) {
                 DWORD error = GetLastError();
                 if (error != ERROR_DEVICE_NOT_CONNECTED) {
-                    debug("ReadFile failed with error: %s\n", error);
+                    debug_force("ReadFile failed with error: %lu\n", error);
                 }
                 break;
             }
@@ -51,11 +51,14 @@ bool USBDevice::connect() {
 
 void USBDevice::InputReportCallback(void* context, DWORD bytesRead, uint8_t* report) {
     auto* self = static_cast<USBDevice*>(context);
-    if (!self || !self->connected) {
+    if (!self || !self->connected || !report || bytesRead == 0) {
         return;
     }
     
-    // Try-catch around the processOnMainThread call to handle mutex issues
+    if (self->hidDevice == INVALID_HANDLE_VALUE) {
+        return;
+    }
+    
     try {
         InputEvent event;
         event.reportId = report[0];
@@ -64,7 +67,9 @@ void USBDevice::InputReportCallback(void* context, DWORD bytesRead, uint8_t* rep
         
         self->processOnMainThread(event);
     } catch (const std::system_error& e) {
-        // Silently ignore mutex errors that occur during shutdown
+        return;
+    } catch (...) {
+        debug_force("Unexpected exception in InputReportCallback\n");
         return;
     }
 }
@@ -80,13 +85,12 @@ void USBDevice::update() {
 void USBDevice::disconnect() {
     connected = false;
     
-    // Give the reading thread a moment to see connected=false and exit
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    
     if (hidDevice != INVALID_HANDLE_VALUE) {
         CloseHandle(hidDevice);
         hidDevice = INVALID_HANDLE_VALUE;
     }
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     
     if (inputBuffer) {
         delete[] inputBuffer;
@@ -96,14 +100,20 @@ void USBDevice::disconnect() {
 
 bool USBDevice::writeData(std::vector<uint8_t> data) {
     if (hidDevice == INVALID_HANDLE_VALUE || !connected || data.empty()) {
-        debug("HID device not open, not connected, or empty data\n");
+        debug_force("HID device not open, not connected, or empty data\n");
+        return false;
+    }
+    
+    if (data.size() > 1024) {
+        debug_force("Data size too large: %zu bytes\n", data.size());
         return false;
     }
     
     DWORD bytesWritten;
     BOOL result = WriteFile(hidDevice, data.data(), (DWORD)data.size(), &bytesWritten, nullptr);
     if (!result || bytesWritten != data.size()) {
-        debug("WriteFile failed: %s\n", GetLastError());
+        DWORD error = GetLastError();
+        debug_force("WriteFile failed: %lu (expected %zu bytes, wrote %lu)\n", error, data.size(), bytesWritten);
         return false;
     }
     return true;

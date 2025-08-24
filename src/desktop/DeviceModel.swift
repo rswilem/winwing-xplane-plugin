@@ -26,10 +26,8 @@ func c_isDeviceConnected(_ deviceIndex: Int32) -> Bool
 func c_getDeviceHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
 @_silgen_name("getJoystickHandle")
 func c_getJoystickHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
-@_silgen_name("getMCDUHandle")
-func c_getMCDUHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
-@_silgen_name("getPFPHandle")
-func c_getPFPHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
+@_silgen_name("getFMCHandle")
+func c_getFMCHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
 @_silgen_name("getFCUEfisHandle")
 func c_getFCUEfisHandle(_ deviceIndex: Int32) -> UnsafeRawPointer?
 
@@ -47,25 +45,23 @@ func c_joystick_setVibration(_ handle: UnsafeRawPointer, _ vibration: UInt8) -> 
 @_silgen_name("joystick_setLedBrightness")
 func c_joystick_setLedBrightness(_ handle: UnsafeRawPointer, _ brightness: UInt8) -> Bool
 
-// MCDU functions via handle
-@_silgen_name("mcdu_clearDisplay")
-func c_mcdu_clearDisplay(_ handle: UnsafeRawPointer) -> Void
-@_silgen_name("mcdu_showBackground")
-func c_mcdu_showBackground(_ handle: UnsafeRawPointer, _ variant: Int32) -> Void
-@_silgen_name("mcdu_setLed")
-func c_mcdu_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) -> Bool
-@_silgen_name("mcdu_setLedBrightness")
-func c_mcdu_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ brightness: UInt8) -> Void
-
-// PFP functions via handle
-@_silgen_name("pfp_clearDisplay")
-func c_pfp_clearDisplay(_ handle: UnsafeRawPointer) -> Void
-@_silgen_name("pfp_showBackground")
-func c_pfp_showBackground(_ handle: UnsafeRawPointer, _ variant: Int32) -> Void
-@_silgen_name("pfp_setLed")
-func c_pfp_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) -> Bool
-@_silgen_name("pfp_setLedBrightness")
-func c_pfp_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ brightness: UInt8) -> Void
+// FMC functions via handle
+@_silgen_name("fmc_clearDisplay")
+func c_fmc_clearDisplay(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("fmc_unloadProfile")
+func c_fmc_unloadProfile(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("fmc_showBackground")
+func c_fmc_showBackground(_ handle: UnsafeRawPointer, _ variant: Int32) -> Void
+@_silgen_name("fmc_setLed")
+func c_fmc_setLed(_ handle: UnsafeRawPointer, _ ledId: Int32, _ value: UInt8) -> Bool
+@_silgen_name("fmc_setLedBrightness")
+func c_fmc_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ brightness: UInt8) -> Void
+@_silgen_name("fmc_writeData")
+func c_fmc_writeData(_ handle: UnsafeRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int32) -> Bool
+@_silgen_name("fmc_setFont")
+func c_fmc_setFont(_ handle: UnsafeRawPointer, _ fontType: Int32) -> Void
+@_silgen_name("fmc_setFontUpdatingEnabled")
+func c_fmc_setFontUpdatingEnabled(_ handle: UnsafeRawPointer, _ enabled: Bool) -> Void
 
 // FCU-EFIS functions via handle
 @_silgen_name("fcuefis_clear")
@@ -87,8 +83,7 @@ func c_fcuefis_efisLeftTestDisplay(_ handle: UnsafeRawPointer, _ testType: Unsaf
 
 enum DeviceType: String, CaseIterable {
     case joystick = "joystick"
-    case mcdu = "mcdu"
-    case pfp = "pfp"
+    case fmc = "fmc"
     case fcuEfis = "fcu-efis"
     case unknown = "unknown"
 }
@@ -103,8 +98,7 @@ struct WinwingDevice: Identifiable, Equatable, Hashable {
     // Device handles (cached for performance)
     private let deviceHandle: UnsafeRawPointer?
     private let joystickHandle: UnsafeRawPointer?
-    private let mcduHandle: UnsafeRawPointer?
-    private let pfpHandle: UnsafeRawPointer?
+    private let fmcHandle: UnsafeRawPointer?
     private let fcuEfisHandle: UnsafeRawPointer?
     
     init(id: Int, name: String, type: DeviceType, productId: UInt16, isConnected: Bool) {
@@ -117,8 +111,7 @@ struct WinwingDevice: Identifiable, Equatable, Hashable {
         // Cache device handles
         self.deviceHandle = c_getDeviceHandle(Int32(id))
         self.joystickHandle = c_getJoystickHandle(Int32(id))
-        self.mcduHandle = c_getMCDUHandle(Int32(id))
-        self.pfpHandle = c_getPFPHandle(Int32(id))
+        self.fmcHandle = c_getFMCHandle(Int32(id))
         self.fcuEfisHandle = c_getFCUEfisHandle(Int32(id))
     }
     
@@ -161,16 +154,10 @@ struct WinwingDevice: Identifiable, Equatable, Hashable {
         return JoystickWrapper(handle: handle)
     }
     
-    // MCDU wrapper methods  
-    var mcdu: MCDUWrapper? {
-        guard let handle = mcduHandle else { return nil }
-        return MCDUWrapper(handle: handle)
-    }
-    
-    // PFP wrapper methods
-    var pfp: PFPWrapper? {
-        guard let handle = pfpHandle else { return nil }
-        return PFPWrapper(handle: handle)
+    // FMC wrapper methods  
+    var fmc: FMCWrapper? {
+        guard let handle = fmcHandle else { return nil }
+        return FMCWrapper(handle: handle)
     }
     
     // FCU-EFIS wrapper methods
@@ -199,8 +186,8 @@ struct JoystickWrapper {
     }
 }
 
-// Swift wrapper for MCDU functions
-struct MCDUWrapper {
+// Swift wrapper for FMC functions
+struct FMCWrapper {
     private let handle: UnsafeRawPointer
     
     // LED IDs based on the C++ enum
@@ -224,16 +211,20 @@ struct MCDUWrapper {
     }
     
     func clearDisplay() {
-        c_mcdu_clearDisplay(handle)
+        c_fmc_clearDisplay(handle)
+    }
+    
+    func unloadProfile() {
+        c_fmc_unloadProfile(handle)
     }
     
     func showBackground(_ variant: Int) {
-        c_mcdu_showBackground(handle, Int32(variant))
+        c_fmc_showBackground(handle, Int32(variant))
     }
     
     @discardableResult
     func setLed(_ ledId: LEDId, value: UInt8) -> Bool {
-        return c_mcdu_setLed(handle, Int32(ledId.rawValue), value)
+        return c_fmc_setLed(handle, Int32(ledId.rawValue), value)
     }
     
     @discardableResult
@@ -243,7 +234,7 @@ struct MCDUWrapper {
     
     @discardableResult
     func setLed(_ ledId: Int, value: UInt8) -> Bool {
-        return c_mcdu_setLed(handle, Int32(ledId), value)
+        return c_fmc_setLed(handle, Int32(ledId), value)
     }
     
     @discardableResult
@@ -252,11 +243,11 @@ struct MCDUWrapper {
     }
     
     func setLedBrightness(_ ledId: LEDId, brightness: UInt8) {
-        c_mcdu_setLedBrightness(handle, Int32(ledId.rawValue), brightness)
+        c_fmc_setLedBrightness(handle, Int32(ledId.rawValue), brightness)
     }
     
     func setLedBrightness(_ ledId: Int, brightness: UInt8) {
-        c_mcdu_setLedBrightness(handle, Int32(ledId), brightness)
+        c_fmc_setLedBrightness(handle, Int32(ledId), brightness)
     }
     
     // Convenience methods for common LEDs
@@ -271,79 +262,52 @@ struct MCDUWrapper {
     func setOverallLedsBrightness(_ brightness: UInt8) {
         setLedBrightness(.overallLedsBrightness, brightness: brightness)
     }
-}
-
-// Swift wrapper for PFP functions
-struct PFPWrapper {
-    private let handle: UnsafeRawPointer
     
-    // LED IDs based on the C++ enum (same as MCDU)
-    enum LEDId: Int {
-        case backlight = 0
-        case screenBacklight = 1
-        case overallLedsBrightness = 2
-        case fail = 8
-        case fm = 9
-        case mcdu = 10
-        case menu = 11
-        case fm1 = 12
-        case ind = 13
-        case rdy = 14
-        case status = 15
-        case fm2 = 16
-    }
-    
-    init(handle: UnsafeRawPointer) {
-        self.handle = handle
-    }
-    
-    func clearDisplay() {
-        c_pfp_clearDisplay(handle)
-    }
-    
-    func showBackground(_ variant: Int) {
-        c_pfp_showBackground(handle, Int32(variant))
-    }
-    
+    // Write raw data to the device
     @discardableResult
-    func setLed(_ ledId: LEDId, value: UInt8) -> Bool {
-        return c_pfp_setLed(handle, Int32(ledId.rawValue), value)
+    func writeData(_ data: [UInt8]) -> Bool {
+        return data.withUnsafeBufferPointer { bufferPointer in
+            guard let baseAddress = bufferPointer.baseAddress else { return false }
+            return c_fmc_writeData(handle, baseAddress, Int32(data.count))
+        }
     }
     
-    @discardableResult
-    func setLed(_ ledId: LEDId, state: Bool) -> Bool {
-        return setLed(ledId, value: state ? 255 : 0)
+    // Font types available for the FMC
+    enum FontType: Int, CaseIterable {
+        case airbusVariant1 = 0
+        case airbusVariant2 = 1
+        case airbusVariant3 = 2
+        case b737 = 3
+        case xcrafts = 4
+        case vga1 = 5
+        case vga2 = 6
+        case vga3 = 7
+        case vga4 = 8
+        
+        
+        var displayName: String {
+            switch self {
+            case .airbusVariant1: return "Airbus variant 1"
+            case .airbusVariant2: return "Airbus variant 2"
+            case .airbusVariant3: return "Airbus variant 3"
+            case .b737: return "737"
+            case .xcrafts: return "X-Crafts E-Jet"
+            case .vga1: return "VGA 1"
+            case .vga2: return "VGA 2"
+            case .vga3: return "VGA 3"
+            case .vga4: return "VGA 4"
+            }
+        }
     }
     
-    @discardableResult
-    func setLed(_ ledId: Int, value: UInt8) -> Bool {
-        return c_pfp_setLed(handle, Int32(ledId), value)
+    // Set the font for the FMC display
+    func setFont(_ fontType: FontType) {
+        c_fmc_setFont(handle, Int32(fontType.rawValue))
     }
     
-    @discardableResult
-    func setLed(_ ledId: Int, state: Bool) -> Bool {
-        return setLed(ledId, value: state ? 255 : 0)
-    }
-    
-    func setLedBrightness(_ ledId: LEDId, brightness: UInt8) {
-        c_pfp_setLedBrightness(handle, Int32(ledId.rawValue), brightness)
-    }
-    
-    func setLedBrightness(_ ledId: Int, brightness: UInt8) {
-        c_pfp_setLedBrightness(handle, Int32(ledId), brightness)
-    }
-    
-    // Convenience methods for common LEDs
-    func setBacklight(_ brightness: UInt8) {
-        setLedBrightness(.backlight, brightness: brightness)
-    }
-    
-    func setScreenBacklight(_ brightness: UInt8) {
-        setLedBrightness(.screenBacklight, brightness: brightness)
-    }
-    
-    func setOverallLedsBrightness(_ brightness: UInt8) {
-        setLedBrightness(.overallLedsBrightness, brightness: brightness)
+    // Enable or disable font updating
+    func setFontUpdatingEnabled(_ enabled: Bool) {
+        c_fmc_setFontUpdatingEnabled(handle, enabled)
     }
 }
 

@@ -1,5 +1,6 @@
-#include "zibo-pfp-profile.h"
-#include "product-pfp.h"
+#include "zibo-fmc-profile.h"
+#include "product-fmc.h"
+#include "font.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -7,20 +8,11 @@
 #include <cmath>
 #include <cfloat>
 
-ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product) {
+ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     datarefRegex = std::regex("laminar/B738/fmc1/Line([0-9]{2})_([A-Z]+)");
     
-    const PFPLed ledsToSet[] = {
-        PFPLed::CALL,
-        PFPLed::FAIL,
-        PFPLed::MSG,
-        PFPLed::OFST,
-        PFPLed::EXEC
-    };
-
-    for (auto led : ledsToSet) {
-        product->setLedBrightness(led, 0);
-    }
+    product->setAllLedsEnabled(false);
+    product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> screenBrightness) {
         if (screenBrightness.size() < 11) {
@@ -29,7 +21,7 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
 
         //brightness[11] is fmc2 screen
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? screenBrightness[10] * 255.0f : 0;
-        product->setLedBrightness(PFPLed::SCREEN_BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/panel_brightness", [product](std::vector<float> panelBrightness) {
@@ -38,7 +30,7 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
         }
 
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? panelBrightness[3] * 255.0f : 0;
-        product->setLedBrightness(PFPLed::BACKLIGHT, target);
+        product->setLedBrightness(FMCLed::BACKLIGHT, target);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
@@ -47,15 +39,17 @@ ZiboPfpProfile::ZiboPfpProfile(ProductPFP *product) : PfpAircraftProfile(product
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/fmc/fmc_message", [product](bool enabled) {
-        product->setLedBrightness(PFPLed::MSG, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::PFP_MSG, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::MCDU_MCDU, enabled ? 1 : 0);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/indicators/fmc_exec_lights", [product](bool enabled) {
-        product->setLedBrightness(PFPLed::EXEC, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::PFP_EXEC, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::MCDU_RDY, enabled ? 1 : 0);
     });
 }
 
-ZiboPfpProfile::~ZiboPfpProfile() {
+ZiboFMCProfile::~ZiboFMCProfile() {
     Dataref::getInstance()->unbind("laminar/B738/electric/instrument_brightness");
     Dataref::getInstance()->unbind("laminar/B738/electric/panel_brightness");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
@@ -63,11 +57,11 @@ ZiboPfpProfile::~ZiboPfpProfile() {
     Dataref::getInstance()->unbind("laminar/B738/indicators/fmc_exec_lights");
 }
 
-bool ZiboPfpProfile::IsEligible() {
+bool ZiboFMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("laminar/B738/electric/instrument_brightness");
 }
 
-const std::vector<std::string>& ZiboPfpProfile::displayDatarefs() const {
+const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         "laminar/B738/fmc1/Line00_C",
         "laminar/B738/fmc1/Line00_G",
@@ -138,101 +132,117 @@ const std::vector<std::string>& ZiboPfpProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::vector<PFPButtonDef>& ZiboPfpProfile::buttonDefs() const {
-    static const std::vector<PFPButtonDef> sevenThreeSevenButtonLayout = {
-        {0, "LSK1L", "laminar/B738/button/fmc1_1L"},
-        {1, "LSK2L", "laminar/B738/button/fmc1_2L"},
-        {2, "LSK3L", "laminar/B738/button/fmc1_3L"},
-        {3, "LSK4L", "laminar/B738/button/fmc1_4L"},
-        {4, "LSK5L", "laminar/B738/button/fmc1_5L"},
-        {5, "LSK6L", "laminar/B738/button/fmc1_6L"},
-        {6, "LSK1R", "laminar/B738/button/fmc1_1R"},
-        {7, "LSK2R", "laminar/B738/button/fmc1_2R"},
-        {8, "LSK3R", "laminar/B738/button/fmc1_3R"},
-        {9, "LSK4R", "laminar/B738/button/fmc1_4R"},
-        {10, "LSK5R", "laminar/B738/button/fmc1_5R"},
-        {11, "LSK6R", "laminar/B738/button/fmc1_6R"},
-        {12, "INITREF", "laminar/B738/button/fmc1_init_ref"},
-        {13, "RTE", "laminar/B738/button/fmc1_rte"},
-        {14, "CLB", "laminar/B738/button/fmc1_clb"},
-        {15, "CRZ", "laminar/B738/button/fmc1_crz"},
-        {16, "DES", "laminar/B738/button/fmc1_des"},
-        {17, "BRT-", "laminar/B738/electric/instrument_brightness[10]", -0.1},
-        {18, "BRT+", "laminar/B738/electric/instrument_brightness[10]", 0.1},
-        {19, "MENU", "laminar/B738/button/fmc1_menu"},
-        {20, "LEGS", "laminar/B738/button/fmc1_legs"},
-        {21, "DEPARR", "laminar/B738/button/fmc1_dep_app"},
-        {22, "HOLD", "laminar/B738/button/fmc1_hold"},
-        {23, "PROG", "laminar/B738/button/fmc1_prog"},
-        {24, "EXEC", "laminar/B738/button/fmc1_exec"},
-        {25, "N1LIMIT", "laminar/B738/button/fmc1_n1_lim"},
-        {26, "FIX", "laminar/B738/button/fmc1_fix"},
-        {27, "PREV_PAGE", "laminar/B738/button/fmc1_prev_page"},
-        {28, "NEXT_PAGE", "laminar/B738/button/fmc1_next_page"},
-        {29, "KEY1", "laminar/B738/button/fmc1_1"},
-        {30, "KEY2", "laminar/B738/button/fmc1_2"},
-        {31, "KEY3", "laminar/B738/button/fmc1_3"},
-        {32, "KEY4", "laminar/B738/button/fmc1_4"},
-        {33, "KEY5", "laminar/B738/button/fmc1_5"},
-        {34, "KEY6", "laminar/B738/button/fmc1_6"},
-        {35, "KEY7", "laminar/B738/button/fmc1_7"},
-        {36, "KEY8", "laminar/B738/button/fmc1_8"},
-        {37, "KEY9", "laminar/B738/button/fmc1_9"},
-        {38, "PERIOD", "laminar/B738/button/fmc1_period"},
-        {39, "KEY0", "laminar/B738/button/fmc1_0"},
-        {40, "PLUSMINUS", "laminar/B738/button/fmc1_minus"},
-        {41, "KEYA", "laminar/B738/button/fmc1_A"},
-        {42, "KEYB", "laminar/B738/button/fmc1_B"},
-        {43, "KEYC", "laminar/B738/button/fmc1_C"},
-        {44, "KEYD", "laminar/B738/button/fmc1_D"},
-        {45, "KEYE", "laminar/B738/button/fmc1_E"},
-        {46, "KEYF", "laminar/B738/button/fmc1_F"},
-        {47, "KEYG", "laminar/B738/button/fmc1_G"},
-        {48, "KEYH", "laminar/B738/button/fmc1_H"},
-        {49, "KEYI", "laminar/B738/button/fmc1_I"},
-        {50, "KEYJ", "laminar/B738/button/fmc1_J"},
-        {51, "KEYK", "laminar/B738/button/fmc1_K"},
-        {52, "KEYL", "laminar/B738/button/fmc1_L"},
-        {53, "KEYM", "laminar/B738/button/fmc1_M"},
-        {54, "KEYN", "laminar/B738/button/fmc1_N"},
-        {55, "KEYO", "laminar/B738/button/fmc1_O"},
-        {56, "KEYP", "laminar/B738/button/fmc1_P"},
-        {57, "KEYQ", "laminar/B738/button/fmc1_Q"},
-        {58, "KEYR", "laminar/B738/button/fmc1_R"},
-        {59, "KEYS", "laminar/B738/button/fmc1_S"},
-        {60, "KEYT", "laminar/B738/button/fmc1_T"},
-        {61, "KEYU", "laminar/B738/button/fmc1_U"},
-        {62, "KEYV", "laminar/B738/button/fmc1_V"},
-        {63, "KEYW", "laminar/B738/button/fmc1_W"},
-        {64, "KEYX", "laminar/B738/button/fmc1_X"},
-        {65, "KEYY", "laminar/B738/button/fmc1_Y"},
-        {66, "KEYZ", "laminar/B738/button/fmc1_Z"},
-        {67, "SPACE", "laminar/B738/button/fmc1_SP"},
-        {68, "DEL", "laminar/B738/button/fmc1_del"},
-        {69, "SLASH", "laminar/B738/button/fmc1_slash"},
-        {70, "CLR", "laminar/B738/button/fmc1_clr"}
+const std::vector<FMCButtonDef>& ZiboFMCProfile::buttonDefs() const {
+    static const std::vector<FMCButtonDef> buttons = {
+        {FMCKey::LSK1L, "laminar/B738/button/fmc1_1L"},
+        {FMCKey::LSK2L, "laminar/B738/button/fmc1_2L"},
+        {FMCKey::LSK3L, "laminar/B738/button/fmc1_3L"},
+        {FMCKey::LSK4L, "laminar/B738/button/fmc1_4L"},
+        {FMCKey::LSK5L, "laminar/B738/button/fmc1_5L"},
+        {FMCKey::LSK6L, "laminar/B738/button/fmc1_6L"},
+        {FMCKey::LSK1R, "laminar/B738/button/fmc1_1R"},
+        {FMCKey::LSK2R, "laminar/B738/button/fmc1_2R"},
+        {FMCKey::LSK3R, "laminar/B738/button/fmc1_3R"},
+        {FMCKey::LSK4R, "laminar/B738/button/fmc1_4R"},
+        {FMCKey::LSK5R, "laminar/B738/button/fmc1_5R"},
+        {FMCKey::LSK6R, "laminar/B738/button/fmc1_6R"},
+        {std::vector<FMCKey>{FMCKey::PFP_INIT_REF, FMCKey::MCDU_INIT}, "laminar/B738/button/fmc1_init_ref"},
+        {std::vector<FMCKey>{FMCKey::PFP_ROUTE, FMCKey::MCDU_SEC_FPLN}, "laminar/B738/button/fmc1_rte"},
+        {FMCKey::PFP3_CLB, "laminar/B738/button/fmc1_clb"},
+        {FMCKey::PFP3_CRZ, "laminar/B738/button/fmc1_crz"},
+        {FMCKey::PFP3_DES, "laminar/B738/button/fmc1_des"},
+        {FMCKey::BRIGHTNESS_DOWN, "laminar/B738/electric/instrument_brightness[10]", -0.1},
+        {FMCKey::BRIGHTNESS_UP, "laminar/B738/electric/instrument_brightness[10]", 0.1},
+        {FMCKey::MENU, "laminar/B738/button/fmc1_menu"},
+        {std::vector<FMCKey>{FMCKey::PFP_LEGS, FMCKey::MCDU_FPLN, FMCKey::MCDU_DIR}, "laminar/B738/button/fmc1_legs"},
+        {std::vector<FMCKey>{FMCKey::PFP_DEP_ARR, FMCKey::MCDU_AIRPORT}, "laminar/B738/button/fmc1_dep_app"},
+        {FMCKey::PFP_HOLD, "laminar/B738/button/fmc1_hold"},
+        {FMCKey::PROG, "laminar/B738/button/fmc1_prog"},
+        {std::vector<FMCKey>{FMCKey::PFP_EXEC, FMCKey::MCDU_EMPTY_TOP_RIGHT}, "laminar/B738/button/fmc1_exec"},
+        {std::vector<FMCKey>{FMCKey::PFP3_N1_LIMIT, FMCKey::MCDU_PERF}, "laminar/B738/button/fmc1_n1_lim"},
+        {std::vector<FMCKey>{FMCKey::PFP_FIX, FMCKey::MCDU_EMPTY_BOTTOM_LEFT}, "laminar/B738/button/fmc1_fix"},
+        {FMCKey::PAGE_PREV, "laminar/B738/button/fmc1_prev_page"},
+        {FMCKey::PAGE_NEXT, "laminar/B738/button/fmc1_next_page"},
+        {FMCKey::KEY1, "laminar/B738/button/fmc1_1"},
+        {FMCKey::KEY2, "laminar/B738/button/fmc1_2"},
+        {FMCKey::KEY3, "laminar/B738/button/fmc1_3"},
+        {FMCKey::KEY4, "laminar/B738/button/fmc1_4"},
+        {FMCKey::KEY5, "laminar/B738/button/fmc1_5"},
+        {FMCKey::KEY6, "laminar/B738/button/fmc1_6"},
+        {FMCKey::KEY7, "laminar/B738/button/fmc1_7"},
+        {FMCKey::KEY8, "laminar/B738/button/fmc1_8"},
+        {FMCKey::KEY9, "laminar/B738/button/fmc1_9"},
+        {FMCKey::PERIOD, "laminar/B738/button/fmc1_period"},
+        {FMCKey::KEY0, "laminar/B738/button/fmc1_0"},
+        {FMCKey::PLUSMINUS, "laminar/B738/button/fmc1_minus"},
+        {FMCKey::KEYA, "laminar/B738/button/fmc1_A"},
+        {FMCKey::KEYB, "laminar/B738/button/fmc1_B"},
+        {FMCKey::KEYC, "laminar/B738/button/fmc1_C"},
+        {FMCKey::KEYD, "laminar/B738/button/fmc1_D"},
+        {FMCKey::KEYE, "laminar/B738/button/fmc1_E"},
+        {FMCKey::KEYF, "laminar/B738/button/fmc1_F"},
+        {FMCKey::KEYG, "laminar/B738/button/fmc1_G"},
+        {FMCKey::KEYH, "laminar/B738/button/fmc1_H"},
+        {FMCKey::KEYI, "laminar/B738/button/fmc1_I"},
+        {FMCKey::KEYJ, "laminar/B738/button/fmc1_J"},
+        {FMCKey::KEYK, "laminar/B738/button/fmc1_K"},
+        {FMCKey::KEYL, "laminar/B738/button/fmc1_L"},
+        {FMCKey::KEYM, "laminar/B738/button/fmc1_M"},
+        {FMCKey::KEYN, "laminar/B738/button/fmc1_N"},
+        {FMCKey::KEYO, "laminar/B738/button/fmc1_O"},
+        {FMCKey::KEYP, "laminar/B738/button/fmc1_P"},
+        {FMCKey::KEYQ, "laminar/B738/button/fmc1_Q"},
+        {FMCKey::KEYR, "laminar/B738/button/fmc1_R"},
+        {FMCKey::KEYS, "laminar/B738/button/fmc1_S"},
+        {FMCKey::KEYT, "laminar/B738/button/fmc1_T"},
+        {FMCKey::KEYU, "laminar/B738/button/fmc1_U"},
+        {FMCKey::KEYV, "laminar/B738/button/fmc1_V"},
+        {FMCKey::KEYW, "laminar/B738/button/fmc1_W"},
+        {FMCKey::KEYX, "laminar/B738/button/fmc1_X"},
+        {FMCKey::KEYY, "laminar/B738/button/fmc1_Y"},
+        {FMCKey::KEYZ, "laminar/B738/button/fmc1_Z"},
+        {FMCKey::SPACE, "laminar/B738/button/fmc1_SP"},
+        {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, "laminar/B738/button/fmc1_del"},
+        {FMCKey::SLASH, "laminar/B738/button/fmc1_slash"},
+        {FMCKey::CLR, "laminar/B738/button/fmc1_clr"}
     };
     
-    return sevenThreeSevenButtonLayout;
+    return buttons;
 }
 
-const std::map<char, int>& ZiboPfpProfile::colorMap() const {
-    static const std::map<char, int> colMap = {
-        {'W', 0x0042}, // White
-        {'L', 0x0042}, // White
-        {'S', 0x0042}, // White, small
-        {'M', 0x00A5}, // Magenta
-        {'G', 0x0084}, // Green
-        {'C', 0x0063}, // Cyan
-        {'I', 0x0042}, // White (should be inverted)
-        {'X', 0x0042}, // White (should be special labels)
+const std::map<char, FMCTextColor>& ZiboFMCProfile::colorMap() const {
+    static const std::map<char, FMCTextColor> colMap = {
+        {'W', FMCTextColor::COLOR_WHITE},
+        {'L', FMCTextColor::COLOR_WHITE},
+        {'S', FMCTextColor::COLOR_WHITE}, // White, small
+        {'M', FMCTextColor::COLOR_MAGENTA},
+        {'G', FMCTextColor::COLOR_GREEN},
+        {'C', FMCTextColor::COLOR_CYAN},
+        {'I', FMCTextColor::COLOR_WHITE_BG}, // White (should be inverted gray/white)
+        {'X', FMCTextColor::COLOR_WHITE}, // White (should be special labels)
     };
 
     return colMap;
 }
 
-void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
-    page = std::vector<std::vector<char>>(ProductPFP::PageLines, std::vector<char>(ProductPFP::PageCharsPerLine * ProductPFP::PageBytesPerChar, ' '));
+void ZiboFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
+    switch (character) {
+        case '*':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
+            break;
+
+        case '`':
+            buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
+            break;
+        
+        default:
+            buffer->push_back(character);
+            break;
+    }
+}
+
+void ZiboFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+    page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
     
     auto datarefManager = Dataref::getInstance();
     for (const auto& ref : displayDatarefs()) {
@@ -244,7 +254,7 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
                 char color = (ref == "laminar/B738/fmc1/Line_entry_I") ? 'I' : 'W';
                 
                 // Store scratchpad text for later display on line 13
-                for (int i = 0; i < text.size() && i < ProductPFP::PageCharsPerLine; ++i) {
+                for (int i = 0; i < text.size() && i < ProductFMC::PageCharsPerLine; ++i) {
                     char c = text[i];
                     if (c == 0x00) {
                         break; // End of string
@@ -279,16 +289,7 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
             continue;
         }
 
-        #if DEBUG
-        printf("[PFP] %s: {", ref.c_str());
-        for (unsigned char ch : text) {
-            printf("0x%02X, ", static_cast<unsigned char>(ch));
-        }
-        printf("}\n");
-        #endif
-
-        // Process each character in the text
-        for (int i = 0; i < text.size() && i < ProductPFP::PageCharsPerLine; ++i) {
+        for (int i = 0; i < text.size() && i < ProductFMC::PageCharsPerLine; ++i) {
             char c = text[i];
             if (c == 0x00) {
                 break;
@@ -301,7 +302,7 @@ void ZiboPfpProfile::updatePage(std::vector<std::vector<char>>& page) {
     }
 }
 
-void ZiboPfpProfile::buttonPressed(const PFPButtonDef *button, XPLMCommandPhase phase) {
+void ZiboFMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) {
     if (std::fabs(button->value) > DBL_EPSILON) {
         if (phase != xplm_CommandBegin) {
             return;

@@ -28,6 +28,7 @@ typedef int HIDDeviceHandle;
 class USBController {
 private:
     HIDManagerHandle hidManager;
+    bool shouldShutdown = false;
     
     USBController();
     ~USBController();

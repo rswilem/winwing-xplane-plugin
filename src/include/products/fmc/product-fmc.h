@@ -1,51 +1,53 @@
-#ifndef PRODUCT_PFP_H
-#define PRODUCT_PFP_H
+#ifndef PRODUCT_FMC_H
+#define PRODUCT_FMC_H
 
 #include "usbdevice.h"
-#include "pfp-aircraft-profile.h"
+#include "fmc-aircraft-profile.h"
 #include <map>
 #include <set>
+#include <chrono>
 
-class ProductPFP : public USBDevice {
+class ProductFMC: public USBDevice {
 private:
-    PfpAircraftProfile *profile;
+    FMCAircraftProfile *profile;
     std::vector<std::vector<char>> page;
     int lastUpdateCycle;
-    std::map<std::string, std::string> cachedDatarefValues;
     std::set<int> pressedButtonIndices;
+    uint64_t lastButtonStateLo;
+    uint32_t lastButtonStateHi;
     
     void updatePage();
     void draw(const std::vector<std::vector<char>> *pagePtr = nullptr);
-    
     std::pair<uint8_t, uint8_t> dataFromColFont(char color, bool fontSmall = false);
     
     void setProfileForCurrentAircraft();
 
 public:
-    ProductPFP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
-    ~ProductPFP();
+    ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, unsigned char identifierByte);
+    ~ProductFMC();
     
-#if MCDU_AS_PFP
-    static constexpr unsigned char IdentifierByte = 0x32;
-#else
-    static constexpr unsigned char IdentifierByte = 0x31;
-#endif
     static constexpr unsigned int PageLines = 14; // Header + 6 * label + 6 * cont + textbox
     static constexpr unsigned int PageCharsPerLine = 24;
     static constexpr unsigned int PageBytesPerChar = 3;
     static constexpr unsigned int PageBytesPerLine = PageCharsPerLine * PageBytesPerChar;
+    FMCHardwareType hardwareType;
+    const unsigned char identifierByte;
+    bool fontUpdatingEnabled;
 
     const char* classIdentifier() override;
     bool connect() override;
     void disconnect() override;
+    void unloadProfile();
     void update() override;
     void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
     void writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall = false);
+    void setFont(std::vector<std::vector<unsigned char>> font);
     
-    void setLedBrightness(PFPLed led, uint8_t brightness);
+    void setAllLedsEnabled(bool enable);
+    void setLedBrightness(FMCLed led, uint8_t brightness);
     
     void clearDisplay();
-    void showBackground(unsigned char variant);
+    void showBackground(FMCBackgroundVariant variant);
 };
 
 #endif

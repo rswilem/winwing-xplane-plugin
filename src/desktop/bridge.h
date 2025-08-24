@@ -20,8 +20,7 @@ bool isDeviceConnected(int deviceIndex);
 // Direct device handle access
 void* getDeviceHandle(int deviceIndex);
 void* getJoystickHandle(int deviceIndex);
-void* getMCDUHandle(int deviceIndex);
-void* getPFPHandle(int deviceIndex);
+void* getFMCHandle(int deviceIndex);
 void* getFCUEfisHandle(int deviceIndex);
 
 // Generic device functions via handle
@@ -33,17 +32,15 @@ void device_update(void* deviceHandle);
 bool joystick_setVibration(void* joystickHandle, uint8_t vibration);
 bool joystick_setLedBrightness(void* joystickHandle, uint8_t brightness);
 
-// MCDU functions via handle  
-void mcdu_clearDisplay(void* mcduHandle);
-void mcdu_showBackground(void* mcduHandle, int variant);
-bool mcdu_setLed(void* mcduHandle, int ledId, uint8_t value);
-void mcdu_setLedBrightness(void* mcduHandle, int ledId, uint8_t brightness);
-
-// PFP functions via handle
-void pfp_clearDisplay(void* pfpHandle);
-void pfp_showBackground(void* pfpHandle, int variant);
-bool pfp_setLed(void* pfpHandle, int ledId, uint8_t value);
-void pfp_setLedBrightness(void* pfpHandle, int ledId, uint8_t brightness);
+// FMC functions via handle  
+void fmc_clearDisplay(void* fmcHandle);
+void fmc_unloadProfile(void* fmcHandle);
+void fmc_showBackground(void* fmcHandle, int variant);
+bool fmc_setLed(void* fmcHandle, int ledId, uint8_t value);
+void fmc_setLedBrightness(void* fmcHandle, int ledId, uint8_t brightness);
+bool fmc_writeData(void* fmcHandle, const uint8_t* data, int length);
+void fmc_setFont(void* fmcHandle, int fontType);
+void fmc_setFontUpdatingEnabled(void* fmcHandle, bool enabled);
 
 // FCU-EFIS functions via handle
 void fcuefis_clear(void* fcuefisHandle);
