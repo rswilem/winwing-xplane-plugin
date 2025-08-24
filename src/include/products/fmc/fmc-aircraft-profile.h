@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <array>
 #include <XPLMUtilities.h>
 #include "fmc-hardware-mapping.h"
 
