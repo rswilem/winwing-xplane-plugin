@@ -24,6 +24,8 @@
 		F64BE3EB2E1BF625003C1B73 /* usbdevice_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E62E1BF625003C1B73 /* usbdevice_win.cpp */; };
 		F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E42E1BF625003C1B73 /* usbcontroller_win.cpp */; };
 		F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */; };
+		F67110DD2E5AF429008D493B /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67110DC2E5AF429008D493B /* font.cpp */; };
+		F67110DE2E5AF429008D493B /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67110DC2E5AF429008D493B /* font.cpp */; };
 		F67961952E31357E008031F1 /* usbdevice_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961942E31357E008031F1 /* usbdevice_lin.cpp */; };
 		F67961962E31357E008031F1 /* usbdevice_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961942E31357E008031F1 /* usbdevice_lin.cpp */; };
 		F68164E52E3161FD00319E9D /* usbcontroller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F68164E42E3161FD00319E9D /* usbcontroller.cpp */; };
@@ -75,7 +77,7 @@
 		F62304292E5A212700EE0089 /* vga_4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_4.h; sourceTree = "<group>"; };
 		F623042A2E5A212700EE0089 /* vga_3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_3.h; sourceTree = "<group>"; };
 		F623042B2E5A212700EE0089 /* vga_2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_2.h; sourceTree = "<group>"; };
-		F623042D2E5A230B00EE0089 /* fonts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fonts.h; sourceTree = "<group>"; };
+		F623042D2E5A230B00EE0089 /* font.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = font.h; sourceTree = "<group>"; };
 		F62D2DF52E55FA4C00D307A4 /* xcrafts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xcrafts.h; sourceTree = "<group>"; };
 		F62D2DF72E55FA7B00D307A4 /* airbus_2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = airbus_2.h; sourceTree = "<group>"; };
 		F62D2DF82E55FA9100D307A4 /* airbus_1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = airbus_1.h; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 		F64BE3E42E1BF625003C1B73 /* usbcontroller_win.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_win.cpp; sourceTree = "<group>"; };
 		F64BE3E62E1BF625003C1B73 /* usbdevice_win.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_win.cpp; sourceTree = "<group>"; };
 		F66F91662D0332F600F84283 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		F67110DC2E5AF429008D493B /* font.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = font.cpp; sourceTree = "<group>"; };
 		F67961942E31357E008031F1 /* usbdevice_lin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_lin.cpp; sourceTree = "<group>"; };
 		F68164E42E3161FD00319E9D /* usbcontroller.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller.cpp; sourceTree = "<group>"; };
 		F6827DF82E0564F700382B28 /* WinwingDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WinwingDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -198,7 +201,8 @@
 		F62D2DF62E55FA4C00D307A4 /* fonts */ = {
 			isa = PBXGroup;
 			children = (
-				F623042D2E5A230B00EE0089 /* fonts.h */,
+				F623042D2E5A230B00EE0089 /* font.h */,
+				F67110DC2E5AF429008D493B /* font.cpp */,
 				F62D2DF82E55FA9100D307A4 /* airbus_1.h */,
 				F62D2DF72E55FA7B00D307A4 /* airbus_2.h */,
 				F603C3A12E59D1C400B73F42 /* airbus_3.h */,
@@ -477,6 +481,7 @@
 				F635AD532E059872005D6CDC /* path.cpp in Sources */,
 				F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
 				F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
+				F67110DE2E5AF429008D493B /* font.cpp in Sources */,
 				F688808B2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */,
 				F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
@@ -522,6 +527,7 @@
 				F69FF22D2E1D13CB00F9D2D9 /* GenericDeviceView.swift in Sources */,
 				F69FF22E2E1D13CB00F9D2D9 /* DeviceModel.swift in Sources */,
 				F69FF22F2E1D13CB00F9D2D9 /* JoystickControlView.swift in Sources */,
+				F67110DD2E5AF429008D493B /* font.cpp in Sources */,
 				F647201E2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
 				F67961962E31357E008031F1 /* usbdevice_lin.cpp in Sources */,
 				F635AD422E05697B005D6CDC /* bridge.mm in Sources */,

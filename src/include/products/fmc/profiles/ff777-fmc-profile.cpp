@@ -1,6 +1,6 @@
 #include "ff777-fmc-profile.h"
 #include "product-fmc.h"
-#include "fonts.h"
+#include "font.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -8,7 +8,7 @@
 
 FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFont737);
+    product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
     
     Dataref::getInstance()->monitorExistingDataref<float>("sim/cockpit/electrical/instrument_brightness", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
@@ -55,21 +55,21 @@ const std::vector<FMCButtonDef>& FlightFactor777FMCProfile::buttonDefs() const {
         {FMCKey::LSK4R, "1-sim/ckpt/cduLRK4/anim"},
         {FMCKey::LSK5R, "1-sim/ckpt/cduLRK5/anim"},
         {FMCKey::LSK6R, "1-sim/ckpt/cduLRK6/anim"},
-        {FMCKey::INIT_REF, ""},
-        {FMCKey::ROUTE, ""},
-        {FMCKey::DEP_ARR, ""},
-        {FMCKey::ALTN, ""},
-        {FMCKey::VNAV, ""},
+        {std::vector<FMCKey>{FMCKey::PFP_INIT_REF, FMCKey::MCDU_INIT}, ""},
+        {FMCKey::PFP_ROUTE, ""},
+        {FMCKey::PFP_DEP_ARR, ""},
+        {FMCKey::PFP7_ALTN, ""},
+        {FMCKey::PFP7_VNAV, ""},
         {FMCKey::BRIGHTNESS_DOWN, ""},
         {FMCKey::BRIGHTNESS_UP, ""},
-        {FMCKey::AIRPORT_OR_FIX, ""},
-        {FMCKey::LEGS, ""},
-        {FMCKey::HOLD, ""},
-        {FMCKey::FMC_COMM, ""},
+        {FMCKey::PFP_FIX, ""},
+        {std::vector<FMCKey>{FMCKey::PFP_LEGS, FMCKey::MCDU_FPLN}, ""},
+        {FMCKey::PFP_HOLD, ""},
+        {FMCKey::PFP7_FMC_COMM, ""},
         {FMCKey::PROG, ""},
-        {FMCKey::EXEC_OR_MCDU_EMPTY_TOP_RIGHT, ""},
+        {FMCKey::PFP_EXEC, ""},
         {FMCKey::MENU, ""},
-        {FMCKey::RAD_NAV, ""},
+        {FMCKey::PFP7_NAV_RAD, ""},
         {FMCKey::PAGE_PREV, ""},
         {FMCKey::PAGE_NEXT, ""},
         {FMCKey::KEY1, ""},
@@ -111,7 +111,7 @@ const std::vector<FMCButtonDef>& FlightFactor777FMCProfile::buttonDefs() const {
         {FMCKey::KEYY, ""},
         {FMCKey::KEYZ, ""},
         {FMCKey::SPACE, ""},
-        {FMCKey::OVERFLY_OR_DEL, ""},
+        {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, ""},
         {FMCKey::SLASH, ""},
         {FMCKey::CLR, ""}
     };

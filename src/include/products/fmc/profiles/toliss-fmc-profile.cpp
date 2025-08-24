@@ -1,6 +1,6 @@
 #include "toliss-fmc-profile.h"
 #include "product-fmc.h"
-#include "fonts.h"
+#include "font.h"
 #include "dataref.h"
 #include "config.h"
 #include <algorithm>
@@ -9,7 +9,7 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(pro
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
 
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontAirbusVariant1);
+    product->setFont(Font::GlyphData(FontVariant::FontAirbus1, product->identifierByte));
     
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
@@ -192,26 +192,26 @@ const std::vector<FMCButtonDef>& TolissFMCProfile::buttonDefs() const {
         {FMCKey::LSK4R, "AirbusFBW/MCDU1LSK4R"},
         {FMCKey::LSK5R, "AirbusFBW/MCDU1LSK5R"},
         {FMCKey::LSK6R, "AirbusFBW/MCDU1LSK6R"},
-        {FMCKey::DIRTO, "AirbusFBW/MCDU1DirTo"},
+        {FMCKey::MCDU_DIR, "AirbusFBW/MCDU1DirTo"},
         {FMCKey::PROG, "AirbusFBW/MCDU1Prog"},
-        {FMCKey::N1_LIMIT_OR_PERF, "AirbusFBW/MCDU1Perf"},
-        {FMCKey::INIT_REF, "AirbusFBW/MCDU1Init"},
-        {FMCKey::DATA, "AirbusFBW/MCDU1Data"},
-        {FMCKey::EXEC_OR_MCDU_EMPTY_TOP_RIGHT, "AirbusFBW/CaptChronoButton"},
+        {FMCKey::MCDU_PERF, "AirbusFBW/MCDU1Perf"},
+        {FMCKey::MCDU_INIT, "AirbusFBW/MCDU1Init"},
+        {FMCKey::MCDU_DATA, "AirbusFBW/MCDU1Data"},
+        {FMCKey::MCDU_EMPTY_TOP_RIGHT, "AirbusFBW/CaptChronoButton"},
         {FMCKey::BRIGHTNESS_UP, "AirbusFBW/MCDU1KeyBright"},
-        {FMCKey::FPLN, "AirbusFBW/MCDU1Fpln"},
-        {FMCKey::RAD_NAV, "AirbusFBW/MCDU1RadNav"},
-        {FMCKey::FUEL, "AirbusFBW/MCDU1FuelPred"},
-        {FMCKey::SEC_FPLN, "AirbusFBW/MCDU1SecFpln"},
-        {FMCKey::ATC, "AirbusFBW/MCDU1ATC"},
+        {FMCKey::MCDU_FPLN, "AirbusFBW/MCDU1Fpln"},
+        {FMCKey::MCDU_RAD_NAV, "AirbusFBW/MCDU1RadNav"},
+        {FMCKey::MCDU_FUEL_PRED, "AirbusFBW/MCDU1FuelPred"},
+        {FMCKey::MCDU_SEC_FPLN, "AirbusFBW/MCDU1SecFpln"},
+        {FMCKey::MCDU_ATC_COMM, "AirbusFBW/MCDU1ATC"},
         {FMCKey::MENU, "AirbusFBW/MCDU1Menu"},
         {FMCKey::BRIGHTNESS_DOWN, "AirbusFBW/MCDU1KeyDim"},
-        {FMCKey::AIRPORT_OR_FIX, "AirbusFBW/MCDU1Airport"},
+        {FMCKey::MCDU_AIRPORT, "AirbusFBW/MCDU1Airport"},
         {FMCKey::MCDU_EMPTY_BOTTOM_LEFT, "AirbusFBW/purser/fwd"},
         {FMCKey::PAGE_PREV, "AirbusFBW/MCDU1SlewLeft"},
-        {FMCKey::PAGE_UP, "AirbusFBW/MCDU1SlewUp"},
+        {FMCKey::MCDU_PAGE_UP, "AirbusFBW/MCDU1SlewUp"},
         {FMCKey::PAGE_NEXT, "AirbusFBW/MCDU1SlewRight"},
-        {FMCKey::PAGE_DOWN, "AirbusFBW/MCDU1SlewDown"},
+        {FMCKey::MCDU_PAGE_DOWN, "AirbusFBW/MCDU1SlewDown"},
         {FMCKey::KEY1, "AirbusFBW/MCDU1Key1"},
         {FMCKey::KEY2, "AirbusFBW/MCDU1Key2"},
         {FMCKey::KEY3, "AirbusFBW/MCDU1Key3"},
@@ -252,7 +252,7 @@ const std::vector<FMCButtonDef>& TolissFMCProfile::buttonDefs() const {
         {FMCKey::KEYZ, "AirbusFBW/MCDU1KeyZ"},
         {FMCKey::SLASH, "AirbusFBW/MCDU1KeySlash"},
         {FMCKey::SPACE, "AirbusFBW/MCDU1KeySpace"},
-        {FMCKey::OVERFLY_OR_DEL, "AirbusFBW/MCDU1KeyOverfly"},
+        {std::vector<FMCKey>{FMCKey::MCDU_OVERFLY,FMCKey::PFP_DEL}, "AirbusFBW/MCDU1KeyOverfly"},
         {FMCKey::CLR, "AirbusFBW/MCDU1KeyClear"},
     };
     

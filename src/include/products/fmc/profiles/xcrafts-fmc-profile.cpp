@@ -2,7 +2,7 @@
 #include "product-fmc.h"
 #include "dataref.h"
 #include "appstate.h"
-#include "fonts.h"
+#include "font.h"
 #include <cstring>
 #include <algorithm>
 #include <cmath>
@@ -15,7 +15,7 @@ XCraftsFMCProfile::XCraftsFMCProfile(ProductFMC *product) : FMCAircraftProfile(p
     datarefRegex = std::regex("XCrafts/FMS/CDU_1_([0-9]{2}|ScratchPad)");
     
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontXCrafts);
+    product->setFont(Font::GlyphData(FontVariant::FontXCrafts, product->identifierByte));
     
     // Monitor avionics power for LED control
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [product](bool poweredOn) {
@@ -79,8 +79,8 @@ const std::vector<FMCButtonDef>& XCraftsFMCProfile::buttonDefs() const {
         {FMCKey::LSK6R, "XCrafts/ERJ/CDU_1/RSK6"},
         
         // Function Keys
-        {FMCKey::N1_LIMIT_OR_PERF, "XCrafts/ERJ/CDU_1/Key_PERF"},
-        {FMCKey::FPLN, "XCrafts/ERJ/CDU_1/Key_NAV"},
+//        {FMCKey::PFP3_N1_LIMIT, "XCrafts/ERJ/CDU_1/Key_PERF"},
+//        {FMCKey::FPLN, "XCrafts/ERJ/CDU_1/Key_NAV"},
         
         // Navigation
         {FMCKey::PAGE_PREV, "XCrafts/ERJ/CDU_1/Key_PREV"},
@@ -134,7 +134,7 @@ const std::vector<FMCButtonDef>& XCraftsFMCProfile::buttonDefs() const {
         
         // Special Keys
         {FMCKey::SPACE, "XCrafts/ERJ/CDU_1/Key_Space"},
-        {FMCKey::OVERFLY_OR_DEL, "XCrafts/ERJ/CDU_1/Key_DEL"},
+        {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, "XCrafts/ERJ/CDU_1/Key_DEL"},
         {FMCKey::SLASH, "XCrafts/ERJ/CDU_1/Key_Slash_Command"},
         {FMCKey::CLR, "XCrafts/ERJ/CDU_1/Key_CLR"}
     };

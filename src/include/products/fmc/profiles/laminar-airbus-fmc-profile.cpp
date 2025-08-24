@@ -1,13 +1,13 @@
 #include "laminar-airbus-fmc-profile.h"
 #include "product-fmc.h"
-#include "fonts.h"
+#include "font.h"
 #include "dataref.h"
 #include <cstring>
 #include <algorithm>
 
 LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontAirbusVariant1);
+    product->setFont(Font::GlyphData(FontVariant::FontAirbus1, product->identifierByte));
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {
@@ -73,26 +73,26 @@ const std::vector<FMCButtonDef>& LaminarFMCProfile::buttonDefs() const {
         {FMCKey::LSK4R, "sim/FMS/ls_4r"},
         {FMCKey::LSK5R, "sim/FMS/ls_5r"},
         {FMCKey::LSK6R, "sim/FMS/ls_6r"},
-        {FMCKey::DIRTO, "sim/FMS/dir_intc"},
+        {std::vector<FMCKey>{FMCKey::MCDU_DIR, FMCKey::PFP_LEGS}, "sim/FMS/dir_intc"},
         {FMCKey::PROG, "sim/FMS/prog"},
-        {FMCKey::N1_LIMIT_OR_PERF, "sim/FMS/perf"},
-        {FMCKey::INIT_REF, "sim/FMS/index"},
-        {FMCKey::DATA, "sim/FMS/data"},
-        {FMCKey::EXEC_OR_MCDU_EMPTY_TOP_RIGHT, ""},
+        {std::vector<FMCKey>{FMCKey::MCDU_PERF, FMCKey::PFP3_N1_LIMIT}, "sim/FMS/perf"},
+        {std::vector<FMCKey>{FMCKey::MCDU_INIT, FMCKey::PFP_INIT_REF}, "sim/FMS/index"},
+        {FMCKey::MCDU_DATA, "sim/FMS/data"},
+        {FMCKey::MCDU_EMPTY_TOP_RIGHT, ""},
         {FMCKey::BRIGHTNESS_UP, "laminar/A333/buttons/fms1_brightness_up"},
-        {FMCKey::FPLN, "sim/FMS/fpln"},
-        {FMCKey::RAD_NAV, "sim/FMS/navrad"},
-        {FMCKey::FUEL, "sim/FMS/fuel_pred"},
-        {FMCKey::SEC_FPLN, ""},
-        {FMCKey::ATC, ""},
+        {FMCKey::MCDU_FPLN, "sim/FMS/fpln"},
+        {FMCKey::MCDU_RAD_NAV, "sim/FMS/navrad"},
+        {FMCKey::MCDU_FUEL_PRED, "sim/FMS/fuel_pred"},
+        {FMCKey::MCDU_SEC_FPLN, ""},
+        {FMCKey::MCDU_ATC_COMM, ""},
         {FMCKey::MENU, "sim/FMS/menu"},
         {FMCKey::BRIGHTNESS_DOWN, "laminar/A333/buttons/fms1_brightness_dn"},
-        {FMCKey::AIRPORT_OR_FIX, "sim/FMS/airport"},
+        {FMCKey::MCDU_AIRPORT, "sim/FMS/airport"},
         {FMCKey::MCDU_EMPTY_BOTTOM_LEFT, ""},
         {FMCKey::PAGE_PREV, "sim/FMS/prev"},
-        {FMCKey::PAGE_UP, "sim/FMS/up"},
+        {FMCKey::MCDU_PAGE_UP, "sim/FMS/up"},
         {FMCKey::PAGE_NEXT, "sim/FMS/next"},
-        {FMCKey::PAGE_DOWN, "sim/FMS/down"},
+        {FMCKey::MCDU_PAGE_DOWN, "sim/FMS/down"},
         {FMCKey::KEY1, "sim/FMS/key_1"},
         {FMCKey::KEY2, "sim/FMS/key_2"},
         {FMCKey::KEY3, "sim/FMS/key_1"},
@@ -133,7 +133,7 @@ const std::vector<FMCButtonDef>& LaminarFMCProfile::buttonDefs() const {
         {FMCKey::KEYZ, "sim/FMS/key_Z"},
         {FMCKey::SLASH, "sim/FMS/key_slash"},
         {FMCKey::SPACE, "sim/FMS/key_space"},
-        {FMCKey::OVERFLY_OR_DEL, "sim/FMS/key_overfly"},
+        {std::vector<FMCKey>{FMCKey::MCDU_OVERFLY,FMCKey::PFP_DEL}, "sim/FMS/key_overfly"},
         {FMCKey::CLR, "sim/FMS/key_clear"},
     };
     

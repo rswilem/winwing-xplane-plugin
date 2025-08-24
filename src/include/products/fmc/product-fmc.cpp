@@ -230,7 +230,15 @@ void ProductFMC::didReceiveData(int reportId, uint8_t *report, int reportLength)
         
         FMCKey key = FMCHardwareMapping::ButtonIdentifierForIndex(hardwareType, i);
         const std::vector<FMCButtonDef>& currentButtonDefs = profile->buttonDefs();
-        auto it = std::find_if(currentButtonDefs.begin(), currentButtonDefs.end(), [&](const FMCButtonDef& def) { return def.key == key; });
+        auto it = std::find_if(currentButtonDefs.begin(), currentButtonDefs.end(), [&](const FMCButtonDef& def) {
+            return std::visit([&](auto&& k) {
+                using T = std::decay_t<decltype(k)>;
+                if constexpr (std::is_same_v<T, FMCKey>)
+                    return k == key;
+                else
+                    return std::find(k.begin(), k.end(), key) != k.end();
+            }, def.key);
+        });
         if (it != currentButtonDefs.end()) {
             profile->buttonPressed(&*it, command);
         }

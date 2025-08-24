@@ -1,6 +1,6 @@
 #include "ixeg733-fmc-profile.h"
 #include "product-fmc.h"
-#include "fonts.h"
+#include "font.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -13,7 +13,7 @@
 
 IXEG733FMCProfile::IXEG733FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontVGA1);
+    product->setFont(Font::GlyphData(FontVariant::FontVGA1, product->identifierByte));
         
     Dataref::getInstance()->monitorExistingDataref<float>("ixeg/733/rheostats/light_fmc_pt_act", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
@@ -83,21 +83,21 @@ const std::vector<FMCButtonDef>& IXEG733FMCProfile::buttonDefs() const {
         {FMCKey::LSK4R, "ixeg/733/FMC/cdu1_lsk_4R"},
         {FMCKey::LSK5R, "ixeg/733/FMC/cdu1_lsk_5R"},
         {FMCKey::LSK6R, "ixeg/733/FMC/cdu1_lsk_6R"},
-        {FMCKey::INIT_REF, "ixeg/733/FMC/cdu1_initref"},
-        {FMCKey::ROUTE, "ixeg/733/FMC/cdu1_rte"},
-        {FMCKey::CLB, "ixeg/733/FMC/cdu1_clb"},
-        {FMCKey::CRZ, "ixeg/733/FMC/cdu1_crz"},
-        {FMCKey::DES, "ixeg/733/FMC/cdu1_des"},
+        {FMCKey::PFP_INIT_REF, "ixeg/733/FMC/cdu1_initref"},
+        {FMCKey::PFP_ROUTE, "ixeg/733/FMC/cdu1_rte"},
+        {FMCKey::PFP3_CLB, "ixeg/733/FMC/cdu1_clb"},
+        {FMCKey::PFP3_CRZ, "ixeg/733/FMC/cdu1_crz"},
+        {FMCKey::PFP3_DES, "ixeg/733/FMC/cdu1_des"},
         {FMCKey::BRIGHTNESS_DOWN, "ixeg/733/rheostats/light_fmc_pt_act", -0.1},
         {FMCKey::BRIGHTNESS_UP, "ixeg/733/rheostats/light_fmc_pt_act", 0.1},
         {FMCKey::MENU, "ixeg/733/FMC/cdu1_menu"},
-        {FMCKey::LEGS, "ixeg/733/FMC/cdu1_legs"},
-        {FMCKey::DEP_ARR, "ixeg/733/FMC/cdu1_deparr"},
-        {FMCKey::HOLD, "ixeg/733/FMC/cdu1_hold"},
+        {FMCKey::PFP_LEGS, "ixeg/733/FMC/cdu1_legs"},
+        {FMCKey::PFP_DEP_ARR, "ixeg/733/FMC/cdu1_deparr"},
+        {FMCKey::PFP_HOLD, "ixeg/733/FMC/cdu1_hold"},
         {FMCKey::PROG, "ixeg/733/FMC/cdu1_prog"},
-        {FMCKey::EXEC_OR_MCDU_EMPTY_TOP_RIGHT, "ixeg/733/FMC/cdu1_exec"},
-        {FMCKey::N1_LIMIT_OR_PERF, "ixeg/733/FMC/cdu1_n1limit"},
-        {FMCKey::AIRPORT_OR_FIX, "ixeg/733/FMC/cdu1_fix"},
+        {FMCKey::PFP_EXEC, "ixeg/733/FMC/cdu1_exec"},
+        {FMCKey::PFP3_N1_LIMIT, "ixeg/733/FMC/cdu1_n1limit"},
+        {FMCKey::PFP_FIX, "ixeg/733/FMC/cdu1_fix"},
         {FMCKey::PAGE_PREV, "ixeg/733/FMC/cdu1_prev"},
         {FMCKey::PAGE_NEXT, "ixeg/733/FMC/cdu1_next"},
         {FMCKey::KEY1, "ixeg/733/FMC/cdu1_1"},
@@ -139,7 +139,7 @@ const std::vector<FMCButtonDef>& IXEG733FMCProfile::buttonDefs() const {
         {FMCKey::KEYY, "ixeg/733/FMC/cdu1_Y"},
         {FMCKey::KEYZ, "ixeg/733/FMC/cdu1_Z"},
         {FMCKey::SPACE, "ixeg/733/FMC/cdu1_sp"},
-        {FMCKey::OVERFLY_OR_DEL, "ixeg/733/FMC/cdu1_del"},
+        {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, "ixeg/733/FMC/cdu1_del"},
         {FMCKey::SLASH, "ixeg/733/FMC/cdu1_slash"},
         {FMCKey::CLR, "ixeg/733/FMC/cdu1_clr"}
     };

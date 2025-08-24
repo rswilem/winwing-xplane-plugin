@@ -1,6 +1,6 @@
 #include "ssg748-fmc-profile.h"
 #include "product-fmc.h"
-#include "fonts.h"
+#include "font.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -11,7 +11,7 @@ SSG748FMCProfile::SSG748FMCProfile(ProductFMC *product) : FMCAircraftProfile(pro
     datarefRegex = std::regex("SSG/UFMC/LINE_([0-9]+)");
 
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFontVGA1);
+    product->setFont(Font::GlyphData(FontVariant::FontVGA1, product->identifierByte));
         
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("ssg/LGT/mcdu_brt_sw", [product](std::vector<float> brightness) {
         if (brightness.size() < 27) {
@@ -74,21 +74,21 @@ const std::vector<FMCButtonDef>& SSG748FMCProfile::buttonDefs() const {
         {FMCKey::LSK4R, "SSG/CDU/cdu1_rk4_sw"},
         {FMCKey::LSK5R, "SSG/CDU/cdu1_rk5_sw"},
         {FMCKey::LSK6R, "SSG/CDU/cdu1_rk6_sw"},
-        {FMCKey::INIT_REF, "SSG/CDU/cdu1_init_sw"},
-        {FMCKey::ROUTE, "SSG/CDU/cdu1_rte_sw"},
-        {FMCKey::DEP_ARR, "SSG/CDU/cdu1_dep_arr_sw"},
-        {FMCKey::ATC, "SSG/CDU/cdu1_atc_sw"},
-        {FMCKey::VNAV, "SSG/CDU/cdu1_vnav_sw"},
+        {FMCKey::PFP_INIT_REF, "SSG/CDU/cdu1_init_sw"},
+        {FMCKey::PFP_ROUTE, "SSG/CDU/cdu1_rte_sw"},
+        {FMCKey::PFP_DEP_ARR, "SSG/CDU/cdu1_dep_arr_sw"},
+        {FMCKey::PFP4_ATC, "SSG/CDU/cdu1_atc_sw"},
+        {FMCKey::PFP4_VNAV, "SSG/CDU/cdu1_vnav_sw"},
         {FMCKey::BRIGHTNESS_DOWN, "SSG/CDU/cdu1_brt_sw", -1},
         {FMCKey::BRIGHTNESS_UP, "SSG/CDU/cdu1_brt_sw", 1},
-        {FMCKey::AIRPORT_OR_FIX, "SSG/CDU/cdu1_fix_sw"},
-        {FMCKey::LEGS, "SSG/CDU/cdu1_legs_sw"},
-        {FMCKey::HOLD, "SSG/CDU/cdu1_hold_sw"},
-        {FMCKey::FMC_COMM, "SSG/CDU/cdu1_comm_sw"},
+        {FMCKey::PFP_FIX, "SSG/CDU/cdu1_fix_sw"},
+        {FMCKey::PFP_LEGS, "SSG/CDU/cdu1_legs_sw"},
+        {FMCKey::PFP_HOLD, "SSG/CDU/cdu1_hold_sw"},
+        {FMCKey::PFP4_FMC_COMM, "SSG/CDU/cdu1_comm_sw"},
         {FMCKey::PROG, "SSG/CDU/cdu1_prog_sw"},
-        {FMCKey::EXEC_OR_MCDU_EMPTY_TOP_RIGHT, "SSG/CDU/cdu1_exec_sw"},
+        {FMCKey::PFP_EXEC, "SSG/CDU/cdu1_exec_sw"},
         {FMCKey::MENU, "SSG/CDU/cdu1_menu_sw"},
-        {FMCKey::RAD_NAV, "SSG/CDU/cdu1_radio_sw"},
+        {FMCKey::PFP4_NAV_RAD, "SSG/CDU/cdu1_radio_sw"},
         {FMCKey::PAGE_PREV, "SSG/CDU/cdu1_prev_sw"},
         {FMCKey::PAGE_NEXT, "SSG/CDU/cdu1_next_sw"},
         {FMCKey::KEY1, "SSG/CDU/cdu1_1_sw"},
@@ -130,7 +130,7 @@ const std::vector<FMCButtonDef>& SSG748FMCProfile::buttonDefs() const {
         {FMCKey::KEYY, "SSG/CDU/cdu1_y_sw"},
         {FMCKey::KEYZ, "SSG/CDU/cdu1_z_sw"},
         {FMCKey::SPACE, "SSG/CDU/cdu1_sp_sw"},
-        {FMCKey::OVERFLY_OR_DEL, "SSG/CDU/cdu1_del_sw"},
+        {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, "SSG/CDU/cdu1_del_sw"},
         {FMCKey::SLASH, "SSG/CDU/cdu1_slash_sw"},
         {FMCKey::CLR, "SSG/CDU/cdu1_clr_sw"}
     };

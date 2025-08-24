@@ -1,6 +1,6 @@
 #include "zibo-fmc-profile.h"
 #include "product-fmc.h"
-#include "fonts.h"
+#include "font.h"
 #include "dataref.h"
 #include "appstate.h"
 #include <cstring>
@@ -12,7 +12,7 @@ ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) : FMCAircraftProfile(product
     datarefRegex = std::regex("laminar/B738/fmc1/Line([0-9]{2})_([A-Z]+)");
     
     product->setAllLedsEnabled(false);
-    product->setFont(fmcFont737);
+    product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> screenBrightness) {
         if (screenBrightness.size() < 11) {
@@ -40,10 +40,12 @@ ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) : FMCAircraftProfile(product
     
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/fmc/fmc_message", [product](bool enabled) {
         product->setLedBrightness(FMCLed::PFP_MSG, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::MCDU_MCDU, enabled ? 1 : 0);
     });
     
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/indicators/fmc_exec_lights", [product](bool enabled) {
         product->setLedBrightness(FMCLed::PFP_EXEC, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::MCDU_RDY, enabled ? 1 : 0);
     });
 }
 
@@ -144,21 +146,21 @@ const std::vector<FMCButtonDef>& ZiboFMCProfile::buttonDefs() const {
         {FMCKey::LSK4R, "laminar/B738/button/fmc1_4R"},
         {FMCKey::LSK5R, "laminar/B738/button/fmc1_5R"},
         {FMCKey::LSK6R, "laminar/B738/button/fmc1_6R"},
-        {FMCKey::INIT_REF, "laminar/B738/button/fmc1_init_ref"},
-        {FMCKey::ROUTE, "laminar/B738/button/fmc1_rte"},
-        {FMCKey::CLB, "laminar/B738/button/fmc1_clb"},
-        {FMCKey::CRZ, "laminar/B738/button/fmc1_crz"},
-        {FMCKey::DES, "laminar/B738/button/fmc1_des"},
+        {FMCKey::PFP_INIT_REF, "laminar/B738/button/fmc1_init_ref"},
+        {FMCKey::PFP_ROUTE, "laminar/B738/button/fmc1_rte"},
+        {FMCKey::PFP3_CLB, "laminar/B738/button/fmc1_clb"},
+        {FMCKey::PFP3_CRZ, "laminar/B738/button/fmc1_crz"},
+        {FMCKey::PFP3_DES, "laminar/B738/button/fmc1_des"},
         {FMCKey::BRIGHTNESS_DOWN, "laminar/B738/electric/instrument_brightness[10]", -0.1},
         {FMCKey::BRIGHTNESS_UP, "laminar/B738/electric/instrument_brightness[10]", 0.1},
         {FMCKey::MENU, "laminar/B738/button/fmc1_menu"},
-        {FMCKey::LEGS, "laminar/B738/button/fmc1_legs"},
-        {FMCKey::DEP_ARR, "laminar/B738/button/fmc1_dep_app"},
-        {FMCKey::HOLD, "laminar/B738/button/fmc1_hold"},
+        {FMCKey::PFP_LEGS, "laminar/B738/button/fmc1_legs"},
+        {FMCKey::PFP_DEP_ARR, "laminar/B738/button/fmc1_dep_app"},
+        {FMCKey::PFP_HOLD, "laminar/B738/button/fmc1_hold"},
         {FMCKey::PROG, "laminar/B738/button/fmc1_prog"},
-        {FMCKey::EXEC_OR_MCDU_EMPTY_TOP_RIGHT, "laminar/B738/button/fmc1_exec"},
-        {FMCKey::N1_LIMIT_OR_PERF, "laminar/B738/button/fmc1_n1_lim"},
-        {FMCKey::AIRPORT_OR_FIX, "laminar/B738/button/fmc1_fix"},
+        {FMCKey::PFP_EXEC, "laminar/B738/button/fmc1_exec"},
+        {FMCKey::PFP3_N1_LIMIT, "laminar/B738/button/fmc1_n1_lim"},
+        {FMCKey::PFP_FIX, "laminar/B738/button/fmc1_fix"},
         {FMCKey::PAGE_PREV, "laminar/B738/button/fmc1_prev_page"},
         {FMCKey::PAGE_NEXT, "laminar/B738/button/fmc1_next_page"},
         {FMCKey::KEY1, "laminar/B738/button/fmc1_1"},
@@ -200,7 +202,7 @@ const std::vector<FMCButtonDef>& ZiboFMCProfile::buttonDefs() const {
         {FMCKey::KEYY, "laminar/B738/button/fmc1_Y"},
         {FMCKey::KEYZ, "laminar/B738/button/fmc1_Z"},
         {FMCKey::SPACE, "laminar/B738/button/fmc1_SP"},
-        {FMCKey::OVERFLY_OR_DEL, "laminar/B738/button/fmc1_del"},
+        {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, "laminar/B738/button/fmc1_del"},
         {FMCKey::SLASH, "laminar/B738/button/fmc1_slash"},
         {FMCKey::CLR, "laminar/B738/button/fmc1_clr"}
     };
