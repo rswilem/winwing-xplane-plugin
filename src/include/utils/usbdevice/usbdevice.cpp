@@ -13,6 +13,7 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
     
     switch (productId) {
         case 0xBC27: // URSA MINOR Airline Joystick L
+        case 0xBC28: // URSA MINOR Airline Joystick R
             return new ProductUrsaMinorJoystick(hidDevice, vendorId, productId, vendorName, productName);
             
         case 0xBB36: // MCDU-32 (Captain)
