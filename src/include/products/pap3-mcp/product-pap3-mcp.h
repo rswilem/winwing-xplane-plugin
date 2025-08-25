@@ -16,34 +16,7 @@
  * - LCDs: optional; we keep LEDs intact and add LCD init + 0x38/0x2A transactions on value change.
  * - Display payload starts at absolute offset 0x19 (per your reverse engineering).
  */
-class ProductPAP3MCP : public USBDevice
-{
-public:
-    static constexpr unsigned char IdentifierByte = 0x20; // (unused for LEDs)
-
-    ProductPAP3MCP(HIDDeviceHandle hidDevice,
-                   uint16_t vendorId,
-                   uint16_t productId,
-                   std::string vendorName,
-                   std::string productName);
-    ~ProductPAP3MCP() override;
-
-    // USBDevice overrides
-    const char *classIdentifier() override;
-    bool connect() override;
-    void disconnect() override;
-    void update() override;
-    void forceLcdRefresh();
-    void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
-
-    // LCD API (safe to call; LEDs are unaffected)
-    void initializeDisplays();
-    void setLedBrightness(int logicalLedId, uint8_t brightness); // PAP3 LEDs are on/off only
-    static void initializeMenu();
-    static void updateMenuPresence();
-    static bool getShowLcdLabels();
-    static void toggleShowLcdLabels();
-
+class ProductPAP3MCP : public USBDevice {
 private:
     // --- State ---
     McpAircraftProfile *profile = nullptr;
@@ -217,6 +190,28 @@ private:
         bool hasLast = false;
         uint8_t last[kInputBytes] = {0};
     } _inp;
+    
+public:
+    ProductPAP3MCP(HIDDeviceHandle hidDevice,
+                   uint16_t vendorId,
+                   uint16_t productId,
+                   std::string vendorName,
+                   std::string productName);
+    ~ProductPAP3MCP() override;
+
+    const char *classIdentifier() override;
+    bool connect() override;
+    void disconnect() override;
+    void update() override;
+    void forceLcdRefresh();
+    void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
+
+    // LCD API (safe to call; LEDs are unaffected)
+    void initializeDisplays();
+    void setLedBrightness(int logicalLedId, uint8_t brightness); // PAP3 LEDs are on/off only
+    static void initializeMenu();
+    static bool getShowLcdLabels();
+    static void toggleShowLcdLabels();
 };
 
 #endif // PRODUCT_PAP3_MCP_H

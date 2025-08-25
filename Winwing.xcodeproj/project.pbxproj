@@ -65,6 +65,10 @@
 		F6F77AB22E278F300060AFC0 /* product-ursa-minor-joystick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */; };
 		F6F77AB52E278F530060AFC0 /* product-ursa-minor-joystick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */; };
 		F6FBC55F2E3A3E15004E5F42 /* FCUEfisControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */; };
+		F6FC2A162E5C5377009A40E2 /* product-pap3-mcp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6FC2A142E5C5377009A40E2 /* product-pap3-mcp.cpp */; };
+		F6FC2A172E5C5377009A40E2 /* mcp-zibo-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6FC2A102E5C5377009A40E2 /* mcp-zibo-profile.cpp */; };
+		F6FC2A182E5C5377009A40E2 /* product-pap3-mcp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6FC2A142E5C5377009A40E2 /* product-pap3-mcp.cpp */; };
+		F6FC2A192E5C5377009A40E2 /* mcp-zibo-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6FC2A102E5C5377009A40E2 /* mcp-zibo-profile.cpp */; };
 		F6FF5F202E4B5CC5002508F6 /* XPWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6FF5F1F2E4B5CC5002508F6 /* XPWidgets.framework */; };
 		F6FF5F212E4B5CC5002508F6 /* XPLM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6FF5F1E2E4B5CC5002508F6 /* XPLM.framework */; };
 /* End PBXBuildFile section */
@@ -141,6 +145,11 @@
 		F6F77AAC2E278F300060AFC0 /* product-ursa-minor-joystick.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-ursa-minor-joystick.h"; sourceTree = "<group>"; };
 		F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-ursa-minor-joystick.cpp"; sourceTree = "<group>"; };
 		F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCUEfisControlView.swift; sourceTree = "<group>"; };
+		F6FC2A0F2E5C5377009A40E2 /* mcp-zibo-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "mcp-zibo-profile.h"; sourceTree = "<group>"; };
+		F6FC2A102E5C5377009A40E2 /* mcp-zibo-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "mcp-zibo-profile.cpp"; sourceTree = "<group>"; };
+		F6FC2A122E5C5377009A40E2 /* mcp-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "mcp-aircraft-profile.h"; sourceTree = "<group>"; };
+		F6FC2A132E5C5377009A40E2 /* product-pap3-mcp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-pap3-mcp.h"; sourceTree = "<group>"; };
+		F6FC2A142E5C5377009A40E2 /* product-pap3-mcp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-pap3-mcp.cpp"; sourceTree = "<group>"; };
 		F6FF5F1E2E4B5CC5002508F6 /* XPLM.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPLM.framework; path = SDK/Libraries/Mac/XPLM.framework; sourceTree = "<group>"; };
 		F6FF5F1F2E4B5CC5002508F6 /* XPWidgets.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XPWidgets.framework; path = SDK/Libraries/Mac/XPWidgets.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -354,9 +363,30 @@
 			children = (
 				F6A1492E2E4F03A400FB8395 /* fmc */,
 				F6BB75772E32634700C2B21F /* fcu-efis */,
+				F6FC2A152E5C5377009A40E2 /* pap3-mcp */,
 				F6F77AAE2E278F300060AFC0 /* ursa-minor-joystick */,
 			);
 			path = products;
+			sourceTree = "<group>";
+		};
+		F6FC2A112E5C5377009A40E2 /* profiles */ = {
+			isa = PBXGroup;
+			children = (
+				F6FC2A0F2E5C5377009A40E2 /* mcp-zibo-profile.h */,
+				F6FC2A102E5C5377009A40E2 /* mcp-zibo-profile.cpp */,
+			);
+			path = profiles;
+			sourceTree = "<group>";
+		};
+		F6FC2A152E5C5377009A40E2 /* pap3-mcp */ = {
+			isa = PBXGroup;
+			children = (
+				F6FC2A112E5C5377009A40E2 /* profiles */,
+				F6FC2A122E5C5377009A40E2 /* mcp-aircraft-profile.h */,
+				F6FC2A132E5C5377009A40E2 /* product-pap3-mcp.h */,
+				F6FC2A142E5C5377009A40E2 /* product-pap3-mcp.cpp */,
+			);
+			path = "pap3-mcp";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -493,6 +523,8 @@
 				F67961952E31357E008031F1 /* usbdevice_lin.cpp in Sources */,
 				F635AD472E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */,
 				F6AF9EC12D06F84900530297 /* dataref.cpp in Sources */,
+				F6FC2A182E5C5377009A40E2 /* product-pap3-mcp.cpp in Sources */,
+				F6FC2A192E5C5377009A40E2 /* mcp-zibo-profile.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -524,6 +556,8 @@
 				F6A149442E4F04AE00FB8395 /* ixeg733-fmc-profile.cpp in Sources */,
 				F6827E092E05652800382B28 /* ContentView.swift in Sources */,
 				F6FBC55F2E3A3E15004E5F42 /* FCUEfisControlView.swift in Sources */,
+				F6FC2A162E5C5377009A40E2 /* product-pap3-mcp.cpp in Sources */,
+				F6FC2A172E5C5377009A40E2 /* mcp-zibo-profile.cpp in Sources */,
 				F69FF22D2E1D13CB00F9D2D9 /* GenericDeviceView.swift in Sources */,
 				F69FF22E2E1D13CB00F9D2D9 /* DeviceModel.swift in Sources */,
 				F69FF22F2E1D13CB00F9D2D9 /* JoystickControlView.swift in Sources */,

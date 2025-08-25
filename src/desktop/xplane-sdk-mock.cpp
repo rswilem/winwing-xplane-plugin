@@ -4,6 +4,7 @@
 #include <XPLMUtilities.h>
 #include <XPLMDisplay.h>
 #include <XPLMDataAccess.h>
+#include <XPLMMenus.h>
 #include "dataref.h"
 #include <vector>
 #include <string>
@@ -53,6 +54,7 @@ size_t dataRefHandleToIndex(XPLMDataRef ref) {
     return reinterpret_cast<size_t>(ref) - 1000;
 }
 
+XPLMMenuID mainMenuId = 0;
 static std::vector<std::string> registeredCommands = {};
 static std::vector<MockDataRef> mockDataRefs = {};
 static std::unordered_map<std::string, size_t> dataRefNameToIndex = {};
@@ -529,4 +531,20 @@ void XPLMUnregisterFlightLoopCallback(XPLMFlightLoop_f inFlightLoop, void *inRef
 
 int XPLMGetCycleNumber() {
     return static_cast<int>(std::time(nullptr));
+}
+
+XPLMMenuID XPLMCreateMenu(const char *inName, XPLMMenuID inParentMenu, int inParentItem, XPLMMenuHandler_f inHandler, void *inMenuRef) {
+    return mainMenuId;
+}
+
+int XPLMAppendMenuItem(XPLMMenuID inMenu, const char *inItemName, void *inItemRef, int inDeprecatedAndIgnored) {
+    return 0;
+}
+
+void XPLMCheckMenuItem(XPLMMenuID inMenu, int index, XPLMMenuCheck inCheck) {
+    // noop
+}
+
+void XPLMGetSystemPath(char *outSystemPath) {
+    // noop
 }

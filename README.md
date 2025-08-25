@@ -34,18 +34,16 @@ For linux, see the [Linux udev rules](#linux-udev-rules) section below to ensure
 
 The matrix below shows device and aircraft compatibility. Devices are listed vertically, aircraft horizontally.
 
-| Device                    | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 777 | SSG 747 | Notes           |
-| ------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | --------------- |
-| **URSA MINOR Joystick L** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      |                 |
-| **URSA MINOR Joystick R** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      |                 |
-| **MCDU-32**               | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |                 |
-| **PFP 3N**                | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |                 |
-| **PFP 4**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |                 |
-| **PFP 7**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |                 |
-| **Panel of Autopilot 3**  | 🔴          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      | Not implemented |
-| **FCU-EFIS (FCU Unit)**   | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      |                 |
-| **FCU-EFIS (EFIS R)**     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      |                 |
-| **FCU-EFIS (EFIS L)**     | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      |                 |
+| Device                    | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 777 | SSG 747 | Notes |
+| ------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | ----- |
+| **URSA MINOR Joystick L** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      |       |
+| **URSA MINOR Joystick R** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      |       |
+| **MCDU-32**               | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |       |
+| **PFP 3N**                | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |       |
+| **PFP 4**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |       |
+| **PFP 7**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟠     | 🟠      |       |
+| **Panel of Autopilot 3**  | 🔴          | 🔴           | 🔴               | 🟢       | 🔴       | 🔴     | 🔴      |       |
+| **FCU and EFIS L+R**      | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      |       |
 
 #### Legend
 
@@ -66,6 +64,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@CyberGuerro](https://github.com/cyberguerro) for the PFP3N HID protocol.
 - [@claaslange](https://github.com/claaslange) for the FCU-EFIS integration.
 - [@shred86](https://github.com/shred86) for identifying the Ursa Minor Joystick R.
+- [@Belnadifia](https://github.com/Belnadifia) for the complete PAP3 HID protocol and Zibo profile.
 
 ### Linux udev rules
 

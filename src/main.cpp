@@ -14,20 +14,18 @@
 #include "appstate.h"
 #include "dataref.h"
 #include "usbcontroller.h"
-#include "product-mcdu.h"
 #include "product-pap3-mcp.h"
 
 #if IBM
 #include <windows.h>
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH:
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
-        break;
+    switch (ul_reason_for_call) {
+        case DLL_PROCESS_ATTACH:
+        case DLL_THREAD_ATTACH:
+        case DLL_THREAD_DETACH:
+        case DLL_PROCESS_DETACH:
+            break;
     }
 
     return TRUE;
@@ -40,8 +38,7 @@ void menuAction(void *mRef, void *iRef);
 XPLMMenuID mainMenuId;
 int debugLoggingMenuItemIndex;
 
-PLUGIN_API int XPluginStart(char *name, char *sig, char *desc)
-{
+PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
     strcpy(name, FRIENDLY_NAME);
     strcpy(sig, BUNDLE_ID);
     strcpy(desc, "Winwing X-Plane plugin");
@@ -61,79 +58,64 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc)
     return 1;
 }
 
-PLUGIN_API void XPluginStop(void)
-{
+PLUGIN_API void XPluginStop(void) {
     AppState::getInstance()->deinitialize();
     debug_force("Plugin stopped\n");
 }
 
-PLUGIN_API int XPluginEnable(void)
-{
+PLUGIN_API int XPluginEnable(void) {
     XPluginReceiveMessage(0, XPLM_MSG_PLANE_LOADED, nullptr);
 
     return 1;
 }
 
-PLUGIN_API void XPluginDisable(void)
-{
+PLUGIN_API void XPluginDisable(void) {
     debug_force("Disabling plugin...\n");
 }
 
-PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void *params)
-{
-    switch (msg)
-    {
-    case XPLM_MSG_PLANE_LOADED:
-    {
-        if ((intptr_t)params != 0)
-        {
-            // It was not the user's plane. Ignore.
-            return;
+PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void *params) {
+    switch (msg) {
+        case XPLM_MSG_PLANE_LOADED: {
+            if ((intptr_t)params != 0) {
+                // It was not the user's plane. Ignore.
+                return;
+            }
+
+            AppState::getInstance()->initialize();
+            USBController::getInstance()->connectAllDevices();
+            break;
         }
 
-        AppState::getInstance()->initialize();
-        USBController::getInstance()->connectAllDevices();
-        // Détecte si un PAP3 est branché et met à jour son menu
-        ProductPAP3MCP::updateMenuPresence();
-        break;
-    }
+        case XPLM_MSG_PLANE_UNLOADED: {
+            if ((intptr_t)params != 0) {
+                // It was not the user's plane. Ignore.
+                return;
+            }
 
-    case XPLM_MSG_PLANE_UNLOADED:
-    {
-        if ((intptr_t)params != 0)
-        {
-            // It was not the user's plane. Ignore.
-            return;
+            USBController::getInstance()->disconnectAllDevices();
+            break;
         }
 
-        USBController::getInstance()->disconnectAllDevices();
-        break;
-    }
+        case XPLM_MSG_AIRPORT_LOADED: {
+            break;
+        }
 
-    case XPLM_MSG_AIRPORT_LOADED:
-    {
-        break;
-    }
+        case XPLM_MSG_WILL_WRITE_PREFS:
+            // AppState::getInstance()->saveState();
+            break;
 
-    case XPLM_MSG_WILL_WRITE_PREFS:
-        // AppState::getInstance()->saveState();
-        break;
-
-    default:
-        break;
+        default:
+            break;
     }
 }
 
-void menuAction(void *mRef, void *iRef)
-{
-    if (!strcmp((char *)iRef, "ActionReloadDevices"))
-    {
+void menuAction(void *mRef, void *iRef) {
+    if (!strcmp((char *)iRef, "ActionReloadDevices")) {
         debug_force("Reloading devices...\n");
         USBController::getInstance()->disconnectAllDevices();
         USBController::getInstance()->connectAllDevices();
     }
-    else if (!strcmp((char *)iRef, "ActionToggleDebugLogging"))
-    {
+    else if (!strcmp((char *)iRef, "ActionToggleDebugLogging")) {
         XPLMMenuCheck currentState;
         XPLMCheckMenuItemState(mainMenuId, debugLoggingMenuItemIndex, &currentState);
 
@@ -142,17 +124,14 @@ void menuAction(void *mRef, void *iRef)
         XPLMCheckMenuItem(mainMenuId, debugLoggingMenuItemIndex, debugLoggingEnabled ? xplm_Menu_Checked : xplm_Menu_Unchecked);
         AppState::getInstance()->debuggingEnabled = debugLoggingEnabled;
 
-        if (debugLoggingEnabled)
-        {
+        if (debugLoggingEnabled) {
             debug_force("Debug logging was enabled. Currently connected devices (%lu):\n", USBController::getInstance()->devices.size());
 
-            for (auto &device : USBController::getInstance()->devices)
-            {
+            for (auto &device : USBController::getInstance()->devices) {
                 debug_force("- (vendorId: 0x%04X, productId: 0x%04X, handler: %s) %s\n", device->vendorId, device->productId, device->classIdentifier(), device->productName.c_str());
             }
         }
-        else
-        {
+        else {
             debug_force("Debug logging was disabled.\n");
         }
     }
