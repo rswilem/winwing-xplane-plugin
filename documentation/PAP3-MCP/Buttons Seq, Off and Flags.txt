@@ -1,0 +1,76 @@
+Switches positions and rotary :
+
+First byte (offset 0x00) is 0x01
+then 33 bytes for payload as listed bellow :
+
+Offset 0x01 : 
+  Flags:
+    0x01 = N1
+    0x02 = SPEED
+    0x04 = VNAV
+    0x08 = LVL CHG
+    0x10 = HDG SEL
+    0x20 = LNAV
+    0x40 = VOR LOC
+    0x80 = APP
+
+Offset 0x02 :
+  Flags:
+    0x01 = ALT HLD
+    0x02 = V/S
+    0x04 = CMD/A
+    0x08 = CWS/A
+    0x10 = CMD/B
+    0x20 = CWS/B
+    0x40 = C/O (Toogle IAS/MACH)
+    0x80 = SPD INTV
+
+Offset 0x03 :
+  Flags:
+    0x01 = ALT INTV
+    0x02 = CAPT COURSE DOWN
+    0x04 = CAPT COURSE UP
+    0x08 = SPEED DOWN
+    0x10 = SPEED UP
+    0x20 = HEADING DOWN
+    0x40 = HEADING UP
+    0x80 = ALTITUDE DOWN
+
+Offset 0x04 :
+  Flages:
+    0x01 = ALTITUDE UP
+    0x02 = F/O COURSE DOWN
+    0x04 = F/O COURSE UP
+    0x08 = CAPT F/D OFF
+    0x20 = F/O F/D OFF
+    0x80 = ENGAGED (DISENGAGE SWITCH UP)
+
+Offset 0x05 :
+  Flags:
+    0x01 = DISENGAGE (DISENGAGE SWITCH DOWN)
+    0x02 = BANK ANGLE 10
+    0x04 = BANK ANGLE 15
+    0x08 = BANK ANGLE 20
+    0x10 = BANK ANGLE 25
+    0x20 = BANK ANGLE 30 
+    0x40 = V/SPEED DOWN
+    0x80 = V/SPEED UP
+    
+Offset 0x06 :
+  Flags:
+    0x01 = A/T ARMED
+    0x02 = A/T DISARMED
+
+Offset 0x14 : LIGHT SENSOR (0x00 -> 0x0F MIN->MAX)
+Offset 0x15 : CAPT COURSE KNOB POSITION (0x00 -> 0xFF Rolling)
+Offset 0x16 : CAPT COURSE KNOB FULL CYCLE (0x00 -> 0xFF Rolling)
+Offset 0x17 : SPEED KNOB POSITION (0x00 -> 0xFF Rolling)
+Offset 0x18 : SPEED KNOB FULL CYCLE (0x00 -> 0xFF Rolling)
+Offset 0x19 : HEADING KNOB POSITION (0x00 -> 0xFF Rolling)
+Offset 0x1A : HEADING KNOB FULL CYCLE (0x00 -> 0xFF Rolling)
+Offset 0x1B : ALTITUDE KNOB POSITION (0x00 -> 0xFF Rolling)
+Offset 0x1C : ALTITUDE KNOB FULL CYCLE (0x00 -> 0xFF Rolling)
+Offset 0x1D : V/SPEED KNOB POSITION (0x00 -> 0xFF Rolling)
+Offset 0x1E : V/SPEED KNOB FULL CYCLE (0x00 -> 0xFF Rolling)
+Offset 0x1F : F/O COURSE KNOB POSITION (0x00 -> 0xFF Rolling)
+Offset 0x20 : F/O COURSE KNOB FULL CYCLE (0x00 -> 0xFF Rolling)

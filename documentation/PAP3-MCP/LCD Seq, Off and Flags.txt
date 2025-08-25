@@ -1,0 +1,57 @@
+Header :
+F0 00 10 38 0F BF 00 00 02 01 00 00 DF A2 50 00
+00 B0 00 00 00 00 00 00 00
+
+Payload :
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00
+
+
+After sending the first sequence, need to seend 2 empty sequence :
+F0 00 11 38
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+Then a last sequence for commit :
+F0 00 13 2A 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00
+0F BF 00 00 03 01 00 00 DF A2 50 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00
+
+
+
+Segments order by offset postion :
+Mid-TopL-BotL-Bot-BotR-TopR-Top (ie.: 1D = Mid, 21 = TopL, 25=BotL, 29=Bot, 2D=BotR, 31=TopR, 35=Top)
+
+1D-21-25-29-2D-31-35 : CPT_CRS & SPD (Flags: SPD_UNITS=0x01, SPD_TENS=0x02, SPD_HUNDREDS=0x04, SPD_KILO=0x08, CPT_CRS_UNITS=0x20, CPT_CRS_TENS=0x40, CPT_CRS_HUNDREDS=0x80)
+1E-22-26-2A-2E-32-36 : HDG/Alt_HI (Flags: ALT_HUNDREDS=0x01, ALT_KILO=0x02, ALT_TENS_KILO=0x04, HDG_UNITS=0x10, HDG_TENS=0x20, HDG_HUNDREDS=0x40)
+1F-23-27-2B-2F-33-37 : ALT_Lo/VSpd (Flags: VSPD_UNITS=0x01, VSPD_TENS=0x02, VSPD_HUNDREDS=0x04, VSPD_KILO=0x08, ALT_UNITS=0x40, ALT_TENS=0x80)
+20-24-28-2C-30-34-38 : FO_CRS (Flags: FO_CRS_Units=0x10, FO_CRS_Tens=0x20, FO_CRS_Hundreds=0x40)
+
+Labels and Dots :
+
+Offset 0x19, flag 0x20 = Final dot for CAPT_CRS
+Offset 0x19, flag 0x04 = Float separator dot for SPD
+offset 0x26, flag 0x08 = Final dot for HDG
+Offset 0x1a, flag 0x01 = Float separator dot for ALT
+Offset 0x1b, flag 0x04 = Float separator dot for VSPD
+Offset 0x1c, flag 0x10 = Final dot for FO_CRS
+Offset 0x1e, flag 0x80 = Bottom-Mid bar A/B sign of SPD
+offset 0x22, flag 0x80 = Top-Mid bar A/B sign of SPD
+offset 0x1f, flag 0x10 = Minus sign for VSPD
+offset 0x28, flag 0x80 = Bottom bar bellow the minus VSPD sign (To make the plus sign)
+offset 0x2c, flag 0x80 = Top bar above the minus VSPD sign (To make the plus sign)
+offset 0x34, flag 0x80 = FPA Label (VSPD LCD)
+offset 0x38, flag 0x80 = V/S Label (VSPD LCD)
+offset 0x36, flag 0x08 = HDG Label 1/2 (Left light / HDG LCD)
+offset 0x32, flag 0x08 = HDG Label 2/2 (Right light / HDG LCD)
+offset 0x2e, flag 0x08 = TRK Label 1/2 (Left light / HDG LCD)
+offset 0x2a, flag 0x08 = TRK Label 2/2 (Right light / HDG LCD)
+offset 0x36, flag 0x80 = IAS Label (SPD LCD)
+offset 0x32, flag 0x80 = MACH Label 1/2 (Left light / SPD LCD)
+offset 0x2e, flag 0x80 = MACH Label 2/2 (Right light / SPD LCD)
