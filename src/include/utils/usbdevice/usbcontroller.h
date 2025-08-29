@@ -43,9 +43,10 @@ private:
 #elif IBM
     void checkForDeviceChanges();
     void enumerateHidDevices(std::function<void(HANDLE, const std::string&)> deviceHandler);
-    USBDevice* createDeviceFromHandle(HANDLE hidDevice);
+    USBDevice* createDeviceFromHandle(HANDLE hidDevice, const std::string& devicePath);
     bool deviceExistsWithHandle(HANDLE hidDevice);
-    void addDeviceFromHandle(HANDLE hidDevice);
+    bool deviceExistsWithPath(const std::string& devicePath);
+    void addDeviceFromHandle(HANDLE hidDevice, const std::string& devicePath);
 #elif LIN
     static void DeviceAddedCallback(void *context, struct udev_device *device);
     static void DeviceRemovedCallback(void *context, struct udev_device *device);

@@ -24,9 +24,16 @@ bool USBDevice::connect() {
     
     // Try to open the device - if it's already opened by the manager, this will return kIOReturnExclusiveAccess
     // or succeed if it wasn't opened yet. Either way, we'll have an open device.
-    IOReturn result = IOHIDDeviceOpen(hidDevice, kIOHIDOptionsTypeNone);
-    if (result != kIOReturnSuccess && result != kIOReturnExclusiveAccess) {
-        debug("Failed to open HID device: %d\n", result);
+    try {
+        IOReturn result = IOHIDDeviceOpen(hidDevice, kIOHIDOptionsTypeNone);
+        if (result != kIOReturnSuccess && result != kIOReturnExclusiveAccess) {
+            throw std::system_error(std::make_error_code(std::errc::io_error), std::string("IOHIDDeviceOpen failed: ") + std::to_string(result));
+        }
+    } catch (const std::exception& ex) {
+        debug("Failed to open HID device: %s\nError: %s\n", productName.c_str(), ex.what());
+        delete[] inputBuffer;
+        inputBuffer = nullptr;
+        hidDevice = nullptr;
         return false;
     }
     
