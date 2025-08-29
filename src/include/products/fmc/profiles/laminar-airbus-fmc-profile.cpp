@@ -7,7 +7,7 @@
 
 LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontAirbus2, product->identifierByte));
+    product->setFont(Font::GlyphData(FontVariant::FontAirbus4, product->identifierByte));
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {
