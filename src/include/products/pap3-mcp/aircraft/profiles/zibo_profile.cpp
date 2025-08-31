@@ -31,6 +31,9 @@ ZiboPAP3Profile::ZiboPAP3Profile() {
     _drVviShow = XPLMFindDataRef("laminar/B738/autopilot/vvi_dial_show");
     _drCrsCapt = XPLMFindDataRef("laminar/B738/autopilot/course_pilot");
     _drCrsFo   = XPLMFindDataRef("laminar/B738/autopilot/course_copilot");
+    _drMcpBrightnessArr = XPLMFindDataRef("sim/cockpit2/electrical/instrument_brightness_ratio_manual");
+    _drCockpitLightsArr = XPLMFindDataRef("laminar/B738/electric/panel_brightness");
+    
 
     // MCP LCD "special digits"
     _drDigitA = XPLMFindDataRef("laminar/B738/mcp/digit_A");
@@ -170,7 +173,18 @@ void ZiboPAP3Profile::poll() {
     if (_drVviShow) _state.vviVisible = XPLMGetDataf(_drVviShow) > 0.5f;
     if (_drCrsCapt) _state.crsCapt = XPLMGetDatai(_drCrsCapt);
     if (_drCrsFo)   _state.crsFo   = XPLMGetDatai(_drCrsFo);
+    if (_drMcpBrightnessArr) {
+    float v = 0.0f;
+        XPLMGetDatavf(_drMcpBrightnessArr, &v, 15, 1);
+        _state.mcpBrightness = std::clamp(v, 0.0f, 1.0f);
+    }
 
+    if (_drCockpitLightsArr) {
+    float v = 0.0f;
+        XPLMGetDatavf(_drCockpitLightsArr, &v, 0, 1);
+        _state.cockpitLights = std::clamp(v, 0.0f, 1.0f);
+        _state.ledsBrightness = std::max(v, 0.60f); // minimum 60% for LEDs
+    }
     // LCD special digits (A / 8)
     if (_drDigitA) _state.digitA = XPLMGetDataf(_drDigitA) > 0.5f;
     if (_drDigitB) _state.digitB = XPLMGetDataf(_drDigitB) > 0.5f;
