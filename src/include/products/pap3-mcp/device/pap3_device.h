@@ -82,6 +82,8 @@ public:
     // Expose current sequence (for diagnostics/logs).
     std::uint8_t currentSeq() const noexcept { return _seq; }
 
+    void update() override;
+
     // Optional helper: direct entry-point if a lower layer already receives HID input reports.
     // Simply forwards to the internal decoder.
     void onHidInputReport(const uint8_t* report, int len);
@@ -122,13 +124,6 @@ private:
     XPLMFlightLoopID _atPulseFL{nullptr};
     bool _atPulsePending{false};
     static float ATPulseFL(float elapsed, float since, int counter, void* refcon);
-
-    // Flight loop to poll HID at ~10 Hz (guarded by _inputFLRegistered)
-    static float InputPollFL(float elapsedSinceLastCall,
-                             float elapsedTimeSinceLastFlightLoop,
-                             int counter,
-                             void* refcon);
-    bool _inputFLRegistered{false};
 
     // Internal: set up input callbacks and watched offsets once
     void setupInputCallbacks();
