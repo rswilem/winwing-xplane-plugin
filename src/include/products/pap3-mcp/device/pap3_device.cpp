@@ -17,6 +17,7 @@
 #include "../aircraft/pap3_aircraft.h"
 #include "../menu/pap3_menu.h"
 #include "inputs.h"
+#include "usbcontroller.h"
 
 #include <XPLMProcessing.h>
 #include <XPLMUtilities.h>
@@ -101,12 +102,6 @@ PAP3Device::PAP3Device(HIDDeviceHandle hidDevice,
 
 PAP3Device::~PAP3Device()
 {
-    if (_inputFLRegistered) {
-        XPLMUnregisterFlightLoopCallback(&PAP3Device::InputPollFL, this);
-
-        _inputFLRegistered = false;
-        debug_force("[PAP3] Input FlightLoop unregistered\n");
-    }
     _inputs.onEncoders    = nullptr;
     _inputs.onButtons     = nullptr;
     _inputs.onSwitchEdges = nullptr;
@@ -118,6 +113,10 @@ PAP3Device::~PAP3Device()
         _ioCv.notify_all();
         if (_ioThread.joinable()) _ioThread.join();
     }
+    setDimming(0, 0);
+    setDimming(1, 0);
+    setDimming(2, 0);
+
     USBDevice::disconnect();
 }
 
@@ -262,17 +261,11 @@ void PAP3Device::runStartupSequence()
         _profile->start([this](const pap3::aircraft::State& st) {
             this->applyState(st);
         });
+        profileReady = true;
     }
 
     // Inputs setup (only once)
     setupInputCallbacks();
-
-    // Poll HID inputs @ ~10 Hz
-    if (!_inputFLRegistered) {
-        XPLMRegisterFlightLoopCallback(&PAP3Device::InputPollFL, 0.04f, this);
-        _inputFLRegistered = true;
-        debug_force("[PAP3] Input FlightLoop registered @ ~10 Hz\n");
-    }
 
     // Lancer le worker I/O si pas déjà démarré
     if (!_ioRunning.load()) {
@@ -297,6 +290,14 @@ void StartPap3Demo(pap3::device::PAP3Device* dev)
 
     if (!g_demo) g_demo = new pap3::device::PAP3Demo(dev);
     g_demo->start(ledIds, 2.0f, 2.0f, 2.2f);
+}
+
+void PAP3Device::update() {
+    this->USBDevice::update();
+
+    if (_profile) {
+        _profile->tick();
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -339,23 +340,6 @@ bool PAP3Device::setATSolenoid(bool on)
     return sendATSolenoid(static_cast<DevicePtr>(this), on);
 }
 
-// -----------------------------------------------------------------------------
-// Flight loop & HID IN handling
-// -----------------------------------------------------------------------------
-
-float PAP3Device::InputPollFL(float /*inElapsedSinceLastCall*/,
-                              float /*inElapsedTimeSinceLastFlightLoop*/,
-                              int   /*inCounter*/,
-                              void* refcon)
-{
-    auto* self = static_cast<PAP3Device*>(refcon);
-    if (!self) return 0.04f;
-
-    // Pump HID; USBDevice::update() should invoke didReceiveData() for input reports.
-    self->USBDevice::update();
-    return 0.04f; // schedule again in ~100 ms
-}
-
 void PAP3Device::didReceiveData(int /*reportId*/, std::uint8_t* report, int reportLength)
 {
     onHidInputReport(report, reportLength);
@@ -363,7 +347,6 @@ void PAP3Device::didReceiveData(int /*reportId*/, std::uint8_t* report, int repo
 
 void PAP3Device::onHidInputReport(const std::uint8_t* report, int len)
 {
-    // ---- NOUVEAU : snapshot sync au tout premier paquet ----
     if (!_bootSwitchSyncDone && _profile && report && len > 0) {
         _bootSwitchSyncDone = true;
         debug_force("[PAP3] First HID report -> snapshot sync\n");
