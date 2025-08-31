@@ -39,6 +39,9 @@ struct State {
     int   crsFo         = 0;     ///< First Officer course (degrees)
     bool  digitA        = false;
     bool  digitB        = false;
+    float mcpBrightness = 0.0f;
+    float cockpitLights = 0.0f;
+    float ledsBrightness = 1.0f;
 
     // --- LEDs ---------------------------------------------------------------
     /**
