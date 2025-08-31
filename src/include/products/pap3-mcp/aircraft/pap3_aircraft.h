@@ -122,6 +122,8 @@ public:
      */
     virtual State current() const = 0;
 
+    virtual void tick() {}
+
     // ----------------------
     // Input hooks (no-op by default)
     // ----------------------
