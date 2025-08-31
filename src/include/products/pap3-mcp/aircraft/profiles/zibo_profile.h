@@ -65,6 +65,9 @@ private:
     XPLMDataRef _drVviShow{nullptr};
     XPLMDataRef _drCrsCapt{nullptr};
     XPLMDataRef _drCrsFo{nullptr};
+
+    XPLMDataRef _drMcpBrightnessArr{nullptr}; 
+    XPLMDataRef _drCockpitLightsArr{nullptr};
     
     // MCP LCD "special digits"
     XPLMDataRef _drDigitA{nullptr};
