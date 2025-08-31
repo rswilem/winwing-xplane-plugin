@@ -145,24 +145,19 @@ bool ZiboPAP3Profile::isEligible() const {
 void ZiboPAP3Profile::start(StateCallback onChanged) {
     if (_running) return;
     _cb = std::move(onChanged);
-
-
-    XPLMRegisterFlightLoopCallback(&ZiboPAP3Profile::FlightLoopThunk, 0.04f, this);
     _running = true;
 }
 
 void ZiboPAP3Profile::stop() {
     if (!_running) return;
-    XPLMUnregisterFlightLoopCallback(&ZiboPAP3Profile::FlightLoopThunk, this);
     _running = false;
 }
 
 pap3::aircraft::State ZiboPAP3Profile::current() const { return _state; }
 
-float ZiboPAP3Profile::FlightLoopThunk(float elapsed, float, int, void* refcon) {
-    auto* self = static_cast<ZiboPAP3Profile*>(refcon);
-    if (self) self->poll();
-    return 0.04f;
+void ZiboPAP3Profile::tick() {
+    if (!_running) return;
+    poll();
 }
 
 void ZiboPAP3Profile::poll() {
