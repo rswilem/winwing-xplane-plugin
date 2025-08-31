@@ -20,6 +20,7 @@ public:
     void  start(StateCallback onChanged) override;
     void  stop() override;
     State current() const override;
+    void tick() override;
 
     void syncSimToHardware() override;
 
@@ -42,7 +43,6 @@ public:
 
 private:
     bool _haveHwSnapshot{false};
-    static float FlightLoopThunk(float elapsed, float, int, void* refcon);
     void poll();
 
     // Helpers
