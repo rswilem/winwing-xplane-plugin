@@ -265,7 +265,7 @@ void PAP3Device::runStartupSequence()
     }
 
     // Inputs setup (only once)
-    //setupInputCallbacks();
+    setupInputCallbacks();
 
     // Poll HID inputs @ ~10 Hz
     if (!_inputFLRegistered) {
