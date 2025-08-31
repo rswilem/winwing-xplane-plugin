@@ -4,7 +4,7 @@
 #include "product-fmc.h"
 #include "product-ursa-minor-joystick.h"
 #include "product-fcu-efis.h"
-#include "product-pap3-mcp.h"
+#include "pap3_device.h"
 
 USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName)
 {
@@ -54,7 +54,8 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
             return new ProductFCUEfis(hidDevice, vendorId, productId, vendorName, productName);
 
         case 0xBF0F: // PAP3
-            return new ProductPAP3MCP(hidDevice, vendorId, productId, vendorName, productName);
+            debug_force("Detected PAP3 MCP device - vendorId: 0x%04X, productId: 0x%04X\n", vendorId, productId);
+            return new pap3::device::PAP3Device(hidDevice, vendorId, productId, vendorName, productName);
 
         default:
             debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X\n", vendorId, productId);
