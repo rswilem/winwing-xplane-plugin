@@ -152,6 +152,7 @@ void PAP3Device::applyState(const pap3::aircraft::State& st)
     static constexpr std::uint8_t kLedId_MA_CAPT = 0x12;
     static constexpr std::uint8_t kLedId_MA_FO   = 0x13;
 
+
     // Push LED states
     qSetLed(kLedId_N1,      st.led.N1);
     qSetLed(kLedId_SPEED,   st.led.SPEED);
@@ -196,6 +197,18 @@ void PAP3Device::applyState(const pap3::aircraft::State& st)
     std::vector<std::uint8_t> lcd32(payload.begin(), payload.end());
     qLcdPayload(lcd32);
 
+    // Convert float [0..1] to int [0..100] and push as "aircraft percents"
+    const int blPct  = std::clamp(static_cast<int>(std::lround(st.cockpitLights * 100.0f)), 0, 100);
+    const int lcdPct = std::clamp(static_cast<int>(std::lround(st.mcpBrightness * 100.0f)), 0, 100);
+    const int ledsPct = std::clamp(static_cast<int>(std::lround(st.ledsBrightness * 100.0f)), 0, 100);
+
+    _illum.setAircraftPercents(blPct, lcdPct, ledsPct);
+
+    const auto out = _illum.compute();
+    if (out.changed[0]) setDimming(0, out.raw[0]); // Backlight
+    if (out.changed[1]) setDimming(1, out.raw[1]); // LCD
+    if (out.changed[2]) setDimming(2, out.raw[2]); // LEDs
+
     // Illumination / power gating based on profile power mask
     updatePower();
 }
@@ -223,9 +236,9 @@ void PAP3Device::runStartupSequence()
     // LCD/LEDs fixed at 100%.
     _illumCfg.backlight.mode        = pap3::device::IllumMode::Aircraft;
     _illumCfg.backlight.fixedPercent= 100; // ignored in Aircraft mode
-    _illumCfg.lcd.mode              = pap3::device::IllumMode::Fixed;
+    _illumCfg.lcd.mode              = pap3::device::IllumMode::Aircraft;
     _illumCfg.lcd.fixedPercent      = 100;
-    _illumCfg.leds.mode             = pap3::device::IllumMode::Fixed;
+    _illumCfg.leds.mode             = pap3::device::IllumMode::Aircraft;
     _illumCfg.leds.fixedPercent     = 100;
     _illum.setConfig(_illumCfg);
 
@@ -237,9 +250,9 @@ void PAP3Device::runStartupSequence()
     // Apply computed dimming (first frame → all changed)
     {
         auto out = _illum.compute();
-        sendDimming(static_cast<DevicePtr>(this), 0, out.raw[0]);
-        sendDimming(static_cast<DevicePtr>(this), 1, out.raw[1]);
-        sendDimming(static_cast<DevicePtr>(this), 2, out.raw[2]);
+        if (out.changed[0]) qSetDimming(0, out.raw[0]);
+        if (out.changed[1]) qSetDimming(1, out.raw[1]);
+        if (out.changed[2]) qSetDimming(2, out.raw[2]);
     }
 
      // Detect + start aircraft profile
@@ -252,7 +265,7 @@ void PAP3Device::runStartupSequence()
     }
 
     // Inputs setup (only once)
-    setupInputCallbacks();
+    //setupInputCallbacks();
 
     // Poll HID inputs @ ~10 Hz
     if (!_inputFLRegistered) {
@@ -430,9 +443,6 @@ void PAP3Device::updatePower()
 
     const bool powered = (mask & 0x01) != 0; // new rule: illumination enabled only if AP has power
     _illum.setPowerAvailable(powered);
-
-    // Aircraft-driven percent only affects backlight (when configured in Aircraft mode).
-    _illum.setAircraftPercents(_userBacklightPct, /*lcd*/ 100, /*leds*/ 100);
 
     // Apply dimming only when changed (compute() handles change detection).
     const auto out = _illum.compute();
