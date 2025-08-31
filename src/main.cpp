@@ -14,7 +14,7 @@
 #include "appstate.h"
 #include "dataref.h"
 #include "usbcontroller.h"
-#include "product-pap3-mcp.h"
+#include "pap3_menu.h"
 
 #if IBM
 #include <windows.h>
@@ -53,7 +53,7 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
     XPLMCheckMenuItem(mainMenuId, debugLoggingMenuItemIndex, xplm_Menu_Unchecked);
 
     debug_force("Plugin started (version %s)\n", VERSION);
-    ProductPAP3MCP::initializeMenu();
+    pap3menu::Initialize(mainMenuId);
 
     return 1;
 }
