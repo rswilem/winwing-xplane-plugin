@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cfloat>
+#include <regex>
 #include <XPLMUtilities.h>
 #include <XPLMDataAccess.h>
 #include <XPLMProcessing.h>
@@ -32,10 +33,16 @@ FlightFactor767FMCProfile::~FlightFactor767FMCProfile() {
 }
 
 bool FlightFactor767FMCProfile::IsEligible() {
-    return Dataref::getInstance()->exists("757Avionics/CDU/mcdu_menu");
+    static const std::string author = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_author");
+    static const std::string icao = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ICAO");
     
-    // sim/aircraft/view/acf_author  contains   FlightFactor
-    // sim/aircraft/view/acf_ICAO    is one of  B752, B753, B762, B763, B764, 76X, 76Y
+    if (author != "FlightFactor") {
+        return false;
+    }
+
+    static const std::regex icaoPattern("^(B75[23]|B76[234]|76[XY])$");
+    
+    return std::regex_match(icao, icaoPattern);
 }
 
 const std::vector<std::string>& FlightFactor767FMCProfile::displayDatarefs() const {
@@ -165,15 +172,15 @@ void FlightFactor767FMCProfile::updatePage(std::vector<std::vector<char>>& page)
     std::vector<int> sizes = datarefManager->getCached<std::vector<int>>("1-sim/cduL/display/symbolsSize");
     std::vector<int> effects = datarefManager->getCached<std::vector<int>>("1-sim/cduL/display/symbolsEffects");
     
-    if (symbols.size() < FlightFactor777FMCProfile::DataLength || colors.size() < FlightFactor777FMCProfile::DataLength || sizes.size() < FlightFactor777FMCProfile::DataLength || effects.size() < FlightFactor777FMCProfile::DataLength) {
+    if (symbols.size() < FlightFactor767FMCProfile::DataLength || colors.size() < FlightFactor767FMCProfile::DataLength || sizes.size() < FlightFactor767FMCProfile::DataLength || effects.size() < FlightFactor767FMCProfile::DataLength) {
         return;
     }
     
-    for (int line = 0; line < ProductFMC::PageLines && line * ProductFMC::PageCharsPerLine < FlightFactor777FMCProfile::DataLength; ++line) {
+    for (int line = 0; line < ProductFMC::PageLines && line * ProductFMC::PageCharsPerLine < FlightFactor767FMCProfile::DataLength; ++line) {
         for (int pos = 0; pos < ProductFMC::PageCharsPerLine; ++pos) {
             int index = line * ProductFMC::PageCharsPerLine + pos;
             
-            if (index >= FlightFactor777FMCProfile::DataLength) {
+            if (index >= FlightFactor767FMCProfile::DataLength) {
                 break;
             }
             
