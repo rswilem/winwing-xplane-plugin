@@ -36,7 +36,7 @@ bool FlightFactor767FMCProfile::IsEligible() {
     static const std::string author = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_author");
     static const std::string icao = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ICAO");
     
-    if (author != "FlightFactor") {
+    if (!author.starts_with("FlightFactor")) {
         return false;
     }
 
