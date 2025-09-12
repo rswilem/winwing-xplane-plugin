@@ -6,6 +6,7 @@
 #include <iostream>
 #include <thread>
 #include <functional>
+#include <map>
 #include <windows.h>
 #include <hidsdi.h>
 #include <setupapi.h>
@@ -17,10 +18,15 @@ DEFINE_GUID(GUID_DEVINTERFACE_HID, 0x4D1E55B2, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00,
 
 USBController* USBController::instance = nullptr;
 
-USBController::USBController() {    
+// Map to track device paths since we can't modify USBDevice
+static std::map<USBDevice*, std::string> devicePaths;
+
+USBController::USBController() {
+    enumerateDevices();
+    
     std::thread monitorThread([this]() {
         while (!shouldShutdown) {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::this_thread::sleep_for(std::chrono::seconds(5));
             if (!shouldShutdown) {
                 checkForDeviceChanges();
             }
@@ -46,6 +52,7 @@ void USBController::destroy() {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     
     for (auto ptr : devices) {
+        devicePaths.erase(ptr);  // Clean up our map
         delete ptr;
     }
     devices.clear();
@@ -53,7 +60,7 @@ void USBController::destroy() {
     instance = nullptr;
 }
 
-USBDevice* USBController::createDeviceFromHandle(HANDLE hidDevice) {
+USBDevice* USBController::createDeviceFromHandle(HANDLE hidDevice, const std::string& devicePath) {
     HIDD_ATTRIBUTES attributes = {};
     attributes.Size = sizeof(attributes);
     
@@ -72,7 +79,21 @@ USBDevice* USBController::createDeviceFromHandle(HANDLE hidDevice) {
     WideCharToMultiByte(CP_UTF8, 0, vendorName, -1, vendorNameA, sizeof(vendorNameA), nullptr, nullptr);
     WideCharToMultiByte(CP_UTF8, 0, productName, -1, productNameA, sizeof(productNameA), nullptr, nullptr);
     
-    return USBDevice::Device(hidDevice, attributes.VendorID, attributes.ProductID, std::string(vendorNameA), std::string(productNameA));
+    USBDevice* device = USBDevice::Device(hidDevice, attributes.VendorID, attributes.ProductID, std::string(vendorNameA), std::string(productNameA));
+    
+    if (device) {
+        devicePaths[device] = devicePath;
+    }
+    return device;
+}
+
+bool USBController::deviceExistsWithPath(const std::string& devicePath) {
+    for (const auto& pair : devicePaths) {
+        if (pair.second == devicePath) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool USBController::deviceExistsWithHandle(HANDLE hidDevice) {
@@ -84,18 +105,19 @@ bool USBController::deviceExistsWithHandle(HANDLE hidDevice) {
     return false;
 }
 
-void USBController::addDeviceFromHandle(HANDLE hidDevice) {
+void USBController::addDeviceFromHandle(HANDLE hidDevice, const std::string& devicePath) {
     if (hidDevice == INVALID_HANDLE_VALUE) {
         return;
     }
     
-    AppState::getInstance()->executeAfter(0, [this, hidDevice]() {
-        if (deviceExistsWithHandle(hidDevice)) {
-            CloseHandle(hidDevice);
-            return;
-        }
-        
-        USBDevice* device = createDeviceFromHandle(hidDevice);
+    if (deviceExistsWithPath(devicePath)) {
+        CloseHandle(hidDevice);
+        return;
+    }
+    
+    
+    AppState::getInstance()->executeAfter(0, [this, hidDevice, devicePath]() {
+        USBDevice* device = createDeviceFromHandle(hidDevice, devicePath);
         if (device) {
             devices.push_back(device);
         }
@@ -103,6 +125,10 @@ void USBController::addDeviceFromHandle(HANDLE hidDevice) {
 }
 
 void USBController::enumerateHidDevices(std::function<void(HANDLE, const std::string&)> deviceHandler) {
+    if (!AppState::getInstance()->pluginInitialized) {
+        return;
+    }
+    
     HDEVINFO deviceInfoSet = SetupDiGetClassDevs(&GUID_DEVINTERFACE_HID, nullptr, nullptr, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
     if (deviceInfoSet == INVALID_HANDLE_VALUE) {
         return;
@@ -131,7 +157,7 @@ void USBController::enumerateHidDevices(std::function<void(HANDLE, const std::st
 
 void USBController::enumerateDevices() {
     enumerateHidDevices([this](HANDLE hidDevice, const std::string& devicePath) {
-        addDeviceFromHandle(hidDevice);
+        addDeviceFromHandle(hidDevice, devicePath);
     });
 }
 
@@ -143,14 +169,26 @@ void USBController::checkForDeviceChanges() {
         attributes.Size = sizeof(attributes);
         if (HidD_GetAttributes(hidDevice, &attributes) && attributes.VendorID == WINWING_VENDOR_ID) {
             currentDevicePaths.push_back(devicePath);
-            addDeviceFromHandle(hidDevice);
+            addDeviceFromHandle(hidDevice, devicePath);
         } else {
             CloseHandle(hidDevice);
         }
     });
     
+    // Remove devices that are no longer present
     for (auto it = devices.begin(); it != devices.end();) {
-        if ((*it)->hidDevice == INVALID_HANDLE_VALUE || !(*it)->connected) {
+        auto pathIt = devicePaths.find(*it);
+        bool found = false;
+        
+        if (pathIt != devicePaths.end()) {
+            found = std::find(currentDevicePaths.begin(), currentDevicePaths.end(), 
+                             pathIt->second) != currentDevicePaths.end();
+        }
+        
+        if (!found || (*it)->hidDevice == INVALID_HANDLE_VALUE || !(*it)->connected) {
+            if (pathIt != devicePaths.end()) {            
+                devicePaths.erase(pathIt);
+            }
             delete *it;
             it = devices.erase(it);
         } else {

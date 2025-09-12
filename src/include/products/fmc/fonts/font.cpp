@@ -1,8 +1,10 @@
 #include "font.h"
 #include <cstddef>
+#include "default.h"
 #include "airbus_1.h"
 #include "airbus_2.h"
 #include "airbus_3.h"
+#include "airbus_4.h"
 #include "737.h"
 #include "xcrafts.h"
 #include "vga_1.h"
@@ -24,6 +26,10 @@ const std::vector<std::vector<unsigned char>> Font::GlyphData(FontVariant varian
             
         case FontVariant::FontAirbus3:
             result = fmcFontAirbusVariant3;
+            break;
+            
+        case FontVariant::FontAirbus4:
+            result = fmcFontAirbusVariant4;
             break;
             
         case FontVariant::Font737:
@@ -50,7 +56,9 @@ const std::vector<std::vector<unsigned char>> Font::GlyphData(FontVariant varian
             result = fmcFontVGA4;
             break;
             
+        case FontVariant::Default:
         default:
+            result = fmcFontDefault;
             break;
     }
     

@@ -111,7 +111,7 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
     
     DWORD bytesWritten;
     BOOL result = WriteFile(hidDevice, data.data(), (DWORD)data.size(), &bytesWritten, nullptr);
-    if (!result || bytesWritten != data.size()) {
+    if (!result || bytesWritten < data.size()) {
         DWORD error = GetLastError();
         debug_force("WriteFile failed: %lu (expected %zu bytes, wrote %lu)\n", error, data.size(), bytesWritten);
         return false;

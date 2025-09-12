@@ -4,9 +4,11 @@
 #include <vector>
 
 enum class FontVariant : unsigned char {
+    Default,
     FontAirbus1,
     FontAirbus2,
     FontAirbus3,
+    FontAirbus4,
     Font737,
     FontXCrafts,
     FontVGA1,

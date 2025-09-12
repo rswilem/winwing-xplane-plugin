@@ -308,7 +308,6 @@ XPLMDataRef Dataref::findRef(const char* ref) {
     
     XPLMDataRef handle = XPLMFindDataRef(ref);
     if (!handle) {
-        debug("Dataref not found: '%s'\n", ref);
         return nullptr;
     }
     
@@ -411,10 +410,10 @@ T Dataref::get(const char *ref) {
     
     if constexpr (std::is_same_v<T, bool>) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(handle);
-        if (refType == xplmType_Float) {
+        if ((refType & xplmType_Float) == xplmType_Float) {
             return XPLMGetDataf(handle) > std::numeric_limits<float>::epsilon();
         }
-        else if (refType == xplmType_Double) {
+        else if ((refType & xplmType_Double) == xplmType_Double) {
             return XPLMGetDatad(handle) > std::numeric_limits<double>::epsilon();
         }
         else {
@@ -423,10 +422,10 @@ T Dataref::get(const char *ref) {
     }
     else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double>) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(handle);
-        if (refType == xplmType_Float) {
+        if ((refType & xplmType_Float) == xplmType_Float) {
             return XPLMGetDataf(handle);
         }
-        else if (refType == xplmType_Double) {
+        else if ((refType & xplmType_Double) == xplmType_Double) {
             return XPLMGetDatad(handle);
         }
         else {
@@ -499,10 +498,10 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
     
     if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> || std::is_same_v<T, float> || std::is_same_v<T, double>) {
         XPLMDataTypeID refType = XPLMGetDataRefTypes(handle);
-        if (refType == xplmType_Float) {
+        if ((refType & xplmType_Float) == xplmType_Float) {
             XPLMSetDataf(handle, value);
         }
-        else if (refType == xplmType_Double) {
+        else if ((refType & xplmType_Double) == xplmType_Double) {
             XPLMSetDatad(handle, value);
         }
         else {
@@ -526,7 +525,7 @@ void Dataref::set(const char* ref, T value, bool setCacheOnly) {
 void Dataref::executeCommand(const char *command, XPLMCommandPhase phase) {
     XPLMCommandRef handle = XPLMFindCommand(command);
     if (!handle) {
-        debug_force("Command not found: %s\n", command);
+        debug("Command not found: %s\n", command);
         return;
     }
     

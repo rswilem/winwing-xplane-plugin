@@ -133,7 +133,7 @@ public:
             case FMCHardwareType::HARDWARE_PFP7:
                 return getPFP7ButtonForIndex(index);
             default:
-                return FMCKey::LSK1L;
+                return FMCKey::KEY0;
         }
     }
 
