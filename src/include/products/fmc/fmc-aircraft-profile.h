@@ -1,18 +1,19 @@
 #ifndef FMC_AIRCRAFT_PROFILE_H
 #define FMC_AIRCRAFT_PROFILE_H
 
+#include "fmc-hardware-mapping.h"
+
+#include <array>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <array>
 #include <XPLMUtilities.h>
-#include "fmc-hardware-mapping.h"
 
 enum FMCLed : unsigned char {
     BACKLIGHT = 0,
     SCREEN_BACKLIGHT = 1,
     OVERALL_LEDS_BRIGHTNESS = 2,
-    
+
     _PFP_START = 3,
     PFP_CALL = 3,
     PFP_FAIL = 4,
@@ -20,7 +21,7 @@ enum FMCLed : unsigned char {
     PFP_OFST = 6,
     PFP_EXEC = 7,
     _PFP_END = 7,
-    
+
     _MCDU_START = 8,
     MCDU_FAIL = 8,
     MCDU_FM = 9,
@@ -46,7 +47,7 @@ enum FMCTextColor : int {
     COLOR_DARKBROWN = 0x0108,
     COLOR_GREY = 0x0129,
     COLOR_LIGHTBROWN = 0x014A,
-    
+
     COLOR_AMBER_BG = COLOR_AMBER + 0x1E,
     COLOR_BLACK_BG = COLOR_BLACK + 0x1E,
     COLOR_WHITE_BG = COLOR_WHITE + 0x1E,
@@ -61,16 +62,16 @@ enum FMCTextColor : int {
 };
 
 struct FMCSpecialCharacter {
-    static constexpr std::array<uint8_t, 3> OUTLINED_SQUARE = {0xE2, 0x98, 0x90}; // U+2610
-    static constexpr std::array<uint8_t, 3> FILLED_ARROW_LEFT = {0xE2, 0x97, 0x80}; // // U+25C0
-    static constexpr std::array<uint8_t, 3> FILLED_ARROW_RIGHT = {0xE2, 0x96, 0xB6}; // U+25B6
-    static constexpr std::array<uint8_t, 3> ARROW_LEFT = {0xE2, 0x86, 0x90}; // U+2190
-    static constexpr std::array<uint8_t, 3> ARROW_RIGHT = {0xE2, 0x86, 0x92}; // U+2192
-    static constexpr std::array<uint8_t, 3> ARROW_UP = {0xE2, 0x86, 0x91}; // U+2191
-    static constexpr std::array<uint8_t, 3> ARROW_DOWN = {0xE2, 0x86, 0x93}; // U+2193
-    static constexpr std::array<uint8_t, 2> DEGREES = {0xC2, 0xB0}; // U+00B0
-    static constexpr std::array<uint8_t, 2> TRIANGLE = {0xCE, 0x94}; // U+0394
-    static constexpr std::array<uint8_t, 3> DIAMOND = {0xE2, 0xAC, 0xA1}; // U+2B21
+        static constexpr std::array<uint8_t, 3> OUTLINED_SQUARE = {0xE2, 0x98, 0x90};    // U+2610
+        static constexpr std::array<uint8_t, 3> FILLED_ARROW_LEFT = {0xE2, 0x97, 0x80};  // // U+25C0
+        static constexpr std::array<uint8_t, 3> FILLED_ARROW_RIGHT = {0xE2, 0x96, 0xB6}; // U+25B6
+        static constexpr std::array<uint8_t, 3> ARROW_LEFT = {0xE2, 0x86, 0x90};         // U+2190
+        static constexpr std::array<uint8_t, 3> ARROW_RIGHT = {0xE2, 0x86, 0x92};        // U+2192
+        static constexpr std::array<uint8_t, 3> ARROW_UP = {0xE2, 0x86, 0x91};           // U+2191
+        static constexpr std::array<uint8_t, 3> ARROW_DOWN = {0xE2, 0x86, 0x93};         // U+2193
+        static constexpr std::array<uint8_t, 2> DEGREES = {0xC2, 0xB0};                  // U+00B0
+        static constexpr std::array<uint8_t, 2> TRIANGLE = {0xCE, 0x94};                 // U+0394
+        static constexpr std::array<uint8_t, 3> DIAMOND = {0xE2, 0xAC, 0xA1};            // U+2B21
 };
 
 enum class FMCBackgroundVariant : unsigned char {
@@ -87,19 +88,20 @@ enum class FMCBackgroundVariant : unsigned char {
 class ProductFMC;
 
 class FMCAircraftProfile {
-protected:
-    ProductFMC *product;
-    
-public:
-    FMCAircraftProfile(ProductFMC *product) : product(product) {};
-    virtual ~FMCAircraftProfile() = default;
+    protected:
+        ProductFMC *product;
 
-    virtual const std::vector<std::string>& displayDatarefs() const = 0;
-    virtual const std::vector<FMCButtonDef>& buttonDefs() const = 0;
-    virtual const std::map<char, FMCTextColor>& colorMap() const = 0;
-    virtual void mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) = 0;
-    virtual void updatePage(std::vector<std::vector<char>>& page) = 0;
-    virtual void buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) = 0;
+    public:
+        FMCAircraftProfile(ProductFMC *product) :
+            product(product) {};
+        virtual ~FMCAircraftProfile() = default;
+
+        virtual const std::vector<std::string> &displayDatarefs() const = 0;
+        virtual const std::vector<FMCButtonDef> &buttonDefs() const = 0;
+        virtual const std::map<char, FMCTextColor> &colorMap() const = 0;
+        virtual void mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) = 0;
+        virtual void updatePage(std::vector<std::vector<char>> &page) = 0;
+        virtual void buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) = 0;
 };
 
 #endif

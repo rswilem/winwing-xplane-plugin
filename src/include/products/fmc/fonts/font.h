@@ -15,8 +15,8 @@ enum class FontVariant : unsigned char {
 };
 
 class Font {
-public:
-    static const std::vector<std::vector<unsigned char>> GlyphData(FontVariant variant, unsigned char hardwareIdentifier);
+    public:
+        static const std::vector<std::vector<unsigned char>> GlyphData(FontVariant variant, unsigned char hardwareIdentifier);
 };
-    
+
 #endif

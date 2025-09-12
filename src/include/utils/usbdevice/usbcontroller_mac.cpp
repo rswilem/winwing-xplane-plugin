@@ -1,12 +1,13 @@
 #if APL
+#include "appstate.h"
+#include "config.h"
 #include "usbcontroller.h"
 #include "usbdevice.h"
-#include "appstate.h"
-#include <XPLMUtilities.h>
-#include "config.h"
-#include <iostream>
 
-USBController* USBController::instance = nullptr;
+#include <iostream>
+#include <XPLMUtilities.h>
+
+USBController *USBController::instance = nullptr;
 
 USBController::USBController() {
     hidManager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
@@ -14,7 +15,7 @@ USBController::USBController() {
         debug_force("Failed to create IOHIDManager\n");
         return;
     }
-    
+
     CFMutableDictionaryRef matchingDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     if (matchingDict) {
         uint32_t vid = WINWING_VENDOR_ID;
@@ -26,12 +27,12 @@ USBController::USBController() {
     } else {
         IOHIDManagerSetDeviceMatching(hidManager, nullptr);
     }
-    
+
     IOHIDManagerOpen(hidManager, kIOHIDOptionsTypeNone);
 
     IOHIDManagerRegisterDeviceMatchingCallback(hidManager, &USBController::DeviceAddedCallback, this);
     IOHIDManagerRegisterDeviceRemovalCallback(hidManager, &USBController::DeviceRemovedCallback, this);
-    
+
     IOHIDManagerScheduleWithRunLoop(hidManager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 }
 
@@ -39,11 +40,11 @@ USBController::~USBController() {
     destroy();
 }
 
-USBController* USBController::getInstance() {
+USBController *USBController::getInstance() {
     if (instance == nullptr) {
         instance = new USBController();
     }
-    
+
     return instance;
 }
 
@@ -51,12 +52,12 @@ void USBController::enumerateDevices() {
     if (!AppState::getInstance()->pluginInitialized) {
         return;
     }
-    
+
     CFSetRef deviceSet = IOHIDManagerCopyDevices(hidManager);
     if (deviceSet && CFSetGetCount(deviceSet) > 0) {
         CFIndex num = CFSetGetCount(deviceSet);
-        IOHIDDeviceRef *deviceArray = (IOHIDDeviceRef*)malloc(sizeof(IOHIDDeviceRef) * num);
-        CFSetGetValues(deviceSet, (const void **)deviceArray);
+        IOHIDDeviceRef *deviceArray = (IOHIDDeviceRef *) malloc(sizeof(IOHIDDeviceRef) * num);
+        CFSetGetValues(deviceSet, (const void **) deviceArray);
         for (CFIndex i = 0; i < num; ++i) {
             IOHIDDeviceRef hidDevice = deviceArray[i];
             DeviceAddedCallback(this, kIOReturnSuccess, nullptr, hidDevice);
@@ -73,18 +74,18 @@ void USBController::destroy() {
         delete ptr;
     }
     devices.clear();
-    
+
     if (hidManager) {
         IOHIDManagerClose(hidManager, kIOHIDOptionsTypeNone);
         CFRelease(hidManager);
         hidManager = nullptr;
     }
-    
+
     instance = nullptr;
 }
 
 bool USBController::deviceExistsWithHIDDevice(IOHIDDeviceRef device) {
-    for (auto* dev : devices) {
+    for (auto *dev : devices) {
         if (dev->hidDevice == device) {
             return true;
         }
@@ -97,9 +98,9 @@ void USBController::DeviceAddedCallback(void *context, IOReturn result, void *se
         return;
     }
 
-    auto* self = static_cast<USBController*>(context);
+    auto *self = static_cast<USBController *>(context);
 
-    for (auto* dev : self->devices) {
+    for (auto *dev : self->devices) {
         if (dev->hidDevice == device) {
             return;
         }
@@ -112,14 +113,18 @@ void USBController::DeviceAddedCallback(void *context, IOReturn result, void *se
     CFTypeRef pidRef = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductIDKey));
     CFTypeRef vendorNameRef = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDManufacturerKey));
     CFTypeRef productNameRef = IOHIDDeviceGetProperty(device, CFSTR(kIOHIDProductKey));
-    if (vidRef && CFGetTypeID(vidRef) == CFNumberGetTypeID())
-        CFNumberGetValue((CFNumberRef)vidRef, kCFNumberIntType, &vendorId);
-    if (pidRef && CFGetTypeID(pidRef) == CFNumberGetTypeID())
-        CFNumberGetValue((CFNumberRef)pidRef, kCFNumberIntType, &productId);
-    if (vendorNameRef && CFGetTypeID(vendorNameRef) == CFStringGetTypeID())
-        CFStringGetCString((CFStringRef)vendorNameRef, vendorNameBuf, sizeof(vendorNameBuf), kCFStringEncodingUTF8);
-    if (productNameRef && CFGetTypeID(productNameRef) == CFStringGetTypeID())
-        CFStringGetCString((CFStringRef)productNameRef, productNameBuf, sizeof(productNameBuf), kCFStringEncodingUTF8);
+    if (vidRef && CFGetTypeID(vidRef) == CFNumberGetTypeID()) {
+        CFNumberGetValue((CFNumberRef) vidRef, kCFNumberIntType, &vendorId);
+    }
+    if (pidRef && CFGetTypeID(pidRef) == CFNumberGetTypeID()) {
+        CFNumberGetValue((CFNumberRef) pidRef, kCFNumberIntType, &productId);
+    }
+    if (vendorNameRef && CFGetTypeID(vendorNameRef) == CFStringGetTypeID()) {
+        CFStringGetCString((CFStringRef) vendorNameRef, vendorNameBuf, sizeof(vendorNameBuf), kCFStringEncodingUTF8);
+    }
+    if (productNameRef && CFGetTypeID(productNameRef) == CFStringGetTypeID()) {
+        CFStringGetCString((CFStringRef) productNameRef, productNameBuf, sizeof(productNameBuf), kCFStringEncodingUTF8);
+    }
 
     std::string vendorNameStr = std::string(vendorNameBuf);
     std::string productNameStr = std::string(productNameBuf);
@@ -132,7 +137,7 @@ void USBController::DeviceAddedCallback(void *context, IOReturn result, void *se
         if (self->deviceExistsWithHIDDevice(device)) {
             return;
         }
-        
+
         USBDevice *newDevice = USBDevice::Device(device, vendorId, productId, vendorNameStr, productNameStr);
         if (newDevice) {
             self->devices.push_back(newDevice);
@@ -145,15 +150,15 @@ void USBController::DeviceRemovedCallback(void *context, IOReturn result, void *
         return;
     }
 
-    auto* self = static_cast<USBController*>(context);
-    for (auto it = self->devices.begin(); it != self->devices.end(); ) {
+    auto *self = static_cast<USBController *>(context);
+    for (auto it = self->devices.begin(); it != self->devices.end();) {
         if ((*it)->hidDevice == device) {
             (*it)->disconnect();
         }
     }
-    
+
     AppState::getInstance()->executeAfter(0, [self, device]() {
-        for (auto it = self->devices.begin(); it != self->devices.end(); ) {
+        for (auto it = self->devices.begin(); it != self->devices.end();) {
             if ((*it)->hidDevice == device) {
                 delete *it;
                 it = self->devices.erase(it); // erase returns next valid iterator

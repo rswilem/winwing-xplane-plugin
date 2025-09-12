@@ -27,52 +27,52 @@ class USBDevice;
 
 namespace pap3::device::transport {
 
-using DevicePtr = ::USBDevice*;
+    using DevicePtr = ::USBDevice *;
 
-// Low-level writer signature: writes exactly 'len' bytes from 'data' to 'dev'.
-// Returns true on success. The writer may adapt the buffer (e.g., add Report ID) before calling HID APIs.
-using WriterFn = bool(*)(DevicePtr, const uint8_t*, std::size_t);
+    // Low-level writer signature: writes exactly 'len' bytes from 'data' to 'dev'.
+    // Returns true on success. The writer may adapt the buffer (e.g., add Report ID) before calling HID APIs.
+    using WriterFn = bool (*)(DevicePtr, const uint8_t *, std::size_t);
 
-// Install the concrete writer (call once after the HID device is opened).
-void setWriter(WriterFn fn);
+    // Install the concrete writer (call once after the HID device is opened).
+    void setWriter(WriterFn fn);
 
-// Default writer for macOS HID: prefixes Report ID (0x00 by default) and calls USBDevice::writeData(std::vector<uint8_t>).
-bool writerUsbWriteData(DevicePtr dev, const uint8_t* data, std::size_t len);
+    // Default writer for macOS HID: prefixes Report ID (0x00 by default) and calls USBDevice::writeData(std::vector<uint8_t>).
+    bool writerUsbWriteData(DevicePtr dev, const uint8_t *data, std::size_t len);
 
-// -----------------------------------------------------------------------------
-// Public transport API
-// -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // Public transport API
+    // -----------------------------------------------------------------------------
 
-// Brightness (backlight/LCD/LEDs). Common format:
-//   02 0F BF 00 00 03 49 CC VV 00 00 00 00 00
-// CC = channel (0/1/2), VV = 0..255
-bool sendDimming(DevicePtr dev, uint8_t channel, uint8_t value);
+    // Brightness (backlight/LCD/LEDs). Common format:
+    //   02 0F BF 00 00 03 49 CC VV 00 00 00 00 00
+    // CC = channel (0/1/2), VV = 0..255
+    bool sendDimming(DevicePtr dev, uint8_t channel, uint8_t value);
 
-// LED on/off. Same base format; CC = hardware LED id, VV = 0x01/0x00.
-bool sendLed(DevicePtr dev, uint8_t ledId, bool on);
+    // LED on/off. Same base format; CC = hardware LED id, VV = 0x01/0x00.
+    bool sendLed(DevicePtr dev, uint8_t ledId, bool on);
 
-// LCD payload frame (opcode 0x38):
-// - Common header at [0x00..0x03]
-// - Fixed preamble at [0x04..]
-// - 32-byte user payload copied to [0x19..0x38] inclusive
-// On success, increments 'seq' (kept non-zero).
-bool sendLcdPayload(DevicePtr dev, uint8_t& seq, const std::vector<uint8_t>& payloadAfter0x19);
+    // LCD payload frame (opcode 0x38):
+    // - Common header at [0x00..0x03]
+    // - Fixed preamble at [0x04..]
+    // - 32-byte user payload copied to [0x19..0x38] inclusive
+    // On success, increments 'seq' (kept non-zero).
+    bool sendLcdPayload(DevicePtr dev, uint8_t &seq, const std::vector<uint8_t> &payloadAfter0x19);
 
-// LCD "empty" frame (opcode 0x38) with zeros after common header.
-// On success, increments 'seq'.
-bool sendLcdEmptyFrame(DevicePtr dev, uint8_t& seq);
+    // LCD "empty" frame (opcode 0x38) with zeros after common header.
+    // On success, increments 'seq'.
+    bool sendLcdEmptyFrame(DevicePtr dev, uint8_t &seq);
 
-// LCD commit frame (opcode 0x2A) with fixed constants at specific offsets.
-// On success, increments 'seq'.
-bool sendLcdCommit(DevicePtr dev, uint8_t& seq);
+    // LCD commit frame (opcode 0x2A) with fixed constants at specific offsets.
+    // On success, increments 'seq'.
+    bool sendLcdCommit(DevicePtr dev, uint8_t &seq);
 
-// LCD init frame (opcode 0x12) with a fixed tail at [0x04..].
-// On success, increments 'seq'.
-bool sendLcdInit(DevicePtr dev, uint8_t& seq);
+    // LCD init frame (opcode 0x12) with a fixed tail at [0x04..].
+    // On success, increments 'seq'.
+    bool sendLcdInit(DevicePtr dev, uint8_t &seq);
 
-// AT solenoid latch. Exact 14-byte frame:
-// 02 0F BF 00 00 03 49 1E VV 00 00 00 00 00
-// VV = 0x01 (ON) or 0x00 (OFF)
-bool sendATSolenoid(DevicePtr dev, bool on);
+    // AT solenoid latch. Exact 14-byte frame:
+    // 02 0F BF 00 00 03 49 1E VV 00 00 00 00 00
+    // VV = 0x01 (ON) or 0x00 (OFF)
+    bool sendATSolenoid(DevicePtr dev, bool on);
 
 } // namespace pap3::device::transport

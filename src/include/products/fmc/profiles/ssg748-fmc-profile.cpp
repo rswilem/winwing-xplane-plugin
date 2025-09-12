@@ -1,28 +1,31 @@
 #include "ssg748-fmc-profile.h"
-#include "product-fmc.h"
-#include "font.h"
-#include "dataref.h"
+
 #include "appstate.h"
-#include <cstring>
+#include "dataref.h"
+#include "font.h"
+#include "product-fmc.h"
+
 #include <algorithm>
+#include <cstring>
 #include <regex>
 
-SSG748FMCProfile::SSG748FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
+SSG748FMCProfile::SSG748FMCProfile(ProductFMC *product) :
+    FMCAircraftProfile(product) {
     datarefRegex = std::regex("SSG/UFMC/LINE_([0-9]+)");
 
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::FontVGA1, product->identifierByte));
-        
+
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("ssg/LGT/mcdu_brt_sw", [product](std::vector<float> brightness) {
         if (brightness.size() < 27) {
             return;
         }
-        
+
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255.0f : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("ssg/LGT/mcdu_brt_sw");
     });
@@ -37,7 +40,7 @@ bool SSG748FMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("SSG/748/simtime");
 }
 
-const std::vector<std::string>& SSG748FMCProfile::displayDatarefs() const {
+const std::vector<std::string> &SSG748FMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         "SSG/UFMC/LINE_1",
         "SSG/UFMC/LINE_2",
@@ -52,15 +55,14 @@ const std::vector<std::string>& SSG748FMCProfile::displayDatarefs() const {
         "SSG/UFMC/LINE_11",
         "SSG/UFMC/LINE_12",
         "SSG/UFMC/LINE_13",
-        "SSG/UFMC/LINE_14"
-    };
-    
+        "SSG/UFMC/LINE_14"};
+
     return datarefs;
 }
 
-const std::vector<FMCButtonDef>& SSG748FMCProfile::buttonDefs() const {
-    //SSG/CDU/cdu1_init_sw
-    //SSG/CDU/cdu1_g_sw set to 1 then 0
+const std::vector<FMCButtonDef> &SSG748FMCProfile::buttonDefs() const {
+    // SSG/CDU/cdu1_init_sw
+    // SSG/CDU/cdu1_g_sw set to 1 then 0
     static const std::vector<FMCButtonDef> buttons = {
         {FMCKey::LSK1L, "SSG/CDU/cdu1_lk1_sw"},
         {FMCKey::LSK2L, "SSG/CDU/cdu1_lk2_sw"},
@@ -132,21 +134,20 @@ const std::vector<FMCButtonDef>& SSG748FMCProfile::buttonDefs() const {
         {FMCKey::SPACE, "SSG/CDU/cdu1_sp_sw"},
         {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, "SSG/CDU/cdu1_del_sw"},
         {FMCKey::SLASH, "SSG/CDU/cdu1_slash_sw"},
-        {FMCKey::CLR, "SSG/CDU/cdu1_clr_sw"}
-    };
-    
+        {FMCKey::CLR, "SSG/CDU/cdu1_clr_sw"}};
+
     return buttons;
 }
 
-const std::map<char, FMCTextColor>& SSG748FMCProfile::colorMap() const {
+const std::map<char, FMCTextColor> &SSG748FMCProfile::colorMap() const {
     static const std::map<char, FMCTextColor> colMap = {
         {'c', FMCTextColor::COLOR_CYAN},
         {'g', FMCTextColor::COLOR_GREEN},
         {'p', FMCTextColor::COLOR_MAGENTA},
         {'w', FMCTextColor::COLOR_WHITE},
-        {'l', FMCTextColor::COLOR_RED}, // l = Large/white
-        {'s', FMCTextColor::COLOR_GREY}, // s = Small/white
-        {'x', FMCTextColor::COLOR_RED}, // x = Special/labels (white)
+        {'l', FMCTextColor::COLOR_RED},      // l = Large/white
+        {'s', FMCTextColor::COLOR_GREY},     // s = Small/white
+        {'x', FMCTextColor::COLOR_RED},      // x = Special/labels (white)
         {'i', FMCTextColor::COLOR_WHITE_BG}, // i = Inverted
     };
 
@@ -158,34 +159,34 @@ void SSG748FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t charac
         case '#':
             buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
             break;
-            
+
         case '=':
             buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
             break;
-        
+
         default:
             buffer->push_back(character);
             break;
     }
 }
 
-void SSG748FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+void SSG748FMCProfile::updatePage(std::vector<std::vector<char>> &page) {
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
-    
+
     auto datarefManager = Dataref::getInstance();
-    for (const auto& ref : displayDatarefs()) {
+    for (const auto &ref : displayDatarefs()) {
         std::smatch match;
         if (!std::regex_match(ref, match, datarefRegex)) {
             continue;
         }
-        
+
         int lineNum = std::stoi(match[1]);
         int lineIndex = lineNum - 1;
-        
+
         if (lineIndex < 0 || lineIndex >= ProductFMC::PageLines) {
             continue;
         }
-        
+
         std::string text = datarefManager->getCached<std::string>(ref.c_str());
         if (text.empty()) {
             continue;
@@ -194,27 +195,27 @@ void SSG748FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
         char currentColor = 'W';
         bool fontSmall = lineIndex % 2 == 1;
         int displayPos = 0;
-        
+
         for (int i = 0; i < text.size() && displayPos < ProductFMC::PageCharsPerLine; ++i) {
             char c = text[i];
             if (c == 0x00) {
                 break;
             }
-            
+
             if (c == ';' && i + 1 < text.size()) {
                 char colorCode = text[i + 1];
                 currentColor = colorCode;
                 i++; // Skip the color code character
                 continue;
             }
-            
+
             if (c == '[' && i + 1 < text.size() && text[i + 1] == ']') {
                 product->writeLineToPage(page, lineIndex, displayPos, "#", currentColor, fontSmall);
                 i++; // Skip the closing bracket
                 displayPos++;
                 continue;
             }
-            
+
             if (c != 0x20) {
                 product->writeLineToPage(page, lineIndex, displayPos, std::string(1, toupper(c)), currentColor, fontSmall);
             }

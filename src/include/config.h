@@ -1,13 +1,39 @@
 #if defined(_WIN32) || defined(_WIN64)
-    #include <windows.h>
+#include <windows.h>
 #endif
 
 #if DEBUG
-#define debug(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); if (AppState::getInstance()->debuggingEnabled) { XPLMDebugString(buffer); }  printf("%s", buffer); }
-#define debug_force(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); XPLMDebugString(buffer); printf("%s", buffer); }
+#define debug(format, ...)                                                    \
+    {                                                                         \
+        char buffer[1024];                                                    \
+        snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); \
+        if (AppState::getInstance()->debuggingEnabled) {                      \
+            XPLMDebugString(buffer);                                          \
+        }                                                                     \
+        printf("%s", buffer);                                                 \
+    }
+#define debug_force(format, ...)                                              \
+    {                                                                         \
+        char buffer[1024];                                                    \
+        snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); \
+        XPLMDebugString(buffer);                                              \
+        printf("%s", buffer);                                                 \
+    }
 #else
-#define debug(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); if (AppState::getInstance()->debuggingEnabled) { XPLMDebugString(buffer); } }
-#define debug_force(format, ...) { char buffer[1024]; snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); XPLMDebugString(buffer); }
+#define debug(format, ...)                                                    \
+    {                                                                         \
+        char buffer[1024];                                                    \
+        snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); \
+        if (AppState::getInstance()->debuggingEnabled) {                      \
+            XPLMDebugString(buffer);                                          \
+        }                                                                     \
+    }
+#define debug_force(format, ...)                                              \
+    {                                                                         \
+        char buffer[1024];                                                    \
+        snprintf(buffer, sizeof(buffer), "[Winwing] " format, ##__VA_ARGS__); \
+        XPLMDebugString(buffer);                                              \
+    }
 #endif
 
 #define PRODUCT_NAME "winwing"

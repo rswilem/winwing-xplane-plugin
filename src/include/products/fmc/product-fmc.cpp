@@ -1,18 +1,21 @@
 #include "product-fmc.h"
-#include "dataref.h"
+
 #include "appstate.h"
 #include "config.h"
+#include "dataref.h"
 #include "profiles/ff777-fmc-profile.h"
 #include "profiles/ixeg733-fmc-profile.h"
 #include "profiles/laminar-airbus-fmc-profile.h"
 #include "profiles/ssg748-fmc-profile.h"
 #include "profiles/toliss-fmc-profile.h"
-#include "profiles/zibo-fmc-profile.h"
 #include "profiles/xcrafts-fmc-profile.h"
+#include "profiles/zibo-fmc-profile.h"
+
 #include <chrono>
 #include <XPLMProcessing.h>
 
-ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, unsigned char identifierByte) : USBDevice(hidDevice, vendorId, productId, vendorName, productName), hardwareType(hardwareType), identifierByte(identifierByte) {
+ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, unsigned char identifierByte) :
+    USBDevice(hidDevice, vendorId, productId, vendorName, productName), hardwareType(hardwareType), identifierByte(identifierByte) {
     profile = nullptr;
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageBytesPerLine, ' '));
     lastUpdateCycle = 0;
@@ -20,7 +23,7 @@ ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
     lastButtonStateHi = 0;
     pressedButtonIndices = {};
     fontUpdatingEnabled = true;
-    
+
     connect();
 }
 
@@ -34,38 +37,32 @@ void ProductFMC::setProfileForCurrentAircraft() {
         clearDisplay();
         profile = new TolissFMCProfile(this);
         profileReady = true;
-    }
-    else if (LaminarFMCProfile::IsEligible()) {
+    } else if (LaminarFMCProfile::IsEligible()) {
         debug("Using Laminar profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new LaminarFMCProfile(this);
         profileReady = true;
-    }
-    else if (XCraftsFMCProfile::IsEligible()) {
+    } else if (XCraftsFMCProfile::IsEligible()) {
         debug("Using X-Crafts profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new XCraftsFMCProfile(this);
         profileReady = true;
-    }
-    else if (ZiboFMCProfile::IsEligible()) {
+    } else if (ZiboFMCProfile::IsEligible()) {
         debug("Using Zibo PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new ZiboFMCProfile(this);
         profileReady = true;
-    }
-    else if (FlightFactor777FMCProfile::IsEligible()) {
+    } else if (FlightFactor777FMCProfile::IsEligible()) {
         debug("Using FlightFactor 777 PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new FlightFactor777FMCProfile(this);
         profileReady = true;
-    }
-    else if (SSG748FMCProfile::IsEligible()) {
+    } else if (SSG748FMCProfile::IsEligible()) {
         debug("Using SSG 748 PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new SSG748FMCProfile(this);
         profileReady = true;
-    }
-    else if (IXEG733FMCProfile::IsEligible()) {
+    } else if (IXEG733FMCProfile::IsEligible()) {
         debug("Using IXEG 733 PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new IXEG733FMCProfile(this);
@@ -73,27 +70,24 @@ void ProductFMC::setProfileForCurrentAircraft() {
     }
 }
 
-const char* ProductFMC::classIdentifier() {
+const char *ProductFMC::classIdentifier() {
     if (hardwareType == FMCHardwareType::HARDWARE_MCDU) {
         return "Product FMC (MCDU)";
-    }
-    else if (hardwareType == FMCHardwareType::HARDWARE_PFP3N) {
+    } else if (hardwareType == FMCHardwareType::HARDWARE_PFP3N) {
         return "Product FMC (PFP3N)";
-    }
-    else if (hardwareType == FMCHardwareType::HARDWARE_PFP4) {
+    } else if (hardwareType == FMCHardwareType::HARDWARE_PFP4) {
         return "Product FMC (PFP4)";
-    }
-    else if (hardwareType == FMCHardwareType::HARDWARE_PFP7) {
+    } else if (hardwareType == FMCHardwareType::HARDWARE_PFP7) {
         return "Product FMC (PFP7)";
     }
-    
+
     return "Product FMC (unknown hardware)";
 }
 
 bool ProductFMC::connect() {
     if (USBDevice::connect()) {
         uint8_t col_bg[] = {0x00, 0x00, 0x00};
-        
+
         writeData({0xf0, 0x0, 0x1, 0x38, identifierByte, 0xbb, 0x0, 0x0, 0x1e, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, identifierByte, 0xbb, 0x0, 0x0, 0x18, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0x8, 0x0, 0x0, 0x0, 0x34, 0x0, 0x18, 0x0, 0xe, 0x0, 0x18, 0x0, identifierByte, 0xbb, 0x0, 0x0, 0x19, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0xe, 0x0, 0x0, 0x0, 0x0});
         writeData({0xf0, 0x0, 0x2, 0x38, 0x0, 0x0, 0x0, 0x1, 0x0, 0x5, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, identifierByte, 0xbb, 0x0, 0x0, 0x19, 0x1, 0x0, 0x0, 0xc4, 0x24, 0xa, 0x0, 0x0, 0xe, 0x0, 0x0, 0x0, 0x1, 0x0, 0x6, 0x0, 0x0, 0x0, 0x3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, identifierByte, 0xbb, 0x0, 0x0, 0x19, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0});
         writeData({0xf0, 0x0, 0x3, 0x38, 0x76, 0x72, 0x19, 0x0, 0x0, 0xe, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0x0, 0x0, 0xff, 0x4, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, identifierByte, 0xbb, 0x0, 0x0, 0x19, 0x1, 0x0, 0x0, 0x76, 0x72, 0x19, 0x0, 0x0, 0xe, 0x0, 0x0, 0x0, 0x2, 0x0, 0x0, 0xa5, 0xff, 0xff, 0x5, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, identifierByte, 0xbb, 0x0, 0x0, 0x0, 0x0});
@@ -117,17 +111,17 @@ bool ProductFMC::connect() {
         setLedBrightness(FMCLed::OVERALL_LEDS_BRIGHTNESS, 255);
         setAllLedsEnabled(false);
         showBackground(FMCBackgroundVariant::WINWING_LOGO);
-        
+
         setLedBrightness(FMCLed::MCDU_FAIL, 1);
         setLedBrightness(FMCLed::PFP_FAIL, 1);
-        
+
         if (!profile) {
             setProfileForCurrentAircraft();
         }
-        
+
         return true;
     }
-    
+
     return false;
 }
 
@@ -135,19 +129,19 @@ void ProductFMC::disconnect() {
     setLedBrightness(FMCLed::BACKLIGHT, 0);
     setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
     setAllLedsEnabled(false);
-    
+
     unloadProfile();
-    
+
     USBDevice::disconnect();
 }
 
 void ProductFMC::unloadProfile() {
     profileReady = false;
-    
+
     if (!profile) {
         return;
     }
-    
+
     delete profile;
     profile = nullptr;
 }
@@ -156,21 +150,21 @@ void ProductFMC::update() {
     if (!connected) {
         return;
     }
-    
+
     if (!profile) {
         setProfileForCurrentAircraft();
         return;
     }
-    
+
     USBDevice::update();
     updatePage();
 }
 
-void ProductFMC::didReceiveData(int reportId, uint8_t *report, int reportLength) {    
+void ProductFMC::didReceiveData(int reportId, uint8_t *report, int reportLength) {
     if (!connected || !profile || !report || reportLength <= 0) {
         return;
     }
-    
+
     if (reportId != 1 || reportLength < 13) { // We only handle report #1 for now.
 #if DEBUG
 //        printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
@@ -182,67 +176,67 @@ void ProductFMC::didReceiveData(int reportId, uint8_t *report, int reportLength)
 #endif
         return;
     }
-    
+
     uint64_t buttonsLo = 0;
     uint32_t buttonsHi = 0;
     for (int i = 0; i < 8; ++i) {
-        buttonsLo |= ((uint64_t)report[i+1]) << (8 * i);
+        buttonsLo |= ((uint64_t) report[i + 1]) << (8 * i);
     }
     for (int i = 0; i < 4; ++i) {
-        buttonsHi |= ((uint32_t)report[i+9]) << (8 * i);
+        buttonsHi |= ((uint32_t) report[i + 9]) << (8 * i);
     }
-    
+
     if (buttonsLo == lastButtonStateLo && buttonsHi == lastButtonStateHi) {
         return;
     }
-    
+
     lastButtonStateLo = buttonsLo;
     lastButtonStateHi = buttonsHi;
-    
+
     for (int i = 0; i < 96; ++i) {
         bool pressed;
-        
+
         if (i < 64) {
             pressed = (buttonsLo >> i) & 1;
         } else {
             pressed = (buttonsHi >> (i - 64)) & 1;
         }
-        
+
         bool pressedButtonIndexExists = pressedButtonIndices.find(i) != pressedButtonIndices.end();
         XPLMCommandPhase command = -1;
         if (pressed && !pressedButtonIndexExists) {
             command = xplm_CommandBegin;
-        }
-        else if (pressed && pressedButtonIndexExists) {
+        } else if (pressed && pressedButtonIndexExists) {
             command = xplm_CommandContinue;
-        }
-        else if (!pressed && pressedButtonIndexExists) {
+        } else if (!pressed && pressedButtonIndexExists) {
             command = xplm_CommandEnd;
         }
-        
+
         if (command < 0) {
             continue;
         }
-        
+
         if (command == xplm_CommandBegin) {
             pressedButtonIndices.insert(i);
         }
-        
+
         FMCKey key = FMCHardwareMapping::ButtonIdentifierForIndex(hardwareType, i);
-        const std::vector<FMCButtonDef>& currentButtonDefs = profile->buttonDefs();
-        auto it = std::find_if(currentButtonDefs.begin(), currentButtonDefs.end(), [&](const FMCButtonDef& def) {
-            return std::visit([&](auto&& k) {
+        const std::vector<FMCButtonDef> &currentButtonDefs = profile->buttonDefs();
+        auto it = std::find_if(currentButtonDefs.begin(), currentButtonDefs.end(), [&](const FMCButtonDef &def) {
+            return std::visit([&](auto &&k) {
                 using T = std::decay_t<decltype(k)>;
-                if constexpr (std::is_same_v<T, FMCKey>)
+                if constexpr (std::is_same_v<T, FMCKey>) {
                     return k == key;
-                else
+                } else {
                     return std::find(k.begin(), k.end(), key) != k.end();
-            }, def.key);
+                }
+            },
+                              def.key);
         });
         if (it != currentButtonDefs.end()) {
             profile->buttonPressed(&*it, command);
         }
-        
+
         if (command == xplm_CommandEnd) {
             pressedButtonIndices.erase(i);
         }
@@ -276,7 +270,7 @@ void ProductFMC::draw(const std::vector<std::vector<char>> *pagePtr) {
             profile->mapCharacter(&buf, val, fontSmall);
         }
     }
-    
+
     while (!buf.empty()) {
         size_t maxLength = std::min<size_t>(63, buf.size());
         std::vector<uint8_t> usbBuf(buf.begin(), buf.begin() + maxLength);
@@ -293,8 +287,8 @@ std::pair<uint8_t, uint8_t> ProductFMC::dataFromColFont(char color, bool fontSma
     if (!profile) {
         return {0x42, 0x00}; // Default white
     }
-    
-    const std::map<char, FMCTextColor>& col_map = profile->colorMap();
+
+    const std::map<char, FMCTextColor> &col_map = profile->colorMap();
 
     auto it = col_map.find(color);
     int value = it != col_map.end() ? it->second : FMCTextColor::COLOR_WHITE;
@@ -305,7 +299,7 @@ std::pair<uint8_t, uint8_t> ProductFMC::dataFromColFont(char color, bool fontSma
     return {static_cast<uint8_t>(value & 0xFF), static_cast<uint8_t>((value >> 8) & 0xFF)};
 }
 
-void ProductFMC::writeLineToPage(std::vector<std::vector<char>>& page, int line, int pos, const std::string &text, char color, bool fontSmall) {
+void ProductFMC::writeLineToPage(std::vector<std::vector<char>> &page, int line, int pos, const std::string &text, char color, bool fontSmall) {
     if (line < 0 || line >= ProductFMC::PageLines) {
         debug("Not writing line %i: Line number is out of range!\n", line);
         return;
@@ -335,7 +329,7 @@ void ProductFMC::clearDisplay() {
         blankLine.push_back(0x00);
         blankLine.push_back(' ');
     }
-    
+
     for (int i = 0; i < 16; ++i) {
         writeData(blankLine);
     }
@@ -345,7 +339,7 @@ void ProductFMC::setFont(std::vector<std::vector<unsigned char>> font) {
     if (!fontUpdatingEnabled) {
         return;
     }
-    
+
     for (auto &fontBytes : font) {
         writeData(fontBytes);
     }
@@ -353,63 +347,60 @@ void ProductFMC::setFont(std::vector<std::vector<unsigned char>> font) {
 
 void ProductFMC::showBackground(FMCBackgroundVariant variant) {
     std::vector<uint8_t> data;
-    
+
     switch (variant) {
         case FMCBackgroundVariant::GRAY:
             data = {0xf0, 0x00, 0x02, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x53, 0x20, 0x07, 0x00};
             break;
-            
+
         case FMCBackgroundVariant::BLACK:
             data = {0xf0, 0x00, 0x03, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0xfd, 0x24, 0x07, 0x00};
             break;
-            
+
         case FMCBackgroundVariant::RED:
             data = {0xf0, 0x00, 0x04, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x55, 0x29, 0x07, 0x00};
             break;
-            
+
         case FMCBackgroundVariant::GREEN:
             data = {0xf0, 0x00, 0x06, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0xad, 0x95, 0x09, 0x00};
             break;
-            
+
         case FMCBackgroundVariant::BLUE:
             data = {0xf0, 0x00, 0x07, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0xa7, 0x9b, 0x09, 0x00};
             break;
-            
+
         case FMCBackgroundVariant::YELLOW:
             data = {0xf0, 0x00, 0x08, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x09, 0xa1, 0x09, 0x00};
             break;
-            
+
         case FMCBackgroundVariant::PURPLE:
             data = {0xf0, 0x00, 0x09, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x05, 0xa7, 0x09, 0x00};
             break;
-            
+
         case FMCBackgroundVariant::WINWING_LOGO:
             data = {0xf0, 0x00, 0x0a, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0xd4, 0xac, 0x09, 0x00};
             break;
-            
+
         default:
             return;
     }
-    
+
     std::vector<uint8_t> extra = {
-        0x00, 0x01, 0x00, 0x00, 0x00, static_cast<uint8_t>(0x0c + (int)variant), 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    };
+        0x00, 0x01, 0x00, 0x00, 0x00, static_cast<uint8_t>(0x0c + (int) variant), 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     data.insert(data.end(), extra.begin(), extra.end());
-    
+
     writeData(data);
 }
 
 void ProductFMC::setAllLedsEnabled(bool enable) {
     unsigned char start = FMCLed::_PFP_START;
     unsigned char end = FMCLed::_PFP_END;
-    
+
     if (hardwareType == FMCHardwareType::HARDWARE_MCDU) {
         start = FMCLed::_MCDU_START;
         end = FMCLed::_MCDU_END;
     }
-    
+
     for (unsigned char i = start; i <= end; ++i) {
         FMCLed led = static_cast<FMCLed>(i);
         setLedBrightness(led, enable ? 1 : 0);
@@ -420,11 +411,10 @@ void ProductFMC::setLedBrightness(FMCLed led, uint8_t brightness) {
     if (led > FMCLed::OVERALL_LEDS_BRIGHTNESS && hardwareType == FMCHardwareType::HARDWARE_MCDU && led >= FMCLed::_PFP_START && led <= FMCLed::_PFP_END) {
         // Tried setting a PFP led on MCDU hardware, ignore.
         return;
-    }
-    else if (led > FMCLed::OVERALL_LEDS_BRIGHTNESS && hardwareType != FMCHardwareType::HARDWARE_MCDU && led >= FMCLed::_MCDU_START && led <= FMCLed::_MCDU_END) {
+    } else if (led > FMCLed::OVERALL_LEDS_BRIGHTNESS && hardwareType != FMCHardwareType::HARDWARE_MCDU && led >= FMCLed::_MCDU_START && led <= FMCLed::_MCDU_END) {
         // Tried setting a MCDU led on PFP hardware, ignore.
         return;
     }
-    
+
     writeData({0x02, identifierByte, 0xbb, 0x00, 0x00, 0x03, 0x49, led, brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
 }
