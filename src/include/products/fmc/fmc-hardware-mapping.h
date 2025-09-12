@@ -1,6 +1,7 @@
 #ifndef FMC_HARDWARE_MAPPING_H
 #define FMC_HARDWARE_MAPPING_H
 
+#include <string>
 #include <variant>
 #include <vector>
 
