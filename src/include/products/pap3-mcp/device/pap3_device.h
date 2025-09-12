@@ -302,7 +302,7 @@ namespace pap3::device {
                                 // --- Séquence atomique + pacing obligatoire ---
                                 auto *dev = static_cast<transport::DevicePtr>(this);
 
-                                debug_force("[PAP3][LCD] TX begin (seq=%u)\n", _seq);
+                                debug("[PAP3][LCD] TX begin (seq=%u)\n", _seq);
 
                                 // PAYLOAD
                                 transport::sendLcdPayload(dev, _seq, pendLcd32);
@@ -319,7 +319,7 @@ namespace pap3::device {
                                 // COMMIT
                                 transport::sendLcdCommit(dev, _seq);
 
-                                debug_force("[PAP3][LCD] TX end (seq=%u)\n", _seq);
+                                debug("[PAP3][LCD] TX end (seq=%u)\n", _seq);
 
                                 _sentLcd32 = pendLcd32;
                                 lastTx = now;

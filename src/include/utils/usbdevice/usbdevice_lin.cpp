@@ -110,7 +110,6 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
 
     ssize_t bytesWritten = write(hidDevice, data.data(), data.size());
     if (bytesWritten == (ssize_t) data.size()) {
-        debug_force("Write successful via raw write()\n");
         return true;
     }
 

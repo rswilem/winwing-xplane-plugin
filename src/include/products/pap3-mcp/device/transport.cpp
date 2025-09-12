@@ -125,7 +125,7 @@ namespace pap3::device::transport {
             return false;
         }
         auto buf = makeShortCommand(channel, value);
-        debug_force("[PAP3] sendDimming(ch=%u, val=%u) sent\n", static_cast<unsigned>(channel), static_cast<unsigned>(value));
+        debug("[PAP3] sendDimming(ch=%u, val=%u) sent\n", static_cast<unsigned>(channel), static_cast<unsigned>(value));
         return write(dev, buf.data(), buf.size());
     }
 
@@ -137,7 +137,7 @@ namespace pap3::device::transport {
             return false;
         }
         auto buf = makeShortCommand(ledId, static_cast<uint8_t>(on ? 0x01 : 0x00));
-        debug_force("[PAP3] sendLed(id=0x%02X, %s) sent\n", static_cast<unsigned>(ledId), on ? "ON" : "OFF");
+        debug("[PAP3] sendLed(id=0x%02X, %s) sent\n", static_cast<unsigned>(ledId), on ? "ON" : "OFF");
         return write(dev, buf.data(), buf.size());
     }
 
@@ -150,7 +150,7 @@ namespace pap3::device::transport {
         }
         constexpr uint8_t selectorAT = 0x1E;
         auto buf = makeShortCommand(selectorAT, static_cast<uint8_t>(on ? 0x01 : 0x00));
-        debug_force("[PAP3] sendATSolenoid(%s) sent\n", on ? "ON" : "OFF");
+        debug("[PAP3] sendATSolenoid(%s) sent\n", on ? "ON" : "OFF");
         return write(dev, buf.data(), buf.size());
     }
 
@@ -250,7 +250,7 @@ namespace pap3::device::transport {
         if (ok) {
             bumpSeq(seq);
         }
-        debug_force("[PAP3][LCD] sendLcdPayload(seq=%u) sent\n", static_cast<unsigned>(seq));
+        debug("[PAP3][LCD] sendLcdPayload(seq=%u) sent\n", static_cast<unsigned>(seq));
         return ok;
     }
 
@@ -267,7 +267,7 @@ namespace pap3::device::transport {
         if (ok) {
             bumpSeq(seq);
         }
-        debug_force("[PAP3][LCD] sendLcdEmptyFrame(seq=%u) sent\n", static_cast<unsigned>(seq));
+        debug("[PAP3][LCD] sendLcdEmptyFrame(seq=%u) sent\n", static_cast<unsigned>(seq));
         return ok;
     }
 
@@ -283,7 +283,7 @@ namespace pap3::device::transport {
         writeCommitConstants(buf);
 
         const bool ok = write(dev, buf, sizeof(buf));
-        debug_force("[PAP3][LCD] sendLcdCommit(seq=%u) sent\n", static_cast<unsigned>(seq));
+        debug("[PAP3][LCD] sendLcdCommit(seq=%u) sent\n", static_cast<unsigned>(seq));
         if (ok) {
             bumpSeq(seq);
         }
@@ -302,7 +302,7 @@ namespace pap3::device::transport {
         writeInitTail(buf);
 
         const bool ok = write(dev, buf, sizeof(buf));
-        debug_force("[PAP3][LCD] sendLcdInit(seq=%u) sent\n", static_cast<unsigned>(seq));
+        debug("[PAP3][LCD] sendLcdInit(seq=%u) sent\n", static_cast<unsigned>(seq));
         if (ok) {
             bumpSeq(seq);
         }

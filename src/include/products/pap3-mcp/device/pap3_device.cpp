@@ -93,11 +93,11 @@ namespace pap3::device {
                            const std::string &productName) :
         USBDevice(hidDevice, vendorId, productId, vendorName, productName), _seq(1) {
         ensureWriterInstalled();
-        debug_force("PAP3Device constructed - vendorId: 0x%04X, productId: 0x%04X\n", vendorId, productId);
+        debug("PAP3Device constructed - vendorId: 0x%04X, productId: 0x%04X\n", vendorId, productId);
 
         // Attempt connection. Keep object valid even if connect() fails.
         if (USBDevice::connect()) {
-            debug_force("PAP3Device connected\n");
+            debug("PAP3Device connected\n");
             runStartupSequence();
         }
     }
@@ -338,7 +338,7 @@ namespace pap3::device {
     }
 
     bool PAP3Device::setATSolenoid(bool on) {
-        debug_force("[PAP3] setATSolenoid(%s) called\n", on ? "ON" : "OFF");
+        debug("[PAP3] setATSolenoid(%s) called\n", on ? "ON" : "OFF");
         return sendATSolenoid(static_cast<DevicePtr>(this), on);
     }
 
@@ -349,7 +349,7 @@ namespace pap3::device {
     void PAP3Device::onHidInputReport(const std::uint8_t *report, int len) {
         if (!_bootSwitchSyncDone && _profile && report && len > 0) {
             _bootSwitchSyncDone = true;
-            debug_force("[PAP3] First HID report -> snapshot sync\n");
+            debug("[PAP3] First HID report -> snapshot sync\n");
             _profile->syncSimToHardwareFromRaw(report, len);
         }
 
@@ -386,9 +386,9 @@ namespace pap3::device {
                 }
 
                 if (const char *name = LookupEncoderName(it.off)) {
-                    debug_force("[PAP3][ENC] %s: delta=%+d\n", name, static_cast<int>(it.d));
+                    debug("[PAP3][ENC] %s: delta=%+d\n", name, static_cast<int>(it.d));
                 } else {
-                    debug_force("[PAP3][ENC] off=0x%02X: delta=%+d\n", it.off, static_cast<int>(it.d));
+                    debug("[PAP3][ENC] off=0x%02X: delta=%+d\n", it.off, static_cast<int>(it.d));
                 }
 
                 if (_profile) {
@@ -418,7 +418,7 @@ namespace pap3::device {
             if (_initialSwitchSyncPending) {
                 _initialSwitchSyncPending = false;
                 if (_profile) {
-                    debug_force("[PAP3] first switch snapshot -> sync\n");
+                    debug("[PAP3] first switch snapshot -> sync\n");
                     _profile->syncSimToHardware();
                 }
             }
