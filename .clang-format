@@ -1,0 +1,110 @@
+---
+
+Language: Cpp
+
+DisableFormat: false
+RemoveSemicolon: false
+RemoveBracesLLVM: false
+SpaceInEmptyBlock: false
+CompactNamespaces: false
+SpaceBeforeCaseColon: false
+SpaceAfterLogicalNot: false
+SpaceBeforeSquareBrackets: false
+SpacesInContainerLiterals: false
+SpaceAfterTemplateKeyword: false
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+InsertBraces: true
+ReflowComments: true
+IndentRequires: true
+IndentCaseLabels: true
+BreakStringLiterals: true
+FixNamespaceComments: true
+IndentRequiresClause: true
+SpaceAfterCStyleCast: true
+IndentAccessModifiers: true
+IndentWrappedFunctionNames: true
+SpaceBeforeInheritanceColon: true
+AllowShortLoopsOnASingleLine: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCtorInitializerColon: true
+AllowShortCaseLabelsOnASingleLine: false 
+SpaceBeforeRangeBasedForLoopColon: true
+
+SortIncludes: CaseInsensitive
+IncludeBlocks: Regroup
+AlignOperands: AlignAfterOperator 
+SpaceBeforeParens: Custom
+RemoveParentheses: MultipleParentheses
+IndentPPDirectives: AfterHash
+NamespaceIndentation: All
+BreakInheritanceList: AfterComma
+SortUsingDeclarations: LexicographicNumeric
+SpaceAroundPointerQualifiers: After
+RequiresExpressionIndentation: Keyword
+EmptyLineBeforeAccessModifier: LogicalBlock
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never 
+
+AlignConsecutiveBitFields: None
+AlignConsecutiveAssignments: None
+AlignConsecutiveDeclarations: None
+
+PointerAlignment: Right
+QualifierAlignment: Left
+ReferenceAlignment: Right
+AlignArrayOfStructures: Right 
+
+UseTab: Never
+SpacesInAngles: Never
+BreakBeforeBinaryOperators: None
+PackConstructorInitializers: NextLine
+EmptyLineAfterAccessModifier: Never
+
+SeparateDefinitionBlocks: Always
+AllowShortBlocksOnASingleLine: Always
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeTernaryOperators: true
+
+IndentWidth: 4
+ShortNamespaceLines: 0
+MaxEmptyLinesToKeep: 1
+ContinuationIndentWidth: 4
+SpacesBeforeTrailingComments: 1
+
+ColumnLimit: 240
+
+SpaceBeforeParensOptions:
+  AfterPlacementOperator: false    
+  AfterFunctionDefinitionName: false
+  AfterFunctionDeclarationName: false
+  AfterControlStatements: true
+
+BraceWrapping:
+  AfterEnum: false
+  AfterClass: true
+  AfterUnion: false
+  BeforeElse: false
+  BeforeWhile: false
+  AfterStruct: false
+  BeforeCatch: false
+  AfterFunction: true
+  AfterCaseLabel: false
+  AfterNamespace: false
+  AfterExternBlock: false
+  SplitEmptyRecord: false
+  SplitEmptyFunction: false
+  SplitEmptyNamespace: false
+  AfterControlStatement: Never
+
+AlignConsecutiveShortCaseStatements:
+  Enabled: true 
+  AcrossComments: true 
+  AlignCaseColons: true 
+  AcrossEmptyLines: true 
+
+AlignTrailingComments: 
+  Kind: Always
+  OverEmptyLines: 2
+
+---

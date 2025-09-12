@@ -243,35 +243,31 @@ void fmc_setFont(void* fmcHandle, int fontType) {
     
     FontVariant variant;
     switch (fontType) {
-        case 0: // AirbusVariant1
-            variant = FontVariant::FontAirbus1;
+        case 1: // Airbus
+            variant = FontVariant::FontAirbus;
             break;
-        case 1: // AirbusVariant2
-            variant = FontVariant::FontAirbus2;
-            break;
-        case 2: // AirbusVariant3
-            variant = FontVariant::FontAirbus3;
-            break;
-        case 3: // 737
+        case 2: // 737
             variant = FontVariant::Font737;
             break;
-        case 4: // X-Crafts
+        case 3: // X-Crafts
             variant = FontVariant::FontXCrafts;
             break;
-        case 5: // VGA 1
+        case 4: // VGA 1
             variant = FontVariant::FontVGA1;
             break;
-        case 6: // VGA 2
+        case 5: // VGA 2
             variant = FontVariant::FontVGA2;
             break;
-        case 7: // VGA 3
+        case 6: // VGA 3
             variant = FontVariant::FontVGA3;
             break;
-        case 8: // VGA 4
+        case 7: // VGA 4
             variant = FontVariant::FontVGA4;
             break;
+            
+        case 0:
         default:
-            variant = FontVariant::FontAirbus1;
+            variant = FontVariant::Default;
             break;
     }
     

@@ -7,7 +7,7 @@
 
 LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontAirbus2, product->identifierByte));
+    product->setFont(Font::GlyphData(FontVariant::FontAirbus, product->identifierByte));
     
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {
@@ -83,8 +83,8 @@ const std::vector<FMCButtonDef>& LaminarFMCProfile::buttonDefs() const {
         {std::vector<FMCKey>{FMCKey::MCDU_FPLN, FMCKey::PFP_LEGS}, "sim/FMS/fpln"},
         {std::vector<FMCKey>{FMCKey::MCDU_RAD_NAV, FMCKey::PFP4_NAV_RAD, FMCKey::PFP7_NAV_RAD}, "sim/FMS/navrad"},
         {FMCKey::MCDU_FUEL_PRED, "sim/FMS/fuel_pred"},
-        {FMCKey::MCDU_SEC_FPLN, ""},
-        {std::vector<FMCKey>{FMCKey::MCDU_ATC_COMM, FMCKey::PFP4_ATC}, ""},
+        {FMCKey::MCDU_SEC_FPLN, "sim/FMS/sec_fpln"},
+        {std::vector<FMCKey>{FMCKey::MCDU_ATC_COMM, FMCKey::PFP4_ATC}, "sim/FMS/atc_comm"},
         {FMCKey::MENU, "sim/FMS/menu"},
         {FMCKey::BRIGHTNESS_DOWN, "laminar/A333/buttons/fms1_brightness_dn"},
         {std::vector<FMCKey>{FMCKey::MCDU_AIRPORT, FMCKey::PFP_DEP_ARR}, "sim/FMS/airport"},
@@ -95,13 +95,13 @@ const std::vector<FMCButtonDef>& LaminarFMCProfile::buttonDefs() const {
         {std::vector<FMCKey>{FMCKey::MCDU_PAGE_DOWN, FMCKey::PAGE_NEXT}, "sim/FMS/down"},
         {FMCKey::KEY1, "sim/FMS/key_1"},
         {FMCKey::KEY2, "sim/FMS/key_2"},
-        {FMCKey::KEY3, "sim/FMS/key_1"},
-        {FMCKey::KEY4, "sim/FMS/key_1"},
-        {FMCKey::KEY5, "sim/FMS/key_1"},
-        {FMCKey::KEY6, "sim/FMS/key_1"},
-        {FMCKey::KEY7, "sim/FMS/key_1"},
-        {FMCKey::KEY8, "sim/FMS/key_1"},
-        {FMCKey::KEY9, "sim/FMS/key_1"},
+        {FMCKey::KEY3, "sim/FMS/key_3"},
+        {FMCKey::KEY4, "sim/FMS/key_4"},
+        {FMCKey::KEY5, "sim/FMS/key_5"},
+        {FMCKey::KEY6, "sim/FMS/key_6"},
+        {FMCKey::KEY7, "sim/FMS/key_7"},
+        {FMCKey::KEY8, "sim/FMS/key_8"},
+        {FMCKey::KEY9, "sim/FMS/key_9"},
         {FMCKey::PERIOD, "sim/FMS/key_period"},
         {FMCKey::KEY0, "sim/FMS/key_0"},
         {FMCKey::PLUSMINUS, "sim/FMS/key_minus"},

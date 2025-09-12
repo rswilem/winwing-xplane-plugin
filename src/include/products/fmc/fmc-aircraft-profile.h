@@ -61,16 +61,16 @@ enum FMCTextColor : int {
 };
 
 struct FMCSpecialCharacter {
-    static constexpr std::array<uint8_t, 3> OUTLINED_SQUARE = {0xE2, 0x98, 0x90};
-    static constexpr std::array<uint8_t, 3> FILLED_ARROW_LEFT = {0xE2, 0x97, 0x80};
-    static constexpr std::array<uint8_t, 3> FILLED_ARROW_RIGHT = {0xE2, 0x96, 0xB6};
-    static constexpr std::array<uint8_t, 3> ARROW_LEFT = {0xE2, 0x86, 0x90};
-    static constexpr std::array<uint8_t, 3> ARROW_RIGHT = {0xE2, 0x86, 0x92};
-    static constexpr std::array<uint8_t, 3> ARROW_UP = {0xE2, 0x86, 0x91};
-    static constexpr std::array<uint8_t, 3> ARROW_DOWN = {0xE2, 0x86, 0x93};
-    static constexpr std::array<uint8_t, 2> DEGREES = {0xC2, 0xB0};
-    static constexpr std::array<uint8_t, 2> TRIANGLE = {0xCE, 0x14};
-    static constexpr std::array<uint8_t, 3> DIAMOND = {0xE2, 0x6C, 0x21};
+    static constexpr std::array<uint8_t, 3> OUTLINED_SQUARE = {0xE2, 0x98, 0x90}; // U+2610
+    static constexpr std::array<uint8_t, 3> FILLED_ARROW_LEFT = {0xE2, 0x97, 0x80}; // // U+25C0
+    static constexpr std::array<uint8_t, 3> FILLED_ARROW_RIGHT = {0xE2, 0x96, 0xB6}; // U+25B6
+    static constexpr std::array<uint8_t, 3> ARROW_LEFT = {0xE2, 0x86, 0x90}; // U+2190
+    static constexpr std::array<uint8_t, 3> ARROW_RIGHT = {0xE2, 0x86, 0x92}; // U+2192
+    static constexpr std::array<uint8_t, 3> ARROW_UP = {0xE2, 0x86, 0x91}; // U+2191
+    static constexpr std::array<uint8_t, 3> ARROW_DOWN = {0xE2, 0x86, 0x93}; // U+2193
+    static constexpr std::array<uint8_t, 2> DEGREES = {0xC2, 0xB0}; // U+00B0
+    static constexpr std::array<uint8_t, 2> TRIANGLE = {0xCE, 0x94}; // U+0394
+    static constexpr std::array<uint8_t, 3> DIAMOND = {0xE2, 0xAC, 0xA1}; // U+2B21
 };
 
 enum class FMCBackgroundVariant : unsigned char {

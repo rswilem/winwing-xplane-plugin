@@ -131,6 +131,10 @@ void USBController::addDeviceFromPath(const std::string& devicePath) {
 }
 
 void USBController::enumerateDevices() {
+    if (!AppState::getInstance()->pluginInitialized) {
+        return;
+    }
+    
     DIR* dir = opendir("/dev");
     if (!dir) {
         return;
@@ -147,6 +151,10 @@ void USBController::enumerateDevices() {
 }
 
 void USBController::monitorDevices() {
+    if (!AppState::getInstance()->pluginInitialized) {
+        return;
+    }
+    
     int fd = udev_monitor_get_fd(hidManager);
     while (!shouldStopMonitoring) {
         fd_set fds;

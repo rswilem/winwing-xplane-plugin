@@ -48,6 +48,10 @@ USBController* USBController::getInstance() {
 }
 
 void USBController::enumerateDevices() {
+    if (!AppState::getInstance()->pluginInitialized) {
+        return;
+    }
+    
     CFSetRef deviceSet = IOHIDManagerCopyDevices(hidManager);
     if (deviceSet && CFSetGetCount(deviceSet) > 0) {
         CFIndex num = CFSetGetCount(deviceSet);
@@ -89,7 +93,7 @@ bool USBController::deviceExistsWithHIDDevice(IOHIDDeviceRef device) {
 }
 
 void USBController::DeviceAddedCallback(void *context, IOReturn result, void *sender, IOHIDDeviceRef device) {
-    if (result != kIOReturnSuccess || !context || !device) {
+    if (!AppState::getInstance()->pluginInitialized || result != kIOReturnSuccess || !context || !device) {
         return;
     }
 
@@ -142,14 +146,21 @@ void USBController::DeviceRemovedCallback(void *context, IOReturn result, void *
     }
 
     auto* self = static_cast<USBController*>(context);
-
     for (auto it = self->devices.begin(); it != self->devices.end(); ) {
         if ((*it)->hidDevice == device) {
-            delete *it;
-            it = self->devices.erase(it); // erase returns next valid iterator
-        } else {
-            ++it;
+            (*it)->disconnect();
         }
     }
+    
+    AppState::getInstance()->executeAfter(0, [self, device]() {
+        for (auto it = self->devices.begin(); it != self->devices.end(); ) {
+            if ((*it)->hidDevice == device) {
+                delete *it;
+                it = self->devices.erase(it); // erase returns next valid iterator
+            } else {
+                ++it;
+            }
+        }
+    });
 }
 #endif

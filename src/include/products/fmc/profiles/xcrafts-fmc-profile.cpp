@@ -17,27 +17,21 @@ XCraftsFMCProfile::XCraftsFMCProfile(ProductFMC *product) : FMCAircraftProfile(p
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::FontXCrafts, product->identifierByte));
     
-    // Monitor avionics power for LED control
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [product](bool poweredOn) {
-        // Set appropriate brightness based on avionics power
-        uint8_t brightness = poweredOn ? 255 : 0;
+    Dataref::getInstance()->monitorExistingDataref<float>("XCrafts/FMS/CDU1_brt", [product](float rawBrightness) {
+        bool poweredOn = Dataref::getInstance()->getCached<bool>("XCrafts/FMS/power_stat");
+        uint8_t brightness = poweredOn ? rawBrightness * 255.0f : 0;
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, brightness);
         product->setLedBrightness(FMCLed::BACKLIGHT, brightness);
     });
     
-#if DEBUG
-    AppState::getInstance()->executeAfter(3000, [](){
-        Dataref::getInstance()->executeCommand("XCrafts/ERJ/OPS/GPU_toggle");
+    Dataref::getInstance()->monitorExistingDataref<bool>("XCrafts/FMS/power_stat", [this](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("XCrafts/FMS/CDU1_brt");
     });
-    
-    AppState::getInstance()->executeAfter(4000, [](){
-        Dataref::getInstance()->set<int>("XCrafts/electric/GPU_sw", 1);
-    });
-#endif
 }
 
 XCraftsFMCProfile::~XCraftsFMCProfile() {
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
+    Dataref::getInstance()->unbind("XCrafts/FMS/CDU1_brt");
+    Dataref::getInstance()->unbind("XCrafts/FMS/power_stat");
 }
 
 bool XCraftsFMCProfile::IsEligible() {
@@ -78,11 +72,25 @@ const std::vector<FMCButtonDef>& XCraftsFMCProfile::buttonDefs() const {
         {FMCKey::LSK5R, "XCrafts/ERJ/CDU_1/RSK5"},
         {FMCKey::LSK6R, "XCrafts/ERJ/CDU_1/RSK6"},
         
-        // Function Keys
-//        {FMCKey::PFP3_N1_LIMIT, "XCrafts/ERJ/CDU_1/Key_PERF"},
-//        {FMCKey::FPLN, "XCrafts/ERJ/CDU_1/Key_NAV"},
+        {std::vector<FMCKey>{FMCKey::MCDU_SEC_FPLN, FMCKey::PFP_INIT_REF}, "XCrafts/ERJ/CDU_1/Key_NAV;XCrafts/ERJ/CDU_1/LSK4"}, // Nav IDENT
+        {FMCKey::PFP3_CLB, "XCrafts/ERJ/CDU_1/Key_PERF;XCrafts/ERJ/CDU_1/RSK2"}, // Perf CLIMB
+        {FMCKey::PFP3_CRZ, "XCrafts/ERJ/CDU_1/Key_PERF;XCrafts/ERJ/CDU_1/LSK2"}, // Perf CRUISE
+        {std::vector<FMCKey>{FMCKey::MCDU_AIRPORT, FMCKey::PFP3_DES}, "XCrafts/ERJ/CDU_1/Key_PERF;XCrafts/ERJ/CDU_1/LSK3"}, // Perf DESCENT
+//        {std::vector<FMCKey>{FMCKey::PFP4_VNAV, FMCKey::PFP7_VNAV}, "XCrafts/ERJ/CDU_1/Key_NAV;XCrafts/ERJ/CDU_1/LSK3"}, // Nav TOD details
+//        {FMCKey::PFP_HOLD, "XCrafts/ERJ/CDU_1/Key_NAV;XCrafts/ERJ/CDU_1/LSK3"}, // Nav HOLD
+//        {FMCKey::PFP_FIX, "XCrafts/ERJ/CDU_1/Key_NAV;XCrafts/ERJ/CDU_1/LSK3"}, // Nav PILOT WAYPOINT
         
-        // Navigation
+//        {FMCKey::PFP_EXEC, "custom_tbd"},
+//        {FMCKey::PFP_DEP_ARR, "custom_tbd"},
+        
+        {FMCKey::PROG, "XCrafts/ERJ/CDU_1/Key_PROG"},
+        {FMCKey::PFP3_N1_LIMIT, "XCrafts/ERJ/CDU_1/Key_TRS"},
+        {FMCKey::MCDU_PERF, "XCrafts/ERJ/CDU_1/Key_PERF"},
+        {std::vector<FMCKey>{FMCKey::MCDU_INIT, FMCKey::PFP_ROUTE}, "XCrafts/ERJ/CDU_1/Key_RTE"},
+        {std::vector<FMCKey>{FMCKey::MCDU_DATA, FMCKey::PFP4_FMC_COMM, FMCKey::PFP7_FMC_COMM}, "XCrafts/ERJ/CDU_1/Key_DLK"},
+        {std::vector<FMCKey>{FMCKey::MCDU_FPLN, FMCKey::PFP_LEGS}, "XCrafts/ERJ/CDU_1/Key_FPL"},
+        {std::vector<FMCKey>{FMCKey::MCDU_RAD_NAV, FMCKey::PFP4_NAV_RAD, FMCKey::PFP7_NAV_RAD}, "XCrafts/ERJ/CDU_1/Key_RADIO"},
+        {FMCKey::MENU, "XCrafts/ERJ/CDU_1/Key_DLK"},
         {FMCKey::PAGE_PREV, "XCrafts/ERJ/CDU_1/Key_PREV"},
         {FMCKey::PAGE_NEXT, "XCrafts/ERJ/CDU_1/Key_NEXT"},
         
@@ -274,7 +282,19 @@ void XCraftsFMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPha
             Dataref::getInstance()->set<float>(ref.c_str(), button->value);
         }
     } else {
-        // Handle command buttons
-        Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
+        // Handle command buttons, optionally handle multiple with ;
+        std::string ref = button->dataref;
+        std::stringstream ss(ref);
+        std::string cmd;
+        int milliseconds = 0;
+        while (std::getline(ss, cmd, ';')) {
+            if (!cmd.empty()) {
+                AppState::getInstance()->executeAfter(milliseconds, [cmd, phase](){
+                    Dataref::getInstance()->executeCommand(cmd.c_str(), phase);
+                });
+                
+                milliseconds += 200;
+            }
+        }
     }
 }
