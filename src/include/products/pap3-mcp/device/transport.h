@@ -75,4 +75,4 @@ namespace pap3::device::transport {
     // VV = 0x01 (ON) or 0x00 (OFF)
     bool sendATSolenoid(DevicePtr dev, bool on);
 
-} // namespace pap3::device::transport
+}

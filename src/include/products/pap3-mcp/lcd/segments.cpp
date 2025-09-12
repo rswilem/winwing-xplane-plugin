@@ -83,4 +83,4 @@ namespace pap3::lcd::segments {
         applyOnePos(p, g.top, flag, (kLetterA & A) != 0);
     }
 
-} // namespace pap3::lcd::segments
+}

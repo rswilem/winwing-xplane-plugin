@@ -205,4 +205,4 @@ namespace pap3::device {
         return true;
     }
 
-} // namespace pap3::device
+}

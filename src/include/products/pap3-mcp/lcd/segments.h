@@ -189,4 +189,4 @@ namespace pap3::lcd::segments {
     /// Utility to set/clear a single bit at an absolute offset.
     void setFlag(Payload &p, uint8_t absOffset, uint8_t mask, bool enable);
 
-} // namespace pap3::lcd::segments
+}

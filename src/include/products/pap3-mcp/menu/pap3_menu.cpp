@@ -119,4 +119,4 @@ namespace pap3menu {
         s_itemShowLabels = -1;
     }
 
-} // namespace pap3menu
+}

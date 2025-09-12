@@ -25,8 +25,8 @@ namespace pap3 {
     namespace aircraft {
         struct State;
         class PAP3AircraftProfile;
-    } // namespace aircraft
-} // namespace pap3
+    }
+}
 
 namespace pap3::device {
     /**
@@ -333,4 +333,4 @@ namespace pap3::device {
 
     void StartPap3Demo(PAP3Device *dev);
 
-} // namespace pap3::device
+}

@@ -240,4 +240,4 @@ namespace pap3::lcd::compose {
         return p;
     }
 
-} // namespace pap3::lcd::compose
+}

@@ -109,7 +109,6 @@ namespace pap3::device {
         _inputs.onLightSensor = nullptr;
         _inputs.onRaw = nullptr;
 
-        // Stopper proprement le worker
         if (_ioRunning.exchange(false)) {
             _ioCv.notify_all();
             if (_ioThread.joinable()) {
@@ -278,7 +277,6 @@ namespace pap3::device {
         // Inputs setup (only once)
         setupInputCallbacks();
 
-        // Lancer le worker I/O si pas déjà démarré
         if (!_ioRunning.load()) {
             _ioRunning.store(true);
             _ioThread = std::thread([this] {
@@ -355,7 +353,6 @@ namespace pap3::device {
             _profile->syncSimToHardwareFromRaw(report, len);
         }
 
-        // Inputs::decode() filtre et n’émet que sur changements (edges).
         _inputs.decode(report, len);
     }
 
@@ -504,4 +501,4 @@ namespace pap3::device {
         XPLMScheduleFlightLoop(_atPulseFL, delaySec, /*relativeToNow=*/1);
     }
 
-} // namespace pap3::device
+}

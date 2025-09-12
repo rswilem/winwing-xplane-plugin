@@ -54,4 +54,4 @@ namespace pap3::aircraft {
             XPLMDataRef _drLedMaFo{nullptr};
     };
 
-} // namespace pap3::aircraft
+}

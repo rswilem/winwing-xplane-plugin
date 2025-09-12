@@ -59,4 +59,4 @@ namespace pap3::lcd::compose {
     /// The returned buffer is ready to be copied at [0x19..] in the 0x38 LCD frame.
     Payload build(const Snapshot &s);
 
-} // namespace pap3::lcd::compose
+}

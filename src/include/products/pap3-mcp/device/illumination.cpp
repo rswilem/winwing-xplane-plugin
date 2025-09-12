@@ -171,4 +171,4 @@ namespace pap3::device {
         return out;
     }
 
-} // namespace pap3::device
+}

@@ -309,4 +309,4 @@ namespace pap3::device::transport {
         return ok;
     }
 
-} // namespace pap3::device::transport
+}

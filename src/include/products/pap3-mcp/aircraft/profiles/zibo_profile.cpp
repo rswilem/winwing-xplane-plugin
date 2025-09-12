@@ -574,4 +574,4 @@ namespace pap3::aircraft {
         }
     }
 
-} // namespace pap3::aircraft
+}

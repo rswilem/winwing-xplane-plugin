@@ -15,12 +15,12 @@ SpaceAfterTemplateKeyword: false
 KeepEmptyLinesAtTheStartOfBlocks: false
 
 InsertBraces: true
-ReflowComments: true
+ReflowComments: Never
 IndentRequires: true
+IndentRequiresClause: true
 IndentCaseLabels: true
 BreakStringLiterals: true
-FixNamespaceComments: true
-IndentRequiresClause: true
+FixNamespaceComments: false
 SpaceAfterCStyleCast: true
 IndentAccessModifiers: true
 IndentWrappedFunctionNames: true

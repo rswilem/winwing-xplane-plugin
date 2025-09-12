@@ -144,4 +144,4 @@ namespace pap3::aircraft {
             std::vector<EncBinding> _encs;
     };
 
-} // namespace pap3::aircraft
+}

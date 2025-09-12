@@ -129,4 +129,4 @@ namespace pap3::device {
             std::array<uint8_t, 3> _lastRaw{{0, 0, 0}};
     };
 
-} // namespace pap3::device
+}

@@ -26,4 +26,4 @@ namespace pap3menu {
     // Optional: teardown
     void Shutdown();
 
-} // namespace pap3menu
+}

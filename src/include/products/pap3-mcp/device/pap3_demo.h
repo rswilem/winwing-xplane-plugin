@@ -84,4 +84,4 @@ namespace pap3::device {
             std::uint8_t _hbMax{220};
     };
 
-} // namespace pap3::device
+}

@@ -292,4 +292,4 @@ namespace pap3::device {
         _dev->setDimming(1, val);
     }
 
-} // namespace pap3::device
+}

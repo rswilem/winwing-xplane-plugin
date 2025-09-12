@@ -1,5 +1,6 @@
 // pap3_aircraft.h
-#pragma once
+#ifndef PAP3_AIRCRAFT_H
+#define PAP3_AIRCRAFT_H
 
 #include <cstdint>
 #include <functional>
@@ -12,8 +13,8 @@
 namespace pap3 {
     namespace device {
         class PAP3Device;
-    } // namespace device
-} // namespace pap3
+    }
+}
 
 namespace pap3::aircraft {
 
@@ -23,7 +24,7 @@ namespace pap3::aircraft {
         constexpr std::uint8_t MCP_POWER = 0x01; // Bit 0: AP has power
         constexpr std::uint8_t DC_BUS_1 = 0x02;  // Bit 1: DC Bus 1
         constexpr std::uint8_t DC_BUS_2 = 0x04;  // Bit 2: DC Bus 2
-    } // namespace PowerBits
+    }
 
     // -----------------------------------------------------------------------------
     // State structure: canonical values for PAP3
@@ -185,4 +186,6 @@ namespace pap3::aircraft {
             pap3::device::PAP3Device *_device{nullptr};
     };
 
-} // namespace pap3::aircraft
+}
+
+#endif

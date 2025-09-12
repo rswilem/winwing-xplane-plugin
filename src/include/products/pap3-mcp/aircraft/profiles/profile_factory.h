@@ -10,4 +10,4 @@ namespace pap3::aircraft {
             static std::unique_ptr<PAP3AircraftProfile> detect();
     };
 
-} // namespace pap3::aircraft
+}

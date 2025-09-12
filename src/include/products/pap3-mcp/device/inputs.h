@@ -151,4 +151,4 @@ namespace pap3::device {
             uint8_t _lsOffset = kDefaultLightSensorOffset;
     };
 
-} // namespace pap3::device
+}
