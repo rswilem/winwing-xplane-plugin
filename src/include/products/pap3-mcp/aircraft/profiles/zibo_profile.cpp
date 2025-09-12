@@ -1,7 +1,7 @@
-// src/include/products/pap3-mcp/aircraft/zibo_profile.cpp
 #include "zibo_profile.h"
 
-#include "../../device/pap3_device.h"
+#include "dataref.h"
+#include "pap3_device.h"
 
 #include <algorithm>
 #include <cmath>
@@ -11,93 +11,10 @@
 
 namespace pap3::aircraft {
 
-    static inline XPLMCommandRef Cmd(const char *s) {
-        return XPLMFindCommand(s);
-    }
-
-    static inline bool dr_is_on(XPLMDataRef r) {
-        if (!r) {
-            return false;
-        }
-        const XPLMDataTypeID ty = XPLMGetDataRefTypes(r);
-        // Prefer native type when available; fall back sanely.
-        if (ty & xplmType_Int) {
-            return XPLMGetDatai(r) != 0;
-        }
-        if (ty & xplmType_Float) {
-            return XPLMGetDataf(r) > 0.5f;
-        }
-        if (ty & xplmType_Double) {
-            return XPLMGetDatad(r) > 0.5;
-        }
-        // Last resort: try int
-        return XPLMGetDatai(r) != 0;
-    }
-
     ZiboPAP3Profile::ZiboPAP3Profile() {
-        // MCP values
-        _drSpd = XPLMFindDataRef("laminar/B738/autopilot/mcp_speed_dial_kts_mach");
-        _drHdg = XPLMFindDataRef("laminar/B738/autopilot/mcp_hdg_dial");
-        _drAlt = XPLMFindDataRef("laminar/B738/autopilot/mcp_alt_dial");
-        _drVvi = XPLMFindDataRef("sim/cockpit2/autopilot/vvi_dial_fpm");
-        _drVviShow = XPLMFindDataRef("laminar/B738/autopilot/vvi_dial_show");
-        _drCrsCapt = XPLMFindDataRef("laminar/B738/autopilot/course_pilot");
-        _drCrsFo = XPLMFindDataRef("laminar/B738/autopilot/course_copilot");
-        _drMcpBrightnessArr = XPLMFindDataRef("sim/cockpit2/electrical/instrument_brightness_ratio_manual");
-        _drCockpitLightsArr = XPLMFindDataRef("laminar/B738/electric/panel_brightness");
-
-        // MCP LCD "special digits"
-        _drDigitA = XPLMFindDataRef("laminar/B738/mcp/digit_A");
-        _drDigitB = XPLMFindDataRef("laminar/B738/mcp/digit_8");
-
-        // LEDs
-        _drLedN1 = XPLMFindDataRef("laminar/B738/autopilot/n1_status1");
-        _drLedSpd = XPLMFindDataRef("laminar/B738/autopilot/speed_status1");
-        _drLedVnav = XPLMFindDataRef("laminar/B738/autopilot/vnav_status1");
-        _drLedLvlChg = XPLMFindDataRef("laminar/B738/autopilot/lvl_chg_status");
-        _drLedHdgSel = XPLMFindDataRef("laminar/B738/autopilot/hdg_sel_status");
-        _drLedLnav = XPLMFindDataRef("laminar/B738/autopilot/lnav_status");
-        _drLedVorLoc = XPLMFindDataRef("laminar/B738/autopilot/vorloc_status");
-        _drLedApp = XPLMFindDataRef("laminar/B738/autopilot/app_status");
-        _drLedAltHld = XPLMFindDataRef("laminar/B738/autopilot/alt_hld_status");
-        _drLedVs = XPLMFindDataRef("laminar/B738/autopilot/vs_status");
-        _drLedCmdA = XPLMFindDataRef("laminar/B738/autopilot/cmd_a_status");
-        _drLedCwsA = XPLMFindDataRef("laminar/B738/autopilot/cws_a_status");
-        _drLedCmdB = XPLMFindDataRef("laminar/B738/autopilot/cmd_b_status");
-        _drLedCwsB = XPLMFindDataRef("laminar/B738/autopilot/cws_b_status");
-        _drLedAtArm = XPLMFindDataRef("laminar/B738/autopilot/autothrottle_status1");
-        _drLedMaCapt = XPLMFindDataRef("laminar/B738/autopilot/master_capt_status");
-        _drLedMaFo = XPLMFindDataRef("laminar/B738/autopilot/master_fo_status");
-
-        // --- Switch position refs ---
-        _drFDCaptPos = XPLMFindDataRef("laminar/B738/autopilot/flight_director_pos");
-        _drFDFoPos = XPLMFindDataRef("laminar/B738/autopilot/flight_director_fo_pos");
-        _drATArmPos = XPLMFindDataRef("laminar/B738/autopilot/autothrottle_arm_pos");
-        _drApDiscPos = XPLMFindDataRef("laminar/B738/autopilot/disconnect_pos");
-
-        // --- Toggle commands ---
-        _cmdFDCaptToggle = Cmd("laminar/B738/autopilot/flight_director_toggle");
-        _cmdFDFoToggle = Cmd("laminar/B738/autopilot/flight_director_fo_toggle");
-        _cmdATArmToggle = Cmd("laminar/B738/autopilot/autothrottle_arm_toggle");
-        _cmdApDiscToggle = Cmd("laminar/B738/autopilot/disconnect_toggle");
-
-        // Power-related refs
-        _drHasApPower = XPLMFindDataRef("sim/cockpit2/autopilot/autopilot_has_power");
-        _drDcBus1 = XPLMFindDataRef("laminar/B738/electric/dc_bus1_status");
-        _drDcBus2 = XPLMFindDataRef("laminar/B738/electric/dc_bus2_status");
-
-        // --- Bank angle (Zibo) ---
-        _drBankIdx = XPLMFindDataRef("laminar/B738/autopilot/bank_angle_pos");
-        if (!_drBankIdx) {
-            _drBankIdx = XPLMFindDataRef("laminar/B738/autopilot/bank_angle_sel"); // fallback ancien Zibo
-        }
-
-        _cmdBankUp = Cmd("laminar/B738/autopilot/bank_angle_up");
-        _cmdBankDn = Cmd("laminar/B738/autopilot/bank_angle_dn");
-
         // Button bindings (press-only, unless noted). Offsets/masks per device map.
         auto B = [&](uint8_t off, uint8_t mask, const char *press, const char *release = nullptr) {
-            _btns.push_back({off, mask, Cmd(press), release ? Cmd(release) : nullptr});
+            _btns.push_back({off, mask, press, release});
         };
 
         // 0x01
@@ -126,7 +43,7 @@ namespace pap3::aircraft {
 
         // Encoder bindings
         auto E = [&](uint8_t posOff, const char *inc, const char *dec, int step = 1) {
-            _encs.push_back({posOff, Cmd(inc), Cmd(dec), step});
+            _encs.push_back({posOff, inc, dec, step});
         };
 
         // CRS CAPT
@@ -148,7 +65,7 @@ namespace pap3::aircraft {
     }
 
     bool ZiboPAP3Profile::isEligible() const {
-        return _drSpd != nullptr;
+        return Dataref::getInstance()->exists("laminar/B738/autopilot/mcp_speed_dial_kts_mach");
     }
 
     void ZiboPAP3Profile::start(StateCallback onChanged) {
@@ -178,64 +95,46 @@ namespace pap3::aircraft {
     }
 
     void ZiboPAP3Profile::poll() {
-        if (_drSpd) {
-            _state.spd = XPLMGetDataf(_drSpd);
-        }
-        if (_drHdg) {
-            _state.hdg = XPLMGetDatai(_drHdg);
-        }
-        if (_drAlt) {
-            _state.alt = XPLMGetDatai(_drAlt);
-        }
-        if (_drVvi) {
-            _state.vvi = (XPLMGetDataf(_drVvi));
-        }
-        if (_drVviShow) {
-            _state.vviVisible = XPLMGetDataf(_drVviShow) > 0.5f;
-        }
-        if (_drCrsCapt) {
-            _state.crsCapt = XPLMGetDatai(_drCrsCapt);
-        }
-        if (_drCrsFo) {
-            _state.crsFo = XPLMGetDatai(_drCrsFo);
-        }
-        if (_drMcpBrightnessArr) {
-            float v = 0.0f;
-            XPLMGetDatavf(_drMcpBrightnessArr, &v, 15, 1);
-            _state.mcpBrightness = std::clamp(v, 0.0f, 1.0f);
+        _state.spd = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/mcp_speed_dial_kts_mach");
+        _state.hdg = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/mcp_hdg_dial");
+        _state.alt = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/mcp_alt_dial");
+        _state.vvi = Dataref::getInstance()->getCached<float>("sim/cockpit2/autopilot/vvi_dial_fpm");
+        _state.vviVisible = Dataref::getInstance()->getCached<float>("sim/cockpit2/autopilot/vvi_dial_fpmShow") > 0.5f;
+        _state.crsCapt = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/course_pilot");
+        _state.crsFo = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/course_copilot");
+
+        if (Dataref::getInstance()->exists("sim/cockpit2/electrical/instrument_brightness_ratio_manual")) {
+            std::vector<float> brightness = Dataref::getInstance()->get<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio_manual");
+            _state.mcpBrightness = std::clamp(brightness[15], 0.0f, 1.0f);
         }
 
-        if (_drCockpitLightsArr) {
-            float v = 0.0f;
-            XPLMGetDatavf(_drCockpitLightsArr, &v, 0, 1);
-            _state.cockpitLights = std::clamp(v, 0.0f, 1.0f);
-            _state.ledsBrightness = std::max(v, 0.60f); // minimum 60% for LEDs
+        if (Dataref::getInstance()->exists("laminar/B738/electric/panel_brightness")) {
+            std::vector<float> brightness = Dataref::getInstance()->get<std::vector<float>>("laminar/B738/electric/panel_brightness");
+            _state.cockpitLights = std::clamp(brightness[0], 0.0f, 1.0f);
+            _state.ledsBrightness = std::max(brightness[0], 0.60f); // minimum 60% for LEDs
         }
+
         // LCD special digits (A / 8)
-        if (_drDigitA) {
-            _state.digitA = XPLMGetDataf(_drDigitA) > 0.5f;
-        }
-        if (_drDigitB) {
-            _state.digitB = XPLMGetDataf(_drDigitB) > 0.5f;
-        }
+        _state.digitA = Dataref::getInstance()->get<float>("laminar/B738/mcp/digit_A") > 0.5f;
+        _state.digitB = Dataref::getInstance()->get<float>("laminar/B738/mcp/digit_8") > 0.5f;
 
-        _state.led.N1 = (_drLedN1 && XPLMGetDataf(_drLedN1) > 0.5f);
-        _state.led.SPEED = (_drLedSpd && XPLMGetDataf(_drLedSpd) > 0.5f);
-        _state.led.VNAV = (_drLedVnav && XPLMGetDataf(_drLedVnav) > 0.5f);
-        _state.led.LVL_CHG = (_drLedLvlChg && XPLMGetDataf(_drLedLvlChg) > 0.5f);
-        _state.led.HDG_SEL = (_drLedHdgSel && XPLMGetDataf(_drLedHdgSel) > 0.5f);
-        _state.led.LNAV = (_drLedLnav && XPLMGetDataf(_drLedLnav) > 0.5f);
-        _state.led.VORLOC = (_drLedVorLoc && XPLMGetDataf(_drLedVorLoc) > 0.5f);
-        _state.led.APP = (_drLedApp && XPLMGetDataf(_drLedApp) > 0.5f);
-        _state.led.ALT_HLD = (_drLedAltHld && XPLMGetDataf(_drLedAltHld) > 0.5f);
-        _state.led.V_S = (_drLedVs && XPLMGetDataf(_drLedVs) > 0.5f);
-        _state.led.CMD_A = (_drLedCmdA && XPLMGetDataf(_drLedCmdA) > 0.5f);
-        _state.led.CWS_A = (_drLedCwsA && XPLMGetDataf(_drLedCwsA) > 0.5f);
-        _state.led.CMD_B = (_drLedCmdB && XPLMGetDataf(_drLedCmdB) > 0.5f);
-        _state.led.CWS_B = (_drLedCwsB && XPLMGetDataf(_drLedCwsB) > 0.5f);
-        _state.led.AT_ARM = (_drLedAtArm && XPLMGetDataf(_drLedAtArm) > 0.5f);
-        _state.led.MA_CAPT = (_drLedMaCapt && XPLMGetDataf(_drLedMaCapt) > 0.5f);
-        _state.led.MA_FO = (_drLedMaFo && XPLMGetDataf(_drLedMaFo) > 0.5f);
+        _state.led.N1 = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/n1_status1") > 0.5f;
+        _state.led.SPEED = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/speed_status1") > 0.5f;
+        _state.led.VNAV = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/vnav_status1") > 0.5f;
+        _state.led.LVL_CHG = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/lvl_chg_status") > 0.5f;
+        _state.led.HDG_SEL = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/hdg_sel_status") > 0.5f;
+        _state.led.LNAV = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/lnav_status") > 0.5f;
+        _state.led.VORLOC = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/vorloc_status") > 0.5f;
+        _state.led.APP = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/app_status") > 0.5f;
+        _state.led.ALT_HLD = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/alt_hld_status") > 0.5f;
+        _state.led.V_S = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/vs_status") > 0.5f;
+        _state.led.CMD_A = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/cmd_a_status") > 0.5f;
+        _state.led.CWS_A = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/cws_a_status") > 0.5f;
+        _state.led.CMD_B = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/cmd_b_status") > 0.5f;
+        _state.led.CWS_B = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/cws_b_status") > 0.5f;
+        _state.led.AT_ARM = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/autothrottle_status1") > 0.5f;
+        _state.led.MA_CAPT = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/master_capt_status") > 0.5f;
+        _state.led.MA_FO = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/master_fo_status") > 0.5f;
 
         if (_cb) {
             _cb(_state);
@@ -247,17 +146,17 @@ namespace pap3::aircraft {
 
         if (_haveHwSnapshot) {
             // FD CAPT
-            maybeToggle(_drFDCaptPos, _hwFDCaptOn, _cmdFDCaptToggle);
+            maybeToggle("laminar/B738/autopilot/flight_director_pos", _hwFDCaptOn, "laminar/B738/autopilot/flight_director_toggle");
 
             // FD FO
-            maybeToggle(_drFDFoPos, _hwFDFoOn, _cmdFDFoToggle);
+            maybeToggle("laminar/B738/autopilot/flight_director_fo_pos", _hwFDFoOn, "laminar/B738/autopilot/flight_director_fo_toggle");
 
             // A/T ARM
             // Debounce is not strictly required here because we only toggle on mismatch.
             // If you still want to limit rate, you can reuse debounce(_lastAtToggleTime).
-            // maybeToggle(_drATArmPos, _hwATOn, _cmdATArmToggle);
-            if (_drATArmPos) {
-                const int simAT = XPLMGetDataf(_drATArmPos); // 0 = DISARMED, 1 = ARMED
+            // maybeToggle("laminar/B738/autopilot/autothrottle_arm_pos", _hwATOn, "laminar/B738/autopilot/autothrottle_arm_toggle");
+            if ("laminar/B738/autopilot/autothrottle_arm_pos") {
+                const bool simAT = Dataref::getInstance()->getCached<bool>("laminar/B738/autopilot/autothrottle_arm_pos"); // 0 = DISARMED, 1 = ARMED
 
                 // If simulator shows ARMED and hardware is ARMED at that moment,
                 // pulse the solenoid (non-blocking OFF->ON after ~50ms).
@@ -266,37 +165,26 @@ namespace pap3::aircraft {
                     _device->pulseATSolenoid(100);
                 } else {
                     // Otherwise, enforce hardware-priority on the sim switch.
-                    maybeToggle(_drATArmPos, _hwATOn, _cmdATArmToggle);
+                    maybeToggle("laminar/B738/autopilot/autothrottle_arm_pos", _hwATOn, "laminar/B738/autopilot/autothrottle_arm_toggle");
                 }
             }
 
             // A/P DISCONNECT latch (ENGAGED vs DISENGAGED as captured in _hwApDiscEngaged)
-            maybeToggle(_drApDiscPos, _hwApDiscEngaged, _cmdApDiscToggle);
+            maybeToggle("laminar/B738/autopilot/disconnect_pos", _hwApDiscEngaged, "laminar/B738/autopilot/disconnect_toggle");
         }
 #endif
     }
 
-    // --- Input hooks implementation ---------------------------------------------
-
-    void ZiboPAP3Profile::execOnce(XPLMCommandRef cmd) {
-        if (!cmd) {
-            return;
-        }
-        XPLMCommandOnce(cmd);
-    }
-
-    void ZiboPAP3Profile::repeatCmd(XPLMCommandRef inc, XPLMCommandRef dec, int8_t delta, int stepPerTick) {
+    void ZiboPAP3Profile::repeatCmd(const char *inc, const char *dec, int8_t delta, int stepPerTick) {
         if (delta == 0) {
             return;
         }
+
         const bool up = (delta > 0);
         const int reps = std::max(1, static_cast<int>(std::abs(static_cast<int>(delta))) * std::max(1, stepPerTick));
-        XPLMCommandRef cmd = up ? inc : dec;
-        if (!cmd) {
-            return;
-        }
+
         for (int i = 0; i < reps; ++i) {
-            XPLMCommandOnce(cmd);
+            Dataref::getInstance()->executeCommand(up ? inc : dec);
         }
     }
 
@@ -309,14 +197,14 @@ namespace pap3::aircraft {
         return true;
     }
 
-    void ZiboPAP3Profile::maybeToggle(XPLMDataRef posRef, bool desiredOn, XPLMCommandRef toggleCmd) {
+    void ZiboPAP3Profile::maybeToggle(const char *dataref, bool desiredOn, const char *toggleCmd) {
         // Compare desired hardware state to current sim state and toggle only if needed.
-        if (!posRef || !toggleCmd) {
+        if (!dataref || !toggleCmd) {
             return;
         }
-        const bool simOn = dr_is_on(posRef);
+        const bool simOn = Dataref::getInstance()->get<bool>(dataref);
         if (simOn != desiredOn) {
-            XPLMCommandOnce(toggleCmd);
+            Dataref::getInstance()->executeCommand(toggleCmd);
         }
     }
 
@@ -355,7 +243,7 @@ namespace pap3::aircraft {
         if (off == 0x04 && mask == 0x08) {
             _hwFDCaptOn = pressed;
             _haveHwSnapshot = true;
-            maybeToggle(_drFDCaptPos, _hwFDCaptOn, _cmdFDCaptToggle);
+            maybeToggle("laminar/B738/autopilot/flight_director_pos", _hwFDCaptOn, "laminar/B738/autopilot/flight_director_toggle");
             return;
         }
 
@@ -363,7 +251,7 @@ namespace pap3::aircraft {
         if (off == 0x04 && mask == 0x20) {
             _hwFDFoOn = pressed;
             _haveHwSnapshot = true;
-            maybeToggle(_drFDFoPos, _hwFDFoOn, _cmdFDFoToggle);
+            maybeToggle("laminar/B738/autopilot/flight_director_fo_pos", _hwFDFoOn, "laminar/B738/autopilot/flight_director_fo_toggle");
             return;
         }
 
@@ -377,7 +265,7 @@ namespace pap3::aircraft {
                 _hwATOn = !pressed;    // pressed -> OFF, released -> ON
             }
             if (debounce(_lastAtToggleTime)) {
-                maybeToggle(_drATArmPos, _hwATOn, _cmdATArmToggle);
+                maybeToggle("laminar/B738/autopilot/autothrottle_arm_pos", _hwATOn, "laminar/B738/autopilot/autothrottle_arm_toggle");
             }
             return;
         }
@@ -394,7 +282,7 @@ namespace pap3::aircraft {
                 _haveHwSnapshot = true;
             }
             if (debounce(_lastApDiscToggleTime)) {
-                maybeToggle(_drApDiscPos, _hwApDiscEngaged, _cmdApDiscToggle);
+                maybeToggle("laminar/B738/autopilot/disconnect_pos", _hwApDiscEngaged, "laminar/B738/autopilot/disconnect_toggle");
             }
             return;
         }
@@ -402,7 +290,7 @@ namespace pap3::aircraft {
         // All other momentary buttons use the existing mapping table
         for (const auto &b : _btns) {
             if (b.off == off && b.mask == mask) {
-                execOnce(pressed ? b.press : b.release);
+                Dataref::getInstance()->executeCommand(pressed ? b.press : b.release);
                 return;
             }
         }
@@ -420,13 +308,13 @@ namespace pap3::aircraft {
     uint8_t ZiboPAP3Profile::mcpPowerMask() const {
         uint8_t mask = 0;
 
-        if (dr_is_on(_drHasApPower)) {
+        if (Dataref::getInstance()->get<bool>("sim/cockpit2/autopilot/autopilot_has_power")) {
             mask |= 0x01; // bit0 = autopilot has power
         }
-        if (dr_is_on(_drDcBus1)) {
+        if (Dataref::getInstance()->get<bool>("laminar/B738/electric/dc_bus1_status")) {
             mask |= 0x02; // bit1 = DC bus 1 alive
         }
-        if (dr_is_on(_drDcBus2)) {
+        if (Dataref::getInstance()->get<bool>("laminar/B738/electric/dc_bus2_status")) {
             mask |= 0x04; // bit2 = DC bus 2 alive
         }
 
@@ -442,13 +330,13 @@ namespace pap3::aircraft {
             return; // <--- garde-fou
         }
 
-        maybeToggle(_drFDCaptPos, _hwFDCaptOn, _cmdFDCaptToggle);
-        maybeToggle(_drFDFoPos, _hwFDFoOn, _cmdFDFoToggle);
-        maybeToggle(_drApDiscPos, _hwApDiscEngaged, _cmdApDiscToggle);
+        maybeToggle("laminar/B738/autopilot/flight_director_pos", _hwFDCaptOn, "laminar/B738/autopilot/flight_director_toggle");
+        maybeToggle("laminar/B738/autopilot/flight_director_fo_pos", _hwFDFoOn, "laminar/B738/autopilot/flight_director_fo_toggle");
+        maybeToggle("laminar/B738/autopilot/disconnect_pos", _hwApDiscEngaged, "laminar/B738/autopilot/disconnect_toggle");
 
-        const bool havePower = (dr_is_on(_drHasApPower) && (dr_is_on(_drDcBus1) || dr_is_on(_drDcBus2)));
+        const bool havePower = (Dataref::getInstance()->get<bool>("sim/cockpit2/autopilot/autopilot_has_power") && (Dataref::getInstance()->get<bool>("laminar/B738/electric/dc_bus1_status") || Dataref::getInstance()->get<bool>("laminar/B738/electric/dc_bus2_status")));
         if (havePower) {
-            maybeToggle(_drATArmPos, _hwATOn, _cmdATArmToggle);
+            maybeToggle("laminar/B738/autopilot/autothrottle_arm_pos", _hwATOn, "laminar/B738/autopilot/autothrottle_arm_toggle");
         }
     }
 
@@ -465,8 +353,8 @@ namespace pap3::aircraft {
         // Lignes "OFF" (1 => OFF). ON <=> (OFF == 0)
         const bool hwFDCaptOn = !bit(r, len, 0x04, 0x08); // FD CAPT OFF
         const bool hwFDFoOn = !bit(r, len, 0x04, 0x20);   // FD FO   OFF
-        maybeToggle(_drFDCaptPos, hwFDCaptOn, _cmdFDCaptToggle);
-        maybeToggle(_drFDFoPos, hwFDFoOn, _cmdFDFoToggle);
+        maybeToggle("laminar/B738/autopilot/flight_director_pos", hwFDCaptOn, "laminar/B738/autopilot/flight_director_toggle");
+        maybeToggle("laminar/B738/autopilot/flight_director_fo_pos", hwFDFoOn, "laminar/B738/autopilot/flight_director_fo_toggle");
         _hwFDCaptOn = hwFDCaptOn; // seed internes si tu les utilises
         _hwFDFoOn = hwFDFoOn;
 
@@ -499,12 +387,11 @@ namespace pap3::aircraft {
             nudgeBankAngleTo(targetBank);
         }
 
-        const bool havePower = (dr_is_on(_drHasApPower) &&
-                                (dr_is_on(_drDcBus1) || dr_is_on(_drDcBus2)));
+        const bool havePower = (Dataref::getInstance()->get<bool>("sim/cockpit2/autopilot/autopilot_has_power") &&
+                                (Dataref::getInstance()->get<bool>("laminar/B738/electric/dc_bus1_status") || Dataref::getInstance()->get<bool>("laminar/B738/electric/dc_bus2_status")));
         if (havePower) {
-            maybeToggle(_drATArmPos, hwATOn, _cmdATArmToggle);
-            // Si SIM déjà ARMÉ et HW=ON au boot, pulse une fois proprement
-            if (dr_is_on(_drATArmPos) && hwATOn && _device) {
+            maybeToggle("laminar/B738/autopilot/autothrottle_arm_pos", hwATOn, "laminar/B738/autopilot/autothrottle_arm_toggle");
+            if (Dataref::getInstance()->get<bool>("laminar/B738/autopilot/autothrottle_arm_pos") && hwATOn && _device) {
                 _device->pulseATSolenoid(100);
             }
         }
@@ -516,32 +403,20 @@ namespace pap3::aircraft {
         const bool upEng = bit(r, len, 0x04, 0x80);
         const bool downDiseng = bit(r, len, 0x05, 0x01);
         const bool hwApEngaged = upEng || !downDiseng;
-        maybeToggle(_drApDiscPos, hwApEngaged, _cmdApDiscToggle);
+        maybeToggle("laminar/B738/autopilot/disconnect_pos", hwApEngaged, "laminar/B738/autopilot/disconnect_toggle");
         _hwApDiscEngaged = hwApEngaged;
     }
 
     int ZiboPAP3Profile::readBankIndex() const {
-        if (!_drBankIdx) {
+        if (Dataref::getInstance()->exists("laminar/B738/autopilot/bank_angle_pos")) {
             return -1;
         }
-        const XPLMDataTypeID ty = XPLMGetDataRefTypes(_drBankIdx);
-        if (ty & xplmType_Int) {
-            return std::clamp(XPLMGetDatai(_drBankIdx), 0, 4);
-        }
-        if (ty & xplmType_Float) {
-            return std::clamp((int) std::lround(XPLMGetDataf(_drBankIdx)), 0, 4);
-        }
-        if (ty & xplmType_Double) {
-            return std::clamp((int) std::lround(XPLMGetDatad(_drBankIdx)), 0, 4);
-        }
-        return -1;
+
+        return Dataref::getInstance()->get<int>("laminar/B738/autopilot/bank_angle_pos");
     }
 
     void ZiboPAP3Profile::nudgeBankAngleTo(int target) {
         if (target < 0 || target > 4) {
-            return;
-        }
-        if (!_cmdBankUp && !_cmdBankDn) {
             return;
         }
 
@@ -556,18 +431,13 @@ namespace pap3::aircraft {
 
         while (cur != target && steps++ < maxSteps) {
             const bool up = (target > cur);
-            XPLMCommandRef cmd = up ? _cmdBankUp : _cmdBankDn;
-            if (!cmd) {
-                break;
-            }
 
-            XPLMCommandOnce(cmd);
+            Dataref::getInstance()->executeCommand(up ? "laminar/B738/autopilot/bank_angle_up" : "laminar/B738/autopilot/bank_angle_dn");
 
             // Relis la position; Zibo met à jour très vite.
             int next = readBankIndex();
             if (next == cur) {
-                // si pas de progression, insiste une fois
-                XPLMCommandOnce(cmd);
+                Dataref::getInstance()->executeCommand(up ? "laminar/B738/autopilot/bank_angle_up" : "laminar/B738/autopilot/bank_angle_dn");
                 next = readBankIndex();
             }
             cur = next;

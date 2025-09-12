@@ -1,5 +1,5 @@
-// src/include/products/pap3-mcp/device/pap3_device.h
-#pragma once
+#ifndef PAP3_DEVICE_H
+#define PAP3_DEVICE_H
 
 #include "illumination.h"
 #include "inputs.h"
@@ -334,3 +334,5 @@ namespace pap3::device {
     void StartPap3Demo(PAP3Device *dev);
 
 }
+
+#endif

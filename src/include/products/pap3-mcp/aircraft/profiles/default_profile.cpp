@@ -14,7 +14,6 @@ namespace pap3::aircraft {
         _drCrsCapt = XPLMFindDataRef("laminar/B738/autopilot/course_pilot");
         _drCrsFo = XPLMFindDataRef("laminar/B738/autopilot/course_copilot");
 
-        // LEDs (exemples courants, adaptez si besoin)
         _drLedN1 = XPLMFindDataRef("laminar/B738/autopilot/n1_status1");
         _drLedSpd = XPLMFindDataRef("laminar/B738/autopilot/speed_status1");
         _drLedVnav = XPLMFindDataRef("laminar/B738/autopilot/vnav_status1");
@@ -39,7 +38,7 @@ namespace pap3::aircraft {
     }
 
     bool DefaultPAP3Profile::isEligible() const {
-        return true; // Toujours OK si aucun profil spécifique
+        return true;
     }
 
     void DefaultPAP3Profile::start(StateCallback onChanged) {

@@ -2,6 +2,7 @@
 #define FMC_HARDWARE_MAPPING_H
 
 #include <variant>
+#include <vector>
 
 enum class FMCHardwareType : unsigned char {
     HARDWARE_MCDU = 1,

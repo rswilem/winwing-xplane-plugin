@@ -11,12 +11,12 @@
 
 #include "pap3_device.h"
 
-#include "../aircraft/pap3_aircraft.h"
-#include "../lcd/compose.h"
-#include "../menu/pap3_menu.h"
-#include "../profiles/profile_factory.h"
+#include "compose.h"
 #include "inputs.h"
+#include "pap3_aircraft.h"
 #include "pap3_demo.h"
+#include "pap3_menu.h"
+#include "profile_factory.h"
 #include "transport.h"
 #include "usbcontroller.h"
 
@@ -53,7 +53,7 @@ namespace {
         return nullptr;
     }
 
-} // anonymous namespace
+}
 
 namespace pap3::device {
 

@@ -1,5 +1,5 @@
-// src/include/products/pap3-mcp/device/transport.h
-#pragma once
+#ifndef PAP3_TRANSPORT_H
+#define PAP3_TRANSPORT_H
 
 #include <cstddef>
 #include <cstdint>
@@ -76,3 +76,5 @@ namespace pap3::device::transport {
     bool sendATSolenoid(DevicePtr dev, bool on);
 
 }
+
+#endif

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef PAP3_MENU_H
+#define PAP3_MENU_H
+
 #include "XPLMMenus.h"
 
 #include <string>
@@ -27,3 +29,5 @@ namespace pap3menu {
     void Shutdown();
 
 }
+
+#endif

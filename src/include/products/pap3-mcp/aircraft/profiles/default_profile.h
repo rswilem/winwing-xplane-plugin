@@ -1,26 +1,25 @@
-#pragma once
-#include "../pap3_aircraft.h"
+#ifndef PAP3_DEFAULT_PROFILE
+#define PAP3_DEFAULT_PROFILE
+
+#include "pap3_aircraft.h"
 
 #include <XPLMDataAccess.h>
 
 namespace pap3::aircraft {
 
-    // Profil générique: lit les datarefs sim/* standard
     class DefaultPAP3Profile final : public PAP3AircraftProfile {
         public:
             DefaultPAP3Profile();
             ~DefaultPAP3Profile() override;
 
-            bool isEligible() const override;             // fallback si rien d'autre ne matche
-            void start(StateCallback onChanged) override; // démarre un FlightLoop à ~25 Hz
+            bool isEligible() const override;
+            void start(StateCallback onChanged) override;
             void stop() override;
             State current() const override;
 
         private:
-            // Callback FlightLoop -> redirige vers poll()
             static float FlightLoopThunk(float elapsed, float, int, void *refcon);
 
-            // Worker réel
             void poll();
 
             State _state{};
@@ -55,3 +54,5 @@ namespace pap3::aircraft {
     };
 
 }
+
+#endif

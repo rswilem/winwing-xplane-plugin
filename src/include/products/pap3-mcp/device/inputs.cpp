@@ -98,7 +98,7 @@ namespace pap3::device {
             {0x06, 0x01, "A/T ARMED"},
             {0x06, 0x02, "A/T DISARMED"},
         };
-    } // anonymous namespace
+    }
 
     const char *nameForButton(uint8_t off, uint8_t m) {
         // Expect a single-bit mask. If callers pass multi-bit masks, this will just not match.

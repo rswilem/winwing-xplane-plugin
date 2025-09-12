@@ -1,4 +1,6 @@
-#pragma once
+#ifndef PAP3_SEGMENTS_H
+#define PAP3_SEGMENTS_H
+
 #include <array>
 #include <cstdint>
 
@@ -190,3 +192,5 @@ namespace pap3::lcd::segments {
     void setFlag(Payload &p, uint8_t absOffset, uint8_t mask, bool enable);
 
 }
+
+#endif

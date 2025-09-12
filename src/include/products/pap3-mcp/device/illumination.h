@@ -1,4 +1,6 @@
-#pragma once
+#ifndef PAP3_ILLUMINATION_H
+#define PAP3_ILLUMINATION_H
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -130,3 +132,5 @@ namespace pap3::device {
     };
 
 }
+
+#endif

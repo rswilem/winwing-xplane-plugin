@@ -1,4 +1,6 @@
-#pragma once
+#ifndef PAP3_INPUTS_H
+#define PAP3_INPUTS_H
+
 #include <cstdint>
 #include <cstring>
 #include <functional>
@@ -152,3 +154,5 @@ namespace pap3::device {
     };
 
 }
+
+#endif

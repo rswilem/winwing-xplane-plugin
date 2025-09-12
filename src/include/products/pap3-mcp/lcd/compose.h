@@ -1,4 +1,6 @@
-#pragma once
+#ifndef PAP3_COMPOSE_H
+#define PAP3_COMPOSE_H
+
 #include "segments.h"
 
 #include <array>
@@ -60,3 +62,5 @@ namespace pap3::lcd::compose {
     Payload build(const Snapshot &s);
 
 }
+
+#endif

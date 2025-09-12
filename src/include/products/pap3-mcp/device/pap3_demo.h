@@ -1,5 +1,6 @@
-// src/include/products/pap3-mcp/device/pap3_demo.h
-#pragma once
+#ifndef PAP3_DEMO
+#define PAP3_DEMO
+
 #include <cstdint>
 #include <random>
 #include <string>
@@ -85,3 +86,5 @@ namespace pap3::device {
     };
 
 }
+
+#endif
