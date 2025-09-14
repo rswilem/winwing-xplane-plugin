@@ -16,7 +16,7 @@ struct FMCControlView: View {
     // LED states for FMC indicators
     @State private var ledStates: [Bool] = Array(repeating: false, count: 17)
     @State private var selectedTestPage: String = "TOLISS_INIT";
-    @State private var selectedFont: FMCWrapper.FontType = .airbusVariant1
+    @State private var selectedFont: FMCWrapper.FontType = .airbus
     
     private let indicatorLEDs: [(id: Int, name: String)] = [
         (8, "FAIL"), (9, "FM"), (10, "MCDU"), (11, "MENU"), 

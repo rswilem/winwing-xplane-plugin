@@ -1,28 +1,31 @@
 #include "laminar-airbus-fmc-profile.h"
-#include "product-fmc.h"
-#include "font.h"
-#include "dataref.h"
-#include <cstring>
-#include <algorithm>
 
-LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
+#include "dataref.h"
+#include "font.h"
+#include "product-fmc.h"
+
+#include <algorithm>
+#include <cstring>
+
+LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) :
+    FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontAirbus4, product->identifierByte));
-    
+    product->setFont(Font::GlyphData(FontVariant::FontAirbus, product->identifierByte));
+
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {
             return;
         }
-        
+
         uint8_t target = Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255.0f : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/instrument_brightness_ratio");
     });
-    
+
     product->setLedBrightness(FMCLed::BACKLIGHT, 128);
     product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 128);
 }
@@ -36,7 +39,7 @@ bool LaminarFMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("laminar/A333/ckpt_temp");
 }
 
-const std::vector<std::string>& LaminarFMCProfile::displayDatarefs() const {
+const std::vector<std::string> &LaminarFMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         // Text content for lines 0-15
         "sim/cockpit2/radios/indicators/fms_cdu1_text_line0",
@@ -54,12 +57,11 @@ const std::vector<std::string>& LaminarFMCProfile::displayDatarefs() const {
         "sim/cockpit2/radios/indicators/fms_cdu1_text_line12",
         "sim/cockpit2/radios/indicators/fms_cdu1_text_line13",
         "sim/cockpit2/radios/indicators/fms_cdu1_text_line14",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line15"
-    };
+        "sim/cockpit2/radios/indicators/fms_cdu1_text_line15"};
     return datarefs;
 }
 
-const std::vector<FMCButtonDef>& LaminarFMCProfile::buttonDefs() const {
+const std::vector<FMCButtonDef> &LaminarFMCProfile::buttonDefs() const {
     static const std::vector<FMCButtonDef> buttons = {
         {FMCKey::LSK1L, "sim/FMS/ls_1l"},
         {FMCKey::LSK2L, "sim/FMS/ls_2l"},
@@ -83,8 +85,8 @@ const std::vector<FMCButtonDef>& LaminarFMCProfile::buttonDefs() const {
         {std::vector<FMCKey>{FMCKey::MCDU_FPLN, FMCKey::PFP_LEGS}, "sim/FMS/fpln"},
         {std::vector<FMCKey>{FMCKey::MCDU_RAD_NAV, FMCKey::PFP4_NAV_RAD, FMCKey::PFP7_NAV_RAD}, "sim/FMS/navrad"},
         {FMCKey::MCDU_FUEL_PRED, "sim/FMS/fuel_pred"},
-        {FMCKey::MCDU_SEC_FPLN, ""},
-        {std::vector<FMCKey>{FMCKey::MCDU_ATC_COMM, FMCKey::PFP4_ATC}, ""},
+        {FMCKey::MCDU_SEC_FPLN, "sim/FMS/sec_fpln"},
+        {std::vector<FMCKey>{FMCKey::MCDU_ATC_COMM, FMCKey::PFP4_ATC}, "sim/FMS/atc_comm"},
         {FMCKey::MENU, "sim/FMS/menu"},
         {FMCKey::BRIGHTNESS_DOWN, "laminar/A333/buttons/fms1_brightness_dn"},
         {std::vector<FMCKey>{FMCKey::MCDU_AIRPORT, FMCKey::PFP_DEP_ARR}, "sim/FMS/airport"},
@@ -133,14 +135,14 @@ const std::vector<FMCButtonDef>& LaminarFMCProfile::buttonDefs() const {
         {FMCKey::KEYZ, "sim/FMS/key_Z"},
         {FMCKey::SLASH, "sim/FMS/key_slash"},
         {FMCKey::SPACE, "sim/FMS/key_space"},
-        {std::vector<FMCKey>{FMCKey::MCDU_OVERFLY,FMCKey::PFP_DEL}, "sim/FMS/key_overfly"},
+        {std::vector<FMCKey>{FMCKey::MCDU_OVERFLY, FMCKey::PFP_DEL}, "sim/FMS/key_overfly"},
         {FMCKey::CLR, "sim/FMS/key_clear"},
     };
-    
+
     return buttons;
 }
 
-const std::map<char, FMCTextColor>& LaminarFMCProfile::colorMap() const {
+const std::map<char, FMCTextColor> &LaminarFMCProfile::colorMap() const {
     static const std::map<char, FMCTextColor> colMap = {
         {0x00, FMCTextColor::COLOR_WHITE},
         {0x01, FMCTextColor::COLOR_CYAN},
@@ -159,8 +161,7 @@ void LaminarFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t chara
         case '<':
             if (isFontSmall) {
                 buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_LEFT.begin(), FMCSpecialCharacter::ARROW_LEFT.end());
-            }
-            else {
+            } else {
                 buffer->push_back(character);
             }
             break;
@@ -168,8 +169,7 @@ void LaminarFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t chara
         case '>':
             if (isFontSmall) {
                 buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_RIGHT.begin(), FMCSpecialCharacter::ARROW_RIGHT.end());
-            }
-            else {
+            } else {
                 buffer->push_back(character);
             }
             break;
@@ -183,8 +183,7 @@ void LaminarFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t chara
         case 31: // Down arrow
             if (isFontSmall) {
                 buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_DOWN.begin(), FMCSpecialCharacter::ARROW_DOWN.end());
-            }
-            else {
+            } else {
                 buffer->push_back(character);
             }
             break;
@@ -192,46 +191,45 @@ void LaminarFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t chara
         case '`':
             buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
             break;
-        
+
         default:
             buffer->push_back(character);
             break;
     }
 }
 
-void LaminarFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+void LaminarFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
 
     auto datarefManager = Dataref::getInstance();
-    for (int lineNum = 0; lineNum < std::min(ProductFMC::PageLines, (unsigned int)16); ++lineNum) {
+    for (int lineNum = 0; lineNum < std::min(ProductFMC::PageLines, (unsigned int) 16); ++lineNum) {
         std::string textDataref = "sim/cockpit2/radios/indicators/fms_cdu1_text_line" + std::to_string(lineNum);
         std::string styleDataref = "sim/cockpit2/radios/indicators/fms_cdu1_style_line" + std::to_string(lineNum);
-        
+
         std::string text = datarefManager->getCached<std::string>(textDataref.c_str());
         if (text.empty()) {
             continue;
         }
-        
+
         std::vector<unsigned char> styleBytes = datarefManager->getCached<std::vector<unsigned char>>(styleDataref.c_str());
 
         // Replace all special characters with placeholders
         const std::vector<std::pair<std::string, unsigned char>> symbols = {
-            { "\u2190", '<' },
-            { "\u2192", '>' },
-            { "\u2191", 30 },
-            { "\u2193", 31 },
-            { "\u2610", '#' },
-            { "\u00B0", '`' }
-        };
-        
-        for (const auto& symbol : symbols) {
+            {"\u2190", '<'},
+            {"\u2192", '>'},
+            {"\u2191", 30},
+            {"\u2193", 31},
+            {"\u2610", '#'},
+            {"\u00B0", '`'}};
+
+        for (const auto &symbol : symbols) {
             size_t pos = 0;
             while ((pos = text.find(symbol.first, pos)) != std::string::npos) {
-              text.replace(pos, symbol.first.length(), std::string(1, static_cast<char>(symbol.second)));
-              pos += 1;
+                text.replace(pos, symbol.first.length(), std::string(1, static_cast<char>(symbol.second)));
+                pos += 1;
             }
         }
-        
+
         for (size_t i = 0; i < text.size(); ++i) {
             if (static_cast<unsigned char>(text[i]) > 127) {
                 text[i] = '?';
@@ -247,13 +245,13 @@ void LaminarFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             bool fontSmall = false;
             unsigned char styleByte = (i < styleBytes.size()) ? styleBytes[i] : 0x00;
             fontSmall = (styleByte & 0xF0) == 0x00;
-            
+
             int displayLine = lineNum;
             if (displayLine >= ProductFMC::PageLines) {
                 break;
             }
 
-            product->writeLineToPage(page, displayLine, i, std::string(1, c), (styleByte & 0x0F), fontSmall);
+            product->writeLineToPage(page, displayLine, i, std::string(1, c), styleByte & 0x0F, fontSmall);
         }
     }
 }

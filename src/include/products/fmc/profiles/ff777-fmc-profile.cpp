@@ -1,21 +1,24 @@
 #include "ff777-fmc-profile.h"
-#include "product-fmc.h"
-#include "font.h"
-#include "dataref.h"
-#include "appstate.h"
-#include <cstring>
-#include <algorithm>
 
-FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
+#include "appstate.h"
+#include "dataref.h"
+#include "font.h"
+#include "product-fmc.h"
+
+#include <algorithm>
+#include <cstring>
+
+FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) :
+    FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
-    
+
     Dataref::getInstance()->monitorExistingDataref<float>("sim/cockpit/electrical/instrument_brightness", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit/electrical/instrument_brightness");
     });
@@ -23,25 +26,25 @@ FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) : FMCA
 
 FlightFactor777FMCProfile::~FlightFactor777FMCProfile() {
     Dataref::getInstance()->unbind("sim/cockpit/electrical/instrument_brightness");
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");    
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
 }
 
 bool FlightFactor777FMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("1-sim/cduL/display/symbols");
 }
 
-const std::vector<std::string>& FlightFactor777FMCProfile::displayDatarefs() const {
+const std::vector<std::string> &FlightFactor777FMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
-        "1-sim/cduL/display/symbols", // 336 letters
-        "1-sim/cduL/display/symbolsColor", // 336 numbers
+        "1-sim/cduL/display/symbols",        // 336 letters
+        "1-sim/cduL/display/symbolsColor",   // 336 numbers
         "1-sim/cduL/display/symbolsEffects", // 336 numbers
-        "1-sim/cduL/display/symbolsSize" // 336 numbers
+        "1-sim/cduL/display/symbolsSize"     // 336 numbers
     };
-    
+
     return datarefs;
 }
 
-const std::vector<FMCButtonDef>& FlightFactor777FMCProfile::buttonDefs() const {
+const std::vector<FMCButtonDef> &FlightFactor777FMCProfile::buttonDefs() const {
     static const std::vector<FMCButtonDef> buttons = {
         {FMCKey::LSK1L, "1-sim/ckpt/cduLLK1/anim"},
         {FMCKey::LSK2L, "1-sim/ckpt/cduLLK2/anim"},
@@ -113,13 +116,12 @@ const std::vector<FMCButtonDef>& FlightFactor777FMCProfile::buttonDefs() const {
         {FMCKey::SPACE, ""},
         {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, ""},
         {FMCKey::SLASH, ""},
-        {FMCKey::CLR, ""}
-    };
-    
+        {FMCKey::CLR, ""}};
+
     return buttons;
 }
 
-const std::map<char, FMCTextColor>& FlightFactor777FMCProfile::colorMap() const {
+const std::map<char, FMCTextColor> &FlightFactor777FMCProfile::colorMap() const {
     static const std::map<char, FMCTextColor> colMap = {
         {0, FMCTextColor::COLOR_WHITE},
         {1, FMCTextColor::COLOR_WHITE},
@@ -129,7 +131,7 @@ const std::map<char, FMCTextColor>& FlightFactor777FMCProfile::colorMap() const 
         {5, FMCTextColor::COLOR_GREY},
         {6, FMCTextColor::COLOR_WHITE_BG},
     };
-    
+
     return colMap;
 }
 
@@ -138,53 +140,53 @@ void FlightFactor777FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8
         case '#':
             buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
             break;
-            
+
         case '*':
             buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
             break;
-        
+
         default:
             buffer->push_back(character);
             break;
     }
 }
 
-void FlightFactor777FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+void FlightFactor777FMCProfile::updatePage(std::vector<std::vector<char>> &page) {
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
-    
+
     auto datarefManager = Dataref::getInstance();
     std::vector<unsigned char> symbols = datarefManager->getCached<std::vector<unsigned char>>("1-sim/cduL/display/symbols");
     std::vector<int> colors = datarefManager->getCached<std::vector<int>>("1-sim/cduL/display/symbolsColor");
     std::vector<int> sizes = datarefManager->getCached<std::vector<int>>("1-sim/cduL/display/symbolsSize");
     std::vector<int> effects = datarefManager->getCached<std::vector<int>>("1-sim/cduL/display/symbolsEffects");
-    
+
     if (symbols.size() < FlightFactor777FMCProfile::DataLength || colors.size() < FlightFactor777FMCProfile::DataLength || sizes.size() < FlightFactor777FMCProfile::DataLength || effects.size() < FlightFactor777FMCProfile::DataLength) {
         return;
     }
-    
+
     for (int line = 0; line < ProductFMC::PageLines && line * ProductFMC::PageCharsPerLine < FlightFactor777FMCProfile::DataLength; ++line) {
         for (int pos = 0; pos < ProductFMC::PageCharsPerLine; ++pos) {
             int index = line * ProductFMC::PageCharsPerLine + pos;
-            
+
             if (index >= FlightFactor777FMCProfile::DataLength) {
                 break;
             }
-            
+
             char symbol = symbols[index];
             if (symbol == 0x00 || symbol == 0x20) {
                 continue;
             }
-            
+
             unsigned char color = static_cast<unsigned char>(colors[index]);
             unsigned char fontSize = static_cast<unsigned char>(sizes[index]);
             unsigned char effect = static_cast<unsigned char>(effects[index]);
             bool fontSmall = fontSize == 2;
-            
+
             if (effect == 1) {
                 // Inverted text
                 color = 6;
             }
-            
+
             product->writeLineToPage(page, line, pos, std::string(1, symbol), color, fontSmall);
         }
     }
