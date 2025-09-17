@@ -1,9 +1,11 @@
 #ifndef PAP3_DEVICE_H
 #define PAP3_DEVICE_H
 
+#include "appstate.h"
 #include "illumination.h"
 #include "inputs.h"
-#include "transport.h" // for transport::transport::DevicePtr
+#include "transport.h"
+#include "usbdevice.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -17,9 +19,6 @@
 #include <vector>
 #include <XPLMProcessing.h>
 #include <XPLMUtilities.h>
-
-// We inherit from USBDevice so the factory in usbdevices.cpp can return this as USBDevice*.
-#include "usbdevice.h"
 
 namespace pap3 {
     namespace aircraft {
