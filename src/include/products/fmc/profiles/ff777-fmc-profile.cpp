@@ -22,6 +22,16 @@ FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) :
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit/electrical/instrument_brightness");
     });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lamps/cduCptAct", [product](bool enabled) {
+        product->setLedBrightness(FMCLed::PFP_MSG, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::MCDU_MCDU, enabled ? 1 : 0);
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lamps/cduCptMSG", [product](bool enabled) {
+        product->setLedBrightness(FMCLed::PFP_EXEC, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::MCDU_RDY, enabled ? 1 : 0);
+    });
 }
 
 FlightFactor777FMCProfile::~FlightFactor777FMCProfile() {
@@ -197,5 +207,5 @@ void FlightFactor777FMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCo
         return;
     }
 
-    Dataref::getInstance()->set<float>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
+    Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
 }
