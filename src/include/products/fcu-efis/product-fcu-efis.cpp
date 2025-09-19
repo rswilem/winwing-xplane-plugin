@@ -329,7 +329,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     if (displayData.vsSign) {
         flagBytes[static_cast<int>(DisplayByteIndex::V2)] |= 0x10; // VS sign: true = positive, false = negative (per Python impl)
     }
-    if (displayData.machComma) {
+    if (displayData.spdMach) { // Mach comma
         flagBytes[static_cast<int>(DisplayByteIndex::S1)] |= 0x01;
     }
 
@@ -391,7 +391,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
 
 void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRightSide) {
     std::vector<uint8_t> flagBytes(17, 0);
-    flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B0 : DisplayByteIndex::EFISL_B0)] |= data->showQfe ? 0x01 : 0x02;
+    flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B0 : DisplayByteIndex::EFISL_B0)] |= data->isStd ? 0x00 : (data->showQfe ? 0x01 : 0x02);
     if (data->unitIsInHg) { // Show comma
         flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)] |= 0x80;
     }
@@ -403,7 +403,7 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
         0xF0, 0x00, packageNumber, 0x1A, static_cast<uint8_t>(isRightSide ? 0x0E : 0x0D), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add barometric data
-    auto baroData = encodeStringEfis(4, fixStringLength(data->baro, 4));
+    auto baroData = encodeStringEfis(4, fixStringLength(data->isStd ? "STD " : data->baro, 4));
     payload.push_back(baroData[3]);
     payload.push_back(baroData[2] | flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)]);
     payload.push_back(baroData[1]);
@@ -458,14 +458,14 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
         return;
     }
 
-    if (reportId != 1 || reportLength < 13) {
+    if (reportId != 1 || reportLength < 13) { // We only handle report #1 for now.
 #if DEBUG
-        printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
-        printf("[%s] Data (hex): ", classIdentifier());
-        for (int i = 0; i < reportLength; ++i) {
-            printf("%02X ", report[i]);
-        }
-        printf("\n");
+//        printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
+//        printf("[%s] Data (hex): ", classIdentifier());
+//        for (int i = 0; i < reportLength; ++i) {
+//            printf("%02X ", report[i]);
+//        }
+//        printf("\n");
 #endif
         return;
     }
