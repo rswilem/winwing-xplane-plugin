@@ -18,7 +18,9 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
             return;
         }
 
-        uint8_t target = brightness[0] * 255.0f;
+        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+
+        uint8_t target = hasPower ? brightness[0] * 255.0f : 0;
         product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
@@ -27,10 +29,14 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
         product->setLedBrightness(FCUEfisLed::EFISR_FLAG_GREEN, target);
         product->setLedBrightness(FCUEfisLed::EFISL_FLAG_GREEN, target);
 
-        uint8_t screenBrightness = brightness[1] * 255.0f;
+        uint8_t screenBrightness = hasPower ? brightness[1] * 255.0f : 0;
         product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, screenBrightness);
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SupplLightLevelRehostats");
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/AP1Engage", [product](bool engaged) {
@@ -128,8 +134,8 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
 }
 
 TolissFCUEfisProfile::~TolissFCUEfisProfile() {
-    // Unbind brightness control datarefs
     Dataref::getInstance()->unbind("AirbusFBW/SupplLightLevelRehostats");
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
 
     // Unbind FCU datarefs
     Dataref::getInstance()->unbind("AirbusFBW/AP1Engage");
@@ -250,8 +256,8 @@ const std::vector<FCUEfisButtonDef> &TolissFCUEfisProfile::buttonDefs() const {
         {38, "R_ARPT", "toliss_airbus/dispcommands/CoArptPushButton"},
         {39, "R_STD PUSH", "toliss_airbus/copilot_baro_push"},
         {40, "R_STD PULL", "toliss_airbus/copilot_baro_pull"},
-        {41, "R_PRESS DEC", "sim/instruments/barometer_copilot_down"},
-        {42, "R_PRESS INC", "sim/instruments/barometer_copilot_up"},
+        {41, "R_PRESS DEC", "custom", FCUEfisDatarefType::BAROMETER_FO, -1.0},
+        {42, "R_PRESS INC", "custom", FCUEfisDatarefType::BAROMETER_FO, 1.0},
         {43, "R_inHg", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 0.0},                        // Set to 0 for inHg
         {44, "R_hPa", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 1.0},                         // Set to 1 for hPa
         {45, "R_MODE LS", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 0.0},                       // LS mode
@@ -283,8 +289,8 @@ const std::vector<FCUEfisButtonDef> &TolissFCUEfisProfile::buttonDefs() const {
         {70, "L_ARPT", "toliss_airbus/dispcommands/CaptArptPushButton"},
         {71, "L_STD PUSH", "toliss_airbus/capt_baro_push"},
         {72, "L_STD PULL", "toliss_airbus/capt_baro_pull"},
-        {73, "L_PRESS DEC", "sim/instruments/barometer_down"},
-        {74, "L_PRESS INC", "sim/instruments/barometer_up"},
+        {73, "L_PRESS DEC", "custom", FCUEfisDatarefType::BAROMETER_PILOT, -1.0},
+        {74, "L_PRESS INC", "custom", FCUEfisDatarefType::BAROMETER_PILOT, 1.0},
         {75, "L_inHg", "AirbusFBW/BaroUnitCapt", FCUEfisDatarefType::SET_VALUE, 0.0},                    // Set to 0 for inHg
         {76, "L_hPa", "AirbusFBW/BaroUnitCapt", FCUEfisDatarefType::SET_VALUE, 1.0},                     // Set to 1 for hPa
         {77, "L_MODE LS", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 0.0},                   // LS mode
@@ -319,27 +325,21 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
 
     // Speed/Mach mode - using sim/cockpit/autopilot/airspeed_is_mach (int, 1 or 0)
     data.spdMach = datarefManager->getCached<bool>("sim/cockpit/autopilot/airspeed_is_mach");
-
-    // Format FCU speed display - using sim/cockpit2/autopilot/airspeed_dial_kts_mach (float)
     float speed = datarefManager->getCached<float>("sim/cockpit2/autopilot/airspeed_dial_kts_mach");
-    bool isMach = datarefManager->getCached<bool>("sim/cockpit/autopilot/airspeed_is_mach");
 
     if (speed > 0 && datarefManager->getCached<bool>("AirbusFBW/SPDdashed") == false) {
         std::stringstream ss;
-        if (isMach) {
+        if (data.spdMach) {
             // In Mach mode, format as 0.XX -> "0XX" (e.g., 0.40 -> "040", 0.82 -> "082")
             int machHundredths = static_cast<int>(std::round(speed * 100));
             ss << std::setfill('0') << std::setw(3) << machHundredths;
-            data.machComma = true; // Enable decimal point after first digit
         } else {
             // In speed mode, format as regular integer
             ss << std::setfill('0') << std::setw(3) << static_cast<int>(speed);
-            data.machComma = false;
         }
         data.speed = ss.str();
     } else {
         data.speed = "---";
-        data.machComma = false;
     }
 
     // Format FCU heading display - using sim/cockpit/autopilot/heading_mag (float)
@@ -375,7 +375,7 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     data.vsMode = !data.hdgTrk; // VS mode when HDG mode
     data.fpaMode = data.hdgTrk; // FPA mode when TRK mode
 
-    if (vsDashed == 1) {
+    if (vsDashed) {
         // When dashed, show 5 dashes with minus sign
         data.verticalSpeed = "-----";
         data.vsSign = false;          // Show minus sign for dashes
@@ -403,14 +403,14 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
 
         data.fpaComma = true;     // Enable decimal point display
         data.vsSign = (fpa >= 0); // Control sign display for FPA
-    } else if (vs != 0) {
+    } else {
         // Normal VS mode: Format with proper padding to 4 digits (no sign in string)
         std::stringstream ss;
         int vsInt = static_cast<int>(std::round(vs));
         int absVs = std::abs(vsInt);
 
         // If VS is a multiple of 100, show last two digits as "##"
-        if (absVs % 100 == 0 && absVs >= 100) {
+        if (absVs % 100 == 0) {
             ss << std::setfill('0') << std::setw(2) << (absVs / 100) << "##";
         } else {
             // Show full value for non-multiples of 100
@@ -420,11 +420,6 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
 
         data.vsSign = (vs >= 0); // Control sign display for VS
         data.fpaComma = false;   // No decimal point in VS mode
-    } else {
-        // When VS is exactly 0, show 5 dashes
-        data.verticalSpeed = "-----";
-        data.vsSign = false;          // Show minus sign for dashes
-        data.fpaComma = data.fpaMode; // Show decimal point in FPA mode, not in VS mode
     }
 
     // Set VS/FPA indication flags based on current mode
@@ -446,7 +441,8 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
         float baroValue = datarefManager->getCached<float>(isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
 
         EfisDisplayValue value = {
-            .baro = "STD ", // Four characters
+            .baro = "",
+            .isStd = isStd,
             .unitIsInHg = false};
 
         if (!isStd && baroValue > 0) {
@@ -466,18 +462,42 @@ void TolissFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCom
         return;
     }
 
-    if (phase == xplm_CommandBegin && (button->datarefType == FCUEfisDatarefType::SET_VALUE || button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE)) {
+    auto datarefManager = Dataref::getInstance();
+
+    if (phase == xplm_CommandBegin && (button->datarefType == FCUEfisDatarefType::BAROMETER_PILOT || button->datarefType == FCUEfisDatarefType::BAROMETER_FO)) {
+        bool isCaptain = button->datarefType == FCUEfisDatarefType::BAROMETER_PILOT;
+        bool isStd = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroStdCapt" : "AirbusFBW/BaroStdFO");
+        if (isStd) {
+            return;
+        }
+
+        bool isBaroHpa = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroUnitCapt" : "AirbusFBW/BaroUnitFO");
+        const char *datarefName = isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot";
+        float baroValue = datarefManager->getCached<float>(datarefName);
+        bool increase = button->value > 0;
+
+        if (isBaroHpa) {
+            float hpaValue = baroValue * 33.8639f;
+            hpaValue += increase ? 1.0f : -1.0f;
+            baroValue = hpaValue / 33.8639f;
+        } else {
+            baroValue += increase ? 0.01f : -0.01f;
+        }
+
+        datarefManager->set<float>(datarefName, baroValue);
+    } else if (phase == xplm_CommandBegin && (button->datarefType == FCUEfisDatarefType::SET_VALUE || button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE)) {
         bool wantsToggle = button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE;
 
         if (wantsToggle) {
-            int currentValue = Dataref::getInstance()->get<int>(button->dataref.c_str());
+            int currentValue = datarefManager->get<int>(button->dataref.c_str());
             int newValue = currentValue ? 0 : 1;
-            Dataref::getInstance()->set<int>(button->dataref.c_str(), newValue);
+            datarefManager->set<int>(button->dataref.c_str(), newValue);
         } else {
-            Dataref::getInstance()->set<float>(button->dataref.c_str(), button->value);
+            datarefManager->set<float>(button->dataref.c_str(), button->value);
         }
+
         return;
     } else if (phase == xplm_CommandBegin && button->datarefType == FCUEfisDatarefType::EXECUTE_CMD_ONCE) {
-        Dataref::getInstance()->executeCommand(button->dataref.c_str());
+        datarefManager->executeCommand(button->dataref.c_str());
     }
 }

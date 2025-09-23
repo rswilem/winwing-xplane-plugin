@@ -51,7 +51,9 @@ struct DisplayFlag {
 enum FCUEfisDatarefType : unsigned char {
     SET_VALUE = 1,
     TOGGLE_VALUE,
-    EXECUTE_CMD_ONCE
+    EXECUTE_CMD_ONCE,
+    BAROMETER_PILOT,
+    BAROMETER_FO,
 };
 
 struct FCUEfisButtonDef {
@@ -102,18 +104,20 @@ enum class FCUEfisLed : int {
 struct EfisDisplayValue {
         std::string baro;
         bool unitIsInHg;
+        bool isStd = false;
         bool showQfe = false;
 
         bool operator==(const EfisDisplayValue &other) const {
-            return showQfe == other.showQfe && baro == other.baro && unitIsInHg == other.unitIsInHg;
+            return showQfe == other.showQfe && baro == other.baro && unitIsInHg == other.unitIsInHg && isStd == other.isStd;
         }
 
         void setBaro(float inHgValue, bool isBaroInHg) {
             // Either make QNH hPa value (1013), or inHg * 100 (2992)
+            isStd = false;
             int baroValue = static_cast<int>(std::round(inHgValue * (isBaroInHg ? 100.0f : 33.8639f)));
             unitIsInHg = isBaroInHg;
             std::ostringstream oss;
-            oss << std::setw(4) << std::setfill('0') << baroValue;
+            oss << std::setw(4) << std::setfill(' ') << baroValue;
             baro = oss.str();
         }
 };
@@ -146,7 +150,6 @@ struct FCUDisplayData {
         bool vsIndication = false;
         bool fpaIndication = false;
         bool fpaComma = false;
-        bool machComma = false;
         bool vsSign = true; // true = positive (up), false = negative (down)
 };
 

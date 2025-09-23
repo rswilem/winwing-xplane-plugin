@@ -14,6 +14,7 @@
 
 #include "transport.h" // public API + forward-declared USBDevice
 
+#include "appstate.h"
 #include "usbdevice.h" // full type needed only here
 
 #include <algorithm>

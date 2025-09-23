@@ -511,7 +511,8 @@ void fcuefis_efisRightTestDisplay(void* fcuefisHandle, const char* testType) {
         fcuefis->sendEfisDisplayWithFlags(&efisData, true);
     } else if (test == "STD") {
         // STD: no decimal point
-        efisData.baro = "STD ";
+        efisData.baro = "";
+        efisData.isStd = true;
         efisData.unitIsInHg = false;
         efisData.showQfe = false;
         fcuefis->sendEfisDisplayWithFlags(&efisData, true);
@@ -539,7 +540,8 @@ void fcuefis_efisLeftTestDisplay(void* fcuefisHandle, const char* testType) {
         fcuefis->sendEfisDisplayWithFlags(&efisData, false);
     } else if (test == "STD") {
         // STD: no decimal point
-        efisData.baro = "STD ";
+        efisData.baro = "";
+        efisData.isStd = true;
         efisData.unitIsInHg = false;
         efisData.showQfe = false;
         fcuefis->sendEfisDisplayWithFlags(&efisData, false);
