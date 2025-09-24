@@ -34,7 +34,6 @@ class ProductFCUEfis : public USBDevice {
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
 
         void setLedBrightness(FCUEfisLed led, uint8_t brightness);
-        void monitorDatarefs();
 
         void initializeDisplays();
         void sendFCUDisplay(const std::string &speed, const std::string &heading, const std::string &altitude, const std::string &vs);

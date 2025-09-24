@@ -96,7 +96,6 @@ ProductFCUEfis::~ProductFCUEfis() {
 void ProductFCUEfis::setProfileForCurrentAircraft() {
     if (TolissFCUEfisProfile::IsEligible()) {
         profile = new TolissFCUEfisProfile(this);
-        monitorDatarefs();
         profileReady = true;
     } else {
         setLedBrightness(FCUEfisLed::FLAG_GREEN, 255);
@@ -488,9 +487,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
     lastButtonStateLo = buttonsLo;
     lastButtonStateHi = buttonsHi;
 
-    // Parse button press data - format is specific to FCU-EFIS hardware
-    // Python reference shows: bytes 1-4 for FCU, bytes 5-8 for EFIS-L, bytes 9-12 for EFIS-R
-    // Byte 0 is skipped (likely report ID or status byte)
     const std::vector<FCUEfisButtonDef> &currentButtonDefs = profile->buttonDefs();
 
     // Process FCU buttons (bytes 1-4 = buttons 0-31)
@@ -609,20 +605,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
                 pressedButtonIndices.erase(hardwareButtonIndex);
                 profile->buttonPressed(buttonDef, xplm_CommandEnd);
             }
-        }
-    }
-}
-
-void ProductFCUEfis::monitorDatarefs() {
-    if (!profile) {
-        return;
-    }
-
-    // Ensure all display datarefs exist and are accessible
-    const std::vector<std::string> &datarefs = profile->displayDatarefs();
-    for (const std::string &ref : datarefs) {
-        if (Dataref::getInstance()->exists(ref.c_str())) {
-        } else {
         }
     }
 }
