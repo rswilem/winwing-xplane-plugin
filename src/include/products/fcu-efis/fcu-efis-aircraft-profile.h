@@ -120,6 +120,15 @@ struct EfisDisplayValue {
             oss << std::setw(4) << std::setfill(' ') << baroValue;
             baro = oss.str();
         }
+
+        static EfisDisplayValue Empty() {
+            EfisDisplayValue v;
+            v.isStd = true;
+            v.unitIsInHg = false;
+            v.baro = "    ";
+            v.showQfe = false;
+            return v;
+        }
 };
 
 struct FCUDisplayData {

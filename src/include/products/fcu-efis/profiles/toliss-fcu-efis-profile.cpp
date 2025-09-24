@@ -47,16 +47,6 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
         product->setLedBrightness(FCUEfisLed::AP2_GREEN, engaged ? 255 : 0);
     });
 
-    // Force initial LED state sync since monitorExistingDataref only triggers on changes
-    if (Dataref::getInstance()->exists("AirbusFBW/AP1Engage")) {
-        bool ap1Value = Dataref::getInstance()->get<bool>("AirbusFBW/AP1Engage");
-        product->setLedBrightness(FCUEfisLed::AP1_GREEN, ap1Value ? 255 : 0);
-    }
-    if (Dataref::getInstance()->exists("AirbusFBW/AP2Engage")) {
-        bool ap2Value = Dataref::getInstance()->get<bool>("AirbusFBW/AP2Engage");
-        product->setLedBrightness(FCUEfisLed::AP2_GREEN, ap2Value ? 255 : 0);
-    }
-
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/ATHRmode", [product](int mode) {
         product->setLedBrightness(FCUEfisLed::ATHR_GREEN, mode > 0 ? 255 : 0);
     });
@@ -131,6 +121,17 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowARPTCapt", [product](bool show) {
         product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, show ? 255 : 0);
     });
+
+    // Set initial switch states
+    if (Dataref::getInstance()->exists("AirbusFBW/AP1Engage")) {
+        bool ap1Value = Dataref::getInstance()->get<bool>("AirbusFBW/AP1Engage");
+        product->setLedBrightness(FCUEfisLed::AP1_GREEN, ap1Value ? 255 : 0);
+    }
+
+    if (Dataref::getInstance()->exists("AirbusFBW/AP2Engage")) {
+        bool ap2Value = Dataref::getInstance()->get<bool>("AirbusFBW/AP2Engage");
+        product->setLedBrightness(FCUEfisLed::AP2_GREEN, ap2Value ? 255 : 0);
+    }
 }
 
 TolissFCUEfisProfile::~TolissFCUEfisProfile() {

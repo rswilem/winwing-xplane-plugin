@@ -13,7 +13,10 @@ class ProductFCUEfis : public USBDevice {
         FCUDisplayData displayData;
         int lastUpdateCycle;
         std::set<int> pressedButtonIndices;
-        std::map<std::string, int> selectorPositions; // Track rotary selector positions by dataref
+        std::map<std::string, int> selectorPositions;
+
+        uint64_t lastButtonStateLo = 0;
+        uint32_t lastButtonStateHi = 0;
 
         void setProfileForCurrentAircraft();
         void updateDisplays();

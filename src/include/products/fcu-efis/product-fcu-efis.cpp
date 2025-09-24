@@ -171,6 +171,11 @@ void ProductFCUEfis::disconnect() {
         setLedBrightness(led, 0);
     }
 
+    sendFCUDisplay("", "", "", "");
+    EfisDisplayValue empty = EfisDisplayValue::Empty();
+    sendEfisDisplayWithFlags(&empty, false);
+    sendEfisDisplayWithFlags(&empty, true);
+
     if (profile) {
         delete profile;
         profile = nullptr;
@@ -451,14 +456,11 @@ void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
 }
 
 void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLength) {
-    static uint8_t lastReport[32] = {0};
-    static bool hasLastReport = false;
-
     if (!connected || !profile || !report || reportLength <= 0) {
         return;
     }
 
-    if (reportId != 1 || reportLength < 13) { // We only handle report #1 for now.
+    if (reportId != 1 || reportLength < 13) {
 #if DEBUG
 //        printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
 //        printf("[%s] Data (hex): ", classIdentifier());
@@ -470,27 +472,21 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
         return;
     }
 
-    // Skip processing if report data hasn't changed (reduces queue pressure)
-    // Compare only the button bytes (1-12), not the entire report
-    if (hasLastReport && reportLength >= 13) {
-        bool buttonsChanged = false;
-        for (int i = 1; i <= 12 && i < reportLength; i++) {
-            if (report[i] != lastReport[i]) {
-                buttonsChanged = true;
-                break;
-            }
-        }
-
-        if (!buttonsChanged) {
-            return; // No button state change, skip processing
-        }
+    uint64_t buttonsLo = 0;
+    uint32_t buttonsHi = 0;
+    for (int i = 0; i < 8 && i + 1 < reportLength; ++i) {
+        buttonsLo |= ((uint64_t) report[i + 1]) << (8 * i);
+    }
+    for (int i = 0; i < 4 && i + 9 < reportLength; ++i) {
+        buttonsHi |= ((uint32_t) report[i + 9]) << (8 * i);
     }
 
-    // Cache the current report for next comparison
-    if (reportLength <= 32) {
-        memcpy(lastReport, report, reportLength);
-        hasLastReport = true;
+    if (buttonsLo == lastButtonStateLo && buttonsHi == lastButtonStateHi) {
+        return;
     }
+
+    lastButtonStateLo = buttonsLo;
+    lastButtonStateHi = buttonsHi;
 
     // Parse button press data - format is specific to FCU-EFIS hardware
     // Python reference shows: bytes 1-4 for FCU, bytes 5-8 for EFIS-L, bytes 9-12 for EFIS-R
@@ -517,8 +513,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
 
             // Skip if no button definition found or if button has empty dataref
             if (!buttonDef) {
-                if (pressed && !pressedButtonIndexExists) {
-                }
                 continue;
             }
 
