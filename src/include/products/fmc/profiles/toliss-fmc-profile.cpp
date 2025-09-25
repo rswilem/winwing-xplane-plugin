@@ -1,30 +1,33 @@
 #include "toliss-fmc-profile.h"
-#include "product-fmc.h"
-#include "font.h"
-#include "dataref.h"
+
 #include "config.h"
+#include "dataref.h"
+#include "font.h"
+#include "product-fmc.h"
+
 #include <algorithm>
 
-TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
+TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
+    FMCAircraftProfile(product) {
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
 
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontAirbus4, product->identifierByte));
-    
+    product->setFont(Font::GlyphData(FontVariant::FontAirbus, product->identifierByte));
+
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/DUBrightness", [product](std::vector<float> brightness) {
         if (brightness.size() < 8) {
             return;
         }
-        
+
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255.0f : 0;
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
@@ -41,7 +44,7 @@ bool TolissFMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("AirbusFBW/PanelBrightnessLevel");
 }
 
-const std::vector<std::string>& TolissFMCProfile::displayDatarefs() const {
+const std::vector<std::string> &TolissFMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         "AirbusFBW/MCDU1titleb",
         "AirbusFBW/MCDU1titleg",
@@ -170,15 +173,15 @@ const std::vector<std::string>& TolissFMCProfile::displayDatarefs() const {
         "AirbusFBW/MCDU1scont4y",
         "AirbusFBW/MCDU1scont5y",
         "AirbusFBW/MCDU1scont6y",
-        
+
         "AirbusFBW/MCDU1spw", // scratchpad
-        "AirbusFBW/MCDU1spa" // scratchpad
+        "AirbusFBW/MCDU1spa"  // scratchpad
     };
-    
+
     return datarefs;
 }
 
-const std::vector<FMCButtonDef>& TolissFMCProfile::buttonDefs() const {
+const std::vector<FMCButtonDef> &TolissFMCProfile::buttonDefs() const {
     static const std::vector<FMCButtonDef> buttons = {
         {FMCKey::LSK1L, "AirbusFBW/MCDU1LSK1L"},
         {FMCKey::LSK2L, "AirbusFBW/MCDU1LSK2L"},
@@ -252,14 +255,14 @@ const std::vector<FMCButtonDef>& TolissFMCProfile::buttonDefs() const {
         {FMCKey::KEYZ, "AirbusFBW/MCDU1KeyZ"},
         {FMCKey::SLASH, "AirbusFBW/MCDU1KeySlash"},
         {FMCKey::SPACE, "AirbusFBW/MCDU1KeySpace"},
-        {std::vector<FMCKey>{FMCKey::MCDU_OVERFLY,FMCKey::PFP_DEL}, "AirbusFBW/MCDU1KeyOverfly"},
+        {std::vector<FMCKey>{FMCKey::MCDU_OVERFLY, FMCKey::PFP_DEL}, "AirbusFBW/MCDU1KeyOverfly"},
         {FMCKey::CLR, "AirbusFBW/MCDU1KeyClear"},
     };
-    
+
     return buttons;
 }
 
-const std::map<char, FMCTextColor>& TolissFMCProfile::colorMap() const {
+const std::map<char, FMCTextColor> &TolissFMCProfile::colorMap() const {
     static const std::map<char, FMCTextColor> colMap = {
         {'a', FMCTextColor::COLOR_AMBER},
         {'w', FMCTextColor::COLOR_WHITE},
@@ -270,7 +273,7 @@ const std::map<char, FMCTextColor>& TolissFMCProfile::colorMap() const {
         {'y', FMCTextColor::COLOR_YELLOW},
         {'e', FMCTextColor::COLOR_GREY},
     };
-    
+
     return colMap;
 }
 
@@ -279,12 +282,11 @@ void TolissFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t charac
         case '#':
             buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
             break;
-            
+
         case '<':
             if (isFontSmall) {
                 buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_LEFT.begin(), FMCSpecialCharacter::ARROW_LEFT.end());
-            }
-            else {
+            } else {
                 buffer->push_back(character);
             }
             break;
@@ -292,8 +294,7 @@ void TolissFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t charac
         case '>':
             if (isFontSmall) {
                 buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_RIGHT.begin(), FMCSpecialCharacter::ARROW_RIGHT.end());
-            }
-            else {
+            } else {
                 buffer->push_back(character);
             }
             break;
@@ -307,12 +308,11 @@ void TolissFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t charac
         case 31: // Down arrow
             if (isFontSmall) {
                 buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_DOWN.begin(), FMCSpecialCharacter::ARROW_DOWN.end());
-            }
-            else {
+            } else {
                 buffer->push_back(character);
             }
             break;
-            
+
         case '`':
             buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
             break;
@@ -320,27 +320,27 @@ void TolissFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t charac
         case '|':
             buffer->insert(buffer->end(), FMCSpecialCharacter::TRIANGLE.begin(), FMCSpecialCharacter::TRIANGLE.end());
             break;
-        
+
         default:
             buffer->push_back(character);
             break;
     }
 }
 
-void TolissFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+void TolissFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
     std::array<int, ProductFMC::PageBytesPerLine> spw_line{};
     std::array<int, ProductFMC::PageBytesPerLine> spa_line{};
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
 
     auto datarefManager = Dataref::getInstance();
-    for (const auto& ref : displayDatarefs()) {        
+    for (const auto &ref : displayDatarefs()) {
         bool isScratchpad = (ref.size() >= 3 && (ref.substr(ref.size() - 3) == "spw" || ref.substr(ref.size() - 3) == "spa"));
-        
+
         std::smatch match;
         if (!std::regex_match(ref, match, datarefRegex) && !isScratchpad) {
             continue;
         }
-         
+
         unsigned char mcduIndex = std::stoi(match[1]);
         if (mcduIndex != 1) {
             continue;
@@ -350,7 +350,7 @@ void TolissFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
         unsigned char line = match[4].str().empty() ? 0 : std::stoi(match[4]) * 2;
         char color = match[6].str()[0];
         bool fontSmall = match[2] == "s" || (type == "label" && match[5] != "L") || color == 's';
-        
+
         std::string text = datarefManager->getCached<std::string>(ref.c_str());
         if (text.empty()) {
             continue;
@@ -366,15 +366,42 @@ void TolissFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             unsigned char targetColor = color;
             if (color == 's') {
                 switch (c) {
-                    case 'A': c = 91; targetColor = 'b'; break;
-                    case 'B': c = 93; targetColor = 'b'; break;
-                    case '0': c = 60; targetColor = 'b'; break;
-                    case '1': c = 62; targetColor = 'b'; break;
-                    case '2': c = 60; targetColor = 'w'; break;
-                    case '3': c = 62; targetColor = 'w'; break;
-                    case '4': c = 60; targetColor = 'a'; break;
-                    case '5': c = 62; targetColor = 'a'; break;
-                    case 'E': c = 35; targetColor = 'a'; break;
+                    case 'A':
+                        c = 91;
+                        targetColor = 'b';
+                        break;
+                    case 'B':
+                        c = 93;
+                        targetColor = 'b';
+                        break;
+                    case '0':
+                        c = 60;
+                        targetColor = 'b';
+                        break;
+                    case '1':
+                        c = 62;
+                        targetColor = 'b';
+                        break;
+                    case '2':
+                        c = 60;
+                        targetColor = 'w';
+                        break;
+                    case '3':
+                        c = 62;
+                        targetColor = 'w';
+                        break;
+                    case '4':
+                        c = 60;
+                        targetColor = 'a';
+                        break;
+                    case '5':
+                        c = 62;
+                        targetColor = 'a';
+                        break;
+                    case 'E':
+                        c = 35;
+                        targetColor = 'a';
+                        break;
                 }
             }
 
@@ -430,11 +457,11 @@ void TolissFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             } else if (i == ProductFMC::PageCharsPerLine - 1 && (vertSlewType == 1 || vertSlewType == 3)) {
                 dispChar = 31; // Down character
             }
-            
+
             dispColor = 'w';
             smallFont = true;
         }
-                
+
         product->writeLineToPage(page, 13, i, std::string(1, dispChar), dispColor, smallFont);
     }
 }

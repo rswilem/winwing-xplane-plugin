@@ -1,26 +1,28 @@
 #include "ixeg733-fmc-profile.h"
-#include "product-fmc.h"
-#include "font.h"
-#include "dataref.h"
+
 #include "appstate.h"
-#include <cstring>
+#include "dataref.h"
+#include "font.h"
+#include "product-fmc.h"
+
 #include <algorithm>
-#include <cmath>
 #include <cfloat>
-#include <XPLMUtilities.h>
+#include <cmath>
+#include <cstring>
 #include <XPLMDataAccess.h>
 #include <XPLMProcessing.h>
+#include <XPLMUtilities.h>
 
-IXEG733FMCProfile::IXEG733FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
+IXEG733FMCProfile::IXEG733FMCProfile(ProductFMC *product) :
+    FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
-        
     Dataref::getInstance()->monitorExistingDataref<float>("ixeg/733/rheostats/light_fmc_pt_act", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("ixeg/733/rheostats/light_fmc_pt_act");
     });
@@ -35,7 +37,7 @@ bool IXEG733FMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("ixeg/733/FMC/cdu1_menu");
 }
 
-const std::vector<std::string>& IXEG733FMCProfile::displayDatarefs() const {
+const std::vector<std::string> &IXEG733FMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         "ixeg/733/FMC/cdu1D_pg_number",
         "ixeg/733/FMC/cdu1D_title",
@@ -65,11 +67,11 @@ const std::vector<std::string>& IXEG733FMCProfile::displayDatarefs() const {
         "ixeg/733/FMC/cdu1D_line6R_t",
         "ixeg/733/FMC/cdu1D_scrpad",
     };
-    
+
     return datarefs;
 }
 
-const std::vector<FMCButtonDef>& IXEG733FMCProfile::buttonDefs() const {
+const std::vector<FMCButtonDef> &IXEG733FMCProfile::buttonDefs() const {
     static const std::vector<FMCButtonDef> buttons = {
         {FMCKey::LSK1L, "ixeg/733/FMC/cdu1_lsk_1L"},
         {FMCKey::LSK2L, "ixeg/733/FMC/cdu1_lsk_2L"},
@@ -141,13 +143,12 @@ const std::vector<FMCButtonDef>& IXEG733FMCProfile::buttonDefs() const {
         {FMCKey::SPACE, "ixeg/733/FMC/cdu1_sp"},
         {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, "ixeg/733/FMC/cdu1_del"},
         {FMCKey::SLASH, "ixeg/733/FMC/cdu1_slash"},
-        {FMCKey::CLR, "ixeg/733/FMC/cdu1_clr"}
-    };
-    
+        {FMCKey::CLR, "ixeg/733/FMC/cdu1_clr"}};
+
     return buttons;
 }
 
-const std::map<char, FMCTextColor>& IXEG733FMCProfile::colorMap() const {
+const std::map<char, FMCTextColor> &IXEG733FMCProfile::colorMap() const {
     static const std::map<char, FMCTextColor> colMap = {
         {'W', FMCTextColor::COLOR_WHITE},
         {'G', FMCTextColor::COLOR_GREEN}, // Green text
@@ -162,11 +163,11 @@ void IXEG733FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t chara
         case '#':
             buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
             break;
-            
+
         case '`':
             buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
             break;
-        
+
         default:
             buffer->push_back(character);
             break;
@@ -176,35 +177,35 @@ void IXEG733FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t chara
 std::pair<std::string, std::vector<char>> IXEG733FMCProfile::processIxegText(const std::vector<unsigned char> &characters) {
     std::string text;
     std::vector<char> colors;
-    
+
     bool inInvertedMode = false;
     bool inSmallMode = false;
-    
+
     for (size_t i = 0; i < characters.size(); ++i) {
         unsigned char c = characters[i];
-        
+
         if (c == 0x00) {
             break;
         }
-        
+
         if (c == 0xA3) {
             // 0xA3 = start marker for white text until next space
             inSmallMode = true;
             continue;
         }
-        
+
         if (c >= 0x20 && c <= 0x7E) {
             char ch = static_cast<char>(c);
-            
+
             // Check for $$ at current position
-            if (!inInvertedMode && ch == '$' && i + 1 < characters.size() && 
-                characters[i + 1] >= 0x20 && characters[i + 1] <= 0x7E && 
+            if (!inInvertedMode && ch == '$' && i + 1 < characters.size() &&
+                characters[i + 1] >= 0x20 && characters[i + 1] <= 0x7E &&
                 static_cast<char>(characters[i + 1]) == '$') {
                 inInvertedMode = true;
-                i++; // Skip the second $
+                i++;      // Skip the second $
                 continue; // Don't add $$ to the output text
             }
-            
+
             // Check if we hit a space while in inverted or white mode
             if (ch == ' ') {
                 if (inInvertedMode) {
@@ -214,25 +215,25 @@ std::pair<std::string, std::vector<char>> IXEG733FMCProfile::processIxegText(con
                     inSmallMode = false;
                 }
             }
-            
+
             text += ch;
             colors.push_back(inInvertedMode ? 'I' : (inSmallMode ? 'S' : 'G'));
         }
     }
-    
+
     return std::make_pair(text, colors);
 }
 
-void IXEG733FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+void IXEG733FMCProfile::updatePage(std::vector<std::vector<char>> &page) {
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
-    
+
     auto datarefManager = Dataref::getInstance();
-    for (const auto& ref : displayDatarefs()) {
+    for (const auto &ref : displayDatarefs()) {
         std::vector<unsigned char> characters = datarefManager->getCached<std::vector<unsigned char>>(ref.c_str());
         if (characters.empty()) {
             continue;
         }
-        
+
         auto [text, colors] = processIxegText(characters);
         if (ref == "ixeg/733/FMC/cdu1D_title") {
             for (int i = 0; i < text.size() && i < ProductFMC::PageCharsPerLine; ++i) {
@@ -242,9 +243,9 @@ void IXEG733FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             }
             continue;
         }
-        
+
         if (ref == "ixeg/733/FMC/cdu1D_pg_number") {
-            int startPos = ProductFMC::PageCharsPerLine - (int)text.length();
+            int startPos = ProductFMC::PageCharsPerLine - (int) text.length();
             if (startPos > 0) {
                 for (int i = 0; i < text.size() && (startPos + i) < ProductFMC::PageCharsPerLine; ++i) {
                     char c = text[i];
@@ -254,7 +255,7 @@ void IXEG733FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             }
             continue;
         }
-        
+
         if (ref == "ixeg/733/FMC/cdu1D_scrpad") {
             for (int i = 0; i < text.size() && i < ProductFMC::PageCharsPerLine; ++i) {
                 char c = text[i];
@@ -263,32 +264,31 @@ void IXEG733FMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             }
             continue;
         }
-        
+
         if (ref.find("ixeg/733/FMC/cdu1D_line") == 0) {
             size_t linePos = ref.find("line") + 4;
             if (linePos + 2 < ref.length()) {
                 char lineChar = ref[linePos];
                 char sideChar = ref[linePos + 1];
                 char typeChar = ref[ref.length() - 1];
-                
-                if (lineChar >= '1' && lineChar <= '6' && 
+
+                if (lineChar >= '1' && lineChar <= '6' &&
                     (sideChar == 'L' || sideChar == 'R') &&
                     (typeChar == 'd' || typeChar == 't')) {
-                    
                     int lineNum = lineChar - '0';
                     bool isLeftSide = (sideChar == 'L');
                     bool isTitle = (typeChar == 't');
-                    
+
                     int displayLine = (lineNum * 2) - (isTitle ? 1 : 0);
-                    
+
                     int startPos = 0;
                     if (!isLeftSide) {
-                        startPos = ProductFMC::PageCharsPerLine - (int)text.length();
+                        startPos = ProductFMC::PageCharsPerLine - (int) text.length();
                         if (startPos < ProductFMC::PageCharsPerLine / 2) {
                             startPos = ProductFMC::PageCharsPerLine / 2;
                         }
                     }
-                    
+
                     for (int i = 0; i < text.size() && (startPos + i) < ProductFMC::PageCharsPerLine; ++i) {
                         char c = text[i];
                         char color = i < colors.size() ? colors[i] : 'G';
@@ -305,7 +305,7 @@ void IXEG733FMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPha
     if (phase == xplm_CommandContinue) {
         return;
     }
-    
+
     if (std::holds_alternative<FMCKey>(button->key) &&
         std::get<FMCKey>(button->key) == FMCKey::CLR) {
         Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);

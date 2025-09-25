@@ -1,29 +1,32 @@
 #include "zibo-fmc-profile.h"
-#include "product-fmc.h"
-#include "font.h"
-#include "dataref.h"
-#include "appstate.h"
-#include <cstring>
-#include <algorithm>
-#include <cmath>
-#include <cfloat>
 
-ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
+#include "appstate.h"
+#include "dataref.h"
+#include "font.h"
+#include "product-fmc.h"
+
+#include <algorithm>
+#include <cfloat>
+#include <cmath>
+#include <cstring>
+
+ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) :
+    FMCAircraftProfile(product) {
     datarefRegex = std::regex("laminar/B738/fmc1/Line([0-9]{2})_([A-Z]+)");
-    
+
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
-    
+
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> screenBrightness) {
         if (screenBrightness.size() < 11) {
             return;
         }
 
-        //brightness[11] is fmc2 screen
+        // brightness[11] is fmc2 screen
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? screenBrightness[10] * 255.0f : 0;
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/panel_brightness", [product](std::vector<float> panelBrightness) {
         if (panelBrightness.size() < 4) {
             return;
@@ -32,17 +35,17 @@ ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) : FMCAircraftProfile(product
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? panelBrightness[3] * 255.0f : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/panel_brightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/instrument_brightness");
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/fmc/fmc_message", [product](bool enabled) {
         product->setLedBrightness(FMCLed::PFP_MSG, enabled ? 1 : 0);
         product->setLedBrightness(FMCLed::MCDU_MCDU, enabled ? 1 : 0);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/B738/indicators/fmc_exec_lights", [product](bool enabled) {
         product->setLedBrightness(FMCLed::PFP_EXEC, enabled ? 1 : 0);
         product->setLedBrightness(FMCLed::MCDU_RDY, enabled ? 1 : 0);
@@ -61,7 +64,7 @@ bool ZiboFMCProfile::IsEligible() {
     return Dataref::getInstance()->exists("laminar/B738/electric/instrument_brightness");
 }
 
-const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
+const std::vector<std::string> &ZiboFMCProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
         "laminar/B738/fmc1/Line00_C",
         "laminar/B738/fmc1/Line00_G",
@@ -69,7 +72,7 @@ const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
         "laminar/B738/fmc1/Line00_L",
         "laminar/B738/fmc1/Line00_M",
         "laminar/B738/fmc1/Line00_S",
-        
+
         "laminar/B738/fmc1/Line01_G",
         "laminar/B738/fmc1/Line01_GX",
         "laminar/B738/fmc1/Line01_I",
@@ -78,7 +81,7 @@ const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
         "laminar/B738/fmc1/Line01_M",
         "laminar/B738/fmc1/Line01_S",
         "laminar/B738/fmc1/Line01_X",
-        
+
         "laminar/B738/fmc1/Line02_G",
         "laminar/B738/fmc1/Line02_GX",
         "laminar/B738/fmc1/Line02_I",
@@ -87,7 +90,7 @@ const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
         "laminar/B738/fmc1/Line02_M",
         "laminar/B738/fmc1/Line02_S",
         "laminar/B738/fmc1/Line02_X",
-        
+
         "laminar/B738/fmc1/Line03_G",
         "laminar/B738/fmc1/Line03_GX",
         "laminar/B738/fmc1/Line03_I",
@@ -96,7 +99,7 @@ const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
         "laminar/B738/fmc1/Line03_M",
         "laminar/B738/fmc1/Line03_S",
         "laminar/B738/fmc1/Line03_X",
-        
+
         "laminar/B738/fmc1/Line04_G",
         "laminar/B738/fmc1/Line04_GX",
         "laminar/B738/fmc1/Line04_I",
@@ -106,7 +109,7 @@ const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
         "laminar/B738/fmc1/Line04_S",
         "laminar/B738/fmc1/Line04_SI",
         "laminar/B738/fmc1/Line04_X",
-        
+
         "laminar/B738/fmc1/Line05_G",
         "laminar/B738/fmc1/Line05_GX",
         "laminar/B738/fmc1/Line05_I",
@@ -115,7 +118,7 @@ const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
         "laminar/B738/fmc1/Line05_M",
         "laminar/B738/fmc1/Line05_S",
         "laminar/B738/fmc1/Line05_X",
-        
+
         "laminar/B738/fmc1/Line06_G",
         "laminar/B738/fmc1/Line06_GX",
         "laminar/B738/fmc1/Line06_I",
@@ -124,15 +127,14 @@ const std::vector<std::string>& ZiboFMCProfile::displayDatarefs() const {
         "laminar/B738/fmc1/Line06_M",
         "laminar/B738/fmc1/Line06_S",
         "laminar/B738/fmc1/Line06_X",
-        
+
         "laminar/B738/fmc1/Line_entry",
-        "laminar/B738/fmc1/Line_entry_I"
-    };
-    
+        "laminar/B738/fmc1/Line_entry_I"};
+
     return datarefs;
 }
 
-const std::vector<FMCButtonDef>& ZiboFMCProfile::buttonDefs() const {
+const std::vector<FMCButtonDef> &ZiboFMCProfile::buttonDefs() const {
     static const std::vector<FMCButtonDef> buttons = {
         {FMCKey::LSK1L, "laminar/B738/button/fmc1_1L"},
         {FMCKey::LSK2L, "laminar/B738/button/fmc1_2L"},
@@ -204,13 +206,12 @@ const std::vector<FMCButtonDef>& ZiboFMCProfile::buttonDefs() const {
         {FMCKey::SPACE, "laminar/B738/button/fmc1_SP"},
         {std::vector<FMCKey>{FMCKey::PFP_DEL, FMCKey::MCDU_OVERFLY}, "laminar/B738/button/fmc1_del"},
         {FMCKey::SLASH, "laminar/B738/button/fmc1_slash"},
-        {FMCKey::CLR, "laminar/B738/button/fmc1_clr"}
-    };
-    
+        {FMCKey::CLR, "laminar/B738/button/fmc1_clr"}};
+
     return buttons;
 }
 
-const std::map<char, FMCTextColor>& ZiboFMCProfile::colorMap() const {
+const std::map<char, FMCTextColor> &ZiboFMCProfile::colorMap() const {
     static const std::map<char, FMCTextColor> colMap = {
         {'W', FMCTextColor::COLOR_WHITE},
         {'L', FMCTextColor::COLOR_WHITE},
@@ -219,7 +220,7 @@ const std::map<char, FMCTextColor>& ZiboFMCProfile::colorMap() const {
         {'G', FMCTextColor::COLOR_GREEN},
         {'C', FMCTextColor::COLOR_CYAN},
         {'I', FMCTextColor::COLOR_WHITE_BG}, // White (should be inverted gray/white)
-        {'X', FMCTextColor::COLOR_WHITE}, // White (should be special labels)
+        {'X', FMCTextColor::COLOR_WHITE},    // White (should be special labels)
     };
 
     return colMap;
@@ -234,25 +235,25 @@ void ZiboFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t characte
         case '`':
             buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
             break;
-        
+
         default:
             buffer->push_back(character);
             break;
     }
 }
 
-void ZiboFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
+void ZiboFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
-    
+
     auto datarefManager = Dataref::getInstance();
-    for (const auto& ref : displayDatarefs()) {
+    for (const auto &ref : displayDatarefs()) {
         std::string text = datarefManager->getCached<std::string>(ref.c_str());
-        
+
         // Handle scratchpad datarefs specially
         if (ref == "laminar/B738/fmc1/Line_entry" || ref == "laminar/B738/fmc1/Line_entry_I") {
             if (!text.empty()) {
                 char color = (ref == "laminar/B738/fmc1/Line_entry_I") ? 'I' : 'W';
-                
+
                 // Store scratchpad text for later display on line 13
                 for (int i = 0; i < text.size() && i < ProductFMC::PageCharsPerLine; ++i) {
                     char c = text[i];
@@ -266,19 +267,18 @@ void ZiboFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             }
             continue;
         }
-        
-        
+
         std::smatch match;
         if (!std::regex_match(ref, match, datarefRegex)) {
             continue;
         }
-        
+
         unsigned char lineNum = std::stoi(match[1]);
         std::string colorStr = match[2];
-        
+
         // For double-letter codes like "GX", "LX", use first letter for color
         char color = colorStr[0];
-        
+
         unsigned char displayLine = lineNum * 2;
         bool fontSmall = color == 'X' || color == 'S';
         if (colorStr.back() == 'X') {
@@ -294,7 +294,7 @@ void ZiboFMCProfile::updatePage(std::vector<std::vector<char>>& page) {
             if (c == 0x00) {
                 break;
             }
-            
+
             if (c != 0x20) {
                 product->writeLineToPage(page, displayLine, i, std::string(1, c), color, fontSmall);
             }
@@ -307,24 +307,23 @@ void ZiboFMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPhase 
         if (phase != xplm_CommandBegin) {
             return;
         }
-        
+
         std::string ref = button->dataref;
         size_t start = ref.find('[');
         if (start != std::string::npos) {
             size_t end = ref.find(']', start);
             int index = std::stoi(ref.substr(start + 1, end - start - 1));
             std::string baseRef = ref.substr(0, start);
-            
+
             auto vec = Dataref::getInstance()->get<std::vector<float>>(baseRef.c_str());
-            if (index >= 0 && index < (int)vec.size()) {
+            if (index >= 0 && index < (int) vec.size()) {
                 vec[index] = std::clamp(vec[index] + button->value, 0.0, 1.0);
                 Dataref::getInstance()->set<std::vector<float>>(baseRef.c_str(), vec);
             }
         } else {
             Dataref::getInstance()->set<float>(ref.c_str(), button->value);
         }
-    }
-    else {
+    } else {
         Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
     }
 }

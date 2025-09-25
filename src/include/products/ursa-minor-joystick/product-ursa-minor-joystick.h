@@ -3,25 +3,25 @@
 
 #include "usbdevice.h"
 
-class ProductUrsaMinorJoystick: public USBDevice {
-private:
-    bool didInitializeDatarefs = false;
-    int lastVibration;
-    float lastGForce;
+class ProductUrsaMinorJoystick : public USBDevice {
+    private:
+        bool didInitializeDatarefs = false;
+        int lastVibration;
+        float lastGForce;
 
-public:
-    ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
-    ~ProductUrsaMinorJoystick();
-    
-    const char* classIdentifier() override;
-    bool connect() override;
-    void disconnect() override;
-    void update() override;
+    public:
+        ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
+        ~ProductUrsaMinorJoystick();
 
-    bool setVibration(uint8_t vibration);
-    bool setLedBrightness(uint8_t brightness);
-    
-    void initializeDatarefs();
+        const char *classIdentifier() override;
+        bool connect() override;
+        void disconnect() override;
+        void update() override;
+
+        bool setVibration(uint8_t vibration);
+        bool setLedBrightness(uint8_t brightness);
+
+        void initializeDatarefs();
 };
 
 #endif
