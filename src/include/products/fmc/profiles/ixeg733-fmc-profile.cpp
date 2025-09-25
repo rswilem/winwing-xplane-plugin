@@ -306,15 +306,21 @@ void IXEG733FMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPha
         return;
     }
     
-    if (std::fabs(button->value) > DBL_EPSILON) {
-        if (phase != xplm_CommandBegin) {
-            return;
+    if (std::holds_alternative<FMCKey>(button->key) &&
+        std::get<FMCKey>(button->key) == FMCKey::CLR) {
+        Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
+    } else {
+        if (std::fabs(button->value) > DBL_EPSILON) {
+            if (phase != xplm_CommandBegin) {
+                return;
+            }
+            
+            float currentValue = Dataref::getInstance()->get<float>(button->dataref.c_str());
+            Dataref::getInstance()->set<float>(button->dataref.c_str(), std::clamp(currentValue + button->value, 0.0, 1.0));
         }
-        
-        float currentValue = Dataref::getInstance()->get<float>(button->dataref.c_str());
-        Dataref::getInstance()->set<float>(button->dataref.c_str(), std::clamp(currentValue + button->value, 0.0, 1.0));
+        else {
+            Dataref::getInstance()->set<int>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
+        }
     }
-    else {
-        Dataref::getInstance()->set<int>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
-    }
+    
 }
