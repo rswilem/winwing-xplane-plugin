@@ -16,8 +16,7 @@
 IXEG733FMCProfile::IXEG733FMCProfile(ProductFMC *product) :
     FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontVGA1, product->identifierByte));
-
+    product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
     Dataref::getInstance()->monitorExistingDataref<float>("ixeg/733/rheostats/light_fmc_pt_act", [product](float brightness) {
         uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
@@ -307,14 +306,21 @@ void IXEG733FMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPha
         return;
     }
 
-    if (std::fabs(button->value) > DBL_EPSILON) {
-        if (phase != xplm_CommandBegin) {
-            return;
-        }
-
-        float currentValue = Dataref::getInstance()->get<float>(button->dataref.c_str());
-        Dataref::getInstance()->set<float>(button->dataref.c_str(), std::clamp(currentValue + button->value, 0.0, 1.0));
+    if (std::holds_alternative<FMCKey>(button->key) &&
+        std::get<FMCKey>(button->key) == FMCKey::CLR) {
+        Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
     } else {
-        Dataref::getInstance()->set<int>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
+        if (std::fabs(button->value) > DBL_EPSILON) {
+            if (phase != xplm_CommandBegin) {
+                return;
+            }
+            
+            float currentValue = Dataref::getInstance()->get<float>(button->dataref.c_str());
+            Dataref::getInstance()->set<float>(button->dataref.c_str(), std::clamp(currentValue + button->value, 0.0, 1.0));
+        }
+        else {
+            Dataref::getInstance()->set<int>(button->dataref.c_str(), phase == xplm_CommandBegin ? 1 : 0);
+        }
     }
+    
 }
