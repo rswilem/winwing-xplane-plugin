@@ -5,6 +5,7 @@
 #include "dataref.h"
 #include "profiles/ff777-fmc-profile.h"
 #include "profiles/ixeg733-fmc-profile.h"
+#include "profiles/ff767-fmc-profile.h"
 #include "profiles/laminar-airbus-fmc-profile.h"
 #include "profiles/ssg748-fmc-profile.h"
 #include "profiles/toliss-fmc-profile.h"
@@ -47,6 +48,11 @@ void ProductFMC::setProfileForCurrentAircraft() {
     } else if (ZiboFMCProfile::IsEligible()) {
         clearDisplay();
         profile = new ZiboFMCProfile(this);
+        profileReady = true;
+    } else if (FlightFactor767FMCProfile::IsEligible()) {
+        debug("Using FlightFactor 757/767 PFP profile for %s.\n", classIdentifier());
+        clearDisplay();
+        profile = new FlightFactor767FMCProfile(this);
         profileReady = true;
     } else if (FlightFactor777FMCProfile::IsEligible()) {
         clearDisplay();

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5DBA92312E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DBA92302E6F4D71007328BC /* ff767-fmc-profile.cpp */; };
+		5DBA92322E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DBA92302E6F4D71007328BC /* ff767-fmc-profile.cpp */; };
 		F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66F91662D0332F600F84283 /* main.cpp */; };
 		F635AD422E05697B005D6CDC /* bridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F6827E102E05664C00382B28 /* bridge.mm */; };
 		F635AD462E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */; };
@@ -94,6 +96,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5DBA922F2E6F4D71007328BC /* ff767-fmc-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ff767-fmc-profile.h"; sourceTree = "<group>"; };
+		5DBA92302E6F4D71007328BC /* ff767-fmc-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ff767-fmc-profile.cpp"; sourceTree = "<group>"; };
 		D607B19909A556E400699BC3 /* winwing.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = winwing.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
 		F61F8B2D2D059ED500E63C3F /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		F62304282E59DF8500EE0089 /* vga_1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_1.h; sourceTree = "<group>"; };
@@ -383,6 +387,8 @@
 		F6A1492A2E4F03A400FB8395 /* profiles */ = {
 			isa = PBXGroup;
 			children = (
+				5DBA922F2E6F4D71007328BC /* ff767-fmc-profile.h */,
+				5DBA92302E6F4D71007328BC /* ff767-fmc-profile.cpp */,
 				F6A149352E4F04AE00FB8395 /* ff777-fmc-profile.h */,
 				F6A149362E4F04AE00FB8395 /* ff777-fmc-profile.cpp */,
 				F6A149372E4F04AE00FB8395 /* ixeg733-fmc-profile.h */,
@@ -523,7 +529,9 @@
 		D607B16109A5563100699BC3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					F6827DF72E0564F700382B28 = {
 						CreatedOnToolsVersion = 26.0;
@@ -597,6 +605,7 @@
 				F69B3FFA2E7464F80088DDB1 /* transport.cpp in Sources */,
 				F6A1492F2E4F03A400FB8395 /* product-fmc.cpp in Sources */,
 				F6A149302E4F03A400FB8395 /* toliss-fmc-profile.cpp in Sources */,
+				5DBA92322E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */,
 				F6A149312E4F03A400FB8395 /* laminar-airbus-fmc-profile.cpp in Sources */,
 				F67961952E31357E008031F1 /* usbdevice_lin.cpp in Sources */,
 				F635AD472E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */,
@@ -638,6 +647,7 @@
 				F69FF22F2E1D13CB00F9D2D9 /* JoystickControlView.swift in Sources */,
 				F67110DD2E5AF429008D493B /* font.cpp in Sources */,
 				F647201E2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
+				5DBA92312E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */,
 				F69B3FE52E7464F80088DDB1 /* zibo_profile.cpp in Sources */,
 				F69B3FE62E7464F80088DDB1 /* profile_factory.cpp in Sources */,
 				F69B3FE72E7464F80088DDB1 /* compose.cpp in Sources */,
@@ -675,11 +685,13 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -718,8 +730,8 @@
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				XPSDK_ROOT = SDK;
 			};
@@ -743,14 +755,17 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				EXECUTABLE_EXTENSION = xpl;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/Libraries/Mac",
@@ -784,9 +799,10 @@
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "${TARGET_NAME}";
+				SWIFT_COMPILATION_MODE = wholemodule;
 				XPSDK_ROOT = SDK;
 			};
 			name = Release;
@@ -795,13 +811,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				ARCHS = arm64;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				DEAD_CODE_STRIPPING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/Libraries/Mac",
-					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
-					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/SDK/Libraries/Mac",
+					"$(PROJECT_DIR)",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
@@ -813,7 +828,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DNDEBUG",
@@ -831,7 +846,7 @@
 					"-Wl,-exported_symbol",
 					"-Wl,_XPluginStop",
 				);
-				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = YES;
 				XPSDK_ROOT = SDK;
 			};
@@ -841,16 +856,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				ARCHS = (
-					x86_64,
-					arm64,
-				);
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				DEAD_CODE_STRIPPING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/Libraries/Mac",
-					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
-					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/SDK/Libraries/Mac",
+					"$(PROJECT_DIR)",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/CHeaders/Widgets",
@@ -861,7 +872,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DNDEBUG",
@@ -879,7 +890,7 @@
 					"-Wl,-exported_symbol",
 					"-Wl,_XPluginStop",
 				);
-				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = YES;
 				XPSDK_ROOT = SDK;
 			};
@@ -908,6 +919,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = WUAFN7S2AR;
 				ENABLE_APP_SANDBOX = YES;
@@ -985,6 +997,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = WUAFN7S2AR;
 				ENABLE_APP_SANDBOX = YES;
@@ -1055,11 +1068,13 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1098,8 +1113,8 @@
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				XPSDK_ROOT = SDK;
 			};
@@ -1109,13 +1124,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				ARCHS = x86_64;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				DEAD_CODE_STRIPPING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(XPSDK_ROOT)/Libraries/Mac",
-					"$(PROJECT_DIR)/SDK_410/Libraries/Mac",
-					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/SDK/Libraries/Mac",
+					"$(PROJECT_DIR)",
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
@@ -1127,7 +1141,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MACOSX_DEPLOYMENT_TARGET = 11.5;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DNDEBUG",
@@ -1145,7 +1159,7 @@
 					"-Wl,-exported_symbol",
 					"-Wl,_XPluginStop",
 				);
-				SUPPORTED_PLATFORMS = "xrsimulator xros watchsimulator watchos macosx iphonesimulator iphoneos driverkit appletvsimulator appletvos";
+				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = YES;
 				XPSDK_ROOT = SDK;
 			};
@@ -1174,6 +1188,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = WUAFN7S2AR;
 				ENABLE_APP_SANDBOX = YES;
