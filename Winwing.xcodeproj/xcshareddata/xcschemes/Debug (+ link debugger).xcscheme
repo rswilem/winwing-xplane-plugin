@@ -6,6 +6,24 @@
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
       buildArchitectures = "Automatic">
+      <PostActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;cleaned_product_name=&quot;${PRODUCT_NAME//-mac/}&quot;&#10;cleaned_product_name=&quot;${cleaned_product_name//-win/}&quot;&#10;cleaned_product_name=&quot;${cleaned_product_name//-lin/}&quot;&#10;folder=&quot;$HOME/X-Plane 12/Resources/plugins/${cleaned_product_name}&quot;&#10;&#10;[ ! -d &quot;$folder/assets&quot; ] &amp;&amp; mkdir -p &quot;$folder/assets&quot;&#10;[ -d &quot;./assets&quot; ] &amp;&amp; rsync -a --exclude=&quot;.gitkeep&quot; ./assets/ &quot;$folder/assets/&quot; || true&#10;&#10;case &quot;$OSTYPE&quot; in&#10;darwin*) os_folder=&quot;mac_x64&quot; ;;&#10;linux*) os_folder=&quot;lin_x64&quot; ;;&#10;msys*) os_folder=&quot;win_x64&quot; ;;&#10;*) os_folder=&quot;unknown&quot; ;;&#10;esac&#10;&#10;[ &quot;$os_folder&quot; != &quot;unknown&quot; ] &amp;&amp; mkdir -p &quot;$folder/$os_folder&quot; &amp;&amp; cp &quot;$BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH&quot; &quot;$folder/$os_folder/&quot;&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "D607B19809A556E400699BC3"
+                     BuildableName = "winwing.xpl"
+                     BlueprintName = "winwing"
+                     ReferencedContainer = "container:Winwing.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PostActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"

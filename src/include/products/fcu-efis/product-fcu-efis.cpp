@@ -4,6 +4,7 @@
 #include "config.h"
 #include "dataref.h"
 #include "profiles/toliss-fcu-efis-profile.h"
+#include "profiles/laminar-fcu-efis-profile.h"
 
 #include <algorithm>
 #include <cstring>
@@ -97,7 +98,11 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
     if (TolissFCUEfisProfile::IsEligible()) {
         profile = new TolissFCUEfisProfile(this);
         profileReady = true;
+    } else if (LaminarFCUEfisProfile::IsEligible()) {
+        profile = new LaminarFCUEfisProfile(this);
+        profileReady = true;
     } else {
+        debug("No profile found for %s.\n", classIdentifier());
         setLedBrightness(FCUEfisLed::FLAG_GREEN, 255);
     }
 }
@@ -454,6 +459,12 @@ void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {
     }
 }
 
+void ProductFCUEfis::forceStateSync() {
+    pressedButtonIndices.clear();
+    lastButtonStateLo = 0;
+    lastButtonStateHi = 0;
+}
+
 void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLength) {
     if (!connected || !profile || !report || reportLength <= 0) {
         return;
@@ -547,8 +558,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
             }
 
             if (!buttonDef) {
-                if (pressed && !pressedButtonIndexExists) {
-                }
                 continue;
             }
 
@@ -587,8 +596,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
             }
 
             if (!buttonDef) {
-                if (pressed && !pressedButtonIndexExists) {
-                }
                 continue;
             }
 

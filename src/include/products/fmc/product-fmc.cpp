@@ -33,37 +33,30 @@ ProductFMC::~ProductFMC() {
 
 void ProductFMC::setProfileForCurrentAircraft() {
     if (TolissFMCProfile::IsEligible()) {
-        debug("Using Toliss profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new TolissFMCProfile(this);
         profileReady = true;
     } else if (LaminarFMCProfile::IsEligible()) {
-        debug("Using Laminar profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new LaminarFMCProfile(this);
         profileReady = true;
     } else if (XCraftsFMCProfile::IsEligible()) {
-        debug("Using X-Crafts profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new XCraftsFMCProfile(this);
         profileReady = true;
     } else if (ZiboFMCProfile::IsEligible()) {
-        debug("Using Zibo PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new ZiboFMCProfile(this);
         profileReady = true;
     } else if (FlightFactor777FMCProfile::IsEligible()) {
-        debug("Using FlightFactor 777 PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new FlightFactor777FMCProfile(this);
         profileReady = true;
     } else if (SSG748FMCProfile::IsEligible()) {
-        debug("Using SSG 748 PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new SSG748FMCProfile(this);
         profileReady = true;
     } else if (IXEG733FMCProfile::IsEligible()) {
-        debug("Using IXEG 733 PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new IXEG733FMCProfile(this);
         profileReady = true;

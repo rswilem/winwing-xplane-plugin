@@ -32,6 +32,7 @@ class ProductFCUEfis : public USBDevice {
         void disconnect() override;
         void update() override;
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
+        void forceStateSync();
 
         void setLedBrightness(FCUEfisLed led, uint8_t brightness);
 
