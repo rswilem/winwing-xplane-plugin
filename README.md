@@ -34,16 +34,15 @@ For linux, see the [Linux udev rules](#linux-udev-rules) section below to ensure
 
 The matrix below shows device and aircraft compatibility. Devices are listed vertically, aircraft horizontally.
 
-| Device                    | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 777 | SSG 747 | Notes |
-| ------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ------ | ------- | ----- |
-| **URSA MINOR Joystick L** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      |       |
-| **URSA MINOR Joystick R** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟢      |       |
-| **MCDU-32**               | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      |       |
-| **PFP 3N**                | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      |       |
-| **PFP 4**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      |       |
-| **PFP 7**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢     | 🟠      |       |
-| **Panel of Autopilot 3**  | 🔴          | 🔴           | 🔴               | 🟢       | 🔴       | 🔴     | 🔴      |       |
-| **FCU and EFIS L+R**      | 🟢          | 🔴           | 🔴               | 🔴       | 🔴       | 🔴     | 🔴      |       |
+| Device                      | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 767/777 | SSG 747 |
+| --------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ---------- | ------- |
+| **URSA MINOR Joystick L+R** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟢      |
+| **MCDU-32**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
+| **PFP 3N**                  | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
+| **PFP 4**                   | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
+| **PFP 7**                   | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
+| **Panel of Autopilot 3**    | 🔴          | 🔴           | 🔴               | 🟢       | 🔴       | 🔴         | 🔴      |
+| **FCU and EFIS L+R**        | 🟢          | 🟢           | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 
 #### Legend
 
