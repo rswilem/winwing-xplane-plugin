@@ -200,9 +200,9 @@ void USBController::DeviceRemovedCallback(void *context, struct udev_device *dev
         return;
     }
 
+    // First pass: disconnect
     for (auto it = self->devices.begin(); it != self->devices.end(); ++it) {
         if ((*it)->hidDevice >= 0) {
-            // Check if this device matches the removed path
             char existingPath[256];
             snprintf(existingPath, sizeof(existingPath), "/proc/self/fd/%d", (*it)->hidDevice);
             char linkTarget[256];
@@ -210,19 +210,38 @@ void USBController::DeviceRemovedCallback(void *context, struct udev_device *dev
             if (len > 0) {
                 linkTarget[len] = '\0';
                 if (strcmp(linkTarget, devicePath) == 0) {
-                    delete *it;
-                    *it = nullptr;
-                    self->devices.erase(it);
+                    (*it)->disconnect();
                     break;
                 }
             }
         } else {
-            // Device already closed/invalid, remove it
-            delete *it;
-            *it = nullptr;
-            self->devices.erase(it);
+            (*it)->disconnect();
             break;
         }
     }
+
+    // Second pass: deferred erase
+    AppState::getInstance()->executeAfter(0, [self, devicePath = std::string(devicePath)]() {
+        for (auto it = self->devices.begin(); it != self->devices.end();) {
+            if (!(*it) || !(*it)->profileReady) {
+                delete *it;
+                it = self->devices.erase(it);
+            } else {
+                char existingPath[256];
+                snprintf(existingPath, sizeof(existingPath), "/proc/self/fd/%d", (*it)->hidDevice);
+                char linkTarget[256];
+                ssize_t len = readlink(existingPath, linkTarget, sizeof(linkTarget) - 1);
+                if (len > 0) {
+                    linkTarget[len] = '\0';
+                    if (strcmp(linkTarget, devicePath.c_str()) == 0) {
+                        delete *it;
+                        it = self->devices.erase(it);
+                        continue;
+                    }
+                }
+                ++it;
+            }
+        }
+    });
 }
 #endif

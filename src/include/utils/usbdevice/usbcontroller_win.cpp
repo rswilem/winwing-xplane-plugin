@@ -175,24 +175,42 @@ void USBController::checkForDeviceChanges() {
         }
     });
 
-    // Remove devices that are no longer present
-    for (auto it = devices.begin(); it != devices.end();) {
-        auto pathIt = devicePaths.find(*it);
+    // First pass: disconnect stale devices
+    for (auto *dev : devices) {
+        auto pathIt = devicePaths.find(dev);
         bool found = false;
-
         if (pathIt != devicePaths.end()) {
             found = std::find(currentDevicePaths.begin(), currentDevicePaths.end(), pathIt->second) != currentDevicePaths.end();
         }
-
-        if (!found || (*it)->hidDevice == INVALID_HANDLE_VALUE || !(*it)->connected) {
-            if (pathIt != devicePaths.end()) {
-                devicePaths.erase(pathIt);
-            }
-            delete *it;
-            it = devices.erase(it);
-        } else {
-            ++it;
+        if (!found || dev->hidDevice == INVALID_HANDLE_VALUE || !dev->connected) {
+            dev->disconnect();
         }
     }
+
+    // Second pass: deferred erase
+    AppState::getInstance()->executeAfter(0, [this]() {
+        for (auto it = devices.begin(); it != devices.end();) {
+            auto pathIt = devicePaths.find(*it);
+            bool remove = false;
+            if (!(*it)->profileReady || (*it)->hidDevice == INVALID_HANDLE_VALUE || !(*it)->connected) {
+                remove = true;
+            }
+            if (pathIt != devicePaths.end() &&
+                std::find_if(devices.begin(), devices.end(), [&](USBDevice *d) {
+                    return devicePaths[d] == pathIt->second;
+                }) == devices.end()) {
+                remove = true;
+            }
+            if (remove) {
+                if (pathIt != devicePaths.end()) {
+                    devicePaths.erase(pathIt);
+                }
+                delete *it;
+                it = devices.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    });
 }
 #endif
