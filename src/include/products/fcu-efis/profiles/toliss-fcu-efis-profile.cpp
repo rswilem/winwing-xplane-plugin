@@ -25,9 +25,9 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EXPED_BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::FLAG_GREEN, target);
-        product->setLedBrightness(FCUEfisLed::EFISR_FLAG_GREEN, target);
-        product->setLedBrightness(FCUEfisLed::EFISL_FLAG_GREEN, target);
+        product->setLedBrightness(FCUEfisLed::OVERALL_GREEN, hasPower ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, hasPower ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_OVERALL_GREEN, hasPower ? 255 : 0);
 
         uint8_t screenBrightness = hasPower ? brightness[1] * 255.0f : 0;
         product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, screenBrightness);
@@ -42,86 +42,86 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/AP1Engage", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::AP1_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::AP1_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/AP2Engage", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::AP2_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::AP2_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/ATHRmode", [product](int mode) {
-        product->setLedBrightness(FCUEfisLed::ATHR_GREEN, mode > 0 ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::ATHR_GREEN, mode > 0 ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/LOCilluminated", [product](bool illuminated) {
-        product->setLedBrightness(FCUEfisLed::LOC_GREEN, illuminated ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::LOC_GREEN, illuminated ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/APPRilluminated", [product](bool illuminated) {
-        product->setLedBrightness(FCUEfisLed::APPR_GREEN, illuminated ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::APPR_GREEN, illuminated ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/APVerticalMode", [product](int vsMode) {
         bool expedEnabled = vsMode >= 0 && vsMode & 0b00010000;
-        product->setLedBrightness(FCUEfisLed::EXPED_GREEN, expedEnabled ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EXPED_GREEN, expedEnabled ? 1 : 0);
     });
 
     // Monitor EFIS Right (Captain) LED states
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/FD2Engage", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/ILSonFO", [product](bool on) {
-        product->setLedBrightness(FCUEfisLed::EFISR_LS_GREEN, on ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_LS_GREEN, on ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowCSTRFO", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_CSTR_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_CSTR_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowWPTFO", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_WPT_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_WPT_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowVORDFO", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_VORD_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_VORD_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowNDBFO", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_NDB_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_NDB_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowARPTFO", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_ARPT_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_ARPT_GREEN, show ? 1 : 0);
     });
 
     // Monitor EFIS Left (First Officer) LED states
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/FD1Engage", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/ILSonCapt", [product](bool on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_LS_GREEN, on ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_LS_GREEN, on ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowCSTRCapt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_CSTR_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_CSTR_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowWPTCapt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_WPT_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_WPT_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowVORDCapt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_VORD_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_VORD_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowNDBCapt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_NDB_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_NDB_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/NDShowARPTCapt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, show ? 1 : 0);
     });
 }
 
@@ -163,35 +163,32 @@ bool TolissFCUEfisProfile::IsEligible() {
 
 const std::vector<std::string> &TolissFCUEfisProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
-        // FCU display datarefs
-        "sim/cockpit2/autopilot/airspeed_dial_kts_mach", // float
-        "AirbusFBW/SPDmanaged",                          // int, 1 or 0
-        "AirbusFBW/SPDdashed",                           // int, 1 or 0
+        "sim/cockpit2/autopilot/airspeed_dial_kts_mach",
+        "AirbusFBW/SPDmanaged",
+        "AirbusFBW/SPDdashed",
 
-        "sim/cockpit/autopilot/heading_mag", // float
-        "AirbusFBW/HDGmanaged",              // int, 1 or 0
-        "AirbusFBW/HDGdashed",               // int, 1 or 0
+        "sim/cockpit/autopilot/heading_mag",
+        "AirbusFBW/HDGmanaged",
+        "AirbusFBW/HDGdashed",
 
-        "sim/cockpit/autopilot/altitude", // float
-        "AirbusFBW/ALTmanaged",           // int, 1 or 0
+        "sim/cockpit/autopilot/altitude",
+        "AirbusFBW/ALTmanaged",
 
-        "sim/cockpit/autopilot/vertical_velocity", // float
-        "AirbusFBW/VSdashed",                      // int, 1 or 0
+        "sim/cockpit/autopilot/vertical_velocity",
+        "AirbusFBW/VSdashed",
 
-        "sim/cockpit/autopilot/airspeed_is_mach", // int, 1 or 0
-        "AirbusFBW/HDGTRKmode",                   // HDG=VS,TRK=FPA, // int, 1 or 0
+        "sim/cockpit/autopilot/airspeed_is_mach",
+        "AirbusFBW/HDGTRKmode",
 
-        // FCU button state datarefs for LED monitoring
-        "AirbusFBW/AP1Engage", // int, 1 or 0
-        "AirbusFBW/AP2Engage", // int, 1 or 0
+        "AirbusFBW/AP1Engage",
+        "AirbusFBW/AP2Engage",
 
-        // EFIS barometric pressure datarefs
-        "AirbusFBW/BaroStdCapt",                                         // int, 1 or 0
-        "AirbusFBW/BaroUnitCapt",                                        // int, 1 for hPa, 0 for inHg
-        "AirbusFBW/BaroStdFO",                                           // int, 1 or 0
-        "AirbusFBW/BaroUnitFO",                                          // int, 1 for hPa, 0 for inHg
-        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",   // float, inHg
-        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot", // float, inHg
+        "AirbusFBW/BaroStdCapt",
+        "AirbusFBW/BaroUnitCapt",
+        "AirbusFBW/BaroStdFO",
+        "AirbusFBW/BaroUnitFO",
+        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
+        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot",
     };
 
     return datarefs;

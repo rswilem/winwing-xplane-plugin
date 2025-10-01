@@ -24,9 +24,9 @@ LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EXPED_BACKLIGHT, target);
-        product->setLedBrightness(FCUEfisLed::FLAG_GREEN, target);
-        product->setLedBrightness(FCUEfisLed::EFISR_FLAG_GREEN, target);
-        product->setLedBrightness(FCUEfisLed::EFISL_FLAG_GREEN, target);
+        product->setLedBrightness(FCUEfisLed::OVERALL_GREEN, hasPower ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, hasPower ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_OVERALL_GREEN, hasPower ? 255 : 0);
 
         uint8_t screenBrightness = hasPower ? brightness[10] * 255.0f : 0;
         product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, screenBrightness);
@@ -41,85 +41,85 @@ LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/ap1_mode", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::AP1_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::AP1_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/ap2_mode", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::AP2_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::AP2_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/a_thr_mode", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::ATHR_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::ATHR_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/loc_mode", [product](bool illuminated) {
-        product->setLedBrightness(FCUEfisLed::LOC_GREEN, illuminated ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::LOC_GREEN, illuminated ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/appr_mode", [product](bool illuminated) {
-        product->setLedBrightness(FCUEfisLed::APPR_GREEN, illuminated ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::APPR_GREEN, illuminated ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("laminar/A333/annun/autopilot/alt_mode", [product](bool illuminated) {
-        product->setLedBrightness(FCUEfisLed::EXPED_GREEN, illuminated ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EXPED_GREEN, illuminated ? 1 : 0);
     });
 
     // Monitor EFIS Right (Captain) LED states
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/fo_flight_director_on", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/fo_ls_bars_on", [product](bool on) {
-        product->setLedBrightness(FCUEfisLed::EFISR_LS_GREEN, on ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_LS_GREEN, on ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_cstr", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_CSTR_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_CSTR_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_fix", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_WPT_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_WPT_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_vor", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_VORD_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_VORD_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_ndb", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_NDB_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_NDB_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_arpt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_ARPT_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_ARPT_GREEN, show ? 1 : 0);
     });
 
     // Monitor EFIS Left (First Officer) LED states
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/capt_flight_director_on", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, engaged ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, engaged ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/captain_ls_bars_on", [product](bool on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_LS_GREEN, on ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_LS_GREEN, on ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_cstr", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_CSTR_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_CSTR_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_fix", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_WPT_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_WPT_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_vor", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_VORD_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_VORD_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_ndb", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_NDB_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_NDB_GREEN, show ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_arpt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, show ? 255 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, show ? 1 : 0);
     });
 }
 
@@ -161,35 +161,28 @@ bool LaminarFCUEfisProfile::IsEligible() {
 
 const std::vector<std::string> &LaminarFCUEfisProfile::displayDatarefs() const {
     static const std::vector<std::string> datarefs = {
-        // FCU display datarefs
-        "sim/cockpit2/autopilot/airspeed_dial_kts_mach", // float
-        "AirbusFBW/SPDmanaged",                          // int, 1 or 0
-        "sim/cockpit2/autopilot/vnav_speed_window_open",                           // int, 1 or 0
+        "laminar/A333/annun/autopilot/ap1_mode",
+        "laminar/A333/annun/autopilot/ap2_mode",
 
-        "sim/cockpit/autopilot/heading_mag", // float
-        "AirbusFBW/HDGmanaged",              // int, 1 or 0
-        "AirbusFBW/HDGdashed",               // int, 1 or 0
-
-        "sim/cockpit/autopilot/altitude", // float
-        "AirbusFBW/ALTmanaged",           // int, 1 or 0
-
-        "sim/cockpit/autopilot/vertical_velocity", // float
-        "sim/cockpit2/autopilot/speed_status",                      // int, 1 or 0
-
-        "sim/cockpit/autopilot/airspeed_is_mach", // int, 1 or 0
-        "sim/cockpit2/autopilot/trk_fpa",                   // HDG=VS,TRK=FPA, // int, 1 or 0
-
-        // FCU button state datarefs for LED monitoring
-        "AirbusFBW/AP1Engage", // int, 1 or 0
-        "AirbusFBW/AP2Engage", // int, 1 or 0
-
-        // EFIS barometric pressure datarefs
-        "AirbusFBW/BaroStdCapt",                                         // int, 1 or 0
-        "AirbusFBW/BaroUnitCapt",                                        // int, 1 for hPa, 0 for inHg
-        "AirbusFBW/BaroStdFO",                                           // int, 1 or 0
-        "AirbusFBW/BaroUnitFO",                                          // int, 1 for hPa, 0 for inHg
-        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",   // float, inHg
-        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot", // float, inHg
+        "sim/cockpit2/autopilot/vnav_speed_window_open",
+        "laminar/A333/autopilot/hdg_window_open",
+        "laminar/A333/autopilot/vvi_fpa_window_open",
+        "sim/cockpit/autopilot/airspeed_is_mach",
+        "sim/cockpit2/autopilot/vnav_speed_window_open",
+        "laminar/A333/autopilot/hdg_window_open",
+        "sim/cockpit2/autopilot/trk_fpa",
+        "sim/cockpit2/autopilot/airspeed_dial_kts_mach",
+        "sim/cockpit/autopilot/heading_mag",
+        "sim/cockpit/autopilot/altitude",
+        "sim/cockpit/autopilot/vertical_velocity",
+        "sim/cockpit2/autopilot/speed_status",
+        "sim/cockpit2/autopilot/fms_vnav",
+        "sim/cockpit2/gauges/actuators/barometer_setting_is_std_pilot",
+        "sim/cockpit2/gauges/actuators/barometer_setting_is_std_copilot",
+        "laminar/A333/barometer/capt_inHg_hPa_pos",
+        "laminar/A333/barometer/fo_inHg_hPa_pos",
+        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
+        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot",
     };
 
     return datarefs;
@@ -198,32 +191,32 @@ const std::vector<std::string> &LaminarFCUEfisProfile::displayDatarefs() const {
 const std::vector<FCUEfisButtonDef> &LaminarFCUEfisProfile::buttonDefs() const {
     static const std::vector<FCUEfisButtonDef> buttons = {
         {0, "MACH", "sim/autopilot/knots_mach_toggle"},
-        {1, "LOC", "AirbusFBW/LOCbutton"},
+        {1, "LOC", "sim/autopilot/NAV"},
         {2, "TRK", "sim/autopilot/trkfpa"},
-        {3, "AP1", "AirbusFBW/AP1Engage", FCUEfisDatarefType::TOGGLE_VALUE},
-        {4, "AP2", "AirbusFBW/AP2Engage", FCUEfisDatarefType::TOGGLE_VALUE},
-        {5, "A/THR", "AirbusFBW/ATHRbutton"},
-        {6, "EXPED", "AirbusFBW/EXPEDbutton"},
-        {7, "METRIC", "toliss_airbus/metric_alt_button_push"},
-        {8, "APPR", "AirbusFBW/APPRbutton"},
+        {3, "AP1", "sim/autopilot/servos_toggle"},
+        {4, "AP2", "sim/autopilot/servos2_toggle"},
+        {5, "A/THR", "laminar/A333/autopilot/a_thr_toggle"},
+        {6, "EXPED", "sim/autopilot/altitude_hold"},
+        {7, "METRIC", "laminar/A333/autopilot/metric_alt_push"},
+        {8, "APPR", "sim/autopilot/approach"},
         {9, "SPD DEC", "sim/autopilot/airspeed_down"},
         {10, "SPD INC", "sim/autopilot/airspeed_up"},
-        {11, "SPD PUSH", "sim/autopilot/spd_intv"},
-        {12, "SPD PULL", "sim/autopilot/spd_intv"},
+        {11, "SPD PUSH", "laminar/A333/autopilot/speed_knob_push"},
+        {12, "SPD PULL", "laminar/A333/autopilot/speed_knob_pull"},
         {13, "HDG DEC", "sim/autopilot/heading_down"},
         {14, "HDG INC", "sim/autopilot/heading_up"},
-        {15, "HDG PUSH", "sim/autopilot/gpss"},
-        {16, "HDG PULL", "sim/autopilot/heading"},
+        {15, "HDG PUSH", "laminar/A333/autopilot/heading_knob_push"},
+        {16, "HDG PULL", "laminar/A333/autopilot/heading_knob_pull"},
         {17, "ALT DEC", "sim/autopilot/altitude_down"},
         {18, "ALT INC", "sim/autopilot/altitude_up"},
-        {19, "ALT PUSH", "sim/autopilot/FMS"},
-        {20, "ALT PULL", "sim/autopilot/level_change"},
+        {19, "ALT PUSH", "laminar/A333/autopilot/altitude_knob_push"},
+        {20, "ALT PULL", "laminar/A333/autopilot/altitude_knob_pull"},
         {21, "VS DEC", "sim/autopilot/vertical_speed_down"},
         {22, "VS INC", "sim/autopilot/vertical_speed_up"},
-        {23, "VS PUSH", ""},
-        {24, "VS PULL", "sim/autopilot/alt_vs"},
-        {25, "ALT 100", "", FCUEfisDatarefType::SET_VALUE, 0.0},  // Set to 0 for 100ft increments
-        {26, "ALT 1000", "AirbusFBW/ALT100_1000", FCUEfisDatarefType::SET_VALUE, 1.0}, // Set to 1 for 1000ft increments
+        {23, "VS PUSH", "laminar/A333/autopilot/vertical_knob_push"},
+        {24, "VS PULL", "laminar/A333/autopilot/vertical_knob_pull"},
+        {25, "ALT 100", "laminar/A333/autopilot/alt_step_left"},
+        {26, "ALT 1000", "laminar/A333/autopilot/alt_step_right"},
 
         // Brightness control buttons
         // These are handled internally via brightness callback system
@@ -248,25 +241,25 @@ const std::vector<FCUEfisButtonDef> &LaminarFCUEfisProfile::buttonDefs() const {
         {40, "R_STD PULL", "laminar/A333/pull/baro/fo_std"},
         {41, "R_PRESS DEC", "custom", FCUEfisDatarefType::BAROMETER_FO, -1.0},
         {42, "R_PRESS INC", "custom", FCUEfisDatarefType::BAROMETER_FO, 1.0},
-        {43, "R_inHg", "laminar/A333/knob/baro/fo_hPa", FCUEfisDatarefType::SET_VALUE, 0.0},                        // Set to 0 for inHg
-        {44, "R_hPa", "AirbusFBW/BaroUnitFO", FCUEfisDatarefType::SET_VALUE, 1.0},                         // Set to 1 for hPa
-        {45, "R_MODE LS", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 0.0},                       // LS mode
-        {46, "R_MODE VOR", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 1.0},                      // VOR mode
-        {47, "R_MODE NAV", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 2.0},                      // NAV mode
-        {48, "R_MODE ARC", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 3.0},                      // ARC mode
-        {49, "R_MODE PLAN", "AirbusFBW/NDmodeFO", FCUEfisDatarefType::SET_VALUE, 4.0},                     // PLAN mode
-        {50, "R_RANGE 10", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},                     // 10nm range
-        {51, "R_RANGE 20", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},                     // 20nm range
-        {52, "R_RANGE 40", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},                     // 40nm range
-        {53, "R_RANGE 80", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 3.0},                     // 80nm range
-        {54, "R_RANGE 160", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 4.0},                    // 160nm range
-        {55, "R_RANGE 320", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 5.0},                    // 320nm range
-        {56, "R_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0}, // VOR1
-        {57, "R_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0}, // OFF1
-        {58, "R_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0}, // ADF1
-        {59, "R_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0}, // VOR2
-        {60, "R_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0}, // OFF2
-        {61, "R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0}, // ADF2
+        {43, "R_inHg", "laminar/A333/knob/baro/fo_inHg"},
+        {44, "R_hPa", "laminar/A333/knob/baro/fo_hPa"},
+        {45, "R_MODE LS", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 0.0},   // LS mode
+        {46, "R_MODE VOR", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 1.0},  // VOR mode
+        {47, "R_MODE NAV", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 2.0},  // NAV mode
+        {48, "R_MODE ARC", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 3.0},  // ARC mode
+        {49, "R_MODE PLAN", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 4.0}, // PLAN mode
+        {50, "R_RANGE 10", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                            // 10nm range
+        {51, "R_RANGE 20", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                            // 20nm range
+        {52, "R_RANGE 40", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                            // 40nm range
+        {53, "R_RANGE 80", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 3.0},                                                                                            // 80nm range
+        {54, "R_RANGE 160", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 4.0},                                                                                           // 160nm range
+        {55, "R_RANGE 320", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 5.0},                                                                                           // 320nm range
+        {56, "R_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                        // VOR1
+        {57, "R_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                        // OFF1
+        {58, "R_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                        // ADF1
+        {59, "R_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                        // VOR2
+        {60, "R_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                        // OFF2
+        {61, "R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                        // ADF2
         // Buttons 62-63 reserved
 
         // EFIS Left (Pilot) buttons (64-95)
@@ -281,25 +274,25 @@ const std::vector<FCUEfisButtonDef> &LaminarFCUEfisProfile::buttonDefs() const {
         {72, "L_STD PULL", "laminar/A333/pull/baro/capt_std"},
         {73, "L_PRESS DEC", "custom", FCUEfisDatarefType::BAROMETER_PILOT, -1.0},
         {74, "L_PRESS INC", "custom", FCUEfisDatarefType::BAROMETER_PILOT, 1.0},
-        {75, "L_inHg", "laminar/A333/barometer/capt_inHg_hPa_pos", FCUEfisDatarefType::SET_VALUE, 0.0},                    // laminar/A333/barometer/capt_inHg_hPa_pos Set to 0 for inHg
-        {76, "L_hPa", "laminar/A333/knob/baro/capt_hPa", FCUEfisDatarefType::SET_VALUE, 1.0},                     // Set to 1 for hPa
-        {77, "L_MODE LS", "laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE, 0.0},                   // LS mode
-        {78, "L_MODE VOR", "laminar/A333/knobs/capt_EFIS_knob_left", FCUEfisDatarefType::SET_VALUE, 1.0},                  // VOR mode
-        {79, "L_MODE NAV", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 2.0},                  // NAV mode
-        {80, "L_MODE ARC", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 3.0},                  // ARC mode
-        {81, "L_MODE PLAN", "AirbusFBW/NDmodeCapt", FCUEfisDatarefType::SET_VALUE, 4.0},                 // PLAN mode
-        {82, "L_RANGE 10", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 0.0},                 // 10nm range
-        {83, "L_RANGE 20", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 1.0},                 // 20nm range
-        {84, "L_RANGE 40", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 2.0},                 // 40nm range
-        {85, "L_RANGE 80", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 3.0},                 // 80nm range
-        {86, "L_RANGE 160", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 4.0},                // 160nm range
-        {87, "L_RANGE 320", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 5.0},                // 320nm range
-        {88, "L_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0}, // ADF1
-        {89, "L_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0}, // OFF1
-        {90, "L_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0}, // VOR1
-        {91, "L_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0}, // ADF2
-        {92, "L_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0}, // OFF2
-        {93, "L_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0}, // VOR2
+        {75, "L_inHg", "laminar/A333/knob/baro/capt_inHg"},
+        {76, "L_hPa", "laminar/A333/knob/baro/capt_hPa"},                                                                                                                                               // Set to 1 for hPa
+        {77, "L_MODE LS", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 0.0},   // LS mode
+        {78, "L_MODE VOR", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 1.0},  // VOR mode
+        {79, "L_MODE NAV", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 2.0},  // NAV mode
+        {80, "L_MODE ARC", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 3.0},  // ARC mode
+        {81, "L_MODE PLAN", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 4.0}, // PLAN mode
+        {82, "L_RANGE 10", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                                          // 10nm range
+        {83, "L_RANGE 20", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                                          // 20nm range
+        {84, "L_RANGE 40", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                                          // 40nm range
+        {85, "L_RANGE 80", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 3.0},                                                                                                          // 80nm range
+        {86, "L_RANGE 160", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 4.0},                                                                                                         // 160nm range
+        {87, "L_RANGE 320", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 5.0},                                                                                                         // 320nm range
+        {88, "L_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                                // ADF1
+        {89, "L_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                                // OFF1
+        {90, "L_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                                // VOR1
+        {91, "L_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                                // ADF2
+        {92, "L_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                                // OFF2
+        {93, "L_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                                // VOR2
         // Buttons 94-95 reserved
     };
     return buttons;
@@ -308,12 +301,10 @@ const std::vector<FCUEfisButtonDef> &LaminarFCUEfisProfile::buttonDefs() const {
 void LaminarFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     auto datarefManager = Dataref::getInstance();
 
-    // Set managed mode indicators - using validated int datarefs (1 or 0)
-    data.spdManaged = datarefManager->getCached<bool>("AirbusFBW/SPDmanaged");
-    data.hdgManaged = datarefManager->getCached<bool>("AirbusFBW/HDGmanaged");
-    data.altManaged = datarefManager->getCached<bool>("AirbusFBW/ALTmanaged");
+    data.spdManaged = datarefManager->getCached<bool>("sim/cockpit2/autopilot/vnav_speed_window_open") == false;
+    data.hdgManaged = datarefManager->getCached<bool>("laminar/A333/autopilot/hdg_window_open") == false;
+    data.altManaged = datarefManager->getCached<bool>("sim/cockpit2/autopilot/fms_vnav");
 
-    // Speed/Mach mode - using sim/cockpit/autopilot/airspeed_is_mach (int, 1 or 0)
     data.spdMach = datarefManager->getCached<bool>("sim/cockpit/autopilot/airspeed_is_mach");
     float speed = datarefManager->getCached<float>("sim/cockpit2/autopilot/airspeed_dial_kts_mach");
 
@@ -334,7 +325,7 @@ void LaminarFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
 
     // Format FCU heading display - using sim/cockpit/autopilot/heading_mag (float)
     float heading = datarefManager->getCached<float>("sim/cockpit/autopilot/heading_mag");
-    if (heading >= 0 && datarefManager->getCached<bool>("AirbusFBW/HDGdashed") == false) {
+    if (heading >= 0) {
         // Convert 360 to 0 for display
         int hdgDisplay = static_cast<int>(heading) % 360;
         std::stringstream ss;
@@ -358,7 +349,7 @@ void LaminarFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
 
     // Format vertical speed display - using sim/cockpit/autopilot/vertical_velocity (float)
     float vs = datarefManager->getCached<float>("sim/cockpit/autopilot/vertical_velocity");
-    bool vsDashed = datarefManager->getCached<int>("sim/cockpit2/autopilot/speed_status") == 2;
+    bool vsDashed = datarefManager->getCached<int>("laminar/A333/autopilot/vvi_fpa_window_open") == false;
 
     // HDG/TRK mode
     data.hdgTrk = datarefManager->getCached<bool>("sim/cockpit2/autopilot/trk_fpa");
@@ -426,8 +417,8 @@ void LaminarFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     for (int i = 0; i < 2; i++) {
         bool isCaptain = i == 0;
 
-        bool isStd = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroStdCapt" : "AirbusFBW/BaroStdFO");
-        bool isBaroHpa = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroUnitCapt" : "AirbusFBW/BaroUnitFO");
+        bool isStd = datarefManager->getCached<bool>(isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_is_std_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_is_std_copilot");
+        bool isBaroHpa = datarefManager->getCached<bool>(isCaptain ? "laminar/A333/barometer/capt_inHg_hPa_pos" : "laminar/A333/barometer/fo_inHg_hPa_pos");
         float baroValue = datarefManager->getCached<float>(isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
 
         EfisDisplayValue value = {
@@ -456,14 +447,15 @@ void LaminarFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCo
 
     if (phase == xplm_CommandBegin && (button->datarefType == FCUEfisDatarefType::BAROMETER_PILOT || button->datarefType == FCUEfisDatarefType::BAROMETER_FO)) {
         bool isCaptain = button->datarefType == FCUEfisDatarefType::BAROMETER_PILOT;
-        bool isStd = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroStdCapt" : "AirbusFBW/BaroStdFO");
+        bool isStd = datarefManager->getCached<bool>(isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_is_std_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_is_std_copilot");
         if (isStd) {
             return;
         }
 
-        bool isBaroHpa = datarefManager->getCached<bool>(isCaptain ? "AirbusFBW/BaroUnitCapt" : "AirbusFBW/BaroUnitFO");
+        bool isBaroHpa = datarefManager->getCached<bool>(isCaptain ? "laminar/A333/barometer/capt_inHg_hPa_pos" : "laminar/A333/barometer/fo_inHg_hPa_pos");
         const char *datarefName = isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot";
-        float baroValue = datarefManager->getCached<float>(datarefName);
+        float baroValue = datarefManager->getCached<float>(isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
+
         bool increase = button->value > 0;
 
         if (isBaroHpa) {
@@ -475,6 +467,31 @@ void LaminarFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCo
         }
 
         datarefManager->set<float>(datarefName, baroValue);
+    } else if (phase == xplm_CommandBegin && button->datarefType == FCUEfisDatarefType::SET_VALUE_USING_COMMANDS) {
+        std::stringstream ss(button->dataref);
+        std::string item;
+        std::vector<std::string> parts;
+        while (std::getline(ss, item, ',')) {
+            parts.push_back(item);
+        }
+
+        auto posRef = parts[0];
+        auto leftCmd = parts[1];
+        auto rightCmd = parts[2];
+
+        int current = datarefManager->get<int>(posRef.c_str());
+        int target = static_cast<int>(button->value);
+
+        if (current < target) {
+            for (int i = current; i < target; i++) {
+                datarefManager->executeCommand(rightCmd.c_str());
+            }
+        } else if (current > target) {
+            for (int i = current; i > target; i--) {
+                datarefManager->executeCommand(leftCmd.c_str());
+            }
+        }
+        return;
     } else if (phase == xplm_CommandBegin && (button->datarefType == FCUEfisDatarefType::SET_VALUE || button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE)) {
         bool wantsToggle = button->datarefType == FCUEfisDatarefType::TOGGLE_VALUE;
 

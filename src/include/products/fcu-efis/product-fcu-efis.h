@@ -9,6 +9,7 @@
 
 class ProductFCUEfis : public USBDevice {
     private:
+        uint8_t packetNumber = 1;
         FCUEfisAircraftProfile *profile;
         FCUDisplayData displayData;
         int lastUpdateCycle;
@@ -37,13 +38,9 @@ class ProductFCUEfis : public USBDevice {
         void setLedBrightness(FCUEfisLed led, uint8_t brightness);
 
         void initializeDisplays();
+        void clearDisplays();
         void sendFCUDisplay(const std::string &speed, const std::string &heading, const std::string &altitude, const std::string &vs);
         void sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRightSide);
-
-        // Getter for display data (for testing)
-        FCUDisplayData &getDisplayData() {
-            return displayData;
-        }
 };
 
 #endif

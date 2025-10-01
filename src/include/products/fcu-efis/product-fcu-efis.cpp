@@ -103,7 +103,7 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
         profileReady = true;
     } else {
         debug("No profile found for %s.\n", classIdentifier());
-        setLedBrightness(FCUEfisLed::FLAG_GREEN, 255);
+        clearDisplays();
     }
 }
 
@@ -146,12 +146,12 @@ void ProductFCUEfis::disconnect() {
         FCUEfisLed::ATHR_GREEN,
         FCUEfisLed::EXPED_GREEN,
         FCUEfisLed::APPR_GREEN,
-        FCUEfisLed::FLAG_GREEN,
+        FCUEfisLed::OVERALL_GREEN,
         FCUEfisLed::EXPED_BACKLIGHT,
 
         FCUEfisLed::EFISR_BACKLIGHT,
         FCUEfisLed::EFISR_SCREEN_BACKLIGHT,
-        FCUEfisLed::EFISR_FLAG_GREEN,
+        FCUEfisLed::EFISR_OVERALL_GREEN,
         FCUEfisLed::EFISR_FD_GREEN,
         FCUEfisLed::EFISR_LS_GREEN,
         FCUEfisLed::EFISR_CSTR_GREEN,
@@ -162,7 +162,7 @@ void ProductFCUEfis::disconnect() {
 
         FCUEfisLed::EFISL_BACKLIGHT,
         FCUEfisLed::EFISL_SCREEN_BACKLIGHT,
-        FCUEfisLed::EFISL_FLAG_GREEN,
+        FCUEfisLed::EFISL_OVERALL_GREEN,
         FCUEfisLed::EFISL_FD_GREEN,
         FCUEfisLed::EFISL_LS_GREEN,
         FCUEfisLed::EFISL_CSTR_GREEN,
@@ -175,10 +175,7 @@ void ProductFCUEfis::disconnect() {
         setLedBrightness(led, 0);
     }
 
-    sendFCUDisplay("", "", "", "");
-    EfisDisplayValue empty = EfisDisplayValue::Empty();
-    sendEfisDisplayWithFlags(&empty, false);
-    sendEfisDisplayWithFlags(&empty, true);
+    clearDisplays();
 
     if (profile) {
         delete profile;
@@ -255,6 +252,20 @@ void ProductFCUEfis::initializeDisplays() {
     std::vector<uint8_t> initCmd = {
         0xF0, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     writeData(initCmd);
+}
+
+void ProductFCUEfis::clearDisplays() {
+    displayData = {
+        .displayEnabled = false
+    };
+    
+    sendFCUDisplay("", "", "", "");
+    
+    EfisDisplayValue empty = {
+        .displayEnabled = false
+    };
+    sendEfisDisplayWithFlags(&empty, false);
+    sendEfisDisplayWithFlags(&empty, true);
 }
 
 void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string &heading, const std::string &altitude, const std::string &vs) {
@@ -341,12 +352,18 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     if (displayData.spdMach) { // Mach comma
         flagBytes[static_cast<int>(DisplayByteIndex::S1)] |= 0x01;
     }
-
-    static uint8_t packageNumber = 1;
+    
+    if (!displayData.displayEnabled) {
+        std::fill(speedData.begin(), speedData.end(), 0);
+        std::fill(headingData.begin(), headingData.end(), 0);
+        std::fill(altitudeData.begin(), altitudeData.end(), 0);
+        std::fill(vsData.begin(), vsData.end(), 0);
+        std::fill(flagBytes.begin(), flagBytes.end(), 0);
+    }
 
     // First request - send display data
     std::vector<uint8_t> data1 = {
-        0xF0, 0x00, packageNumber, 0x31, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0xF0, 0x00, packetNumber, 0x31, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add speed data (3 bytes)
     data1.push_back(speedData[2]);
@@ -382,7 +399,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
 
     // Second request - commit display data
     std::vector<uint8_t> data2 = {
-        0xF0, 0x00, packageNumber, 0x11, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00};
+        0xF0, 0x00, packetNumber, 0x11, ProductFCUEfis::IdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00};
 
     // Pad to 64 bytes
     while (data2.size() < 64) {
@@ -391,10 +408,9 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
 
     writeData(data2);
 
-    // Increment package number for next call
-    packageNumber++;
-    if (packageNumber == 0) {
-        packageNumber = 1;
+    packetNumber++;
+    if (packetNumber == 0) {
+        packetNumber = 1;
     }
 }
 
@@ -405,14 +421,18 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
         flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)] |= 0x80;
     }
 
-    static uint8_t packageNumber = 1;
-
     // EFIS display protocol
     std::vector<uint8_t> payload = {
-        0xF0, 0x00, packageNumber, 0x1A, static_cast<uint8_t>(isRightSide ? 0x0E : 0x0D), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0xF0, 0x00, packetNumber, 0x1A, static_cast<uint8_t>(isRightSide ? 0x0E : 0x0D), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add barometric data
     auto baroData = encodeStringEfis(4, fixStringLength(data->isStd ? "STD " : data->baro, 4));
+    
+    if (!data->displayEnabled) {
+        std::fill(baroData.begin(), baroData.end(), 0);
+        std::fill(flagBytes.begin(), flagBytes.end(), 0);
+    }
+    
     payload.push_back(baroData[3]);
     payload.push_back(baroData[2] | flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)]);
     payload.push_back(baroData[1]);
@@ -430,9 +450,9 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
     writeData(payload);
 
     // Increment package number for next call
-    packageNumber++;
-    if (packageNumber == 0) {
-        packageNumber = 1;
+    packetNumber++;
+    if (packetNumber == 0) {
+        packetNumber = 1;
     }
 }
 

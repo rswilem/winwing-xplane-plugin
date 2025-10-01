@@ -50,6 +50,7 @@ struct DisplayFlag {
 
 enum FCUEfisDatarefType : unsigned char {
     SET_VALUE = 1,
+    SET_VALUE_USING_COMMANDS,
     TOGGLE_VALUE,
     EXECUTE_CMD_ONCE,
     BAROMETER_PILOT,
@@ -63,6 +64,7 @@ struct FCUEfisButtonDef {
         FCUEfisDatarefType datarefType = FCUEfisDatarefType::EXECUTE_CMD_ONCE;
         double value = 0.0;
 };
+
 enum class FCUEfisLed : int {
     // FCU LEDs
     BACKLIGHT = 0,
@@ -73,13 +75,13 @@ enum class FCUEfisLed : int {
     ATHR_GREEN = 9,
     EXPED_GREEN = 11,
     APPR_GREEN = 13,
-    FLAG_GREEN = 17,
+    OVERALL_GREEN = 17,
     EXPED_BACKLIGHT = 30,
 
     // EFIS Right LEDs (100-199)
     EFISR_BACKLIGHT = 100,
     EFISR_SCREEN_BACKLIGHT = 101,
-    EFISR_FLAG_GREEN = 102,
+    EFISR_OVERALL_GREEN = 102,
     EFISR_FD_GREEN = 103,
     EFISR_LS_GREEN = 104,
     EFISR_CSTR_GREEN = 105,
@@ -91,7 +93,7 @@ enum class FCUEfisLed : int {
     // EFIS Left LEDs (200-299)
     EFISL_BACKLIGHT = 200,
     EFISL_SCREEN_BACKLIGHT = 201,
-    EFISL_FLAG_GREEN = 202,
+    EFISL_OVERALL_GREEN = 202,
     EFISL_FD_GREEN = 203,
     EFISL_LS_GREEN = 204,
     EFISL_CSTR_GREEN = 205,
@@ -103,6 +105,7 @@ enum class FCUEfisLed : int {
 
 struct EfisDisplayValue {
         std::string baro;
+        bool displayEnabled = true;
         bool unitIsInHg;
         bool isStd = false;
         bool showQfe = false;
@@ -120,15 +123,6 @@ struct EfisDisplayValue {
             oss << std::setw(4) << std::setfill(' ') << baroValue;
             baro = oss.str();
         }
-
-        static EfisDisplayValue Empty() {
-            EfisDisplayValue v;
-            v.isStd = true;
-            v.unitIsInHg = false;
-            v.baro = "    ";
-            v.showQfe = false;
-            return v;
-        }
 };
 
 struct FCUDisplayData {
@@ -138,6 +132,8 @@ struct FCUDisplayData {
         std::string verticalSpeed;
         EfisDisplayValue efisLeft;
         EfisDisplayValue efisRight;
+
+        bool displayEnabled = true;
 
         // Display flags
         bool spdMach = false;
