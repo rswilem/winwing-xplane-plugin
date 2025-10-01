@@ -3,8 +3,8 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
-#include "profiles/toliss-fcu-efis-profile.h"
 #include "profiles/laminar-fcu-efis-profile.h"
+#include "profiles/toliss-fcu-efis-profile.h"
 
 #include <algorithm>
 #include <cstring>
@@ -256,14 +256,12 @@ void ProductFCUEfis::initializeDisplays() {
 
 void ProductFCUEfis::clearDisplays() {
     displayData = {
-        .displayEnabled = false
-    };
-    
+        .displayEnabled = false};
+
     sendFCUDisplay("", "", "", "");
-    
+
     EfisDisplayValue empty = {
-        .displayEnabled = false
-    };
+        .displayEnabled = false};
     sendEfisDisplayWithFlags(&empty, false);
     sendEfisDisplayWithFlags(&empty, true);
 }
@@ -352,7 +350,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     if (displayData.spdMach) { // Mach comma
         flagBytes[static_cast<int>(DisplayByteIndex::S1)] |= 0x01;
     }
-    
+
     if (!displayData.displayEnabled) {
         std::fill(speedData.begin(), speedData.end(), 0);
         std::fill(headingData.begin(), headingData.end(), 0);
@@ -427,12 +425,12 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
 
     // Add barometric data
     auto baroData = encodeStringEfis(4, fixStringLength(data->isStd ? "STD " : data->baro, 4));
-    
+
     if (!data->displayEnabled) {
         std::fill(baroData.begin(), baroData.end(), 0);
         std::fill(flagBytes.begin(), flagBytes.end(), 0);
     }
-    
+
     payload.push_back(baroData[3]);
     payload.push_back(baroData[2] | flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)]);
     payload.push_back(baroData[1]);

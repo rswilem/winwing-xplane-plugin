@@ -64,6 +64,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@shred86](https://github.com/shred86) for identifying the Ursa Minor Joystick R.
 - [@Belnadifia](https://github.com/Belnadifia) for the complete PAP3 HID protocol and Zibo profile.
 - [@ColinM9991](https://github.com/ColinM9991) for the FF777 profile.
+- [@tukan68](https://github.com/tukan68) for FF767 profile.
 
 ### Linux udev rules
 
