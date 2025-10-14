@@ -361,23 +361,13 @@ struct FCUEfisWrapper {
     }
     
     @discardableResult
-    func setLed(_ ledId: LEDId, value: UInt8) -> Bool {
+    func setLed(_ ledId: LEDId, _ value: UInt8) -> Bool {
         return c_fcuefis_setLed(handle, Int32(ledId.rawValue), value)
     }
     
     @discardableResult
-    func setLed(_ ledId: LEDId, state: Bool) -> Bool {
-        return setLed(ledId, value: state ? 255 : 0)
-    }
-    
-    @discardableResult
-    func setLed(_ ledId: Int, value: UInt8) -> Bool {
+    func setLed(_ ledId: Int, _ value: UInt8) -> Bool {
         return c_fcuefis_setLed(handle, Int32(ledId), value)
-    }
-    
-    @discardableResult
-    func setLed(_ ledId: Int, state: Bool) -> Bool {
-        return setLed(ledId, value: state ? 255 : 0)
     }
     
     func setLedBrightness(_ ledId: LEDId, brightness: UInt8) {

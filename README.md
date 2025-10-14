@@ -59,7 +59,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 
 - [@Schenlap](https://github.com/schenlap) for the initial python implementation and providing the HID protocol documentation.
 - [@zodiac1214](https://github.com/zodiac1214) for the Ursa Minor Joystick HID protocol.
-- [@CyberGuerro](https://github.com/cyberguerro) for the PFP3N HID protocol.
+- [@CyberGuerro](https://github.com/cyberguerro) for the PFP3N HID protocol and a lot of testing work.
 - [@claaslange](https://github.com/claaslange) for the FCU-EFIS integration.
 - [@shred86](https://github.com/shred86) for identifying the Ursa Minor Joystick R.
 - [@Belnadifia](https://github.com/Belnadifia) for the complete PAP3 HID protocol and Zibo profile.

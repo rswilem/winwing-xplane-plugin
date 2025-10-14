@@ -5,7 +5,6 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
-#include "pap3_menu.h"
 #include "usbcontroller.h"
 
 #include <algorithm>
@@ -53,7 +52,6 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
     XPLMCheckMenuItem(mainMenuId, debugLoggingMenuItemIndex, xplm_Menu_Unchecked);
 
     debug_force("Plugin started (version %s)\n", VERSION);
-    pap3menu::Initialize(mainMenuId);
 
     return 1;
 }

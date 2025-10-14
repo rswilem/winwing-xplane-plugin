@@ -1,9 +1,9 @@
 #include "usbdevice.h"
 
 #include "appstate.h"
-#include "pap3_device.h"
 #include "product-fcu-efis.h"
 #include "product-fmc.h"
+#include "product-pap3-mcp.h"
 #include "product-ursa-minor-joystick.h"
 
 #include <XPLMUtilities.h>
@@ -53,8 +53,8 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBA01: // FCU + EFIS-L + EFIS-R
             return new ProductFCUEfis(hidDevice, vendorId, productId, vendorName, productName);
 
-        case 0xBF0F: // PAP3
-            return new pap3::device::PAP3Device(hidDevice, vendorId, productId, vendorName, productName);
+        case 0xBF0F: // PAP3-MCP
+            return new ProductPAP3MCP(hidDevice, vendorId, productId, vendorName, productName);
 
         default:
             debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X\n", vendorId, productId);

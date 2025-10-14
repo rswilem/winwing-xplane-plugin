@@ -152,7 +152,7 @@ void USBController::enumerateDevices() {
 }
 
 void USBController::monitorDevices() {
-    if (!AppState::getInstance()->pluginInitialized) {
+    if (!AppState::getInstance()->pluginInitialized || shouldStopMonitoring) {
         return;
     }
 

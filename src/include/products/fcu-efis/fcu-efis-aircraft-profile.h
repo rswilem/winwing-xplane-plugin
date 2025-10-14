@@ -48,7 +48,7 @@ struct DisplayFlag {
             name(n), byteIndex(idx), mask(m), defaultValue(def) {}
 };
 
-enum FCUEfisDatarefType : unsigned char {
+enum class FCUEfisDatarefType : unsigned char {
     SET_VALUE = 1,
     SET_VALUE_USING_COMMANDS,
     TOGGLE_VALUE,
@@ -69,13 +69,13 @@ enum class FCUEfisLed : int {
     // FCU LEDs
     BACKLIGHT = 0,
     SCREEN_BACKLIGHT = 1,
+    OVERALL_GREEN = 2,
     LOC_GREEN = 3,
     AP1_GREEN = 5,
     AP2_GREEN = 7,
     ATHR_GREEN = 9,
     EXPED_GREEN = 11,
     APPR_GREEN = 13,
-    OVERALL_GREEN = 17,
     EXPED_BACKLIGHT = 30,
 
     // EFIS Right LEDs (100-199)

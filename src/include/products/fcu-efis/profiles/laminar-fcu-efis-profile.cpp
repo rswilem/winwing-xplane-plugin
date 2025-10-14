@@ -423,8 +423,9 @@ void LaminarFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
 
         EfisDisplayValue value = {
             .baro = "",
+            .unitIsInHg = false,
             .isStd = isStd,
-            .unitIsInHg = false};
+        };
 
         if (!isStd && baroValue > 0) {
             value.setBaro(baroValue, !isBaroHpa);

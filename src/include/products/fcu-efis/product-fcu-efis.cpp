@@ -256,12 +256,14 @@ void ProductFCUEfis::initializeDisplays() {
 
 void ProductFCUEfis::clearDisplays() {
     displayData = {
-        .displayEnabled = false};
+        .displayEnabled = false,
+    };
 
     sendFCUDisplay("", "", "", "");
 
     EfisDisplayValue empty = {
-        .displayEnabled = false};
+        .displayEnabled = false,
+    };
     sendEfisDisplayWithFlags(&empty, false);
     sendEfisDisplayWithFlags(&empty, true);
 }

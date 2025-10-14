@@ -438,56 +438,15 @@ void fcuefis_testDisplay(void* fcuefisHandle, const char* testType) {
     if (!fcuefisHandle || !testType) return;
     auto fcuefis = static_cast<ProductFCUEfis*>(fcuefisHandle);
     
-    std::string test(testType);
-    if (test == "SPEED") {
-        fcuefis->sendFCUDisplay("250", "088", "12000", "1800");
-    } else if (test == "HEADING") {
-        fcuefis->sendFCUDisplay("120", "360", "35000", "2400");
-    } else if (test == "ALTITUDE") {
-        fcuefis->sendFCUDisplay("180", "270", "41000", "0000");
-    } else if (test == "VS") {
-        fcuefis->sendFCUDisplay("160", "180", "25000", "3000");
-    } else if (test == "EFIS_R") {
-        EfisDisplayValue efisData;
-        efisData.baro = "1013";
-        efisData.unitIsInHg = false;
-        efisData.showQfe = false;
-        fcuefis->sendEfisDisplayWithFlags(&efisData, true);
-    } else if (test == "EFIS_L") {
-        EfisDisplayValue efisData;
-        efisData.baro = "1013";
-        efisData.unitIsInHg = false;
-        efisData.showQfe = false;
-        fcuefis->sendEfisDisplayWithFlags(&efisData, false);
-    } else if (test == "MANAGED") {
-        // Test managed mode dots - temporarily set managed flags
-        auto& displayData = fcuefis->getDisplayData();
-        bool oldSpdManaged = displayData.spdManaged;
-        bool oldHdgManaged = displayData.hdgManaged;
-        bool oldAltManaged = displayData.altManaged;
-        
-        // Set all managed flags to true for testing
-        displayData.spdManaged = true;
-        displayData.hdgManaged = true;
-        displayData.altManaged = true;
-        
-        fcuefis->sendFCUDisplay("250", "180", "35000", "1800");
-        
-        // Restore original flags
-        displayData.spdManaged = oldSpdManaged;
-        displayData.hdgManaged = oldHdgManaged;
-        displayData.altManaged = oldAltManaged;
-    } else if (test == "ALL") {
-        fcuefis->sendFCUDisplay("888", "888", "88888", "8888");
-        
-        // Send test pattern to both EFIS displays
-        EfisDisplayValue efisData;
-        efisData.baro = "8888";
-        efisData.unitIsInHg = false;
-        efisData.showQfe = false;
-        fcuefis->sendEfisDisplayWithFlags(&efisData, true);  // Right
-        fcuefis->sendEfisDisplayWithFlags(&efisData, false); // Left
-    }
+    fcuefis->sendFCUDisplay("888", "888", "88888", "8888");
+    
+    // Send test pattern to both EFIS displays
+    EfisDisplayValue efisData;
+    efisData.baro = "8888";
+    efisData.unitIsInHg = false;
+    efisData.showQfe = false;
+    fcuefis->sendEfisDisplayWithFlags(&efisData, true);  // Right
+    fcuefis->sendEfisDisplayWithFlags(&efisData, false); // Left
 }
 
 void fcuefis_efisRightTestDisplay(void* fcuefisHandle, const char* testType) {

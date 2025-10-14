@@ -24,18 +24,24 @@ struct FCUEfisControlView: View {
     @State private var efisLeftSelectedTestDisplay: String = "QNH_1013"
     @State private var efisRightSelectedTestDisplay: String = "QNH_1013"
     
+    private let fcuIndicatorBrightnessId = 2
+    @State private var fcuIndicatorBrightnessValue: Double = 255
     private let fcuIndicatorLEDs: [(id: Int, name: String)] = [
-        (3, "LOC"), (5, "AP1"), (7, "AP2"), (9, "ATHR"), 
-        (11, "EXPED"), (13, "APPR"), (17, "FLAG"), (30, "EXPED YEL")
+        (3, "LOC"), (5, "AP1"), (7, "AP2"), (9, "ATHR"),
+        (11, "EXPED"), (13, "APPR"), (17, "FLAGMEH"), (30, "EXPED YEL")
     ]
     
+    private let efisRightIndicatorBrightnessId = 102
+    @State private var efisRightIndicatorBrightnessValue: Double = 255
     private let efisRightIndicatorLEDs: [(id: Int, name: String)] = [
-        (102, "FLAG"), (103, "FD"), (104, "LS"), (105, "CSTR"),
+        (103, "FD"), (104, "LS"), (105, "CSTR"),
         (106, "WPT"), (107, "VOR/D"), (108, "NDB"), (109, "ARPT")
     ]
     
+    private let efisLeftIndicatorBrightnessId = 202
+    @State private var efisLeftIndicatorBrightnessValue: Double = 255
     private let efisLeftIndicatorLEDs: [(id: Int, name: String)] = [
-        (202, "FLAG"), (203, "FD"), (204, "LS"), (205, "CSTR"),
+        (203, "FD"), (204, "LS"), (205, "CSTR"),
         (206, "WPT"), (207, "VOR/D"), (208, "NDB"), (209, "ARPT")
     ]
     
@@ -212,6 +218,19 @@ struct FCUEfisControlView: View {
                     .font(.subheadline)
                     .fontWeight(.medium)
                 
+                HStack(alignment: .center, spacing: 16) {
+                    Text("Overall brightness")
+                        .frame(width: 120, alignment: .leading)
+                    Slider(value: $fcuIndicatorBrightnessValue, in: 0...255, step: 1)
+                        .frame(width: 140)
+                    Text("\(Int(fcuIndicatorBrightnessValue))")
+                        .frame(width: 36, alignment: .trailing)
+                    Button(action: { setFCULed(fcuIndicatorBrightnessId, Int(fcuIndicatorBrightnessValue)) }) {
+                        Text("Set")
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 8) {
                     ForEach(Array(fcuIndicatorLEDs.enumerated()), id: \.offset) { index, led in
                         Toggle(led.name, isOn: Binding(
@@ -224,7 +243,7 @@ struct FCUEfisControlView: View {
                             set: { newValue in
                                 if led.id < fcuLedStates.count {
                                     fcuLedStates[led.id] = newValue
-                                    setFCULed(led.id, state: newValue)
+                                    setFCULed(led.id, newValue ? 1 : 0)
                                 }
                             }
                         ))
@@ -238,6 +257,19 @@ struct FCUEfisControlView: View {
                 Text("EFIS Right LED Indicators")
                     .font(.subheadline)
                     .fontWeight(.medium)
+                
+                HStack(alignment: .center, spacing: 16) {
+                    Text("Overall brightness")
+                        .frame(width: 120, alignment: .leading)
+                    Slider(value: $efisRightIndicatorBrightnessValue, in: 0...255, step: 1)
+                        .frame(width: 140)
+                    Text("\(Int(efisRightIndicatorBrightnessValue))")
+                        .frame(width: 36, alignment: .trailing)
+                    Button(action: { setEfisRightLed(efisRightIndicatorBrightnessId, Int(efisRightIndicatorBrightnessValue)) }) {
+                        Text("Set")
+                    }
+                    .buttonStyle(.bordered)
+                }
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 8) {
                     ForEach(Array(efisRightIndicatorLEDs.enumerated()), id: \.offset) { index, led in
@@ -253,7 +285,7 @@ struct FCUEfisControlView: View {
                                 let arrayIndex = led.id - 102
                                 if arrayIndex >= 0 && arrayIndex < efisRightLedStates.count {
                                     efisRightLedStates[arrayIndex] = newValue
-                                    setEfisRightLed(led.id, state: newValue)
+                                    setEfisRightLed(led.id, newValue ? 1 : 0)
                                 }
                             }
                         ))
@@ -267,6 +299,19 @@ struct FCUEfisControlView: View {
                 Text("EFIS Left LED Indicators")
                     .font(.subheadline)
                     .fontWeight(.medium)
+                
+                HStack(alignment: .center, spacing: 16) {
+                    Text("Overall brightness")
+                        .frame(width: 120, alignment: .leading)
+                    Slider(value: $efisLeftIndicatorBrightnessValue, in: 0...255, step: 1)
+                        .frame(width: 140)
+                    Text("\(Int(efisLeftIndicatorBrightnessValue))")
+                        .frame(width: 36, alignment: .trailing)
+                    Button(action: { setEfisLeftLed(efisLeftIndicatorBrightnessId, Int(efisLeftIndicatorBrightnessValue)) }) {
+                        Text("Set")
+                    }
+                    .buttonStyle(.bordered)
+                }
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 8) {
                     ForEach(Array(efisLeftIndicatorLEDs.enumerated()), id: \.offset) { index, led in
@@ -282,7 +327,7 @@ struct FCUEfisControlView: View {
                                 let arrayIndex = led.id - 202
                                 if arrayIndex >= 0 && arrayIndex < efisLeftLedStates.count {
                                     efisLeftLedStates[arrayIndex] = newValue
-                                    setEfisLeftLed(led.id, state: newValue)
+                                    setEfisLeftLed(led.id, newValue ? 1 : 0)
                                 }
                             }
                         ))
@@ -361,19 +406,19 @@ struct FCUEfisControlView: View {
         fcuefis.clear()
     }
     
-    private func setFCULed(_ ledId: Int, state: Bool) {
+    private func setFCULed(_ ledId: Int, _ value: Int) {
         guard let fcuefis = device.fcuEfis else { return }
-        fcuefis.setLed(ledId, state: state)
+        fcuefis.setLed(ledId, UInt8(value))
     }
     
-    private func setEfisRightLed(_ ledId: Int, state: Bool) {
+    private func setEfisRightLed(_ ledId: Int, _ value: Int) {
         guard let fcuefis = device.fcuEfis else { return }
-        fcuefis.setLed(ledId, state: state)
+        fcuefis.setLed(ledId, UInt8(value))
     }
     
-    private func setEfisLeftLed(_ ledId: Int, state: Bool) {
+    private func setEfisLeftLed(_ ledId: Int, _ value: Int) {
         guard let fcuefis = device.fcuEfis else { return }
-        fcuefis.setLed(ledId, state: state)
+        fcuefis.setLed(ledId, UInt8(value))
     }
 }
 

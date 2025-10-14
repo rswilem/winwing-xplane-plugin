@@ -62,6 +62,7 @@
     "cstddef": "cpp",
     "functional": "cpp",
     "chrono": "cpp",
-    "condition_variable": "cpp"
+    "condition_variable": "cpp",
+    "cfloat": "cpp"
   }
 }
