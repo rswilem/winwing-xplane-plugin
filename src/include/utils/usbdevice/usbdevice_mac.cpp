@@ -27,8 +27,6 @@ bool USBDevice::connect() {
         }
     } catch (const std::exception &ex) {
         debug("Failed to open HID device: %s\nError: %s\n", productName.c_str(), ex.what());
-        delete[] inputBuffer;
-        inputBuffer = nullptr;
         hidDevice = nullptr;
         return false;
     }
@@ -87,14 +85,13 @@ void USBDevice::disconnect() {
         IOHIDDeviceClose(hidDevice, kIOHIDOptionsTypeNone);
         hidDevice = nullptr;
     }
-
-    if (inputBuffer) {
-        delete[] inputBuffer;
-        inputBuffer = nullptr;
-    }
 }
 
 void USBDevice::forceStateSync() {
+    if (!connected || !hidDevice) {
+        return;
+    }
+    
     CFArrayRef elements = IOHIDDeviceCopyMatchingElements(hidDevice, nullptr, 0);
     for (CFIndex i = 0; i < CFArrayGetCount(elements); i++) {
         IOHIDElementRef element = (IOHIDElementRef) CFArrayGetValueAtIndex(elements, i);
@@ -107,6 +104,7 @@ void USBDevice::forceStateSync() {
             handleHIDValue(value);
         }
     }
+    
     CFRelease(elements);
 }
 

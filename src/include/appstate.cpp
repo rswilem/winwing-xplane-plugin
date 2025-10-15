@@ -71,18 +71,16 @@ float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLas
 
 void AppState::update() {
     auto now = std::chrono::steady_clock::now();
-
-    for (auto it = taskQueue.begin(); it != taskQueue.end();) {
-        if (now >= it->runAt) {
-            if (it->func) {
-                it->func();
-            }
-            it = taskQueue.erase(it);
-        } else {
-            ++it;
+    for (auto &task : taskQueue) {
+        if (now >= task.runAt && task.func) {
+            task.func();
         }
     }
 
+    taskQueue.erase(std::remove_if(taskQueue.begin(), taskQueue.end(), [&](auto &task) {
+        return now >= task.runAt;
+    }), taskQueue.end());
+    
     if (!pluginInitialized) {
         return;
     }

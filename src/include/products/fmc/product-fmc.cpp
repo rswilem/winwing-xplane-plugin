@@ -156,7 +156,11 @@ void ProductFMC::update() {
     }
 
     USBDevice::update();
-    updatePage();
+
+    if (++displayUpdateFrameCounter >= DISPLAY_UPDATE_FRAME_INTERVAL) {
+        displayUpdateFrameCounter = 0;
+        updatePage();
+    }
 }
 
 void ProductFMC::didReceiveData(int reportId, uint8_t *report, int reportLength) {

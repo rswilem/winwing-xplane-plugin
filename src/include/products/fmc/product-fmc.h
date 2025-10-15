@@ -13,6 +13,7 @@ class ProductFMC : public USBDevice {
         FMCAircraftProfile *profile;
         std::vector<std::vector<char>> page;
         int lastUpdateCycle;
+        int displayUpdateFrameCounter = 0;
         std::set<int> pressedButtonIndices;
         uint64_t lastButtonStateLo;
         uint32_t lastButtonStateHi;

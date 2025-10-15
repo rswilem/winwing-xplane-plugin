@@ -196,7 +196,12 @@ void ProductFCUEfis::update() {
     }
 
     USBDevice::update();
-    updateDisplays();
+
+    // Rate limit display updates to ~30Hz, unless forced
+    if (++displayUpdateFrameCounter >= DISPLAY_UPDATE_FRAME_INTERVAL) {
+        displayUpdateFrameCounter = 0;
+        updateDisplays();
+    }
 }
 
 void ProductFCUEfis::updateDisplays() {

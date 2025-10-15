@@ -13,6 +13,7 @@ class ProductFCUEfis : public USBDevice {
         FCUEfisAircraftProfile *profile;
         FCUDisplayData displayData;
         int lastUpdateCycle;
+        int displayUpdateFrameCounter = 0;
         std::set<int> pressedButtonIndices;
         std::map<std::string, int> selectorPositions;
 

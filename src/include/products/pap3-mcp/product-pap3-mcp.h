@@ -14,6 +14,7 @@ class ProductPAP3MCP : public USBDevice {
         PAP3MCPAircraftProfile *profile;
         PAP3MCPDisplayData displayData;
         int lastUpdateCycle;
+        int displayUpdateFrameCounter = 0;
         std::set<int> pressedButtonIndices;
 
         uint64_t lastButtonStateLo = 0;

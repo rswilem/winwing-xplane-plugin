@@ -112,7 +112,11 @@ void ProductPAP3MCP::update() {
     }
 
     USBDevice::update();
-    updateDisplays();
+
+    if (++displayUpdateFrameCounter >= DISPLAY_UPDATE_FRAME_INTERVAL) {
+        displayUpdateFrameCounter = 0;
+        updateDisplays();
+    }
 }
 
 void ProductPAP3MCP::updateDisplays() {
@@ -501,7 +505,7 @@ void ProductPAP3MCP::forceStateSync() {
     pressedButtonIndices.clear();
     lastButtonStateLo = 0;
     lastButtonStateHi = 0;
-    
+
     USBDevice::forceStateSync();
 }
 
