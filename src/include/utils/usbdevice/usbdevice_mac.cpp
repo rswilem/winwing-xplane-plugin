@@ -17,11 +17,6 @@ USBDevice::~USBDevice() {
 
 bool USBDevice::connect() {
     static const size_t kInputReportSize = 65;
-    if (inputBuffer) {
-        delete[] inputBuffer;
-        inputBuffer = nullptr;
-    }
-    inputBuffer = new uint8_t[kInputReportSize];
 
     // Try to open the device - if it's already opened by the manager, this will return kIOReturnExclusiveAccess
     // or succeed if it wasn't opened yet. Either way, we'll have an open device.
@@ -38,37 +33,25 @@ bool USBDevice::connect() {
         return false;
     }
 
-    IOHIDDeviceRegisterInputReportCallback(hidDevice, inputBuffer, kInputReportSize, &USBDevice::InputReportCallback, this);
     if (hidDevice) {
-        IOHIDDeviceScheduleWithRunLoop(hidDevice, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        hidQueue = IOHIDQueueCreate(kCFAllocatorDefault, hidDevice, kInputReportSize, 0);
+
+        CFArrayRef elements = IOHIDDeviceCopyMatchingElements(hidDevice, nullptr, kIOHIDOptionsTypeNone);
+        CFIndex count = CFArrayGetCount(elements);
+        for (CFIndex i = 0; i < count; i++) {
+            IOHIDElementRef elem = (IOHIDElementRef) CFArrayGetValueAtIndex(elements, i);
+            if (IOHIDElementGetType(elem) == kIOHIDElementTypeInput_Button) {
+                IOHIDQueueAddElement(hidQueue, elem);
+            }
+        }
+        CFRelease(elements);
+
+        IOHIDQueueScheduleWithRunLoop(hidQueue, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+        IOHIDQueueStart(hidQueue);
     }
 
     connected = true;
     return true;
-}
-
-void USBDevice::InputReportCallback(void *context, IOReturn result, void *sender, IOHIDReportType type, uint32_t reportID, uint8_t *report, CFIndex reportLength) {
-    if (result != kIOReturnSuccess || !reportLength || !context) {
-        return;
-    }
-
-    auto *self = static_cast<USBDevice *>(context);
-
-    if (!self->connected || self->hidDevice != sender) {
-        return;
-    }
-
-    try {
-        InputEvent event;
-        event.reportId = reportID;
-        event.reportData.assign(report, report + reportLength);
-        event.reportLength = (int) reportLength;
-
-        self->processOnMainThread(event);
-    } catch (const std::system_error &e) {
-        // Silently ignore mutex errors that occur during shutdown
-        return;
-    }
 }
 
 void USBDevice::update() {
@@ -76,15 +59,24 @@ void USBDevice::update() {
         return;
     }
 
-    processQueuedEvents();
+    if (!hidQueue) {
+        return;
+    }
+
+    IOHIDValueRef value = nullptr;
+    while ((value = IOHIDQueueCopyNextValue(hidQueue))) {
+        handleHIDValue(value);
+        CFRelease(value);
+    }
 }
 
 void USBDevice::disconnect() {
-    // Set connected to false first to prevent callback processing
     connected = false;
 
     if (hidDevice) {
-        IOHIDDeviceUnscheduleFromRunLoop(hidDevice, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        IOHIDQueueStop(hidQueue);
+        IOHIDQueueUnscheduleFromRunLoop(hidQueue, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+        hidQueue = nullptr;
 
         // Force run loop to process any remaining queued callbacks to drain them
         // This ensures any pending callbacks are processed while connected=false
@@ -102,6 +94,22 @@ void USBDevice::disconnect() {
     }
 }
 
+void USBDevice::forceStateSync() {
+    CFArrayRef elements = IOHIDDeviceCopyMatchingElements(hidDevice, nullptr, 0);
+    for (CFIndex i = 0; i < CFArrayGetCount(elements); i++) {
+        IOHIDElementRef element = (IOHIDElementRef) CFArrayGetValueAtIndex(elements, i);
+        if (IOHIDElementGetType(element) != kIOHIDElementTypeInput_Button) {
+            continue;
+        }
+
+        IOHIDValueRef value = nullptr;
+        if (IOHIDDeviceGetValue(hidDevice, element, &value) == kIOReturnSuccess) {
+            handleHIDValue(value);
+        }
+    }
+    CFRelease(elements);
+}
+
 bool USBDevice::writeData(std::vector<uint8_t> data) {
     if (!hidDevice || !connected || data.empty()) {
         debug("HID device not open, not connected, or empty data\n");
@@ -115,5 +123,31 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
         return false;
     }
     return true;
+}
+
+void USBDevice::handleHIDValue(IOHIDValueRef value) {
+    IOHIDElementRef element = IOHIDValueGetElement(value);
+    if (!element) {
+        return;
+    }
+
+    uint32_t reportID = IOHIDElementGetReportID(element);
+    if (reportID != 1) {
+        return;
+    }
+
+    uint32_t hardwareButtonIndex = IOHIDElementGetUsage(element);
+    if (hardwareButtonIndex <= 0 || hardwareButtonIndex > UINT16_MAX) {
+        return;
+    }
+
+    CFIndex len = IOHIDValueGetLength(value);
+    if (len == 0) {
+        return;
+    }
+    const uint8_t *data = static_cast<const uint8_t *>(IOHIDValueGetBytePtr(value));
+
+    bool pressed = data[0] == 1;
+    didReceiveButton(hardwareButtonIndex - 1, pressed);
 }
 #endif

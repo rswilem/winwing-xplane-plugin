@@ -70,6 +70,10 @@ void USBDevice::didReceiveData(int reportId, uint8_t *report, int reportLength) 
     // noop, expect override
 }
 
+void USBDevice::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
+    // noop, expect override
+}
+
 void USBDevice::processOnMainThread(const InputEvent &event) {
     std::lock_guard<std::mutex> lock(eventQueueMutex);
     eventQueue.push(event);

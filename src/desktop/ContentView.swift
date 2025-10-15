@@ -108,7 +108,7 @@ struct ContentView: View {
         }
         .onAppear {
             update();
-            refreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            refreshTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
                 update();
             }
         }

@@ -27,6 +27,7 @@ void* getFCUEfisHandle(int deviceIndex);
 bool device_connect(void* deviceHandle);
 void device_disconnect(void* deviceHandle);
 void device_update(void* deviceHandle);
+void device_force_state_sync(void* deviceHandle);
 
 // Joystick functions via handle
 bool joystick_setVibration(void* joystickHandle, uint8_t vibration);

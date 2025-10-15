@@ -38,6 +38,8 @@ func c_device_connect(_ handle: UnsafeRawPointer) -> Bool
 func c_device_disconnect(_ handle: UnsafeRawPointer) -> Void
 @_silgen_name("device_update")
 func c_device_update(_ handle: UnsafeRawPointer) -> Void
+@_silgen_name("device_force_state_sync")
+func c_device_force_state_sync(_ handle: UnsafeRawPointer) -> Void
 
 // Joystick functions via handle
 @_silgen_name("joystick_setVibration")
@@ -146,6 +148,11 @@ struct WinwingDevice: Identifiable, Equatable, Hashable {
     func update() {
         guard let handle = deviceHandle else { return }
         c_device_update(handle)
+    }
+    
+    func forceStateSync() {
+        guard let handle = deviceHandle else { return }
+        c_device_force_state_sync(handle)
     }
     
     // Joystick wrapper methods

@@ -41,6 +41,8 @@ class ProductFMC : public USBDevice {
         void unloadProfile();
         void update() override;
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
+        void didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count = 1) override;
+
         void writeLineToPage(std::vector<std::vector<char>> &page, int line, int pos, const std::string &text, char color, bool fontSmall = false);
         void setFont(std::vector<std::vector<unsigned char>> font);
 

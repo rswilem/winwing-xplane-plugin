@@ -184,6 +184,12 @@ void device_update(void* deviceHandle) {
     device->update();
 }
 
+void device_force_state_sync(void* deviceHandle) {
+    if (!deviceHandle) return;
+    auto device = static_cast<USBDevice*>(deviceHandle);
+    device->forceStateSync();
+}
+
 // Joystick functions via handle
 bool joystick_setVibration(void* joystickHandle, uint8_t vibration) {
     if (!joystickHandle) return false;

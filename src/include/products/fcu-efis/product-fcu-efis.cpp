@@ -202,7 +202,7 @@ void ProductFCUEfis::update() {
 void ProductFCUEfis::updateDisplays() {
     bool shouldUpdate = false;
     auto datarefManager = Dataref::getInstance();
-    for (std::string dataref : profile->displayDatarefs()) {
+    for (const std::string &dataref : profile->displayDatarefs()) {
         if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {
             shouldUpdate = true;
             break;
@@ -483,6 +483,8 @@ void ProductFCUEfis::forceStateSync() {
     pressedButtonIndices.clear();
     lastButtonStateLo = 0;
     lastButtonStateHi = 0;
+
+    USBDevice::forceStateSync();
 }
 
 void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLength) {
@@ -518,8 +520,6 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
     lastButtonStateLo = buttonsLo;
     lastButtonStateHi = buttonsHi;
 
-    const std::vector<FCUEfisButtonDef> &currentButtonDefs = profile->buttonDefs();
-
     // Process FCU buttons (bytes 1-4 = buttons 0-31)
     for (int byteIndex = 1; byteIndex <= 4 && byteIndex < reportLength; byteIndex++) {
         uint8_t buttonByte = report[byteIndex];
@@ -527,35 +527,7 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
         for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
             int hardwareButtonIndex = (byteIndex - 1) * 8 + bitIndex; // Subtract 1 to start at button 0
             bool pressed = (buttonByte & (1 << bitIndex)) != 0;
-            bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
-
-            // Find button definition with matching ID (hardware index matches button ID)
-            const FCUEfisButtonDef *buttonDef = nullptr;
-            for (const auto &btn : currentButtonDefs) {
-                if (btn.id == hardwareButtonIndex) {
-                    buttonDef = &btn;
-                    break;
-                }
-            }
-
-            // Skip if no button definition found or if button has empty dataref
-            if (!buttonDef) {
-                continue;
-            }
-
-            if (buttonDef->dataref.empty()) {
-                continue;
-            }
-
-            if (pressed && !pressedButtonIndexExists) {
-                pressedButtonIndices.insert(hardwareButtonIndex);
-                profile->buttonPressed(buttonDef, xplm_CommandBegin);
-            } else if (pressed && pressedButtonIndexExists) {
-                profile->buttonPressed(buttonDef, xplm_CommandContinue);
-            } else if (!pressed && pressedButtonIndexExists) {
-                pressedButtonIndices.erase(hardwareButtonIndex);
-                profile->buttonPressed(buttonDef, xplm_CommandEnd);
-            }
+            didReceiveButton(hardwareButtonIndex, pressed);
         }
     }
 
@@ -564,36 +536,9 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
         uint8_t buttonByte = report[byteIndex];
 
         for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
-            int hardwareButtonIndex = 32 + (byteIndex - 9) * 8 + bitIndex; // EFIS-R starts at button 32
+            int hardwareButtonIndex = 64 + (byteIndex - 9) * 8 + bitIndex; // EFIS-R starts at button 64
             bool pressed = (buttonByte & (1 << bitIndex)) != 0;
-            bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
-
-            // Find button definition with matching ID
-            const FCUEfisButtonDef *buttonDef = nullptr;
-            for (const auto &btn : currentButtonDefs) {
-                if (btn.id == hardwareButtonIndex) {
-                    buttonDef = &btn;
-                    break;
-                }
-            }
-
-            if (!buttonDef) {
-                continue;
-            }
-
-            if (buttonDef->dataref.empty()) {
-                continue;
-            }
-
-            if (pressed && !pressedButtonIndexExists) {
-                pressedButtonIndices.insert(hardwareButtonIndex);
-                profile->buttonPressed(buttonDef, xplm_CommandBegin);
-            } else if (pressed && pressedButtonIndexExists) {
-                profile->buttonPressed(buttonDef, xplm_CommandContinue);
-            } else if (!pressed && pressedButtonIndexExists) {
-                pressedButtonIndices.erase(hardwareButtonIndex);
-                profile->buttonPressed(buttonDef, xplm_CommandEnd);
-            }
+            didReceiveButton(hardwareButtonIndex, pressed);
         }
     }
 
@@ -602,36 +547,38 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
         uint8_t buttonByte = report[byteIndex];
 
         for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
-            int hardwareButtonIndex = 64 + (byteIndex - 5) * 8 + bitIndex; // EFIS-L starts at button 64
+            int hardwareButtonIndex = 32 + (byteIndex - 5) * 8 + bitIndex; // EFIS-L starts at button 32
             bool pressed = (buttonByte & (1 << bitIndex)) != 0;
-            bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
-
-            // Find button definition with matching ID
-            const FCUEfisButtonDef *buttonDef = nullptr;
-            for (const auto &btn : currentButtonDefs) {
-                if (btn.id == hardwareButtonIndex) {
-                    buttonDef = &btn;
-                    break;
-                }
-            }
-
-            if (!buttonDef) {
-                continue;
-            }
-
-            if (buttonDef->dataref.empty()) {
-                continue;
-            }
-
-            if (pressed && !pressedButtonIndexExists) {
-                pressedButtonIndices.insert(hardwareButtonIndex);
-                profile->buttonPressed(buttonDef, xplm_CommandBegin);
-            } else if (pressed && pressedButtonIndexExists) {
-                profile->buttonPressed(buttonDef, xplm_CommandContinue);
-            } else if (!pressed && pressedButtonIndexExists) {
-                pressedButtonIndices.erase(hardwareButtonIndex);
-                profile->buttonPressed(buttonDef, xplm_CommandEnd);
-            }
+            didReceiveButton(hardwareButtonIndex, pressed);
         }
+    }
+}
+
+void ProductFCUEfis::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
+    const FCUEfisButtonDef *buttonDef = nullptr;
+    for (const auto &btn : profile->buttonDefs()) {
+        if (btn.id == hardwareButtonIndex) {
+            buttonDef = &btn;
+            break;
+        }
+    }
+
+    if (!buttonDef) {
+        return;
+    }
+
+    if (buttonDef->dataref.empty()) {
+        return;
+    }
+
+    bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
+    if (pressed && !pressedButtonIndexExists) {
+        pressedButtonIndices.insert(hardwareButtonIndex);
+        profile->buttonPressed(buttonDef, xplm_CommandBegin);
+    } else if (pressed && pressedButtonIndexExists) {
+        profile->buttonPressed(buttonDef, xplm_CommandContinue);
+    } else if (!pressed && pressedButtonIndexExists) {
+        pressedButtonIndices.erase(hardwareButtonIndex);
+        profile->buttonPressed(buttonDef, xplm_CommandEnd);
     }
 }

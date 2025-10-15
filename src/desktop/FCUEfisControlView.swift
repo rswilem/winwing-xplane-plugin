@@ -26,9 +26,11 @@ struct FCUEfisControlView: View {
     
     private let fcuIndicatorBrightnessId = 2
     @State private var fcuIndicatorBrightnessValue: Double = 255
+    private let fcuExpedYellowIndicatorBrightnessId = 30
+    @State private var fcuExpedYellowIndicatorBrightnessValue: Double = 255
     private let fcuIndicatorLEDs: [(id: Int, name: String)] = [
         (3, "LOC"), (5, "AP1"), (7, "AP2"), (9, "ATHR"),
-        (11, "EXPED"), (13, "APPR"), (17, "FLAGMEH"), (30, "EXPED YEL")
+        (11, "EXPED"), (13, "APPR")
     ]
     
     private let efisRightIndicatorBrightnessId = 102
@@ -51,6 +53,11 @@ struct FCUEfisControlView: View {
                 .font(.headline)
                 .padding(.top, 8)
             
+            Button(action: { device.forceStateSync() }) {
+                Text("Force state sync")
+            }
+            .buttonStyle(.bordered)
+            
             // Backlight Controls
             VStack(alignment: .leading, spacing: 12) {
                 Text("Backlights")
@@ -65,6 +72,19 @@ struct FCUEfisControlView: View {
                     Text("\(Int(backlight))")
                         .frame(width: 36, alignment: .trailing)
                     Button(action: { setBacklight() }) {
+                        Text("Set")
+                    }
+                    .buttonStyle(.bordered)
+                }
+                
+                HStack(alignment: .center, spacing: 16) {
+                    Text("FCU EXPED Backlight")
+                        .frame(width: 120, alignment: .leading)
+                    Slider(value: $fcuExpedYellowIndicatorBrightnessValue, in: 0...255, step: 1)
+                        .frame(width: 140)
+                    Text("\(Int(fcuExpedYellowIndicatorBrightnessValue))")
+                        .frame(width: 36, alignment: .trailing)
+                    Button(action: { setFCULed(fcuExpedYellowIndicatorBrightnessId, Int(fcuExpedYellowIndicatorBrightnessValue)) }) {
                         Text("Set")
                     }
                     .buttonStyle(.bordered)
@@ -343,6 +363,7 @@ struct FCUEfisControlView: View {
     
     private func viewDidAppear() {
         setDatarefFloat("AirbusFBW/PanelBrightnessLevel", 1);
+        setDatarefFloat("AirbusFBW/FCUAvail", 1);
         //setDatarefFloat("AirbusFBW/FCUAltitude", "----");
     }
     

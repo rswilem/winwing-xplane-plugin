@@ -501,6 +501,8 @@ void ProductPAP3MCP::forceStateSync() {
     pressedButtonIndices.clear();
     lastButtonStateLo = 0;
     lastButtonStateHi = 0;
+    
+    USBDevice::forceStateSync();
 }
 
 void ProductPAP3MCP::didReceiveData(int reportId, uint8_t *report, int reportLength) {
@@ -512,11 +514,8 @@ void ProductPAP3MCP::didReceiveData(int reportId, uint8_t *report, int reportLen
         return;
     }
 
-    // Process button state changes
     uint64_t buttonsLo = 0;
     uint32_t buttonsHi = 0;
-
-    // Read button bytes (simplified - adapt based on actual PAP3 protocol)
     for (int i = 0; i < 8 && i + 1 < reportLength; ++i) {
         buttonsLo |= ((uint64_t) report[i + 1]) << (8 * i);
     }
@@ -531,13 +530,7 @@ void ProductPAP3MCP::didReceiveData(int reportId, uint8_t *report, int reportLen
     lastButtonStateLo = buttonsLo;
     lastButtonStateHi = buttonsHi;
 
-    const std::vector<PAP3MCPButtonDef> &currentButtonDefs = profile->buttonDefs();
-
-    // Process maintained switches before regular buttons
-    // These switches need special handling and should not be treated as momentary buttons
     static uint8_t lastSwitchBytes[7] = {0}; // Track switch states for bytes 0x04-0x06
-
-    // Define maintained switch positions: {byteOffset, bitMask}
     static const std::pair<uint8_t, uint8_t> switches[] = {
         {0x04, 0x08}, // FD CAPT (OFF line)
         {0x04, 0x20}, // FD FO (OFF line)
@@ -563,42 +556,17 @@ void ProductPAP3MCP::didReceiveData(int reportId, uint8_t *report, int reportLen
         }
     }
 
-    // Update switch state cache
     for (int i = 4; i <= 6 && i < reportLength; i++) {
         lastSwitchBytes[i] = report[i];
     }
 
-    // Process button changes
     for (int byteIndex = 1; byteIndex <= 6 && byteIndex < reportLength; byteIndex++) {
         uint8_t buttonByte = report[byteIndex];
 
         for (int bitIndex = 0; bitIndex < 8; bitIndex++) {
             int hardwareButtonIndex = (byteIndex - 1) * 8 + bitIndex;
             bool pressed = (buttonByte & (1 << bitIndex)) != 0;
-            bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
-
-            // Find button definition
-            const PAP3MCPButtonDef *buttonDef = nullptr;
-            for (const auto &btn : currentButtonDefs) {
-                if (btn.id == hardwareButtonIndex) {
-                    buttonDef = &btn;
-                    break;
-                }
-            }
-
-            if (!buttonDef || buttonDef->dataref.empty()) {
-                continue;
-            }
-
-            if (pressed && !pressedButtonIndexExists) {
-                pressedButtonIndices.insert(hardwareButtonIndex);
-                profile->buttonPressed(buttonDef, xplm_CommandBegin);
-            } else if (pressed && pressedButtonIndexExists) {
-                profile->buttonPressed(buttonDef, xplm_CommandContinue);
-            } else if (!pressed && pressedButtonIndexExists) {
-                pressedButtonIndices.erase(hardwareButtonIndex);
-                profile->buttonPressed(buttonDef, xplm_CommandEnd);
-            }
+            didReceiveButton(hardwareButtonIndex, pressed);
         }
     }
 
@@ -629,5 +597,30 @@ void ProductPAP3MCP::didReceiveData(int reportId, uint8_t *report, int reportLen
                 lastEncoderPos[i] = currentPos;
             }
         }
+    }
+}
+
+void ProductPAP3MCP::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
+    const PAP3MCPButtonDef *buttonDef = nullptr;
+    for (const auto &btn : profile->buttonDefs()) {
+        if (btn.id == hardwareButtonIndex) {
+            buttonDef = &btn;
+            break;
+        }
+    }
+
+    if (!buttonDef || buttonDef->dataref.empty()) {
+        return;
+    }
+
+    bool pressedButtonIndexExists = pressedButtonIndices.find(hardwareButtonIndex) != pressedButtonIndices.end();
+    if (pressed && !pressedButtonIndexExists) {
+        pressedButtonIndices.insert(hardwareButtonIndex);
+        profile->buttonPressed(buttonDef, xplm_CommandBegin);
+    } else if (pressed && pressedButtonIndexExists) {
+        profile->buttonPressed(buttonDef, xplm_CommandContinue);
+    } else if (!pressed && pressedButtonIndexExists) {
+        pressedButtonIndices.erase(hardwareButtonIndex);
+        profile->buttonPressed(buttonDef, xplm_CommandEnd);
     }
 }

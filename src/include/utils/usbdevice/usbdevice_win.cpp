@@ -99,6 +99,10 @@ void USBDevice::disconnect() {
     }
 }
 
+void USBDevice::forceStateSync() {
+    // noop, code does not use partial data
+}
+
 bool USBDevice::writeData(std::vector<uint8_t> data) {
     if (hidDevice == INVALID_HANDLE_VALUE || !connected || data.empty()) {
         debug_force("HID device not open, not connected, or empty data\n");
