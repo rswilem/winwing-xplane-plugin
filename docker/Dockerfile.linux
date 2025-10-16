@@ -1,0 +1,19 @@
+FROM --platform=linux/amd64 alpine:latest
+
+RUN apk update && \
+    apk add --no-cache \
+    mesa-dev \
+    openssl-dev \
+    bash \
+    gcc \
+    g++ \
+    make \
+    cmake \
+    musl-dev \
+    eudev-dev \
+    zip \
+    linux-headers
+
+WORKDIR /workspace
+
+CMD ["/bin/sh"]
