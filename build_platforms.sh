@@ -56,10 +56,11 @@ fi
 for platform in $PLATFORMS; do
     echo "Building $platform..."
     if [ $platform = "lin" ]; then
-        # Prerequisite: Create a container based on gcc:latest with cmake and libgl1-mesa-dev, libudev-dev, for x86_64 architecture
-        docker run --rm -v $(pwd):/src -w /src gcc-cmake-x86:latest bash -c "\
+        docker build -t gcc-cmake -f ./docker/Dockerfile.linux . && \
+        docker run --user $(id -u):$(id -g) --rm -v $(pwd):/src -w /src gcc-cmake:latest bash -c "\
         cmake -DCMAKE_CXX_FLAGS="-march=x86-64" -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H. && \
-        make -C build/$platform"
+        NPROCS:=$(shell grep -c ^processor /proc/cpuinfo)
+        make -C build/$platform -j$(NUM_PROCESSORS)"
     else
         cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H.
         make -C build/$platform
@@ -109,7 +110,12 @@ fi
 VERSION=$VERSION-$XPLANE_VERSION
 
 rm -f $PROJECT_NAME-$VERSION.zip
-zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME -x "*/.DS_Store" -x "*/__MACOSX/*"
+if [ $platform = "lin" ]; then
+    docker run --user $(id -u):$(id -g) --rm -v $(pwd):/src -w /src gcc-cmake:latest bash -c "\
+    zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME"
+else
+    zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME -x "*/.DS_Store" -x "*/__MACOSX/*"
+fi
 
 mv $PROJECT_NAME dist
 cd ..
