@@ -13,14 +13,19 @@ FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) :
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
 
-    Dataref::getInstance()->monitorExistingDataref<float>("sim/cockpit/electrical/instrument_brightness", [product](float brightness) {
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
-        product->setLedBrightness(FMCLed::BACKLIGHT, target);
+    Dataref::getInstance()->monitorExistingDataref<float>("1-sim/cduL/brt", [product](float brightness) {
+        uint8_t target = Dataref::getInstance()->get<bool>("1-sim/cduL/ok") ? brightness * 255.0f : 0;
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit/electrical/instrument_brightness");
+    Dataref::getInstance()->monitorExistingDataref<float>("1-sim/ckpt/lights/aisle", [product](float brightness) {
+        uint8_t target = Dataref::getInstance()->get<bool>("1-sim/cduL/ok") ? brightness * 255.0f : 0;
+        product->setLedBrightness(FMCLed::BACKLIGHT, target);
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/cduL/ok", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/cduL/brt");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lights/aisle");
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lamps/cduCptAct", [product](bool enabled) {
@@ -32,11 +37,19 @@ FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) :
         product->setLedBrightness(FMCLed::PFP_MSG, enabled ? 1 : 0);
         product->setLedBrightness(FMCLed::MCDU_RDY, enabled ? 1 : 0);
     });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lamps/cduCptOFST", [product](bool enabled) {
+        product->setLedBrightness(FMCLed::PFP_OFST, enabled ? 1 : 0);
+    });
 }
 
 FlightFactor777FMCProfile::~FlightFactor777FMCProfile() {
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/instrument_brightness");
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
+    Dataref::getInstance()->unbind("1-sim/cduL/brt");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lights/aisle");
+    Dataref::getInstance()->unbind("1-sim/cduL/ok");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lamps/cduCptAct");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lamps/cduCptMSG");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lamps/cduCptOFST");
 }
 
 bool FlightFactor777FMCProfile::IsEligible() {
