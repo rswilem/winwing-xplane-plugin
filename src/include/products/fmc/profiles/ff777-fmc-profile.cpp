@@ -24,12 +24,12 @@ FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) :
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lamps/cduCptAct", [product](bool enabled) {
-        product->setLedBrightness(FMCLed::PFP_MSG, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::PFP_EXEC, enabled ? 1 : 0);
         product->setLedBrightness(FMCLed::MCDU_MCDU, enabled ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lamps/cduCptMSG", [product](bool enabled) {
-        product->setLedBrightness(FMCLed::PFP_EXEC, enabled ? 1 : 0);
+        product->setLedBrightness(FMCLed::PFP_MSG, enabled ? 1 : 0);
         product->setLedBrightness(FMCLed::MCDU_RDY, enabled ? 1 : 0);
     });
 }
@@ -72,7 +72,7 @@ const std::vector<FMCButtonDef> &FlightFactor777FMCProfile::buttonDefs() const {
         {std::vector<FMCKey>{FMCKey::PFP_ROUTE, FMCKey::MCDU_SEC_FPLN}, "1-sim/command/cduLrteButton_button"},
         {std::vector<FMCKey>{FMCKey::PFP_DEP_ARR, FMCKey::MCDU_AIRPORT}, "1-sim/command/cduLdepButton_button"},
         {FMCKey::PFP7_ALTN, "1-sim/command/cduLaltnButton_button"},
-        {std::vector<FMCKey>{FMCKey::PFP7_VNAV, FMCKey::MCDU_DATA, FMCKey::PFP4_VNAV}, "1-sim/command/cduLvnavButton_button"},
+        {std::vector<FMCKey>{FMCKey::PFP7_VNAV, FMCKey::MCDU_DATA, FMCKey::PFP4_VNAV, FMCKey::PFP3_CRZ}, "1-sim/command/cduLvnavButton_button"},
         {FMCKey::BRIGHTNESS_DOWN, "1-sim/command/cduLBrtRotary_rotary-"},
         {FMCKey::BRIGHTNESS_UP, "1-sim/command/cduLBrtRotary_rotary+"},
         {std::vector<FMCKey>{FMCKey::PFP_FIX, FMCKey::MCDU_EMPTY_BOTTOM_LEFT}, "1-sim/command/cduLfixButton_button"},
