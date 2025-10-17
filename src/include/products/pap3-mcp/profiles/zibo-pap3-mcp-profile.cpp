@@ -12,8 +12,6 @@
 
 ZiboPAP3MCPProfile::ZiboPAP3MCPProfile(ProductPAP3MCP *product) :
     PAP3MCPAircraftProfile(product) {
-    auto dr = Dataref::getInstance();
-
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/panel_brightness_ratio", [product](std::vector<float> panelBrightness) {
         if (panelBrightness.size() < 1) {
             return;

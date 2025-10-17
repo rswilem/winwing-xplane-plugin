@@ -15,8 +15,8 @@
 #include <chrono>
 #include <XPLMProcessing.h>
 
-ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, unsigned char identifierByte) :
-    USBDevice(hidDevice, vendorId, productId, vendorName, productName), hardwareType(hardwareType), identifierByte(identifierByte) {
+ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, FMCDeviceVariant variant, unsigned char identifierByte) :
+    USBDevice(hidDevice, vendorId, productId, vendorName, productName), hardwareType(hardwareType), identifierByte(identifierByte), deviceVariant(variant) {
     profile = nullptr;
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageBytesPerLine, ' '));
     lastUpdateCycle = 0;
@@ -424,4 +424,9 @@ void ProductFMC::setLedBrightness(FMCLed led, uint8_t brightness) {
     }
 
     writeData({0x02, identifierByte, 0xbb, 0x00, 0x00, 0x03, 0x49, led, brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
+}
+
+void ProductFMC::setDeviceVariant(FMCDeviceVariant variant) {
+    writeData({0x02, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x05, 0xcc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+    writeData({0x02, identifierByte, 0xbb, 0x00, 0x00, 0x08, 0x06, 0xcc, 0x00, 0x00, 0x01, static_cast<uint8_t>(variant), 0xff, 0xff});
 }

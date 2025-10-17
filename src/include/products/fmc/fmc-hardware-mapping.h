@@ -12,6 +12,12 @@ enum class FMCHardwareType : unsigned char {
     HARDWARE_PFP7,
 };
 
+enum class FMCDeviceVariant : unsigned char {
+    VARIANT_CAPTAIN = 0x00,
+    VARIANT_FIRSTOFFICER = 0x02,
+    VARIANT_OBSERVER = 0x01
+};
+
 enum class FMCKey : unsigned char {
     LSK1L = 1,
     LSK1R,

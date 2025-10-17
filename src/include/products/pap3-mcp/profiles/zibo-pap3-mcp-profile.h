@@ -33,10 +33,7 @@ class ZiboPAP3MCPProfile : public PAP3MCPAircraftProfile {
         void buttonPressed(const PAP3MCPButtonDef *button, XPLMCommandPhase phase) override;
         void encoderRotated(const PAP3MCPEncoderDef *encoder, int8_t delta) override;
 
-        // Bank angle switch handler (called from product when byte 0x05 changes)
-        void handleBankAngleSwitch(uint8_t switchByte);
-
-        // Maintained switch handler (called from product for FD, A/T, AP disconnect switches)
+        void handleBankAngleSwitch(uint8_t switchByte) override;
         void handleSwitchChanged(uint8_t byteOffset, uint8_t bitMask, bool state) override;
 };
 

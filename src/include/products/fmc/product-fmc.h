@@ -25,7 +25,7 @@ class ProductFMC : public USBDevice {
         void setProfileForCurrentAircraft();
 
     public:
-        ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, unsigned char identifierByte);
+        ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, FMCDeviceVariant variant, unsigned char identifierByte);
         ~ProductFMC();
 
         static constexpr unsigned int PageLines = 14; // Header + 6 * label + 6 * cont + textbox
@@ -34,6 +34,7 @@ class ProductFMC : public USBDevice {
         static constexpr unsigned int PageBytesPerLine = PageCharsPerLine * PageBytesPerChar;
         FMCHardwareType hardwareType;
         const unsigned char identifierByte;
+        const FMCDeviceVariant deviceVariant;
         bool fontUpdatingEnabled;
 
         const char *classIdentifier() override;
@@ -52,6 +53,8 @@ class ProductFMC : public USBDevice {
 
         void clearDisplay();
         void showBackground(FMCBackgroundVariant variant);
+    
+        void setDeviceVariant(FMCDeviceVariant variant);
 };
 
 #endif

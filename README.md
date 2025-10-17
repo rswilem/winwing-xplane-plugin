@@ -65,6 +65,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@Belnadifia](https://github.com/Belnadifia) for the complete PAP3 HID protocol and Zibo profile.
 - [@ColinM9991](https://github.com/ColinM9991) for the FF777 profile.
 - [@tukan68](https://github.com/tukan68) for FF767 profile.
+- [@verres1](https://github.com/verres1) for enriching the FF777 profile.
 
 ### Linux udev rules
 
