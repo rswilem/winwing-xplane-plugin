@@ -1,6 +1,7 @@
 #include "rotatemd11-fmc-profile.h"
 
 #include "appstate.h"
+#include "config.h"
 #include "dataref.h"
 #include "font.h"
 #include "product-fmc.h"
@@ -10,24 +11,30 @@
 
 RotateMD11FMCProfile::RotateMD11FMCProfile(ProductFMC *product) :
     FMCAircraftProfile(product) {
+    
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
+    product->setFont(Font::GlyphData(FontVariant::FontMD11, product->identifierByte));
 
-    // Monitor brightness control - using generic sim dataref as fallback
-    Dataref::getInstance()->monitorExistingDataref<float>("sim/cockpit/electrical/instrument_brightness", [product](float brightness) {
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
-        product->setLedBrightness(FMCLed::BACKLIGHT, target);
+    Dataref::getInstance()->monitorExistingDataref<float>("Rotate/aircraft/controls/mcdu_1_brt", [product](float brightness) {
+        uint8_t target = Dataref::getInstance()->get<bool>("Rotate/aircraft/systems/elec_dc_batt_bus_pwrd") ? brightness * 255.0f : 0;
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit/electrical/instrument_brightness");
+    Dataref::getInstance()->monitorExistingDataref<float>("Rotate/aircraft/controls/instr_panel_lts", [product](float brightness) {
+        uint8_t target = Dataref::getInstance()->get<bool>("Rotate/aircraft/systems/elec_dc_batt_bus_pwrd") ? brightness * 255.0f : 0;
+        product->setLedBrightness(FMCLed::BACKLIGHT, target);
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("Rotate/aircraft/systems/elec_dc_batt_bus_pwrd", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("Rotate/aircraft/controls/mcdu_1_brt");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("Rotate/aircraft/controls/instr_panel_lts");
     });
 }
 
 RotateMD11FMCProfile::~RotateMD11FMCProfile() {
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/instrument_brightness");
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
+    Dataref::getInstance()->unbind("Rotate/aircraft/controls/mcdu_1_brt");
+    Dataref::getInstance()->unbind("Rotate/aircraft/controls/instr_panel_lts");
+    Dataref::getInstance()->unbind("Rotate/aircraft/systems/elec_dc_batt_bus_pwrd");
 }
 
 bool RotateMD11FMCProfile::IsEligible() {
@@ -102,7 +109,7 @@ const std::vector<FMCButtonDef> &RotateMD11FMCProfile::buttonDefs() const {
         // Navigation Keys
         {std::vector<FMCKey>{FMCKey::MCDU_PAGE_UP, FMCKey::PAGE_PREV}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_UP"},
         {std::vector<FMCKey>{FMCKey::MCDU_PAGE_DOWN, FMCKey::PAGE_NEXT}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_DOWN"},
-        {FMCKey::PAGE_PREV, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_PAGE"},
+        {FMCKey::PFP_EXEC, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_PAGE"},
         
         // Numeric Keys
         {FMCKey::KEY1, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_1"},
@@ -116,7 +123,8 @@ const std::vector<FMCButtonDef> &RotateMD11FMCProfile::buttonDefs() const {
         {FMCKey::KEY9, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_9"},
         {FMCKey::KEY0, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_0"},
         {FMCKey::PERIOD, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_POINT"},
-        {FMCKey::PLUSMINUS, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_MINUS"},
+        {FMCKey::PLUSMINUS, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_PLUS"},
+        {FMCKey::PFP_DEL, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_MINUS"},
         
         // Alpha Keys
         {FMCKey::KEYA, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_A"},
@@ -158,15 +166,17 @@ const std::vector<FMCButtonDef> &RotateMD11FMCProfile::buttonDefs() const {
 
 const std::map<char, FMCTextColor> &RotateMD11FMCProfile::colorMap() const {
     static const std::map<char, FMCTextColor> colMap = {
-        {1, FMCTextColor::COLOR_GREEN},
-        {2, FMCTextColor::COLOR_GREEN},
-        {4, FMCTextColor::COLOR_AMBER},
-        {5, FMCTextColor::COLOR_GREEN},
+        // Numeric style codes from datarefs
+        {1, FMCTextColor::COLOR_GREEN},     // Normal text
+        {2, FMCTextColor::COLOR_GREEN},     // Normal text
+        {4, FMCTextColor::COLOR_AMBER},     // Error/Warning text
+        {5, FMCTextColor::COLOR_GREEN},     // Normal text
+        // Character codes for compatibility
         {'w', FMCTextColor::COLOR_WHITE},
         {'W', FMCTextColor::COLOR_WHITE},
         {'g', FMCTextColor::COLOR_GREEN},
         {'G', FMCTextColor::COLOR_GREEN},
-        {'e', FMCTextColor::COLOR_AMBER},
+        {'e', FMCTextColor::COLOR_AMBER},   // Error/Warning
         {'E', FMCTextColor::COLOR_AMBER},
     };
 
@@ -176,11 +186,28 @@ const std::map<char, FMCTextColor> &RotateMD11FMCProfile::colorMap() const {
 void RotateMD11FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
     switch (character) {
         case '$':
+            // Outlined square character
             buffer->insert(buffer->end(), FMCSpecialCharacter::OUTLINED_SQUARE.begin(), FMCSpecialCharacter::OUTLINED_SQUARE.end());
             break;
-
-        case '*':
+        case '`':
+            // Degrees symbol
             buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
+            break;
+        
+        case 28:  // Left arrow
+            buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_LEFT.begin(), FMCSpecialCharacter::ARROW_LEFT.end());
+            break;
+        
+        case 29:  // Right arrow
+            buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_RIGHT.begin(), FMCSpecialCharacter::ARROW_RIGHT.end());
+            break;
+        
+        case 30:  // Up arrow
+            buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_UP.begin(), FMCSpecialCharacter::ARROW_UP.end());
+            break;
+        
+        case 31:  // Down arrow
+            buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_DOWN.begin(), FMCSpecialCharacter::ARROW_DOWN.end());
             break;
 
         default:
@@ -190,35 +217,108 @@ void RotateMD11FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t ch
 }
 
 void RotateMD11FMCProfile::updatePage(std::vector<std::vector<char>> &page) {
+    // Initialize page with spaces
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
-
+    
     auto datarefManager = Dataref::getInstance();
     
-    // Read all 14 lines (0-13)
+    // Read only the 14 lines that are actually used (0-13)
     for (int line = 0; line < ProductFMC::PageLines; ++line) {
         std::string contentRef = "Rotate/aircraft/controls/cdu_0/mcdu_line_" + std::to_string(line) + "_content";
         std::string styleRef = "Rotate/aircraft/controls/cdu_0/mcdu_line_" + std::to_string(line) + "_style";
         
-        std::string content = datarefManager->getCached<std::string>(contentRef.c_str());
-        std::vector<int> style = datarefManager->getCached<std::vector<int>>(styleRef.c_str());
+        // Read content as string (dataref manager handles the conversion from byte array)
+        std::string contentStr = datarefManager->getCached<std::string>(contentRef.c_str());
         
-        if (content.empty()) {
+        if (contentStr.empty()) {
             continue;
         }
         
-        // Process each character in the line
-        for (int pos = 0; pos < ProductFMC::PageCharsPerLine && pos < content.size(); ++pos) {
-            char c = content[pos];
+        // Replace UTF-8 arrow sequences with single-byte ASCII codes
+        // This allows mapCharacter() to handle them properly
+        std::string processedContent;
+        for (size_t i = 0; i < contentStr.length(); ) {
+            unsigned char c = static_cast<unsigned char>(contentStr[i]);
             
-            if (c == 0x00 || c == 0x20) {
-                continue; // Skip null and space characters
+            // Check for UTF-8 arrow sequences (0xE2 0x86 0x90-93)
+            if (c == 0xE2 && i + 2 < contentStr.length()) {
+                unsigned char byte2 = static_cast<unsigned char>(contentStr[i + 1]);
+                unsigned char byte3 = static_cast<unsigned char>(contentStr[i + 2]);
+                
+                if (byte2 == 0x86) {
+                    // Arrow characters
+                    if (byte3 == 0x90) {
+                        // U+2190 Left arrow (←) -> ASCII 28
+                        processedContent += static_cast<char>(28);
+                        i += 3;
+                    } else if (byte3 == 0x92) {
+                        // U+2192 Right arrow (→) -> ASCII 29
+                        processedContent += static_cast<char>(29);
+                        i += 3;
+                    } else if (byte3 == 0x91) {
+                        // U+2191 Up arrow (↑) -> ASCII 30
+                        processedContent += static_cast<char>(30);
+                        i += 3;
+                    } else if (byte3 == 0x93) {
+                        // U+2193 Down arrow (↓) -> ASCII 31
+                        processedContent += static_cast<char>(31);
+                        i += 3;
+                    } else {
+                        // Unknown 0xE2 0x86 sequence, skip all 3 bytes
+                        i += 3;
+                    }
+                } else {
+                    // Unknown 0xE2 sequence, skip all 3 bytes
+                    i += 3;
+                }
+            } else if (c >= 0x80) {
+                // Other UTF-8 multi-byte sequence - skip it
+                if ((c & 0xE0) == 0xC0) {
+                    i += 2;  // 2-byte sequence
+                } else if ((c & 0xF0) == 0xE0) {
+                    i += 3;  // 3-byte sequence
+                } else if ((c & 0xF8) == 0xF0) {
+                    i += 4;  // 4-byte sequence
+                } else {
+                    i++;
+                }
+            } else {
+                // Regular ASCII character
+                processedContent += c;
+                i++;
+            }
+        }
+        
+        // Read style as vector of integers (one per character)
+        std::vector<int> styleVec = datarefManager->getCached<std::vector<int>>(styleRef.c_str());
+        
+        // Process the cleaned content (UTF-8 arrows replaced with ASCII codes)
+        for (int pos = 0; pos < ProductFMC::PageCharsPerLine && pos < processedContent.length(); ++pos) {
+            unsigned char c = static_cast<unsigned char>(processedContent[pos]);
+            
+            // Skip null characters
+            if (c == 0x00) {
+                continue;
             }
             
-            // Get color from style array, default to green (1) if not available
-            int colorCode = (style.size() > pos) ? style[pos] : 1;
+            // Get color from style array
+            // Python code: COLOR_MAP = {1: "g", 2: "g", 4: "e", 5: "g"}
+            // Default to green (1) if style not available
+            int styleCode = (styleVec.size() > pos) ? styleVec[pos] : 1;
             
-            // Map color code to character for colorMap lookup
-            char color = static_cast<char>(colorCode);
+            // Map style codes to color characters
+            char color;
+            switch (styleCode) {
+                case 4:
+                    color = 'e';  // Amber for errors/warnings
+                    break;
+                case 1:
+                case 2:
+                case 5:
+                default:
+                    color = 'g';  // Green for normal text
+                    break;
+            }
             
             product->writeLineToPage(page, line, pos, std::string(1, c), color, false);
         }
@@ -232,4 +332,3 @@ void RotateMD11FMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommand
     
     Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
 }
-

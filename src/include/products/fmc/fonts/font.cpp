@@ -3,6 +3,7 @@
 #include "737.h"
 #include "airbus.h"
 #include "default.h"
+#include "md11-cdu.h"
 #include "vga_1.h"
 #include "vga_2.h"
 #include "vga_3.h"
@@ -41,6 +42,10 @@ const std::vector<std::vector<unsigned char>> Font::GlyphData(FontVariant varian
 
         case FontVariant::FontVGA4:
             result = fmcFontVGA4;
+            break;
+
+        case FontVariant::FontMD11:
+            result = fmcFontMd11Cdu;
             break;
 
         case FontVariant::Default:

@@ -12,6 +12,7 @@ enum class FontVariant : unsigned char {
     FontVGA2,
     FontVGA3,
     FontVGA4,
+    FontMD11,
 };
 
 class Font {
