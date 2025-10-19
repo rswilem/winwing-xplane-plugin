@@ -243,8 +243,8 @@ std::string RotateMD11FMCProfile::processUTF8Arrows(const std::string &input) {
 std::vector<int> RotateMD11FMCProfile::buildStylePositionMap(const std::string &content, const std::string &style) {
     // Build mapping: content position -> style index
     // Rules: 
-    // - Last word (after 5+ spaces): maps to end of style array, skips 2+ space sequences
-    // - Beginning content: maps to beginning of style array, skips 5+ space sequences
+    // - Last word (after 2+ spaces): maps to end of style array, skips 2+ space sequences
+    // - Beginning content: maps to beginning of style array, skips 2+ space sequences
     
     std::vector<int> positionMap(content.length(), -1);
     
@@ -263,8 +263,8 @@ std::vector<int> RotateMD11FMCProfile::buildStylePositionMap(const std::string &
     
     int lastWordStart = lastWordEnd;
     for (int i = lastWordEnd - 1; i >= 0; i--) {
-        if (i >= 4 && content[i] == ' ' && content[i-1] == ' ' && 
-            content[i-2] == ' ' && content[i-3] == ' ' && content[i-4] == ' ') {
+        // Look for 2+ consecutive spaces to find last word boundary
+        if (i >= 1 && content[i] == ' ' && content[i-1] == ' ') {
             lastWordStart = i + 1;
             break;
         }
@@ -312,7 +312,7 @@ std::vector<int> RotateMD11FMCProfile::buildStylePositionMap(const std::string &
         }
     }
     
-    // Mark 5+ space sequences in beginning content
+    // Mark 2+ space sequences in beginning content
     for (int i = 0; i < lastWordStart; ) {
         if (content[i] == ' ') {
             int spaceCount = 0;
@@ -321,10 +321,10 @@ std::vector<int> RotateMD11FMCProfile::buildStylePositionMap(const std::string &
                 spaceCount++;
                 i++;
             }
-            if (spaceCount < 5) {
-                // These spaces are encoded, will be mapped below
+            if (spaceCount < 2) {
+                // Single space is encoded, will be mapped below
             } else {
-                // Mark as skipped
+                // Mark 2+ spaces as skipped
                 for (int j = spaceStart; j < spaceStart + spaceCount; j++) {
                     if (positionMap[j] < 0) {
                         positionMap[j] = -2;  // -2 means explicitly skipped
