@@ -4,6 +4,10 @@
 #include "fmc-aircraft-profile.h"
 
 class RotateMD11FMCProfile : public FMCAircraftProfile {
+    private:
+        std::string processUTF8Arrows(const std::string &input);
+        std::vector<int> buildStylePositionMap(const std::string &content, const std::string &style);
+
     public:
         RotateMD11FMCProfile(ProductFMC *product);
         virtual ~RotateMD11FMCProfile();
@@ -19,4 +23,3 @@ class RotateMD11FMCProfile : public FMCAircraftProfile {
 };
 
 #endif
-

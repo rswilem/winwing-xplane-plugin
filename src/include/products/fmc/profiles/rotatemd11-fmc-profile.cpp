@@ -97,7 +97,7 @@ const std::vector<FMCButtonDef> &RotateMD11FMCProfile::buttonDefs() const {
         {FMCKey::PROG, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_PROG"},
         {std::vector<FMCKey>{FMCKey::MCDU_PERF, FMCKey::PFP3_N1_LIMIT}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_PERF"},
         {std::vector<FMCKey>{FMCKey::MCDU_INIT, FMCKey::PFP_INIT_REF}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_INIT"},
-        {std::vector<FMCKey>{FMCKey::MCDU_INIT, FMCKey::PFP_INIT_REF}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_REF"},
+        {std::vector<FMCKey>{FMCKey::MCDU_INIT, FMCKey::PFP_HOLD}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_REF"},
         {std::vector<FMCKey>{FMCKey::MCDU_FPLN, FMCKey::PFP_ROUTE}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_FPLN"},
         {std::vector<FMCKey>{FMCKey::MCDU_RAD_NAV, FMCKey::PFP4_NAV_RAD, FMCKey::PFP7_NAV_RAD}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_NAVRAD"},
         {std::vector<FMCKey>{FMCKey::MCDU_SEC_FPLN}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_SECFPLN"},
@@ -110,6 +110,10 @@ const std::vector<FMCButtonDef> &RotateMD11FMCProfile::buttonDefs() const {
         {std::vector<FMCKey>{FMCKey::MCDU_PAGE_UP, FMCKey::PAGE_PREV}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_UP"},
         {std::vector<FMCKey>{FMCKey::MCDU_PAGE_DOWN, FMCKey::PAGE_NEXT}, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_DOWN"},
         {FMCKey::PFP_EXEC, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_PAGE"},
+
+                // Brightness Controls
+        {FMCKey::BRIGHTNESS_UP, "Rotate/aircraft/controls_c/mcdu_1_brt_up"},
+        {FMCKey::BRIGHTNESS_DOWN, "Rotate/aircraft/controls_c/mcdu_1_brt_dn"},
         
         // Numeric Keys
         {FMCKey::KEY1, "Rotate/aircraft/controls_c/cdu_0/mcdu_key_1"},
@@ -167,20 +171,182 @@ const std::vector<FMCButtonDef> &RotateMD11FMCProfile::buttonDefs() const {
 const std::map<char, FMCTextColor> &RotateMD11FMCProfile::colorMap() const {
     static const std::map<char, FMCTextColor> colMap = {
         // Numeric style codes from datarefs
-        {1, FMCTextColor::COLOR_GREEN},     // Normal text
-        {2, FMCTextColor::COLOR_GREEN},     // Normal text
-        {4, FMCTextColor::COLOR_AMBER},     // Error/Warning text
-        {5, FMCTextColor::COLOR_GREEN},     // Normal text
+        {1, FMCTextColor::COLOR_GREEN},
+        {2, FMCTextColor::COLOR_GREEN},
+        {4, FMCTextColor::COLOR_GREEN},
+        {5, FMCTextColor::COLOR_GREEN},
         // Character codes for compatibility
-        {'w', FMCTextColor::COLOR_WHITE},
-        {'W', FMCTextColor::COLOR_WHITE},
+        {'w', FMCTextColor::COLOR_GREEN},
+        {'W', FMCTextColor::COLOR_GREEN},
         {'g', FMCTextColor::COLOR_GREEN},
         {'G', FMCTextColor::COLOR_GREEN},
-        {'e', FMCTextColor::COLOR_AMBER},   // Error/Warning
-        {'E', FMCTextColor::COLOR_AMBER},
+        {'e', FMCTextColor::COLOR_GREEN},
+        {'E', FMCTextColor::COLOR_GREEN},
     };
 
     return colMap;
+}
+
+std::string RotateMD11FMCProfile::processUTF8Arrows(const std::string &input) {
+    // Replace UTF-8 arrow sequences with single-byte ASCII codes
+    std::string output;
+    
+    for (size_t i = 0; i < input.length(); ) {
+        unsigned char c = static_cast<unsigned char>(input[i]);
+        
+        // Check for UTF-8 arrow sequences (0xE2 0x86 0x90-93)
+        if (c == 0xE2 && i + 2 < input.length()) {
+            unsigned char byte2 = static_cast<unsigned char>(input[i + 1]);
+            unsigned char byte3 = static_cast<unsigned char>(input[i + 2]);
+            
+            if (byte2 == 0x86) {
+                // Arrow characters
+                if (byte3 == 0x90) {
+                    output += static_cast<char>(28);  // Left arrow
+                    i += 3;
+                } else if (byte3 == 0x92) {
+                    output += static_cast<char>(29);  // Right arrow
+                    i += 3;
+                } else if (byte3 == 0x91) {
+                    output += static_cast<char>(30);  // Up arrow
+                    i += 3;
+                } else if (byte3 == 0x93) {
+                    output += static_cast<char>(31);  // Down arrow
+                    i += 3;
+                } else {
+                    i += 3;  // Unknown sequence, skip
+                }
+            } else {
+                i += 3;  // Unknown sequence, skip
+            }
+        } else if (c >= 0x80) {
+            // Other UTF-8 multi-byte sequence - skip
+            if ((c & 0xE0) == 0xC0) {
+                i += 2;
+            } else if ((c & 0xF0) == 0xE0) {
+                i += 3;
+            } else if ((c & 0xF8) == 0xF0) {
+                i += 4;
+            } else {
+                i++;
+            }
+        } else {
+            // Regular ASCII character
+            output += c;
+            i++;
+        }
+    }
+    
+    return output;
+}
+
+std::vector<int> RotateMD11FMCProfile::buildStylePositionMap(const std::string &content, const std::string &style) {
+    // Build mapping: content position -> style index
+    // Rules: 
+    // - Last word (after 5+ spaces): maps to end of style array, skips 2+ space sequences
+    // - Beginning content: maps to beginning of style array, skips 5+ space sequences
+    
+    std::vector<int> positionMap(content.length(), -1);
+    
+    // Find last word boundaries
+    int lastWordEnd = content.length();
+    int trailingSpaces = 0;
+    
+    for (int i = content.length() - 1; i >= 0; i--) {
+        if (content[i] == ' ' || content[i] == 0x00) {
+            trailingSpaces++;
+        } else {
+            lastWordEnd = (trailingSpaces == 1) ? i + 2 : i + 1;
+            break;
+        }
+    }
+    
+    int lastWordStart = lastWordEnd;
+    for (int i = lastWordEnd - 1; i >= 0; i--) {
+        if (i >= 4 && content[i] == ' ' && content[i-1] == ' ' && 
+            content[i-2] == ' ' && content[i-3] == ' ' && content[i-4] == ' ') {
+            lastWordStart = i + 1;
+            break;
+        }
+        if (i == 0) {
+            lastWordStart = 0;
+            break;
+        }
+    }
+    
+    // Count style values needed for last word (skip 2+ space sequences)
+    int lastWordStyleCount = 0;
+    for (int i = lastWordStart; i < lastWordEnd; ) {
+        if (content[i] == ' ') {
+            int spaceCount = 0;
+            while (i < lastWordEnd && content[i] == ' ') {
+                spaceCount++;
+                i++;
+            }
+            if (spaceCount < 2) {
+                lastWordStyleCount += spaceCount;
+            }
+        } else {
+            lastWordStyleCount++;
+            i++;
+        }
+    }
+    
+    // Map last word to end of style array
+    if (lastWordStyleCount > 0 && lastWordStyleCount <= style.size()) {
+        int styleIdx = style.size() - lastWordStyleCount;
+        
+        for (int pos = lastWordStart; pos < lastWordEnd; ++pos) {
+            if (content[pos] == ' ') {
+                // Count consecutive spaces at this position
+                int spaceCount = 1;
+                for (int j = pos + 1; j < lastWordEnd && content[j] == ' '; j++) spaceCount++;
+                for (int j = pos - 1; j >= lastWordStart && content[j] == ' '; j--) spaceCount++;
+                
+                if (spaceCount < 2) {
+                    positionMap[pos] = styleIdx++;
+                }
+            } else {
+                positionMap[pos] = styleIdx++;
+            }
+        }
+    }
+    
+    // Mark 5+ space sequences in beginning content
+    for (int i = 0; i < lastWordStart; ) {
+        if (content[i] == ' ') {
+            int spaceCount = 0;
+            int spaceStart = i;
+            while (i < lastWordStart && content[i] == ' ') {
+                spaceCount++;
+                i++;
+            }
+            if (spaceCount < 5) {
+                // These spaces are encoded, will be mapped below
+            } else {
+                // Mark as skipped
+                for (int j = spaceStart; j < spaceStart + spaceCount; j++) {
+                    if (positionMap[j] < 0) {
+                        positionMap[j] = -2;  // -2 means explicitly skipped
+                    }
+                }
+            }
+        } else {
+            i++;
+        }
+    }
+    
+    // Map beginning content to beginning of style array
+    int styleIdx = 0;
+    for (int pos = 0; pos < lastWordStart; ++pos) {
+        if (positionMap[pos] == -1) {  // Not yet mapped
+            positionMap[pos] = styleIdx++;
+        } else if (positionMap[pos] == -2) {
+            positionMap[pos] = -1;  // Restore to "no mapping"
+        }
+    }
+    
+    return positionMap;
 }
 
 void RotateMD11FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) {
@@ -194,19 +360,19 @@ void RotateMD11FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t ch
             buffer->insert(buffer->end(), FMCSpecialCharacter::DEGREES.begin(), FMCSpecialCharacter::DEGREES.end());
             break;
         
-        case 28:  // Left arrow
+        case 28:  // Left arrow placeholder (will be replaced from UTF-8)
             buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_LEFT.begin(), FMCSpecialCharacter::ARROW_LEFT.end());
             break;
         
-        case 29:  // Right arrow
+        case 29:  // Right arrow placeholder (will be replaced from UTF-8)
             buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_RIGHT.begin(), FMCSpecialCharacter::ARROW_RIGHT.end());
             break;
         
-        case 30:  // Up arrow
+        case 30:  // Up arrow (ASCII 30 = 0x1E)
             buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_UP.begin(), FMCSpecialCharacter::ARROW_UP.end());
             break;
         
-        case 31:  // Down arrow
+        case 31:  // Down arrow (ASCII 31 = 0x1F)
             buffer->insert(buffer->end(), FMCSpecialCharacter::ARROW_DOWN.begin(), FMCSpecialCharacter::ARROW_DOWN.end());
             break;
 
@@ -217,110 +383,43 @@ void RotateMD11FMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t ch
 }
 
 void RotateMD11FMCProfile::updatePage(std::vector<std::vector<char>> &page) {
-    // Initialize page with spaces
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
     
     auto datarefManager = Dataref::getInstance();
     
-    // Read only the 14 lines that are actually used (0-13)
     for (int line = 0; line < ProductFMC::PageLines; ++line) {
         std::string contentRef = "Rotate/aircraft/controls/cdu_0/mcdu_line_" + std::to_string(line) + "_content";
         std::string styleRef = "Rotate/aircraft/controls/cdu_0/mcdu_line_" + std::to_string(line) + "_style";
         
-        // Read content as string (dataref manager handles the conversion from byte array)
         std::string contentStr = datarefManager->getCached<std::string>(contentRef.c_str());
-        
         if (contentStr.empty()) {
             continue;
         }
         
-        // Replace UTF-8 arrow sequences with single-byte ASCII codes
-        // This allows mapCharacter() to handle them properly
-        std::string processedContent;
-        for (size_t i = 0; i < contentStr.length(); ) {
-            unsigned char c = static_cast<unsigned char>(contentStr[i]);
-            
-            // Check for UTF-8 arrow sequences (0xE2 0x86 0x90-93)
-            if (c == 0xE2 && i + 2 < contentStr.length()) {
-                unsigned char byte2 = static_cast<unsigned char>(contentStr[i + 1]);
-                unsigned char byte3 = static_cast<unsigned char>(contentStr[i + 2]);
-                
-                if (byte2 == 0x86) {
-                    // Arrow characters
-                    if (byte3 == 0x90) {
-                        // U+2190 Left arrow (←) -> ASCII 28
-                        processedContent += static_cast<char>(28);
-                        i += 3;
-                    } else if (byte3 == 0x92) {
-                        // U+2192 Right arrow (→) -> ASCII 29
-                        processedContent += static_cast<char>(29);
-                        i += 3;
-                    } else if (byte3 == 0x91) {
-                        // U+2191 Up arrow (↑) -> ASCII 30
-                        processedContent += static_cast<char>(30);
-                        i += 3;
-                    } else if (byte3 == 0x93) {
-                        // U+2193 Down arrow (↓) -> ASCII 31
-                        processedContent += static_cast<char>(31);
-                        i += 3;
-                    } else {
-                        // Unknown 0xE2 0x86 sequence, skip all 3 bytes
-                        i += 3;
-                    }
-                } else {
-                    // Unknown 0xE2 sequence, skip all 3 bytes
-                    i += 3;
-                }
-            } else if (c >= 0x80) {
-                // Other UTF-8 multi-byte sequence - skip it
-                if ((c & 0xE0) == 0xC0) {
-                    i += 2;  // 2-byte sequence
-                } else if ((c & 0xF0) == 0xE0) {
-                    i += 3;  // 3-byte sequence
-                } else if ((c & 0xF8) == 0xF0) {
-                    i += 4;  // 4-byte sequence
-                } else {
-                    i++;
-                }
-            } else {
-                // Regular ASCII character
-                processedContent += c;
-                i++;
-            }
-        }
+        // Convert UTF-8 arrows to ASCII codes
+        std::string processedContent = processUTF8Arrows(contentStr);
         
-        // Read style as vector of integers (one per character)
-        std::vector<int> styleVec = datarefManager->getCached<std::vector<int>>(styleRef.c_str());
+        // Read style and build position mapping
+        std::string styleStr = datarefManager->getCached<std::string>(styleRef.c_str());
+        std::vector<int> positionToStyleIndex = buildStylePositionMap(processedContent, styleStr);
         
-        // Process the cleaned content (UTF-8 arrows replaced with ASCII codes)
+        // Render all characters with their mapped styles
         for (int pos = 0; pos < ProductFMC::PageCharsPerLine && pos < processedContent.length(); ++pos) {
             unsigned char c = static_cast<unsigned char>(processedContent[pos]);
             
-            // Skip null characters
             if (c == 0x00) {
                 continue;
             }
             
-            // Get color from style array
-            // Python code: COLOR_MAP = {1: "g", 2: "g", 4: "e", 5: "g"}
-            // Default to green (1) if style not available
-            int styleCode = (styleVec.size() > pos) ? styleVec[pos] : 1;
-            
-            // Map style codes to color characters
-            char color;
-            switch (styleCode) {
-                case 4:
-                    color = 'e';  // Amber for errors/warnings
-                    break;
-                case 1:
-                case 2:
-                case 5:
-                default:
-                    color = 'g';  // Green for normal text
-                    break;
+            // Get style code from mapping
+            int styleCode = 4;  // Default small font
+            if (positionToStyleIndex[pos] >= 0 && positionToStyleIndex[pos] < styleStr.size()) {
+                styleCode = (unsigned char)styleStr[positionToStyleIndex[pos]];
             }
             
-            product->writeLineToPage(page, line, pos, std::string(1, c), color, false);
+            bool fontSmall = (styleCode == 4);
+            
+            product->writeLineToPage(page, line, pos, std::string(1, c), 'g', fontSmall);
         }
     }
 }
