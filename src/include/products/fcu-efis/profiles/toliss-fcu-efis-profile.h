@@ -8,6 +8,9 @@
 #include <vector>
 
 class TolissFCUEfisProfile : public FCUEfisAircraftProfile {
+    private:
+        bool isAnnunTest();
+    
     public:
         TolissFCUEfisProfile(ProductFCUEfis *product);
         ~TolissFCUEfisProfile();

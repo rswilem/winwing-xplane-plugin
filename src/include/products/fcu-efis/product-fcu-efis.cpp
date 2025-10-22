@@ -223,17 +223,7 @@ void ProductFCUEfis::updateDisplays() {
     profile->updateDisplayData(displayData);
 
     // Update FCU display if data changed
-    if (displayData.speed != oldDisplayData.speed ||
-        displayData.heading != oldDisplayData.heading ||
-        displayData.altitude != oldDisplayData.altitude ||
-        displayData.verticalSpeed != oldDisplayData.verticalSpeed ||
-        displayData.spdMach != oldDisplayData.spdMach ||
-        displayData.hdgTrk != oldDisplayData.hdgTrk ||
-        displayData.altManaged != oldDisplayData.altManaged ||
-        displayData.spdManaged != oldDisplayData.spdManaged ||
-        displayData.hdgManaged != oldDisplayData.hdgManaged ||
-        displayData.vsMode != oldDisplayData.vsMode ||
-        displayData.fpaMode != oldDisplayData.fpaMode) {
+    if (displayData != oldDisplayData) {
         sendFCUDisplay(displayData.speed, displayData.heading, displayData.altitude, displayData.verticalSpeed);
     }
 
@@ -358,12 +348,12 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
         flagBytes[static_cast<int>(DisplayByteIndex::S1)] |= 0x01;
     }
 
-    if (!displayData.displayEnabled) {
-        std::fill(speedData.begin(), speedData.end(), 0);
-        std::fill(headingData.begin(), headingData.end(), 0);
-        std::fill(altitudeData.begin(), altitudeData.end(), 0);
-        std::fill(vsData.begin(), vsData.end(), 0);
-        std::fill(flagBytes.begin(), flagBytes.end(), 0);
+    if (!displayData.displayEnabled || displayData.displayTest) {
+        std::fill(speedData.begin(), speedData.end(), displayData.displayTest ? 0xFF : 0);
+        std::fill(headingData.begin(), headingData.end(), displayData.displayTest ? 0xFF : 0);
+        std::fill(altitudeData.begin(), altitudeData.end(), displayData.displayTest ? 0xFF : 0);
+        std::fill(vsData.begin(), vsData.end(), displayData.displayTest ? 0xFF : 0);
+        std::fill(flagBytes.begin(), flagBytes.end(), displayData.displayTest ? 0xFF : 0);
     }
 
     // First request - send display data
@@ -399,7 +389,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     while (data1.size() < 64) {
         data1.push_back(0x00);
     }
-
+    
     writeData(data1);
 
     // Second request - commit display data
@@ -433,9 +423,9 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
     // Add barometric data
     auto baroData = encodeStringEfis(4, fixStringLength(data->isStd ? "STD " : data->baro, 4));
 
-    if (!data->displayEnabled) {
-        std::fill(baroData.begin(), baroData.end(), 0);
-        std::fill(flagBytes.begin(), flagBytes.end(), 0);
+    if (!data->displayEnabled || data->displayTest) {
+        std::fill(baroData.begin(), baroData.end(), data->displayTest ? 0xFF : 0);
+        std::fill(flagBytes.begin(), flagBytes.end(), data->displayTest ? 0xFF : 0);
     }
 
     payload.push_back(baroData[3]);

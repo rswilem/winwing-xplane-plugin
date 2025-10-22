@@ -106,12 +106,13 @@ enum class FCUEfisLed : int {
 struct EfisDisplayValue {
         std::string baro;
         bool displayEnabled = true;
+        bool displayTest = false;
         bool unitIsInHg;
         bool isStd = false;
         bool showQfe = false;
 
         bool operator==(const EfisDisplayValue &other) const {
-            return showQfe == other.showQfe && baro == other.baro && unitIsInHg == other.unitIsInHg && isStd == other.isStd;
+            return showQfe == other.showQfe && baro == other.baro && unitIsInHg == other.unitIsInHg && isStd == other.isStd && displayEnabled == other.displayEnabled && displayTest == other.displayTest;
         }
 
         void setBaro(float inHgValue, bool isBaroInHg) {
@@ -134,6 +135,7 @@ struct FCUDisplayData {
         EfisDisplayValue efisRight;
 
         bool displayEnabled = true;
+        bool displayTest = false;
 
         // Display flags
         bool spdMach = false;
@@ -156,6 +158,23 @@ struct FCUDisplayData {
         bool fpaIndication = false;
         bool fpaComma = false;
         bool vsSign = true; // true = positive (up), false = negative (down)
+    
+        bool operator==(const FCUDisplayData &other) const {
+            return
+                speed == other.speed &&
+                heading == other.heading &&
+                altitude == other.altitude &&
+                verticalSpeed == other.verticalSpeed &&
+                spdMach == other.spdMach &&
+                hdgTrk == other.hdgTrk &&
+                altManaged == other.altManaged &&
+                spdManaged == other.spdManaged &&
+                hdgManaged == other.hdgManaged &&
+                vsMode == other.vsMode &&
+                fpaMode == other.fpaMode &&
+                displayEnabled == other.displayEnabled &&
+                displayTest == other.displayTest;
+        }
 };
 
 class ProductFCUEfis;

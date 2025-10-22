@@ -28,6 +28,8 @@
 		F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */; };
 		F67110DD2E5AF429008D493B /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67110DC2E5AF429008D493B /* font.cpp */; };
 		F67110DE2E5AF429008D493B /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67110DC2E5AF429008D493B /* font.cpp */; };
+		F671B5DE2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F671B5DD2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp */; };
+		F671B5DF2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F671B5DD2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp */; };
 		F67961952E31357E008031F1 /* usbdevice_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961942E31357E008031F1 /* usbdevice_lin.cpp */; };
 		F67961962E31357E008031F1 /* usbdevice_lin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67961942E31357E008031F1 /* usbdevice_lin.cpp */; };
 		F67FE8142E895BAC00C4243C /* laminar-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F67FE8132E895BAC00C4243C /* laminar-fcu-efis-profile.cpp */; };
@@ -105,6 +107,8 @@
 		F64BE3E62E1BF625003C1B73 /* usbdevice_win.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_win.cpp; sourceTree = "<group>"; };
 		F66F91662D0332F600F84283 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F67110DC2E5AF429008D493B /* font.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = font.cpp; sourceTree = "<group>"; };
+		F671B5DC2EA96BBE00141EF2 /* rotatemd11-fmc-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "rotatemd11-fmc-profile.h"; sourceTree = "<group>"; };
+		F671B5DD2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rotatemd11-fmc-profile.cpp"; sourceTree = "<group>"; };
 		F67961942E31357E008031F1 /* usbdevice_lin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_lin.cpp; sourceTree = "<group>"; };
 		F67FE8122E895BAC00C4243C /* laminar-fcu-efis-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "laminar-fcu-efis-profile.h"; sourceTree = "<group>"; };
 		F67FE8132E895BAC00C4243C /* laminar-fcu-efis-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "laminar-fcu-efis-profile.cpp"; sourceTree = "<group>"; };
@@ -313,6 +317,8 @@
 				F6A149292E4F03A400FB8395 /* toliss-fmc-profile.cpp */,
 				F68880892E523DE900B10AFA /* xcrafts-fmc-profile.h */,
 				F688808A2E523DE900B10AFA /* xcrafts-fmc-profile.cpp */,
+				F671B5DC2EA96BBE00141EF2 /* rotatemd11-fmc-profile.h */,
+				F671B5DD2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp */,
 			);
 			path = profiles;
 			sourceTree = "<group>";
@@ -515,6 +521,7 @@
 				F688808B2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */,
 				F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
+				F671B5DF2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp in Sources */,
 				F64BE3EA2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
 				F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */,
 				F6A1492F2E4F03A400FB8395 /* product-fmc.cpp in Sources */,
@@ -559,6 +566,7 @@
 				F69FF22D2E1D13CB00F9D2D9 /* GenericDeviceView.swift in Sources */,
 				F69FF22E2E1D13CB00F9D2D9 /* DeviceModel.swift in Sources */,
 				F69FF22F2E1D13CB00F9D2D9 /* JoystickControlView.swift in Sources */,
+				F671B5DE2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp in Sources */,
 				F67110DD2E5AF429008D493B /* font.cpp in Sources */,
 				F6C6E0302E8D5DAA00558F46 /* product-pap3-mcp.cpp in Sources */,
 				F6C6E0312E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp in Sources */,
