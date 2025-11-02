@@ -104,9 +104,9 @@ enum class FCUEfisLed : int {
 };
 
 struct EfisDisplayValue {
-        std::string baro;
         bool displayEnabled = true;
         bool displayTest = false;
+        std::string baro;
         bool unitIsInHg;
         bool isStd = false;
         bool showQfe = false;
@@ -158,22 +158,21 @@ struct FCUDisplayData {
         bool fpaIndication = false;
         bool fpaComma = false;
         bool vsSign = true; // true = positive (up), false = negative (down)
-    
+
         bool operator==(const FCUDisplayData &other) const {
-            return
-                speed == other.speed &&
-                heading == other.heading &&
-                altitude == other.altitude &&
-                verticalSpeed == other.verticalSpeed &&
-                spdMach == other.spdMach &&
-                hdgTrk == other.hdgTrk &&
-                altManaged == other.altManaged &&
-                spdManaged == other.spdManaged &&
-                hdgManaged == other.hdgManaged &&
-                vsMode == other.vsMode &&
-                fpaMode == other.fpaMode &&
-                displayEnabled == other.displayEnabled &&
-                displayTest == other.displayTest;
+            return speed == other.speed &&
+                   heading == other.heading &&
+                   altitude == other.altitude &&
+                   verticalSpeed == other.verticalSpeed &&
+                   spdMach == other.spdMach &&
+                   hdgTrk == other.hdgTrk &&
+                   altManaged == other.altManaged &&
+                   spdManaged == other.spdManaged &&
+                   hdgManaged == other.hdgManaged &&
+                   vsMode == other.vsMode &&
+                   fpaMode == other.fpaMode &&
+                   displayEnabled == other.displayEnabled &&
+                   displayTest == other.displayTest;
         }
 };
 

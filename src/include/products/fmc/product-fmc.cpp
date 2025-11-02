@@ -234,6 +234,11 @@ void ProductFMC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, ui
     }
 
     FMCKey key = FMCHardwareMapping::ButtonIdentifierForIndex(hardwareType, hardwareButtonIndex);
+    if (key == FMCKey::INVALID_UNKNOWN) {
+        debug_force("Received unknown key from hardwareType %i - hardwareButtonIndex: %i\n", (int) hardwareType, hardwareButtonIndex);
+        return;
+    }
+
     const std::vector<FMCButtonDef> &currentButtonDefs = profile->buttonDefs();
     auto it = std::find_if(currentButtonDefs.begin(), currentButtonDefs.end(), [&](const FMCButtonDef &def) {
         return std::visit([&](auto &&k) {

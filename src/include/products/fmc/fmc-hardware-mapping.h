@@ -19,6 +19,7 @@ enum class FMCDeviceVariant : unsigned char {
 };
 
 enum class FMCKey : unsigned char {
+    INVALID_UNKNOWN = 0,
     LSK1L = 1,
     LSK1R,
     LSK2L,
@@ -141,7 +142,7 @@ class FMCHardwareMapping {
                 case FMCHardwareType::HARDWARE_PFP7:
                     return getPFP7ButtonForIndex(index);
                 default:
-                    return FMCKey::KEY0;
+                    return FMCKey::INVALID_UNKNOWN;
             }
         }
 
@@ -298,7 +299,7 @@ class FMCHardwareMapping {
                     return FMCKey::CLR;
             }
 
-            return FMCKey::KEY0;
+            return FMCKey::INVALID_UNKNOWN;
         }
 
         static FMCKey getPFP3NButtonForIndex(int index) {
@@ -447,7 +448,7 @@ class FMCHardwareMapping {
                     return FMCKey::CLR;
             }
 
-            return FMCKey::KEY0;
+            return FMCKey::INVALID_UNKNOWN;
         }
 
         static FMCKey getPFP4ButtonForIndex(int index) {
@@ -596,7 +597,7 @@ class FMCHardwareMapping {
                     return FMCKey::CLR;
             }
 
-            return FMCKey::KEY0;
+            return FMCKey::INVALID_UNKNOWN;
         }
 
         static FMCKey getPFP7ButtonForIndex(int index) {
@@ -745,7 +746,7 @@ class FMCHardwareMapping {
                     return FMCKey::CLR;
             }
 
-            return FMCKey::KEY0;
+            return FMCKey::INVALID_UNKNOWN;
         }
 };
 
