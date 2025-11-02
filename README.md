@@ -41,7 +41,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 | **PFP 3N**                  | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
 | **PFP 4**                   | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
 | **PFP 7**                   | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
-| **Panel of Autopilot 3**    | 🔴          | 🔴           | 🔴               | 🟢       | 🔴       | 🔴         | 🔴      |
+| **PAP3 / PAP3 Mag**         | 🔴          | 🔴           | 🔴               | 🟢       | 🔴       | 🔴         | 🔴      |
 | **FCU and EFIS L+R**        | 🟢          | 🟢           | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 
 #### Legend
