@@ -22,7 +22,7 @@ ZiboPAP3MCPProfile::ZiboPAP3MCPProfile(ProductPAP3MCP *product) :
         float ratio = std::clamp(hasMainBus ? panelBrightness[0] : 0.5f, 0.0f, 1.0f);
         uint8_t brightness = hasPower ? static_cast<uint8_t>(ratio * 255.0f) : 0;
         product->setLedBrightness(PAP3MCPLed::BACKLIGHT, brightness);
-        product->setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, brightness);
+        product->setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, hasPower && hasMainBus ? 128 : 0);
 
         product->forceStateSync();
     });
@@ -201,7 +201,6 @@ const std::vector<PAP3MCPEncoderDef> &ZiboPAP3MCPProfile::encoderDefs() const {
 
 void ZiboPAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
     data.showLabels = false; // Zibo MCP does not have labels on the display
-    // Use getCached() for performance - cache is updated by Dataref::update() every frame
     data.speed = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/mcp_speed_dial_kts_mach");
     data.heading = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/mcp_hdg_dial");
     data.altitude = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/mcp_alt_dial");
