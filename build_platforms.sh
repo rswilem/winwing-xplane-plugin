@@ -110,12 +110,7 @@ fi
 VERSION=$VERSION-$XPLANE_VERSION
 
 rm -f $PROJECT_NAME-$VERSION.zip
-if [ $platform = "lin" ]; then
-    docker run --user $(id -u):$(id -g) --rm -v $(pwd):/src -w /src gcc-cmake:latest bash -c "\
-    zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME"
-else
-    zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME -x "*/.DS_Store" -x "*/__MACOSX/*"
-fi
+zip -rq $PROJECT_NAME-$VERSION.zip $PROJECT_NAME -x "*/.DS_Store" -x "*/__MACOSX/*"
 
 mv $PROJECT_NAME dist
 cd ..
