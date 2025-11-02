@@ -40,6 +40,7 @@ class USBDevice {
         IOHIDQueueRef hidQueue;
         void handleHIDValue(IOHIDValueRef value);
 #elif IBM
+        USHORT outputReportByteLength = 0;
         static void InputReportCallback(void *context, DWORD bytesRead, uint8_t *report);
 #elif LIN
         static void InputReportCallback(void *context, int bytesRead, uint8_t *report);

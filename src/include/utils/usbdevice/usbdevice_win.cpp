@@ -11,6 +11,10 @@
 #include <windows.h>
 #include <XPLMUtilities.h>
 
+extern "C" {
+#include <hidpi.h>
+}
+
 USBDevice::USBDevice(HIDDeviceHandle aHidDevice, uint16_t aVendorId, uint16_t aProductId, std::string aVendorName, std::string aProductName) :
     hidDevice(aHidDevice), vendorId(aVendorId), productId(aProductId), vendorName(aVendorName), productName(aProductName), connected(false) {}
 
@@ -25,6 +29,21 @@ bool USBDevice::connect() {
         inputBuffer = nullptr;
     }
     inputBuffer = new uint8_t[kInputReportSize];
+
+    // Query the HID output report size
+    PHIDP_PREPARSED_DATA preparsedData = nullptr;
+    if (HidD_GetPreparsedData(hidDevice, &preparsedData)) {
+        HIDP_CAPS caps;
+        if (HidP_GetCaps(preparsedData, &caps) == HIDP_STATUS_SUCCESS) {
+            outputReportByteLength = caps.OutputReportByteLength;
+            debug("Output report byte length: %u\n", outputReportByteLength);
+        } else {
+            debug_force("Failed to get HID capabilities\n");
+        }
+        HidD_FreePreparsedData(preparsedData);
+    } else {
+        debug_force("Failed to get preparsed data\n");
+    }
 
     // Start input reading thread with proper cleanup
     connected = true;
@@ -114,11 +133,18 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
         return false;
     }
 
+    // Windows HID requires the data to be exactly the output report size
+    // If we have a known report size and data is smaller, pad with zeros
+    std::vector<uint8_t> paddedData = data;
+    if (outputReportByteLength > 0 && paddedData.size() < outputReportByteLength) {
+        paddedData.resize(outputReportByteLength, 0);
+    }
+
     DWORD bytesWritten;
-    BOOL result = WriteFile(hidDevice, data.data(), (DWORD) data.size(), &bytesWritten, nullptr);
-    if (!result || bytesWritten < data.size()) {
+    BOOL result = WriteFile(hidDevice, paddedData.data(), (DWORD) paddedData.size(), &bytesWritten, nullptr);
+    if (!result || bytesWritten < paddedData.size()) {
         DWORD error = GetLastError();
-        debug_force("WriteFile failed: %lu (expected %zu bytes, wrote %lu)\n", error, data.size(), bytesWritten);
+        debug_force("WriteFile failed: %lu (expected %zu bytes, wrote %lu)\n", error, paddedData.size(), bytesWritten);
         return false;
     }
     return true;

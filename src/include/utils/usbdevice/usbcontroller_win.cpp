@@ -10,6 +10,7 @@
 #include <initguid.h>
 #include <iostream>
 #include <map>
+#include <set>
 #include <setupapi.h>
 #include <thread>
 #include <windows.h>
@@ -19,8 +20,8 @@ DEFINE_GUID(GUID_DEVINTERFACE_HID, 0x4D1E55B2, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00,
 
 USBController *USBController::instance = nullptr;
 
-// Map to track device paths since we can't modify USBDevice
 static std::map<USBDevice *, std::string> devicePaths;
+static std::set<std::pair<uint16_t, uint16_t>> pendingDevices;
 
 USBController::USBController() {
     enumerateDevices();
@@ -53,10 +54,11 @@ void USBController::destroy() {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     for (auto ptr : devices) {
-        devicePaths.erase(ptr); // Clean up our map
+        devicePaths.erase(ptr);
         delete ptr;
     }
     devices.clear();
+    pendingDevices.clear();
 
     instance = nullptr;
 }
@@ -97,6 +99,20 @@ bool USBController::deviceExistsWithPath(const std::string &devicePath) {
     return false;
 }
 
+bool USBController::deviceExistsWithVidPid(uint16_t vendorId, uint16_t productId) {
+    for (auto *dev : devices) {
+        if (dev->vendorId == vendorId && dev->productId == productId) {
+            return true;
+        }
+    }
+
+    if (pendingDevices.find(std::make_pair(vendorId, productId)) != pendingDevices.end()) {
+        return true;
+    }
+
+    return false;
+}
+
 bool USBController::deviceExistsWithHandle(HANDLE hidDevice) {
     for (auto *dev : devices) {
         if (dev->hidDevice == hidDevice) {
@@ -116,11 +132,24 @@ void USBController::addDeviceFromHandle(HANDLE hidDevice, const std::string &dev
         return;
     }
 
-    AppState::getInstance()->executeAfter(0, [this, hidDevice, devicePath]() {
+    // Get vendor/product ID to track completion
+    HIDD_ATTRIBUTES attributes = {};
+    attributes.Size = sizeof(attributes);
+    if (!HidD_GetAttributes(hidDevice, &attributes)) {
+        CloseHandle(hidDevice);
+        return;
+    }
+
+    uint16_t vendorId = attributes.VendorID;
+    uint16_t productId = attributes.ProductID;
+
+    AppState::getInstance()->executeAfter(0, [this, hidDevice, devicePath, vendorId, productId]() {
         USBDevice *device = createDeviceFromHandle(hidDevice, devicePath);
         if (device) {
             devices.push_back(device);
         }
+
+        pendingDevices.erase(std::make_pair(vendorId, productId));
     });
 }
 
@@ -157,7 +186,19 @@ void USBController::enumerateHidDevices(std::function<void(HANDLE, const std::st
 
 void USBController::enumerateDevices() {
     enumerateHidDevices([this](HANDLE hidDevice, const std::string &devicePath) {
-        addDeviceFromHandle(hidDevice, devicePath);
+        HIDD_ATTRIBUTES attributes = {};
+        attributes.Size = sizeof(attributes);
+        if (HidD_GetAttributes(hidDevice, &attributes) && attributes.VendorID == WINWING_VENDOR_ID) {
+            if (deviceExistsWithVidPid(attributes.VendorID, attributes.ProductID)) {
+                CloseHandle(hidDevice);
+                return;
+            }
+
+            pendingDevices.insert(std::make_pair(attributes.VendorID, attributes.ProductID));
+            addDeviceFromHandle(hidDevice, devicePath);
+        } else {
+            CloseHandle(hidDevice);
+        }
     });
 }
 
@@ -169,7 +210,13 @@ void USBController::checkForDeviceChanges() {
         attributes.Size = sizeof(attributes);
         if (HidD_GetAttributes(hidDevice, &attributes) && attributes.VendorID == WINWING_VENDOR_ID) {
             currentDevicePaths.push_back(devicePath);
-            addDeviceFromHandle(hidDevice, devicePath);
+
+            if (!deviceExistsWithVidPid(attributes.VendorID, attributes.ProductID)) {
+                pendingDevices.insert(std::make_pair(attributes.VendorID, attributes.ProductID));
+                addDeviceFromHandle(hidDevice, devicePath);
+            } else {
+                CloseHandle(hidDevice);
+            }
         } else {
             CloseHandle(hidDevice);
         }

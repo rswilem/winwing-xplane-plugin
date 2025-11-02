@@ -47,6 +47,7 @@ class USBController {
         USBDevice *createDeviceFromHandle(HANDLE hidDevice, const std::string &devicePath);
         bool deviceExistsWithHandle(HANDLE hidDevice);
         bool deviceExistsWithPath(const std::string &devicePath);
+        bool deviceExistsWithVidPid(uint16_t vendorId, uint16_t productId);
         void addDeviceFromHandle(HANDLE hidDevice, const std::string &devicePath);
 #elif LIN
         static void DeviceAddedCallback(void *context, struct udev_device *device);
