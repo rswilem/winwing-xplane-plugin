@@ -38,6 +38,7 @@ class ProductPAP3MCP : public USBDevice {
         void forceStateSync() override;
 
         void setLedBrightness(PAP3MCPLed led, uint8_t brightness);
+        void setATSolenoid(bool engaged);
 
         void initializeDisplays();
         void clearDisplays();

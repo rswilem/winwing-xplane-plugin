@@ -501,6 +501,26 @@ void ProductPAP3MCP::setLedBrightness(PAP3MCPLed led, uint8_t brightness) {
     writeData(data);
 }
 
+void ProductPAP3MCP::setATSolenoid(bool engaged) {
+    std::vector<uint8_t> data = {
+        0x02,
+        0x0F,
+        0xBF,
+        0x00,
+        0x00,
+        0x03,
+        0x49,
+        0x1E,
+        engaged ? static_cast<uint8_t>(0x01) : static_cast<uint8_t>(0x00),
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00};
+
+    writeData(data);
+}
+
 void ProductPAP3MCP::forceStateSync() {
     pressedButtonIndices.clear();
     lastButtonStateLo = 0;
