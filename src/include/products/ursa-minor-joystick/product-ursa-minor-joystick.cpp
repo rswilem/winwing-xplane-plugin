@@ -53,12 +53,14 @@ void ProductUrsaMinorJoystick::update() {
 
     USBDevice::update();
 
-    if (Dataref::getInstance()->getCached<bool>("sim/flightmodel/failures/onground_any") && Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on")) {
+    if (Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on")) {
         float gForce = Dataref::getInstance()->get<float>("sim/flightmodel/forces/g_nrml");
         float delta = fabs(gForce - lastGForce);
         lastGForce = gForce;
 
-        uint8_t vibration = (uint8_t) std::min(255.0f, delta * 800.0f);
+        bool onGround = Dataref::getInstance()->getCached<bool>("sim/flightmodel/failures/onground_any");
+        float factor = onGround ? 800.0f : 400.0f;
+        uint8_t vibration = (uint8_t) std::min(255.0f, delta * factor);
         if (vibration < 6) {
             vibration = 0;
         }
