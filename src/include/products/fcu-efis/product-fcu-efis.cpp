@@ -101,9 +101,6 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
     } else if (LaminarFCUEfisProfile::IsEligible()) {
         profile = new LaminarFCUEfisProfile(this);
         profileReady = true;
-    } else {
-        debug("No profile found for %s.\n", classIdentifier());
-        clearDisplays();
     }
 }
 

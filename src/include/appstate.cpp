@@ -62,7 +62,7 @@ float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLas
 
     appstate->update();
 
-    if (!USBController::getInstance()->allProfilesReady()) {
+    if (!USBController::getInstance()->anyProfileReady()) {
         return REFRESH_INTERVAL_SECONDS_SLOW;
     }
 
@@ -78,9 +78,9 @@ void AppState::update() {
     }
 
     taskQueue.erase(std::remove_if(taskQueue.begin(), taskQueue.end(), [&](auto &task) {
-                        return now >= task.runAt;
-                    }),
-                    taskQueue.end());
+        return now >= task.runAt;
+    }),
+    taskQueue.end());
 
     if (!pluginInitialized) {
         return;

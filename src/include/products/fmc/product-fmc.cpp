@@ -55,7 +55,6 @@ void ProductFMC::setProfileForCurrentAircraft() {
         profile = new RotateMD11FMCProfile(this);
         profileReady = true;
     } else if (FlightFactor767FMCProfile::IsEligible()) {
-        debug("Using FlightFactor 757/767 PFP profile for %s.\n", classIdentifier());
         clearDisplay();
         profile = new FlightFactor767FMCProfile(this);
         profileReady = true;

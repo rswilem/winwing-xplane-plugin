@@ -2,14 +2,14 @@
 
 #include "appstate.h"
 
-bool USBController::allProfilesReady() {
+bool USBController::anyProfileReady() {
     for (auto &device : devices) {
-        if (!device->profileReady) {
-            return false;
+        if (device->profileReady) {
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 void USBController::connectAllDevices() {

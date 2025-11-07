@@ -40,9 +40,6 @@ void ProductPAP3MCP::setProfileForCurrentAircraft() {
     } else if (LaminarPAP3MCPProfile::IsEligible()) {
         profile = new LaminarPAP3MCPProfile(this);
         profileReady = true;
-    } else {
-        debug_force("No profile found for %s.\n", classIdentifier());
-        clearDisplays();
     }
 }
 
