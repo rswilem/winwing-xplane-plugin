@@ -6,8 +6,8 @@
 #include <algorithm>
 #include <cmath>
 
-ProductUrsaMinorJoystick::ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) :
-    USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
+ProductUrsaMinorJoystick::ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, unsigned char identifierByte) :
+    USBDevice(hidDevice, vendorId, productId, vendorName, productName), identifierByte(identifierByte) {
     connect();
 }
 
@@ -76,11 +76,11 @@ void ProductUrsaMinorJoystick::update() {
 }
 
 bool ProductUrsaMinorJoystick::setVibration(uint8_t vibration) {
-    return writeData({0x02, 7, 191, 0, 0, 3, 0x49, 0, vibration, 0, 0, 0, 0, 0});
+    return writeData({0x02, identifierByte, 0xBF, 0x00, 0x00, 0x03, 0x49, 0x00, vibration, 0x00, 0x00, 0x00, 0x00, 0x00});
 }
 
 bool ProductUrsaMinorJoystick::setLedBrightness(uint8_t brightness) {
-    return writeData({0x02, 0x20, 0xbb, 0, 0, 3, 0x49, 0, brightness, 0, 0, 0, 0, 0});
+    return writeData({0x02, 0x20, 0xBB, 0x00, 0x00, 0x03, 0x49, 0x00, brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
 }
 
 void ProductUrsaMinorJoystick::initializeDatarefs() {

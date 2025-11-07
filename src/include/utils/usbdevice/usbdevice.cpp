@@ -15,9 +15,15 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
     }
 
     switch (productId) {
-        case 0xBC27: // URSA MINOR Airline Joystick L
-        case 0xBC28: // URSA MINOR Airline Joystick R
-            return new ProductUrsaMinorJoystick(hidDevice, vendorId, productId, vendorName, productName);
+        case 0xBC27: { // URSA MINOR Airline Joystick L
+            constexpr uint8_t identifierByte = 0x07;
+            return new ProductUrsaMinorJoystick(hidDevice, vendorId, productId, vendorName, productName, identifierByte);
+        }
+            
+        case 0xBC28: { // URSA MINOR Airline Joystick R
+            constexpr uint8_t identifierByte = 0x08;
+            return new ProductUrsaMinorJoystick(hidDevice, vendorId, productId, vendorName, productName, identifierByte);
+        }
 
         case 0xBB36: { // MCDU-32 (Captain)
             constexpr uint8_t identifierByte = 0x32;
@@ -76,10 +82,18 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBC1D: // FCU + EFIS-L
         case 0xBA01: // FCU + EFIS-L + EFIS-R
             return new ProductFCUEfis(hidDevice, vendorId, productId, vendorName, productName);
+            
+//        case 0xB920: // URSA MINOR Throttle L
+//        case 0xB930: // URSA MINOR Throttle L
+//            break;
 
         case 0xBF0F: // PAP3-MCP
+        case 0xBB61: // PAP3-MCP (3N PDC L)
+        case 0xBB62: // PAP3-MCP (3N PDC R)
+        case 0xBB51: // PAP3-MCP (3M PDC L)
+        case 0xBB52: // PAP3-MCP (3M PDC R)
             return new ProductPAP3MCP(hidDevice, vendorId, productId, vendorName, productName);
-
+            
         default:
             debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X\n", vendorId, productId);
             return nullptr;

@@ -10,8 +10,10 @@ class ProductUrsaMinorJoystick : public USBDevice {
         float lastGForce;
 
     public:
-        ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
+        ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, unsigned char identifierByte);
         ~ProductUrsaMinorJoystick();
+        
+        const unsigned char identifierByte;
 
         const char *classIdentifier() override;
         bool connect() override;
