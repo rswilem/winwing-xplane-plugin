@@ -34,15 +34,15 @@ For linux, see the [Linux udev rules](#linux-udev-rules) section below to ensure
 
 The matrix below shows device and aircraft compatibility. Devices are listed vertically, aircraft horizontally.
 
-| Device                      | Toliss A3xx | Laminar A330 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 767/777 | SSG 747 |
-| --------------------------- | ----------- | ------------ | ---------------- | -------- | -------- | ---------- | ------- |
-| **URSA MINOR Joystick L+R** | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟢      |
-| **MCDU-32**                 | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
-| **PFP 3N**                  | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
-| **PFP 4**                   | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
-| **PFP 7**                   | 🟢          | 🟢           | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
-| **PAP3 / PAP3 Mag**         | 🔴          | 🔴           | 🔴               | 🟢       | 🔴       | 🔴         | 🔴      |
-| **FCU and EFIS L+R**        | 🟢          | 🟢           | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
+| Device                      | Toliss A3xx | Laminar A330 | Laminar 737 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 767/777 | SSG 747 |
+| --------------------------- | ----------- | ------------ | ----------- | ---------------- | -------- | -------- | ---------- | ------- |
+| **URSA MINOR Joystick L+R** | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟢      |
+| **MCDU-32**                 | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
+| **PFP 3N**                  | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
+| **PFP 4**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
+| **PFP 7**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
+| **PAP3 / PAP3 Mag**         | 🔴          | 🔴           | 🔴          | 🔴               | 🟢       | 🔴       | 🔴         | 🔴      |
+| **FCU and EFIS L+R**        | 🟢          | 🟢           | 🟠          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 
 #### Legend
 
@@ -54,6 +54,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 
 - 🟠 The SSG 747 does not expose any colour datarefs yet. Therefore, the PFP will not show the correct colours.
 - 🟠 The SSG 747 has a dual FMC, but the datarefs seem to overwrite eachother.
+- 🟠 Laminar 737: FCU is fully functional, but EFIS controls have not been tested yet.
 
 ### Credits
 
