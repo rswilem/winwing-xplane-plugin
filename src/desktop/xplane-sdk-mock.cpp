@@ -548,3 +548,28 @@ void XPLMCheckMenuItem(XPLMMenuID inMenu, int index, XPLMMenuCheck inCheck) {
 void XPLMGetSystemPath(char *outSystemPath) {
     // noop
 }
+
+void XPLMCheckMenuItemState(XPLMMenuID inMenu, int inIndex, XPLMMenuCheck *out) {
+    // noop
+}
+
+void XPLMClearAllMenuItems(XPLMMenuID inMenu) {
+    // noop
+}
+
+void XPLMDestroyMenu(XPLMMenuID inMenu) {
+    // noop
+}
+
+XPLMMenuID XPLMFindPluginsMenu() {
+    // noop
+    return 0;
+}
+
+void XPLMRemoveMenuItem(XPLMMenuID inMenu, int inIndex) {
+    // noop
+}
+
+void XPLMSetMenuItemName(XPLMMenuID inMenu, int inIndex, const char *inItemName, int dep) {
+    // noop
+}

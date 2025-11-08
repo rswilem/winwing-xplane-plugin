@@ -386,7 +386,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     while (data1.size() < 64) {
         data1.push_back(0x00);
     }
-    
+
     writeData(data1);
 
     // Second request - commit display data
@@ -547,6 +547,8 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
 }
 
 void ProductFCUEfis::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
+    USBDevice::didReceiveButton(hardwareButtonIndex, pressed, count);
+
     const FCUEfisButtonDef *buttonDef = nullptr;
     for (const auto &btn : profile->buttonDefs()) {
         if (btn.id == hardwareButtonIndex) {

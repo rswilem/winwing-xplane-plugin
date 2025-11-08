@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 debian:stable
+FROM --platform=linux/amd64 debian:12
 
 ENV DEBIAN_FRONTEND=noninteractive
 

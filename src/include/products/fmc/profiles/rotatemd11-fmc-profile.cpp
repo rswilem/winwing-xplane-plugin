@@ -249,10 +249,10 @@ std::vector<int> RotateMD11FMCProfile::buildStylePositionMap(const std::string &
     std::vector<int> positionMap(content.length(), -1);
     
     // Find last word boundaries
-    int lastWordEnd = content.length();
+    int lastWordEnd = (int)content.length();
     int trailingSpaces = 0;
     
-    for (int i = content.length() - 1; i >= 0; i--) {
+    for (int i = (int)content.length() - 1; i >= 0; i--) {
         if (content[i] == ' ' || content[i] == 0x00) {
             trailingSpaces++;
         } else {
@@ -294,7 +294,7 @@ std::vector<int> RotateMD11FMCProfile::buildStylePositionMap(const std::string &
     
     // Map last word to end of style array
     if (lastWordStyleCount > 0 && lastWordStyleCount <= style.size()) {
-        int styleIdx = style.size() - lastWordStyleCount;
+        int styleIdx = (int)style.size() - lastWordStyleCount;
         
         for (int pos = lastWordStart; pos < lastWordEnd; ++pos) {
             if (content[pos] == ' ') {

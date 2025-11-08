@@ -8,6 +8,9 @@
 
 #include <XPLMUtilities.h>
 
+// The desktop app overrides this function to get notified of button presses
+__attribute__((weak)) void notifyButtonPressed(uint16_t buttonId, uint16_t productId) {}
+
 USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) {
     if (vendorId != WINWING_VENDOR_ID) {
         debug("Vendor ID mismatch: 0x%04X != 0x%04X\n", vendorId, WINWING_VENDOR_ID);
@@ -19,7 +22,7 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
             constexpr uint8_t identifierByte = 0x07;
             return new ProductUrsaMinorJoystick(hidDevice, vendorId, productId, vendorName, productName, identifierByte);
         }
-            
+
         case 0xBC28: { // URSA MINOR Airline Joystick R
             constexpr uint8_t identifierByte = 0x08;
             return new ProductUrsaMinorJoystick(hidDevice, vendorId, productId, vendorName, productName, identifierByte);
@@ -51,28 +54,28 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP3N, FMCDeviceVariant::VARIANT_OBSERVER, identifierByte);
         }
 
-        case 0xBB38: { // PFP 4 (Captain)
+        case 0xBB38: {                               // PFP 4 (Captain)
             constexpr uint8_t identifierByte = 0x31; // TODO: Verify
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP4, FMCDeviceVariant::VARIANT_CAPTAIN, identifierByte);
         }
-        case 0xBB40: { // PFP 4 (First Officer)
+        case 0xBB40: {                               // PFP 4 (First Officer)
             constexpr uint8_t identifierByte = 0x31; // TODO: Verify
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP4, FMCDeviceVariant::VARIANT_FIRSTOFFICER, identifierByte);
         }
-        case 0xBB3C: { // PFP 4 (Observer)
+        case 0xBB3C: {                               // PFP 4 (Observer)
             constexpr uint8_t identifierByte = 0x31; // TODO: Verify
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP4, FMCDeviceVariant::VARIANT_OBSERVER, identifierByte);
         }
 
-        case 0xBB37: { // PFP 7 (Captain)
+        case 0xBB37: {                               // PFP 7 (Captain)
             constexpr uint8_t identifierByte = 0x31; // TODO: Verify
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP7, FMCDeviceVariant::VARIANT_CAPTAIN, identifierByte);
         }
-        case 0xBB3F: { // PFP 7 (First Officer)
+        case 0xBB3F: {                               // PFP 7 (First Officer)
             constexpr uint8_t identifierByte = 0x31; // TODO: Verify
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP7, FMCDeviceVariant::VARIANT_FIRSTOFFICER, identifierByte);
         }
-        case 0xBB3B: { // PFP 7 (Observer)
+        case 0xBB3B: {                               // PFP 7 (Observer)
             constexpr uint8_t identifierByte = 0x31; // TODO: Verify
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP7, FMCDeviceVariant::VARIANT_OBSERVER, identifierByte);
         }
@@ -82,10 +85,10 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBC1D: // FCU + EFIS-L
         case 0xBA01: // FCU + EFIS-L + EFIS-R
             return new ProductFCUEfis(hidDevice, vendorId, productId, vendorName, productName);
-            
-//        case 0xB920: // URSA MINOR Throttle L
-//        case 0xB930: // URSA MINOR Throttle L
-//            break;
+
+            //        case 0xB920: // URSA MINOR Throttle L
+            //        case 0xB930: // URSA MINOR Throttle L
+            //            break;
 
         case 0xBF0F: // PAP3-MCP
         case 0xBB61: // PAP3-MCP (3N PDC L)
@@ -93,7 +96,7 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBB51: // PAP3-MCP (3M PDC L)
         case 0xBB52: // PAP3-MCP (3M PDC R)
             return new ProductPAP3MCP(hidDevice, vendorId, productId, vendorName, productName);
-            
+
         default:
             debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X\n", vendorId, productId);
             return nullptr;
@@ -109,7 +112,9 @@ void USBDevice::didReceiveData(int reportId, uint8_t *report, int reportLength) 
 }
 
 void USBDevice::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
-    // noop, expect override
+    if (pressed) {
+        notifyButtonPressed(hardwareButtonIndex, this->productId);
+    }
 }
 
 void USBDevice::processOnMainThread(const InputEvent &event) {
