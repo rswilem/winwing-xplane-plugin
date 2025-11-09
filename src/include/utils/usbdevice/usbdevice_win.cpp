@@ -142,7 +142,12 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
 
     DWORD bytesWritten;
     BOOL result = WriteFile(hidDevice, paddedData.data(), (DWORD) paddedData.size(), &bytesWritten, nullptr);
-    if (!result || bytesWritten < paddedData.size()) {
+
+    // The device protocol uses 64-byte packets. Windows may report a larger OutputReportByteLength
+    // (e.g., 73 bytes) from HID capabilities, but the device actually writes 64 bytes.
+    // Accept 64 bytes as success even if we padded to a larger size.
+    const size_t kExpectedWriteSize = 64;
+    if (!result || (bytesWritten < kExpectedWriteSize && bytesWritten != data.size())) {
         DWORD error = GetLastError();
         debug_force("WriteFile failed: %lu (expected %zu bytes, wrote %lu)\n", error, paddedData.size(), bytesWritten);
         return false;

@@ -63,7 +63,7 @@ class USBController {
         static USBController *getInstance();
         void destroy();
 
-        bool allProfilesReady();
+        bool anyProfileReady();
         void connectAllDevices();
         void disconnectAllDevices();
 };

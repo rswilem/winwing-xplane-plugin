@@ -66,6 +66,8 @@
 		F6BB75792E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6BB75722E32634700C2B21F /* toliss-fcu-efis-profile.cpp */; };
 		F6BB757A2E32634700C2B21F /* product-fcu-efis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6BB75762E32634700C2B21F /* product-fcu-efis.cpp */; };
 		F6BB757B2E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6BB75722E32634700C2B21F /* toliss-fcu-efis-profile.cpp */; };
+		F6C248462EBE498500617E89 /* plugins-menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C248452EBE498500617E89 /* plugins-menu.cpp */; };
+		F6C248472EBE498500617E89 /* plugins-menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C248452EBE498500617E89 /* plugins-menu.cpp */; };
 		F6C345512E18797400D7C987 /* dataref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBC2D06F84900530297 /* dataref.cpp */; };
 		F6C3455F2E187AB700D7C987 /* xplane-sdk-mock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C3455E2E187AAF00D7C987 /* xplane-sdk-mock.cpp */; };
 		F6C6E0302E8D5DAA00558F46 /* product-pap3-mcp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02A2E8D5DAA00558F46 /* product-pap3-mcp.cpp */; };
@@ -74,6 +76,8 @@
 		F6C6E0332E8D5DAA00558F46 /* product-pap3-mcp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02A2E8D5DAA00558F46 /* product-pap3-mcp.cpp */; };
 		F6C6E0342E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02C2E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp */; };
 		F6C6E0352E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02E2E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp */; };
+		F6F6F4E92EBF976E00321C19 /* ButtonIdentificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F6F4E72EBF976E00321C19 /* ButtonIdentificationView.swift */; };
+		F6F6F4EA2EBF976E00321C19 /* ButtonMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F6F4E82EBF976E00321C19 /* ButtonMapping.swift */; };
 		F6F77AB22E278F300060AFC0 /* product-ursa-minor-joystick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */; };
 		F6F77AB52E278F530060AFC0 /* product-ursa-minor-joystick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */; };
 		F6FBC55F2E3A3E15004E5F42 /* FCUEfisControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */; };
@@ -154,6 +158,8 @@
 		F6BB75742E32634700C2B21F /* fcu-efis-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "fcu-efis-aircraft-profile.h"; sourceTree = "<group>"; };
 		F6BB75752E32634700C2B21F /* product-fcu-efis.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-fcu-efis.h"; sourceTree = "<group>"; };
 		F6BB75762E32634700C2B21F /* product-fcu-efis.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-fcu-efis.cpp"; sourceTree = "<group>"; };
+		F6C248442EBE498500617E89 /* plugins-menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "plugins-menu.h"; sourceTree = "<group>"; };
+		F6C248452EBE498500617E89 /* plugins-menu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "plugins-menu.cpp"; sourceTree = "<group>"; };
 		F6C3455E2E187AAF00D7C987 /* xplane-sdk-mock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "xplane-sdk-mock.cpp"; sourceTree = "<group>"; };
 		F6C6E0272E8D5DAA00558F46 /* pap3-mcp-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pap3-mcp-aircraft-profile.h"; sourceTree = "<group>"; };
 		F6C6E0282E8D5DAA00558F46 /* pap3-mcp-lcd-segments.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pap3-mcp-lcd-segments.h"; sourceTree = "<group>"; };
@@ -163,6 +169,8 @@
 		F6C6E02C2E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "laminar-pap3-mcp-profile.cpp"; sourceTree = "<group>"; };
 		F6C6E02D2E8D5DAA00558F46 /* zibo-pap3-mcp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "zibo-pap3-mcp-profile.h"; sourceTree = "<group>"; };
 		F6C6E02E2E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "zibo-pap3-mcp-profile.cpp"; sourceTree = "<group>"; };
+		F6F6F4E72EBF976E00321C19 /* ButtonIdentificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonIdentificationView.swift; sourceTree = "<group>"; };
+		F6F6F4E82EBF976E00321C19 /* ButtonMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonMapping.swift; sourceTree = "<group>"; };
 		F6F77AAC2E278F300060AFC0 /* product-ursa-minor-joystick.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-ursa-minor-joystick.h"; sourceTree = "<group>"; };
 		F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-ursa-minor-joystick.cpp"; sourceTree = "<group>"; };
 		F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCUEfisControlView.swift; sourceTree = "<group>"; };
@@ -279,6 +287,8 @@
 				F69FF22A2E1D13CB00F9D2D9 /* JoystickControlView.swift */,
 				F6A149452E4F37ED00FB8395 /* FMCControlView.swift */,
 				F6FBC55E2E3A3E15004E5F42 /* FCUEfisControlView.swift */,
+				F6F6F4E72EBF976E00321C19 /* ButtonIdentificationView.swift */,
+				F6F6F4E82EBF976E00321C19 /* ButtonMapping.swift */,
 				F6827E122E05678E00382B28 /* bridge.h */,
 				F6827E102E05664C00382B28 /* bridge.mm */,
 				F6C3455E2E187AAF00D7C987 /* xplane-sdk-mock.cpp */,
@@ -344,6 +354,8 @@
 				F6AF9EBC2D06F84900530297 /* dataref.cpp */,
 				F635AD512E059872005D6CDC /* path.h */,
 				F635AD522E059872005D6CDC /* path.cpp */,
+				F6C248442EBE498500617E89 /* plugins-menu.h */,
+				F6C248452EBE498500617E89 /* plugins-menu.cpp */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -514,6 +526,7 @@
 				F68164E62E3161FD00319E9D /* usbcontroller.cpp in Sources */,
 				F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */,
 				F635AD532E059872005D6CDC /* path.cpp in Sources */,
+				F6C248462EBE498500617E89 /* plugins-menu.cpp in Sources */,
 				F67FE8142E895BAC00C4243C /* laminar-fcu-efis-profile.cpp in Sources */,
 				F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
 				F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
@@ -575,6 +588,9 @@
 				5DBA92312E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */,
 				F67961962E31357E008031F1 /* usbdevice_lin.cpp in Sources */,
 				F635AD422E05697B005D6CDC /* bridge.mm in Sources */,
+				F6F6F4E92EBF976E00321C19 /* ButtonIdentificationView.swift in Sources */,
+				F6F6F4EA2EBF976E00321C19 /* ButtonMapping.swift in Sources */,
+				F6C248472EBE498500617E89 /* plugins-menu.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -828,13 +844,14 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = src/desktop/Winwing.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DESKTOP_MODE = 1;
 				DEVELOPMENT_TEAM = WUAFN7S2AR;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -850,7 +867,7 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/SDK/Libraries/Mac",
@@ -906,13 +923,14 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = src/desktop/Winwing.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DESKTOP_MODE = 1;
 				DEVELOPMENT_TEAM = WUAFN7S2AR;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -929,7 +947,7 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/SDK/Libraries/Mac",
@@ -1097,13 +1115,14 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = src/desktop/Winwing.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DESKTOP_MODE = 1;
 				DEVELOPMENT_TEAM = WUAFN7S2AR;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1119,7 +1138,7 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/SDK/Libraries/Mac",

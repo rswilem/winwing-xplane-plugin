@@ -47,23 +47,23 @@ const std::vector<std::string> &LaminarPAP3MCPProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::vector<PAP3MCPButtonDef> &LaminarPAP3MCPProfile::buttonDefs() const {
-    static std::vector<PAP3MCPButtonDef> buttons = {
-        {0, "N1", "sim/autopilot/FMS"}, // N1 equivalent
-        {1, "SPEED", "sim/autopilot/autothrottle_on"},
-        {2, "VNAV", "sim/autopilot/FMS"}, // VNAV equivalent
-        {3, "LVL CHG", "sim/autopilot/level_change"},
-        {4, "HDG SEL", "sim/autopilot/heading"},
-        {5, "LNAV", "sim/autopilot/gpss"}, // LNAV equivalent
-        {6, "VOR LOC", "sim/autopilot/NAV"},
-        {7, "APP", "sim/autopilot/approach"},
+const std::unordered_map<uint16_t, PAP3MCPButtonDef> &LaminarPAP3MCPProfile::buttonDefs() const {
+    static const std::unordered_map<uint16_t, PAP3MCPButtonDef> buttons = {
+        {0, {"N1", "sim/autopilot/FMS"}}, // N1 equivalent
+        {1, {"SPEED", "sim/autopilot/autothrottle_on"}},
+        {2, {"VNAV", "sim/autopilot/FMS"}}, // VNAV equivalent
+        {3, {"LVL CHG", "sim/autopilot/level_change"}},
+        {4, {"HDG SEL", "sim/autopilot/heading"}},
+        {5, {"LNAV", "sim/autopilot/gpss"}}, // LNAV equivalent
+        {6, {"VOR LOC", "sim/autopilot/NAV"}},
+        {7, {"APP", "sim/autopilot/approach"}},
 
-        {8, "ALT HLD", "sim/autopilot/altitude_hold"},
-        {9, "V/S", "sim/autopilot/vertical_speed"},
-        {10, "CMD A", "sim/autopilot/servos_on"},
-        {11, "CWS A", "sim/autopilot/cwsa"},
-        {12, "CMD B", "sim/autopilot/servos2_on"},
-        {13, "CWS B", "sim/autopilot/cwsb"}};
+        {8, {"ALT HLD", "sim/autopilot/altitude_hold"}},
+        {9, {"V/S", "sim/autopilot/vertical_speed"}},
+        {10, {"CMD A", "sim/autopilot/servos_on"}},
+        {11, {"CWS A", "sim/autopilot/cwsa"}},
+        {12, {"CMD B", "sim/autopilot/servos2_on"}},
+        {13, {"CWS B", "sim/autopilot/cwsb"}}};
     return buttons;
 }
 

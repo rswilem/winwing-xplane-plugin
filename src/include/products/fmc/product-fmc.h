@@ -17,6 +17,7 @@ class ProductFMC : public USBDevice {
         std::set<int> pressedButtonIndices;
         uint64_t lastButtonStateLo;
         uint32_t lastButtonStateHi;
+        int menuItemId;
 
         void updatePage();
         void draw(const std::vector<std::vector<char>> *pagePtr = nullptr);

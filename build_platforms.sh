@@ -164,9 +164,8 @@ for platform in $PLATFORMS; do
     if [ $platform = "lin" ]; then
         docker build -t gcc-cmake -f ./docker/Dockerfile.linux . && \
         docker run --user $(id -u):$(id -g) --rm -v $(pwd):/src -w /src gcc-cmake:latest bash -c "\
-        cmake -DCMAKE_CXX_FLAGS="-march=x86-64" -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H. && \
-        NPROCS:=$(shell grep -c ^processor /proc/cpuinfo)
-        make -C build/$platform -j$(NUM_PROCESSORS)"
+        cmake -DCMAKE_CXX_FLAGS='-march=x86-64' -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H. && \
+        make -C build/$platform -j\$(nproc)"
     else
         if [ "$DEV_MODE" = true ] && [ ! -z "$XPLANE_PLUGIN_PATH" ]; then
             cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -DXPLANE_PLUGIN_PATH="$XPLANE_PLUGIN_PATH" -Bbuild/$platform -H.

@@ -105,9 +105,6 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
     } else if (LaminarFCUEfisProfile::IsEligible()) {
         profile = new LaminarFCUEfisProfile(this);
         profileReady = true;
-    } else {
-        debug_force("FCU-EFIS: No profile found for %s\n", classIdentifier());
-        clearDisplays();
     }
 }
 
@@ -393,7 +390,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     while (data1.size() < 64) {
         data1.push_back(0x00);
     }
-    
+
     writeData(data1);
 
     // Second request - commit display data
@@ -554,17 +551,15 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
 }
 
 void ProductFCUEfis::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
-    const FCUEfisButtonDef *buttonDef = nullptr;
-    for (const auto &btn : profile->buttonDefs()) {
-        if (btn.id == hardwareButtonIndex) {
-            buttonDef = &btn;
-            break;
-        }
-    }
+    USBDevice::didReceiveButton(hardwareButtonIndex, pressed, count);
 
-    if (!buttonDef) {
+    auto &buttons = profile->buttonDefs();
+    auto it = buttons.find(hardwareButtonIndex);
+    if (it == buttons.end()) {
         return;
     }
+
+    const FCUEfisButtonDef *buttonDef = &it->second;
 
     if (buttonDef->dataref.empty()) {
         return;

@@ -42,6 +42,7 @@ struct ContentView: View {
     @StateObject private var deviceManager = DeviceManager()
     @State private var refreshTimer: Timer?
     @State private var selectedDevice: WinwingDevice?
+    @State private var showingButtonIdentification = false
     
     var body: some View {
         HStack(spacing: 0) {
@@ -56,6 +57,22 @@ struct ContentView: View {
                     }
                 }
                 .padding([.top, .horizontal])
+                
+                // Button Identification Tool
+                Button(action: { showingButtonIdentification = true }) {
+                    HStack {
+                        Image(systemName: "keyboard.badge.eye")
+                        Text("Identify Buttons")
+                            .font(.subheadline)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal)
+                }
+                .buttonStyle(.plain)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .cornerRadius(4)
+                .padding([.horizontal, .bottom])
                 
                 List(selection: Binding(
                     get: { selectedDevice?.id },
@@ -116,6 +133,9 @@ struct ContentView: View {
             refreshTimer?.invalidate()
             refreshTimer = nil
             disconnectAll()
+        }
+        .sheet(isPresented: $showingButtonIdentification) {
+            ButtonIdentificationView()
         }
     }
     

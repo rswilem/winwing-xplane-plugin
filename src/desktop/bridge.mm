@@ -534,3 +534,48 @@ void fcuefis_efisLeftClear(void* fcuefisHandle) {
     efisData.showQfe = false;
     fcuefis->sendEfisDisplayWithFlags(&efisData, false);
 }
+
+// Button identification mode
+static bool buttonListeningMode = false;
+static bool buttonHasBeenPressed = false;
+static int lastPressedButtonId = -1;
+static int lastPressedProductId = -1;
+
+void setButtonListeningMode(bool enabled) {
+    buttonListeningMode = enabled;
+    if (enabled) {
+        buttonHasBeenPressed = false;
+        lastPressedButtonId = -1;
+        lastPressedProductId = -1;
+    }
+}
+
+bool getButtonListeningMode() {
+    return buttonListeningMode;
+}
+
+bool hasButtonPressed() {
+    return buttonHasBeenPressed;
+}
+
+int getLastPressedButtonId() {
+    return lastPressedButtonId;
+}
+
+int getLastPressedProductId() {
+    return lastPressedProductId;
+}
+
+void clearLastPressedButton() {
+    buttonHasBeenPressed = false;
+    lastPressedButtonId = -1;
+    lastPressedProductId = -1;
+}
+
+extern "C++" void notifyButtonPressed(uint16_t buttonId, uint16_t productId) {
+    if (buttonListeningMode) {
+        buttonHasBeenPressed = true;
+        lastPressedButtonId = static_cast<int>(buttonId);
+        lastPressedProductId = static_cast<int>(productId);
+    }
+}

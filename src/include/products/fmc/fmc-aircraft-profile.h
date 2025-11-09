@@ -6,7 +6,7 @@
 #include <array>
 #include <map>
 #include <string>
-#include <vector>
+#include <unordered_map>
 #include <XPLMUtilities.h>
 
 enum FMCLed : unsigned char {
@@ -98,6 +98,7 @@ class FMCAircraftProfile {
 
         virtual const std::vector<std::string> &displayDatarefs() const = 0;
         virtual const std::vector<FMCButtonDef> &buttonDefs() const = 0;
+        virtual const std::unordered_map<FMCKey, const FMCButtonDef *> &buttonKeyMap() const = 0;
         virtual const std::map<char, FMCTextColor> &colorMap() const = 0;
         virtual void mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) = 0;
         virtual void updatePage(std::vector<std::vector<char>> &page) = 0;

@@ -18,6 +18,7 @@ class FlightFactor777FMCProfile : public FMCAircraftProfile {
         static constexpr uint16_t DataLength = 14 * 24; // 336 letters (14 lines x 24 chars)
         const std::vector<std::string> &displayDatarefs() const override;
         const std::vector<FMCButtonDef> &buttonDefs() const override;
+        const std::unordered_map<FMCKey, const FMCButtonDef *> &buttonKeyMap() const override;
         const std::map<char, FMCTextColor> &colorMap() const override;
         void mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) override;
         void updatePage(std::vector<std::vector<char>> &page) override;

@@ -58,7 +58,6 @@ enum class FCUEfisDatarefType : unsigned char {
 };
 
 struct FCUEfisButtonDef {
-        int id;
         std::string name;
         std::string dataref;
         FCUEfisDatarefType datarefType = FCUEfisDatarefType::EXECUTE_CMD_ONCE;
@@ -188,7 +187,7 @@ class FCUEfisAircraftProfile {
         virtual ~FCUEfisAircraftProfile() = default;
 
         virtual const std::vector<std::string> &displayDatarefs() const = 0;
-        virtual const std::vector<FCUEfisButtonDef> &buttonDefs() const = 0;
+        virtual const std::unordered_map<uint16_t, FCUEfisButtonDef> &buttonDefs() const = 0;
         virtual void updateDisplayData(FCUDisplayData &displayData) = 0;
         virtual void buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) = 0;
         virtual bool hasEfisRight() const = 0;

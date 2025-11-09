@@ -161,30 +161,30 @@ const std::vector<std::string> &ZiboPAP3MCPProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::vector<PAP3MCPButtonDef> &ZiboPAP3MCPProfile::buttonDefs() const {
-    static std::vector<PAP3MCPButtonDef> buttons = {
+const std::unordered_map<uint16_t, PAP3MCPButtonDef> &ZiboPAP3MCPProfile::buttonDefs() const {
+    static const std::unordered_map<uint16_t, PAP3MCPButtonDef> buttons = {
         // Row 1 (byte 0x01)
-        {0, "N1", "laminar/B738/autopilot/n1_press"},
-        {1, "SPEED", "laminar/B738/autopilot/speed_press"},
-        {2, "VNAV", "laminar/B738/autopilot/vnav_press"},
-        {3, "LVL CHG", "laminar/B738/autopilot/lvl_chg_press"},
-        {4, "HDG SEL", "laminar/B738/autopilot/hdg_sel_press"},
-        {5, "LNAV", "laminar/B738/autopilot/lnav_press"},
-        {6, "VOR LOC", "laminar/B738/autopilot/vorloc_press"},
-        {7, "APP", "laminar/B738/autopilot/app_press"},
+        {0, {"N1", "laminar/B738/autopilot/n1_press"}},
+        {1, {"SPEED", "laminar/B738/autopilot/speed_press"}},
+        {2, {"VNAV", "laminar/B738/autopilot/vnav_press"}},
+        {3, {"LVL CHG", "laminar/B738/autopilot/lvl_chg_press"}},
+        {4, {"HDG SEL", "laminar/B738/autopilot/hdg_sel_press"}},
+        {5, {"LNAV", "laminar/B738/autopilot/lnav_press"}},
+        {6, {"VOR LOC", "laminar/B738/autopilot/vorloc_press"}},
+        {7, {"APP", "laminar/B738/autopilot/app_press"}},
 
         // Row 2 (byte 0x02)
-        {8, "ALT HLD", "laminar/B738/autopilot/alt_hld_press"},
-        {9, "V/S", "laminar/B738/autopilot/vs_press"},
-        {10, "CMD A", "laminar/B738/autopilot/cmd_a_press"},
-        {11, "CWS A", "laminar/B738/autopilot/cws_a_press"},
-        {12, "CMD B", "laminar/B738/autopilot/cmd_b_press"},
-        {13, "CWS B", "laminar/B738/autopilot/cws_b_press"},
-        {14, "C/O", "laminar/B738/autopilot/change_over_press"},
-        {15, "SPD INTV", "laminar/B738/autopilot/spd_interv"},
+        {8, {"ALT HLD", "laminar/B738/autopilot/alt_hld_press"}},
+        {9, {"V/S", "laminar/B738/autopilot/vs_press"}},
+        {10, {"CMD A", "laminar/B738/autopilot/cmd_a_press"}},
+        {11, {"CWS A", "laminar/B738/autopilot/cws_a_press"}},
+        {12, {"CMD B", "laminar/B738/autopilot/cmd_b_press"}},
+        {13, {"CWS B", "laminar/B738/autopilot/cws_b_press"}},
+        {14, {"C/O", "laminar/B738/autopilot/change_over_press"}},
+        {15, {"SPD INTV", "laminar/B738/autopilot/spd_interv"}},
 
         // Row 3 (byte 0x03)
-        {16, "ALT INTV", "laminar/B738/autopilot/alt_interv"}};
+        {16, {"ALT INTV", "laminar/B738/autopilot/alt_interv"}}};
     return buttons;
 }
 

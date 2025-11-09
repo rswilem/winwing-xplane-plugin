@@ -32,6 +32,7 @@ SpaceBeforeRangeBasedForLoopColon: true
 SortIncludes: CaseInsensitive
 IncludeBlocks: Regroup
 AlignOperands: AlignAfterOperator
+AlignAfterOpenBracket: DontAlign
 SpaceBeforeParens: Custom
 RemoveParentheses: MultipleParentheses
 IndentPPDirectives: None
@@ -47,7 +48,7 @@ AllowShortLoopsOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortLambdasOnASingleLine: Empty
 
-BinPackArguments: false
+BinPackArguments: true
 BinPackParameters: false
 
 AlignConsecutiveBitFields: None
