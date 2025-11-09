@@ -126,20 +126,21 @@ bool ProductFMC::connect() {
         menuItemId = PluginsMenu::getInstance()->addItem(
             classIdentifier(),
             std::vector<MenuItem>{
-                {.name = "Test", .content = [](int menuId) {
-                     printf("Clicked test\n");
-                 }},
-                {.name = "Test2", .content = [](int menuId) {
-                     printf("Clicked test2\n");
+                {.name = "Identify", .content = [this](int menuId) {
+                     setLedBrightness(FMCLed::OVERALL_LEDS_BRIGHTNESS, 255);
+                     setAllLedsEnabled(true);
+                     AppState::getInstance()->executeAfter(2000, [this]() {
+                         setAllLedsEnabled(false);
+                     });
                  }},
                 {.name = "Device variant", .content = std::vector<MenuItem>{
-                                               {.name = "Pilot", .content = [this](int menuId) {
+                                               {.name = "Captain", .checked = deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN, .content = [this](int menuId) {
                                                     setDeviceVariant(FMCDeviceVariant::VARIANT_CAPTAIN);
                                                 }},
-                                               {.name = "First officer", .content = [this](int menuId) {
+                                               {.name = "First officer", .checked = deviceVariant == FMCDeviceVariant::VARIANT_FIRSTOFFICER, .content = [this](int menuId) {
                                                     setDeviceVariant(FMCDeviceVariant::VARIANT_FIRSTOFFICER);
                                                 }},
-                                               {.name = "Observer", .checked = true, .content = [this](int menuId) {
+                                               {.name = "Observer", .checked = deviceVariant == FMCDeviceVariant::VARIANT_OBSERVER, .content = [this](int menuId) {
                                                     setDeviceVariant(FMCDeviceVariant::VARIANT_OBSERVER);
                                                 }},
                                            }},
@@ -263,20 +264,10 @@ void ProductFMC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, ui
         return;
     }
 
-    const std::vector<FMCButtonDef> &currentButtonDefs = profile->buttonDefs();
-    auto it = std::find_if(currentButtonDefs.begin(), currentButtonDefs.end(), [&](const FMCButtonDef &def) {
-        return std::visit([&](auto &&k) {
-            using T = std::decay_t<decltype(k)>;
-            if constexpr (std::is_same_v<T, FMCKey>) {
-                return k == key;
-            } else {
-                return std::find(k.begin(), k.end(), key) != k.end();
-            }
-        },
-            def.key);
-    });
-    if (it != currentButtonDefs.end()) {
-        profile->buttonPressed(&*it, command);
+    const auto &buttonKeyMap = profile->buttonKeyMap();
+    auto it = buttonKeyMap.find(key);
+    if (it != buttonKeyMap.end()) {
+        profile->buttonPressed(it->second, command);
     }
 
     if (command == xplm_CommandEnd) {

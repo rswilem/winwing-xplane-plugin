@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <XPLMUtilities.h>
 
 enum class PAP3MCPLed : int {
@@ -40,7 +41,6 @@ enum PAP3MCPDatarefType : unsigned char {
 };
 
 struct PAP3MCPButtonDef {
-        int id;
         std::string name;
         std::string dataref;
         PAP3MCPDatarefType datarefType = PAP3MCPDatarefType::EXECUTE_CMD_ONCE;
@@ -105,7 +105,7 @@ class PAP3MCPAircraftProfile {
 
         virtual const std::vector<std::string> &displayDatarefs() const = 0;
 
-        virtual const std::vector<PAP3MCPButtonDef> &buttonDefs() const = 0;
+        virtual const std::unordered_map<uint16_t, PAP3MCPButtonDef> &buttonDefs() const = 0;
 
         virtual const std::vector<PAP3MCPEncoderDef> &encoderDefs() const = 0;
 

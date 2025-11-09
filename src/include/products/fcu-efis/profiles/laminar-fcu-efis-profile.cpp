@@ -188,35 +188,35 @@ const std::vector<std::string> &LaminarFCUEfisProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::vector<FCUEfisButtonDef> &LaminarFCUEfisProfile::buttonDefs() const {
-    static const std::vector<FCUEfisButtonDef> buttons = {
-        {0, "MACH", "sim/autopilot/knots_mach_toggle"},
-        {1, "LOC", "sim/autopilot/NAV"},
-        {2, "TRK", "sim/autopilot/trkfpa"},
-        {3, "AP1", "sim/autopilot/servos_toggle"},
-        {4, "AP2", "sim/autopilot/servos2_toggle"},
-        {5, "A/THR", "laminar/A333/autopilot/a_thr_toggle"},
-        {6, "EXPED", "sim/autopilot/altitude_hold"},
-        {7, "METRIC", "laminar/A333/autopilot/metric_alt_push"},
-        {8, "APPR", "sim/autopilot/approach"},
-        {9, "SPD DEC", "sim/autopilot/airspeed_down"},
-        {10, "SPD INC", "sim/autopilot/airspeed_up"},
-        {11, "SPD PUSH", "laminar/A333/autopilot/speed_knob_push"},
-        {12, "SPD PULL", "laminar/A333/autopilot/speed_knob_pull"},
-        {13, "HDG DEC", "sim/autopilot/heading_down"},
-        {14, "HDG INC", "sim/autopilot/heading_up"},
-        {15, "HDG PUSH", "laminar/A333/autopilot/heading_knob_push"},
-        {16, "HDG PULL", "laminar/A333/autopilot/heading_knob_pull"},
-        {17, "ALT DEC", "sim/autopilot/altitude_down"},
-        {18, "ALT INC", "sim/autopilot/altitude_up"},
-        {19, "ALT PUSH", "laminar/A333/autopilot/altitude_knob_push"},
-        {20, "ALT PULL", "laminar/A333/autopilot/altitude_knob_pull"},
-        {21, "VS DEC", "sim/autopilot/vertical_speed_down"},
-        {22, "VS INC", "sim/autopilot/vertical_speed_up"},
-        {23, "VS PUSH", "laminar/A333/autopilot/vertical_knob_push"},
-        {24, "VS PULL", "laminar/A333/autopilot/vertical_knob_pull"},
-        {25, "ALT 100", "laminar/A333/autopilot/alt_step_left"},
-        {26, "ALT 1000", "laminar/A333/autopilot/alt_step_right"},
+const std::unordered_map<uint16_t, FCUEfisButtonDef> &LaminarFCUEfisProfile::buttonDefs() const {
+    static const std::unordered_map<uint16_t, FCUEfisButtonDef> buttons = {
+        {0, {"MACH", "sim/autopilot/knots_mach_toggle"}},
+        {1, {"LOC", "sim/autopilot/NAV"}},
+        {2, {"TRK", "sim/autopilot/trkfpa"}},
+        {3, {"AP1", "sim/autopilot/servos_toggle"}},
+        {4, {"AP2", "sim/autopilot/servos2_toggle"}},
+        {5, {"A/THR", "laminar/A333/autopilot/a_thr_toggle"}},
+        {6, {"EXPED", "sim/autopilot/altitude_hold"}},
+        {7, {"METRIC", "laminar/A333/autopilot/metric_alt_push"}},
+        {8, {"APPR", "sim/autopilot/approach"}},
+        {9, {"SPD DEC", "sim/autopilot/airspeed_down"}},
+        {10, {"SPD INC", "sim/autopilot/airspeed_up"}},
+        {11, {"SPD PUSH", "laminar/A333/autopilot/speed_knob_push"}},
+        {12, {"SPD PULL", "laminar/A333/autopilot/speed_knob_pull"}},
+        {13, {"HDG DEC", "sim/autopilot/heading_down"}},
+        {14, {"HDG INC", "sim/autopilot/heading_up"}},
+        {15, {"HDG PUSH", "laminar/A333/autopilot/heading_knob_push"}},
+        {16, {"HDG PULL", "laminar/A333/autopilot/heading_knob_pull"}},
+        {17, {"ALT DEC", "sim/autopilot/altitude_down"}},
+        {18, {"ALT INC", "sim/autopilot/altitude_up"}},
+        {19, {"ALT PUSH", "laminar/A333/autopilot/altitude_knob_push"}},
+        {20, {"ALT PULL", "laminar/A333/autopilot/altitude_knob_pull"}},
+        {21, {"VS DEC", "sim/autopilot/vertical_speed_down"}},
+        {22, {"VS INC", "sim/autopilot/vertical_speed_up"}},
+        {23, {"VS PUSH", "laminar/A333/autopilot/vertical_knob_push"}},
+        {24, {"VS PULL", "laminar/A333/autopilot/vertical_knob_pull"}},
+        {25, {"ALT 100", "laminar/A333/autopilot/alt_step_left"}},
+        {26, {"ALT 1000", "laminar/A333/autopilot/alt_step_right"}},
 
         // Brightness control buttons
         // These are handled internally via brightness callback system
@@ -230,69 +230,68 @@ const std::vector<FCUEfisButtonDef> &LaminarFCUEfisProfile::buttonDefs() const {
         // Button 31 reserved
 
         // EFIS Left (Pilot) buttons (64-95)
-        {32, "L_FD", "sim/autopilot/fdir_command_bars_toggle"},
-        {33, "L_LS", "laminar/A333/buttons/capt_ils_bars_push"},
-        {34, "L_CSTR", "laminar/A333/buttons/capt_EFIS_CSTR"},
-        {35, "L_WPT", "sim/instruments/EFIS_fix"},
-        {36, "L_VOR.D", "sim/instruments/EFIS_vor"},
-        {37, "L_NDB", "sim/instruments/EFIS_ndb"},
-        {38, "L_ARPT", "sim/instruments/EFIS_apt"},
-        {39, "L_STD PUSH", "laminar/A333/push/baro/capt_std"},
-        {40, "L_STD PULL", "laminar/A333/pull/baro/capt_std"},
-        {41, "L_PRESS DEC", "custom", FCUEfisDatarefType::BAROMETER_PILOT, -1.0},
-        {42, "L_PRESS INC", "custom", FCUEfisDatarefType::BAROMETER_PILOT, 1.0},
-        {43, "L_inHg", "laminar/A333/knob/baro/capt_inHg"},
-        {44, "L_hPa", "laminar/A333/knob/baro/capt_hPa"},                                                                                                                                               // Set to 1 for hPa
-        {45, "L_MODE LS", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 0.0},   // LS mode
-        {46, "L_MODE VOR", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 1.0},  // VOR mode
-        {47, "L_MODE NAV", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 2.0},  // NAV mode
-        {48, "L_MODE ARC", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 3.0},  // ARC mode
-        {49, "L_MODE PLAN", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 4.0}, // PLAN mode
-        {50, "L_RANGE 10", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                                          // 10nm range
-        {51, "L_RANGE 20", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                                          // 20nm range
-        {52, "L_RANGE 40", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                                          // 40nm range
-        {53, "L_RANGE 80", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 3.0},                                                                                                          // 80nm range
-        {54, "L_RANGE 160", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 4.0},                                                                                                         // 160nm range
-        {55, "L_RANGE 320", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 5.0},                                                                                                         // 320nm range
-        {56, "L_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                                // ADF1
-        {57, "L_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                                // OFF1
-        {58, "L_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                                // VOR1
-        {59, "L_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                                // ADF2
-        {60, "L_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                                // OFF2
-        {61, "L_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                                // VOR2
+        {32, {"L_FD", "sim/autopilot/fdir_command_bars_toggle"}},
+        {33, {"L_LS", "laminar/A333/buttons/capt_ils_bars_push"}},
+        {34, {"L_CSTR", "laminar/A333/buttons/capt_EFIS_CSTR"}},
+        {35, {"L_WPT", "sim/instruments/EFIS_fix"}},
+        {36, {"L_VOR.D", "sim/instruments/EFIS_vor"}},
+        {37, {"L_NDB", "sim/instruments/EFIS_ndb"}},
+        {38, {"L_ARPT", "sim/instruments/EFIS_apt"}},
+        {39, {"L_STD PUSH", "laminar/A333/push/baro/capt_std"}},
+        {40, {"L_STD PULL", "laminar/A333/pull/baro/capt_std"}},
+        {41, {"L_PRESS DEC", "custom", FCUEfisDatarefType::BAROMETER_PILOT, -1.0}},
+        {42, {"L_PRESS INC", "custom", FCUEfisDatarefType::BAROMETER_PILOT, 1.0}},
+        {43, {"L_inHg", "laminar/A333/knob/baro/capt_inHg"}},
+        {44, {"L_hPa", "laminar/A333/knob/baro/capt_hPa"}}, // Set to 1 for hPa
+        {45, {"L_MODE LS", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 0.0}},
+        {46, {"L_MODE VOR", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 1.0}},
+        {47, {"L_MODE NAV", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 2.0}},
+        {48, {"L_MODE ARC", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 3.0}},
+        {49, {"L_MODE PLAN", "laminar/A333/knobs/EFIS_mode_pos_capt,laminar/A333/knobs/capt_EFIS_knob_left,laminar/A333/knobs/capt_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 4.0}},
+        {50, {"L_RANGE 10", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 0.0}},
+        {51, {"L_RANGE 20", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 1.0}},
+        {52, {"L_RANGE 40", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 2.0}},
+        {53, {"L_RANGE 80", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 3.0}},
+        {54, {"L_RANGE 160", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 4.0}},
+        {55, {"L_RANGE 320", "sim/cockpit2/EFIS/map_range", FCUEfisDatarefType::SET_VALUE, 5.0}},
+        {56, {"L_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0}},
+        {57, {"L_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0}},
+        {58, {"L_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0}},
+        {59, {"L_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0}},
+        {60, {"L_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0}},
+        {61, {"L_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0}},
         // Buttons 62-63 reserved
 
-        // EFIS Right (FO) buttons (32-63)
-        {64, "R_FD", "sim/autopilot/fdir2_command_bars_toggle"},
-        {65, "R_LS", "laminar/A333/buttons/fo_ils_bars_push"},
-        {66, "R_CSTR", "laminar/A333/buttons/fo_EFIS_CSTR"},
-        {67, "R_WPT", "sim/instruments/EFIS_copilot_fix"},
-        {68, "R_VOR.D", "sim/instruments/EFIS_copilot_vor"},
-        {69, "R_NDB", "sim/instruments/EFIS_copilot_ndb"},
-        {70, "R_ARPT", "sim/instruments/EFIS_copilot_apt"},
-        {71, "R_STD PUSH", "laminar/A333/push/baro/fo_std"},
-        {72, "R_STD PULL", "laminar/A333/pull/baro/fo_std"},
-        {73, "R_PRESS DEC", "custom", FCUEfisDatarefType::BAROMETER_FO, -1.0},
-        {74, "R_PRESS INC", "custom", FCUEfisDatarefType::BAROMETER_FO, 1.0},
-        {75, "R_inHg", "laminar/A333/knob/baro/fo_inHg"},
-        {76, "R_hPa", "laminar/A333/knob/baro/fo_hPa"},
-        {77, "R_MODE LS", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 0.0},   // LS mode
-        {78, "R_MODE VOR", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 1.0},  // VOR mode
-        {79, "R_MODE NAV", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 2.0},  // NAV mode
-        {80, "R_MODE ARC", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 3.0},  // ARC mode
-        {81, "R_MODE PLAN", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 4.0}, // PLAN mode
-        {82, "R_RANGE 10", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                            // 10nm range
-        {83, "R_RANGE 20", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                            // 20nm range
-        {84, "R_RANGE 40", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                            // 40nm range
-        {85, "R_RANGE 80", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 3.0},                                                                                            // 80nm range
-        {86, "R_RANGE 160", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 4.0},                                                                                           // 160nm range
-        {87, "R_RANGE 320", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 5.0},                                                                                           // 320nm range
-        {88, "R_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                        // VOR1
-        {89, "R_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                        // OFF1
-        {90, "R_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                        // ADF1
-        {91, "R_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0},                                                                                        // VOR2
-        {92, "R_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0},                                                                                        // OFF2
-        {93, "R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0},                                                                                        // ADF2
+        {64, {"R_FD", "sim/autopilot/fdir2_command_bars_toggle"}},
+        {65, {"R_LS", "laminar/A333/buttons/fo_ils_bars_push"}},
+        {66, {"R_CSTR", "laminar/A333/buttons/fo_EFIS_CSTR"}},
+        {67, {"R_WPT", "sim/instruments/EFIS_copilot_fix"}},
+        {68, {"R_VOR.D", "sim/instruments/EFIS_copilot_vor"}},
+        {69, {"R_NDB", "sim/instruments/EFIS_copilot_ndb"}},
+        {70, {"R_ARPT", "sim/instruments/EFIS_copilot_apt"}},
+        {71, {"R_STD PUSH", "laminar/A333/push/baro/fo_std"}},
+        {72, {"R_STD PULL", "laminar/A333/pull/baro/fo_std"}},
+        {73, {"R_PRESS DEC", "custom", FCUEfisDatarefType::BAROMETER_FO, -1.0}},
+        {74, {"R_PRESS INC", "custom", FCUEfisDatarefType::BAROMETER_FO, 1.0}},
+        {75, {"R_inHg", "laminar/A333/knob/baro/fo_inHg"}},
+        {76, {"R_hPa", "laminar/A333/knob/baro/fo_hPa"}},
+        {77, {"R_MODE LS", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 0.0}},
+        {78, {"R_MODE VOR", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 1.0}},
+        {79, {"R_MODE NAV", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 2.0}},
+        {80, {"R_MODE ARC", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 3.0}},
+        {81, {"R_MODE PLAN", "laminar/A333/knobs/EFIS_mode_pos_fo,laminar/A333/knobs/fo_EFIS_knob_left,laminar/A333/knobs/fo_EFIS_knob_right", FCUEfisDatarefType::SET_VALUE_USING_COMMANDS, 4.0}},
+        {82, {"R_RANGE 10", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 0.0}},
+        {83, {"R_RANGE 20", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 1.0}},
+        {84, {"R_RANGE 40", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 2.0}},
+        {85, {"R_RANGE 80", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 3.0}},
+        {86, {"R_RANGE 160", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 4.0}},
+        {87, {"R_RANGE 320", "sim/cockpit2/EFIS/map_range_copilot", FCUEfisDatarefType::SET_VALUE, 5.0}},
+        {88, {"R_1 VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0}},
+        {89, {"R_1 OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0}},
+        {90, {"R_1 ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0}},
+        {91, {"R_2 VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0}},
+        {92, {"R_2 OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0}},
+        {93, {"R_2 ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0}},
 
         // Buttons 94-95 reserved
     };

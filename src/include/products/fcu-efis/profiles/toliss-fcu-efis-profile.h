@@ -10,7 +10,7 @@
 class TolissFCUEfisProfile : public FCUEfisAircraftProfile {
     private:
         bool isAnnunTest();
-    
+
     public:
         TolissFCUEfisProfile(ProductFCUEfis *product);
         ~TolissFCUEfisProfile();
@@ -19,7 +19,7 @@ class TolissFCUEfisProfile : public FCUEfisAircraftProfile {
 
         // Override base class methods
         const std::vector<std::string> &displayDatarefs() const override;
-        const std::vector<FCUEfisButtonDef> &buttonDefs() const override;
+        const std::unordered_map<uint16_t, FCUEfisButtonDef> &buttonDefs() const override;
         void updateDisplayData(FCUDisplayData &data) override;
 
         bool hasEfisLeft() const override {

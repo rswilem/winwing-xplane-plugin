@@ -549,17 +549,13 @@ void ProductFCUEfis::didReceiveData(int reportId, uint8_t *report, int reportLen
 void ProductFCUEfis::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
     USBDevice::didReceiveButton(hardwareButtonIndex, pressed, count);
 
-    const FCUEfisButtonDef *buttonDef = nullptr;
-    for (const auto &btn : profile->buttonDefs()) {
-        if (btn.id == hardwareButtonIndex) {
-            buttonDef = &btn;
-            break;
-        }
-    }
-
-    if (!buttonDef) {
+    auto &buttons = profile->buttonDefs();
+    auto it = buttons.find(hardwareButtonIndex);
+    if (it == buttons.end()) {
         return;
     }
+
+    const FCUEfisButtonDef *buttonDef = &it->second;
 
     if (buttonDef->dataref.empty()) {
         return;

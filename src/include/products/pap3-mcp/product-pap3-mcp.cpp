@@ -624,13 +624,9 @@ void ProductPAP3MCP::didReceiveData(int reportId, uint8_t *report, int reportLen
 void ProductPAP3MCP::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
     USBDevice::didReceiveButton(hardwareButtonIndex, pressed, count);
 
-    const PAP3MCPButtonDef *buttonDef = nullptr;
-    for (const auto &btn : profile->buttonDefs()) {
-        if (btn.id == hardwareButtonIndex) {
-            buttonDef = &btn;
-            break;
-        }
-    }
+    auto &buttons = profile->buttonDefs();
+    auto it = buttons.find(hardwareButtonIndex);
+    const PAP3MCPButtonDef *buttonDef = (it != buttons.end()) ? &it->second : nullptr;
 
     if (!buttonDef || buttonDef->dataref.empty()) {
         return;

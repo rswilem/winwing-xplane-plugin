@@ -40,106 +40,136 @@ bool LaminarFMCProfile::IsEligible() {
 }
 
 const std::vector<std::string> &LaminarFMCProfile::displayDatarefs() const {
-    static const std::vector<std::string> datarefs = {
-        // Text content for lines 0-15
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line0",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line1",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line2",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line3",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line4",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line5",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line6",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line7",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line8",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line9",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line10",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line11",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line12",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line13",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line14",
-        "sim/cockpit2/radios/indicators/fms_cdu1_text_line15"};
-    return datarefs;
+    static std::unordered_map<FMCDeviceVariant, std::vector<std::string>> cache;
+
+    return cache.try_emplace(FMCDeviceVariant::VARIANT_CAPTAIN,
+                    std::vector<std::string>{
+                        // Text content for lines 0-15
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line0",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line1",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line2",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line3",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line4",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line5",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line6",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line7",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line8",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line9",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line10",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line11",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line12",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line13",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line14",
+                        "sim/cockpit2/radios/indicators/fms_cdu1_text_line15"})
+        .first->second;
 }
 
 const std::vector<FMCButtonDef> &LaminarFMCProfile::buttonDefs() const {
-    static const std::vector<FMCButtonDef> buttons = {
-        {FMCKey::LSK1L, "sim/FMS/ls_1l"},
-        {FMCKey::LSK2L, "sim/FMS/ls_2l"},
-        {FMCKey::LSK3L, "sim/FMS/ls_3l"},
-        {FMCKey::LSK4L, "sim/FMS/ls_4l"},
-        {FMCKey::LSK5L, "sim/FMS/ls_5l"},
-        {FMCKey::LSK6L, "sim/FMS/ls_6l"},
-        {FMCKey::LSK1R, "sim/FMS/ls_1r"},
-        {FMCKey::LSK2R, "sim/FMS/ls_2r"},
-        {FMCKey::LSK3R, "sim/FMS/ls_3r"},
-        {FMCKey::LSK4R, "sim/FMS/ls_4r"},
-        {FMCKey::LSK5R, "sim/FMS/ls_5r"},
-        {FMCKey::LSK6R, "sim/FMS/ls_6r"},
-        {FMCKey::MCDU_DIR, "sim/FMS/dir_intc"},
-        {FMCKey::PROG, "sim/FMS/prog"},
-        {std::vector<FMCKey>{FMCKey::MCDU_PERF, FMCKey::PFP3_N1_LIMIT}, "sim/FMS/perf"},
-        {std::vector<FMCKey>{FMCKey::MCDU_INIT, FMCKey::PFP_INIT_REF}, "sim/FMS/index"},
-        {FMCKey::MCDU_DATA, "sim/FMS/data"},
-        {FMCKey::MCDU_EMPTY_TOP_RIGHT, ""},
-        {FMCKey::BRIGHTNESS_UP, "laminar/A333/buttons/fms1_brightness_up"},
-        {std::vector<FMCKey>{FMCKey::MCDU_FPLN, FMCKey::PFP_LEGS}, "sim/FMS/fpln"},
-        {std::vector<FMCKey>{FMCKey::MCDU_RAD_NAV, FMCKey::PFP4_NAV_RAD, FMCKey::PFP7_NAV_RAD}, "sim/FMS/navrad"},
-        {FMCKey::MCDU_FUEL_PRED, "sim/FMS/fuel_pred"},
-        {FMCKey::MCDU_SEC_FPLN, "sim/FMS/sec_fpln"},
-        {std::vector<FMCKey>{FMCKey::MCDU_ATC_COMM, FMCKey::PFP4_ATC}, "sim/FMS/atc_comm"},
-        {FMCKey::MENU, "sim/FMS/menu"},
-        {FMCKey::BRIGHTNESS_DOWN, "laminar/A333/buttons/fms1_brightness_dn"},
-        {std::vector<FMCKey>{FMCKey::MCDU_AIRPORT, FMCKey::PFP_DEP_ARR}, "sim/FMS/airport"},
-        {FMCKey::MCDU_EMPTY_BOTTOM_LEFT, ""},
-        {FMCKey::PAGE_PREV, "sim/FMS/prev"},
-        {std::vector<FMCKey>{FMCKey::MCDU_PAGE_UP, FMCKey::PAGE_PREV}, "sim/FMS/up"},
-        {FMCKey::PAGE_NEXT, "sim/FMS/next"},
-        {std::vector<FMCKey>{FMCKey::MCDU_PAGE_DOWN, FMCKey::PAGE_NEXT}, "sim/FMS/down"},
-        {FMCKey::KEY1, "sim/FMS/key_1"},
-        {FMCKey::KEY2, "sim/FMS/key_2"},
-        {FMCKey::KEY3, "sim/FMS/key_3"},
-        {FMCKey::KEY4, "sim/FMS/key_4"},
-        {FMCKey::KEY5, "sim/FMS/key_5"},
-        {FMCKey::KEY6, "sim/FMS/key_6"},
-        {FMCKey::KEY7, "sim/FMS/key_7"},
-        {FMCKey::KEY8, "sim/FMS/key_8"},
-        {FMCKey::KEY9, "sim/FMS/key_9"},
-        {FMCKey::PERIOD, "sim/FMS/key_period"},
-        {FMCKey::KEY0, "sim/FMS/key_0"},
-        {FMCKey::PLUSMINUS, "sim/FMS/key_minus"},
-        {FMCKey::KEYA, "sim/FMS/key_A"},
-        {FMCKey::KEYB, "sim/FMS/key_B"},
-        {FMCKey::KEYC, "sim/FMS/key_C"},
-        {FMCKey::KEYD, "sim/FMS/key_D"},
-        {FMCKey::KEYE, "sim/FMS/key_E"},
-        {FMCKey::KEYF, "sim/FMS/key_F"},
-        {FMCKey::KEYG, "sim/FMS/key_G"},
-        {FMCKey::KEYH, "sim/FMS/key_H"},
-        {FMCKey::KEYI, "sim/FMS/key_I"},
-        {FMCKey::KEYJ, "sim/FMS/key_J"},
-        {FMCKey::KEYK, "sim/FMS/key_K"},
-        {FMCKey::KEYL, "sim/FMS/key_L"},
-        {FMCKey::KEYM, "sim/FMS/key_M"},
-        {FMCKey::KEYN, "sim/FMS/key_N"},
-        {FMCKey::KEYO, "sim/FMS/key_O"},
-        {FMCKey::KEYP, "sim/FMS/key_P"},
-        {FMCKey::KEYQ, "sim/FMS/key_Q"},
-        {FMCKey::KEYR, "sim/FMS/key_R"},
-        {FMCKey::KEYS, "sim/FMS/key_S"},
-        {FMCKey::KEYT, "sim/FMS/key_T"},
-        {FMCKey::KEYU, "sim/FMS/key_U"},
-        {FMCKey::KEYV, "sim/FMS/key_V"},
-        {FMCKey::KEYW, "sim/FMS/key_W"},
-        {FMCKey::KEYX, "sim/FMS/key_X"},
-        {FMCKey::KEYY, "sim/FMS/key_Y"},
-        {FMCKey::KEYZ, "sim/FMS/key_Z"},
-        {FMCKey::SLASH, "sim/FMS/key_slash"},
-        {FMCKey::SPACE, "sim/FMS/key_space"},
-        {std::vector<FMCKey>{FMCKey::MCDU_OVERFLY, FMCKey::PFP_DEL}, "sim/FMS/key_overfly"},
-        {FMCKey::CLR, "sim/FMS/key_clear"},
-    };
+    static std::unordered_map<FMCDeviceVariant, std::vector<FMCButtonDef>> cache;
 
-    return buttons;
+    return cache.try_emplace(FMCDeviceVariant::VARIANT_CAPTAIN,
+                    std::vector<FMCButtonDef>{
+                        {FMCKey::LSK1L, "sim/FMS/ls_1l"},
+                        {FMCKey::LSK2L, "sim/FMS/ls_2l"},
+                        {FMCKey::LSK3L, "sim/FMS/ls_3l"},
+                        {FMCKey::LSK4L, "sim/FMS/ls_4l"},
+                        {FMCKey::LSK5L, "sim/FMS/ls_5l"},
+                        {FMCKey::LSK6L, "sim/FMS/ls_6l"},
+                        {FMCKey::LSK1R, "sim/FMS/ls_1r"},
+                        {FMCKey::LSK2R, "sim/FMS/ls_2r"},
+                        {FMCKey::LSK3R, "sim/FMS/ls_3r"},
+                        {FMCKey::LSK4R, "sim/FMS/ls_4r"},
+                        {FMCKey::LSK5R, "sim/FMS/ls_5r"},
+                        {FMCKey::LSK6R, "sim/FMS/ls_6r"},
+                        {FMCKey::MCDU_DIR, "sim/FMS/dir_intc"},
+                        {FMCKey::PROG, "sim/FMS/prog"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_PERF, FMCKey::PFP3_N1_LIMIT}, "sim/FMS/perf"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_INIT, FMCKey::PFP_INIT_REF}, "sim/FMS/index"},
+                        {FMCKey::MCDU_DATA, "sim/FMS/data"},
+                        {FMCKey::MCDU_EMPTY_TOP_RIGHT, ""},
+                        {FMCKey::BRIGHTNESS_UP, "laminar/A333/buttons/fms1_brightness_up"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_FPLN, FMCKey::PFP_LEGS}, "sim/FMS/fpln"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_RAD_NAV, FMCKey::PFP4_NAV_RAD, FMCKey::PFP7_NAV_RAD}, "sim/FMS/navrad"},
+                        {FMCKey::MCDU_FUEL_PRED, "sim/FMS/fuel_pred"},
+                        {FMCKey::MCDU_SEC_FPLN, "sim/FMS/sec_fpln"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_ATC_COMM, FMCKey::PFP4_ATC}, "sim/FMS/atc_comm"},
+                        {FMCKey::MENU, "sim/FMS/menu"},
+                        {FMCKey::BRIGHTNESS_DOWN, "laminar/A333/buttons/fms1_brightness_dn"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_AIRPORT, FMCKey::PFP_DEP_ARR}, "sim/FMS/airport"},
+                        {FMCKey::MCDU_EMPTY_BOTTOM_LEFT, ""},
+                        {FMCKey::PAGE_PREV, "sim/FMS/prev"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_PAGE_UP, FMCKey::PAGE_PREV}, "sim/FMS/up"},
+                        {FMCKey::PAGE_NEXT, "sim/FMS/next"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_PAGE_DOWN, FMCKey::PAGE_NEXT}, "sim/FMS/down"},
+                        {FMCKey::KEY1, "sim/FMS/key_1"},
+                        {FMCKey::KEY2, "sim/FMS/key_2"},
+                        {FMCKey::KEY3, "sim/FMS/key_3"},
+                        {FMCKey::KEY4, "sim/FMS/key_4"},
+                        {FMCKey::KEY5, "sim/FMS/key_5"},
+                        {FMCKey::KEY6, "sim/FMS/key_6"},
+                        {FMCKey::KEY7, "sim/FMS/key_7"},
+                        {FMCKey::KEY8, "sim/FMS/key_8"},
+                        {FMCKey::KEY9, "sim/FMS/key_9"},
+                        {FMCKey::PERIOD, "sim/FMS/key_period"},
+                        {FMCKey::KEY0, "sim/FMS/key_0"},
+                        {FMCKey::PLUSMINUS, "sim/FMS/key_minus"},
+                        {FMCKey::KEYA, "sim/FMS/key_A"},
+                        {FMCKey::KEYB, "sim/FMS/key_B"},
+                        {FMCKey::KEYC, "sim/FMS/key_C"},
+                        {FMCKey::KEYD, "sim/FMS/key_D"},
+                        {FMCKey::KEYE, "sim/FMS/key_E"},
+                        {FMCKey::KEYF, "sim/FMS/key_F"},
+                        {FMCKey::KEYG, "sim/FMS/key_G"},
+                        {FMCKey::KEYH, "sim/FMS/key_H"},
+                        {FMCKey::KEYI, "sim/FMS/key_I"},
+                        {FMCKey::KEYJ, "sim/FMS/key_J"},
+                        {FMCKey::KEYK, "sim/FMS/key_K"},
+                        {FMCKey::KEYL, "sim/FMS/key_L"},
+                        {FMCKey::KEYM, "sim/FMS/key_M"},
+                        {FMCKey::KEYN, "sim/FMS/key_N"},
+                        {FMCKey::KEYO, "sim/FMS/key_O"},
+                        {FMCKey::KEYP, "sim/FMS/key_P"},
+                        {FMCKey::KEYQ, "sim/FMS/key_Q"},
+                        {FMCKey::KEYR, "sim/FMS/key_R"},
+                        {FMCKey::KEYS, "sim/FMS/key_S"},
+                        {FMCKey::KEYT, "sim/FMS/key_T"},
+                        {FMCKey::KEYU, "sim/FMS/key_U"},
+                        {FMCKey::KEYV, "sim/FMS/key_V"},
+                        {FMCKey::KEYW, "sim/FMS/key_W"},
+                        {FMCKey::KEYX, "sim/FMS/key_X"},
+                        {FMCKey::KEYY, "sim/FMS/key_Y"},
+                        {FMCKey::KEYZ, "sim/FMS/key_Z"},
+                        {FMCKey::SLASH, "sim/FMS/key_slash"},
+                        {FMCKey::SPACE, "sim/FMS/key_space"},
+                        {std::vector<FMCKey>{FMCKey::MCDU_OVERFLY, FMCKey::PFP_DEL}, "sim/FMS/key_overfly"},
+                        {FMCKey::CLR, "sim/FMS/key_clear"},
+                    })
+        .first->second;
+}
+
+const std::unordered_map<FMCKey, const FMCButtonDef *> &LaminarFMCProfile::buttonKeyMap() const {
+    static std::unordered_map<FMCDeviceVariant, std::unordered_map<FMCKey, const FMCButtonDef *>> cache;
+
+    auto it = cache.find(product->deviceVariant);
+    if (it == cache.end()) {
+        std::unordered_map<FMCKey, const FMCButtonDef *> map;
+        const auto &buttons = buttonDefs();
+        for (const auto &button : buttons) {
+            std::visit([&](auto &&k) {
+                using T = std::decay_t<decltype(k)>;
+                if constexpr (std::is_same_v<T, FMCKey>) {
+                    map[k] = &button;
+                } else {
+                    for (const auto &key : k) {
+                        map[key] = &button;
+                    }
+                }
+            },
+                button.key);
+        }
+        it = cache.emplace(product->deviceVariant, std::move(map)).first;
+    }
+    return it->second;
 }
 
 const std::map<char, FMCTextColor> &LaminarFMCProfile::colorMap() const {
