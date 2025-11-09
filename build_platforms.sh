@@ -1,25 +1,128 @@
 #!/bin/sh
 
+# Help function
+show_help() {
+    cat << EOF
+Usage: ./build_platforms.sh [OPTIONS]
+
+Build script for the Winwing X-Plane plugin. Supports building for multiple platforms
+and development mode with live reload to X-Plane.
+
+OPTIONS:
+    --help              Show this help message and exit
+
+    --dev[=PATH]        Enable development mode for faster iteration
+                        - Skips interactive prompts
+                        - Skips distribution bundle creation
+                        - Optionally specify X-Plane plugins path for live reload
+                        - Defaults to building Mac only (override with --platform)
+
+    --platform=PLATFORM Build only the specified platform
+                        Available platforms: mac, win, lin
+                        Can be combined with --dev for targeted development builds
+
+EXAMPLES:
+    # Interactive mode (default) - prompts for platforms and options
+    ./build_platforms.sh
+
+    # Build only for Mac
+    ./build_platforms.sh --platform=mac
+
+    # Build for Mac and Windows
+    ./build_platforms.sh --platform=mac --platform=win
+
+    # Development mode with live reload to X-Plane (Mac only by default)
+    ./build_platforms.sh --dev="/Users/username/X-Plane 12/Resources/plugins"
+
+    # Development mode, will prompt for X-Plane path
+    ./build_platforms.sh --dev
+
+    # Development mode for Windows with live reload
+    ./build_platforms.sh --dev="/Users/username/X-Plane 12/Resources/plugins" --platform=win
+
+    # Quick rebuild after changes (run after initial build)
+    make -C build/mac
+
+NOTES:
+    - The SDK/ folder must be present in the project root
+    - In dev mode, use 'make -C build/<platform>' for quick rebuilds
+    - Linux builds require Docker
+
+EOF
+    exit 0
+}
+
+# Check for flags
+DEV_MODE=false
+XPLANE_PLUGIN_PATH=""
+PLATFORM_OVERRIDE=""
+
+for arg in "$@"; do
+    case $arg in
+        --help)
+            show_help
+            ;;
+        --dev)
+            DEV_MODE=true
+            shift
+            ;;
+        --dev=*)
+            DEV_MODE=true
+            XPLANE_PLUGIN_PATH="${arg#*=}"
+            shift
+            ;;
+        --platform=*)
+            PLATFORM_OVERRIDE="${arg#*=}"
+            shift
+            ;;
+        *)
+            ;;
+    esac
+done
+
 PROJECT_NAME=$(find . -name "*.xcodeproj" | sed 's/\.xcodeproj//g' | sed 's/^\.\///g' | tr '[:upper:]' '[:lower:]')
 VERSION=$(grep "#define VERSION " src/include/config.h | cut -d " " -f 3 | tr -d '"')
-echo "Building $PROJECT_NAME.xpl version $VERSION. Is this correct? (y/n):"
-read CONFIRM
-
-if [ -z "$CONFIRM" ]; then
-    CONFIRM="y"
-fi
-
-if [ "$CONFIRM" != "y" ]; then
-    echo "Please update the version number in config.h and try again."
-    exit 1
-fi
 
 AVAILABLE_PLATFORMS="mac win lin"
-echo "Which platforms would you like to build? ($AVAILABLE_PLATFORMS):"
-read PLATFORMS
 
-if [ -z "$PLATFORMS" ]; then
-    PLATFORMS=$AVAILABLE_PLATFORMS
+# Validate platform override if provided
+if [ ! -z "$PLATFORM_OVERRIDE" ]; then
+    if ! echo $AVAILABLE_PLATFORMS | grep -q $PLATFORM_OVERRIDE; then
+        echo "Invalid platform: $PLATFORM_OVERRIDE. Available: $AVAILABLE_PLATFORMS"
+        exit 1
+    fi
+    PLATFORMS="$PLATFORM_OVERRIDE"
+fi
+
+if [ "$DEV_MODE" = true ]; then
+    echo "Development mode enabled."
+    if [ -z "$XPLANE_PLUGIN_PATH" ]; then
+        echo "Enter X-Plane plugins path (e.g., /Users/username/X-Plane 12/Resources/plugins):"
+        read XPLANE_PLUGIN_PATH
+    fi
+    if [ -z "$PLATFORMS" ]; then
+        PLATFORMS="mac"
+    fi
+    CLEAN_BUILD="n"
+elif [ -z "$PLATFORMS" ]; then
+    echo "Building $PROJECT_NAME.xpl version $VERSION. Is this correct? (y/n):"
+    read CONFIRM
+
+    if [ -z "$CONFIRM" ]; then
+        CONFIRM="y"
+    fi
+
+    if [ "$CONFIRM" != "y" ]; then
+        echo "Please update the version number in config.h and try again."
+        exit 1
+    fi
+
+    echo "Which platforms would you like to build? ($AVAILABLE_PLATFORMS):"
+    read PLATFORMS
+
+    if [ -z "$PLATFORMS" ]; then
+        PLATFORMS=$AVAILABLE_PLATFORMS
+    fi
 fi
 
 for platform in $PLATFORMS; do
@@ -39,11 +142,14 @@ fi
 SDK_VERSION=$(grep "#define kXPLM_Version" SDK/CHeaders/XPLM/XPLMDefs.h | awk '{print $3}' | tr -d '()')
 
 echo "Building with SDK version $SDK_VERSION\n"
-echo "Clean build directory? (y/n):"
-read CLEAN_BUILD
 
-if [ -z "$CLEAN_BUILD" ]; then
-    CLEAN_BUILD="n"
+if [ "$DEV_MODE" = false ]; then
+    echo "Clean build directory? (y/n):"
+    read CLEAN_BUILD
+
+    if [ -z "$CLEAN_BUILD" ]; then
+        CLEAN_BUILD="n"
+    fi
 fi
 
 if [ "$CLEAN_BUILD" = "y" ]; then
@@ -61,7 +167,11 @@ for platform in $PLATFORMS; do
         cmake -DCMAKE_CXX_FLAGS='-march=x86-64' -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H. && \
         make -C build/$platform -j\$(nproc)"
     else
-        cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H.
+        if [ "$DEV_MODE" = true ] && [ ! -z "$XPLANE_PLUGIN_PATH" ]; then
+            cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -DXPLANE_PLUGIN_PATH="$XPLANE_PLUGIN_PATH" -Bbuild/$platform -H.
+        else
+            cmake -DCMAKE_TOOLCHAIN_FILE=toolchain-$platform.cmake -DSDK_VERSION=$SDK_VERSION -Bbuild/$platform -H.
+        fi
         make -C build/$platform
     fi
 
@@ -77,6 +187,27 @@ for platform in $PLATFORMS; do
 done
 
 echo "Building has finished."
+
+if [ "$DEV_MODE" = true ]; then
+    echo "\n\033[1;32mDevelopment build complete!\033[0m"
+    if [ ! -z "$XPLANE_PLUGIN_PATH" ]; then
+        # Create plugin directory structure and copy assets
+        PLUGIN_DIR="$XPLANE_PLUGIN_PATH/$PROJECT_NAME"
+        mkdir -p "$PLUGIN_DIR"
+        
+        # Copy assets folder if it exists
+        if [ -d "assets" ]; then
+            echo "Copying assets folder..."
+            cp -r assets "$PLUGIN_DIR/"
+        fi
+        
+        for platform in $PLATFORMS; do
+            echo "Plugin installed to: $PLUGIN_DIR/${platform}_x64/$PROJECT_NAME.xpl"
+        done
+    fi
+    echo "\nTo rebuild after changes, run: make -C build/$PLATFORMS"
+    exit 0
+fi
 
 echo "Creating distribution bundle..."
 if [ -d "build/dist" ]; then

@@ -4,6 +4,7 @@
 #include "config.h"
 #include "dataref.h"
 #include "profiles/laminar-fcu-efis-profile.h"
+#include "profiles/laminar737-fcu-efis-profile.h"
 #include "profiles/toliss-fcu-efis-profile.h"
 
 #include <algorithm>
@@ -97,6 +98,9 @@ ProductFCUEfis::~ProductFCUEfis() {
 void ProductFCUEfis::setProfileForCurrentAircraft() {
     if (TolissFCUEfisProfile::IsEligible()) {
         profile = new TolissFCUEfisProfile(this);
+        profileReady = true;
+    } else if (Laminar737FCUEfisProfile::IsEligible()) {
+        profile = new Laminar737FCUEfisProfile(this);
         profileReady = true;
     } else if (LaminarFCUEfisProfile::IsEligible()) {
         profile = new LaminarFCUEfisProfile(this);

@@ -70,6 +70,8 @@
 		F6C248472EBE498500617E89 /* plugins-menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C248452EBE498500617E89 /* plugins-menu.cpp */; };
 		F6C345512E18797400D7C987 /* dataref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBC2D06F84900530297 /* dataref.cpp */; };
 		F6C3455F2E187AB700D7C987 /* xplane-sdk-mock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C3455E2E187AAF00D7C987 /* xplane-sdk-mock.cpp */; };
+		F6C69C0E2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C69C0D2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp */; };
+		F6C69C0F2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C69C0D2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp */; };
 		F6C6E0302E8D5DAA00558F46 /* product-pap3-mcp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02A2E8D5DAA00558F46 /* product-pap3-mcp.cpp */; };
 		F6C6E0312E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02C2E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp */; };
 		F6C6E0322E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02E2E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp */; };
@@ -161,6 +163,8 @@
 		F6C248442EBE498500617E89 /* plugins-menu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "plugins-menu.h"; sourceTree = "<group>"; };
 		F6C248452EBE498500617E89 /* plugins-menu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "plugins-menu.cpp"; sourceTree = "<group>"; };
 		F6C3455E2E187AAF00D7C987 /* xplane-sdk-mock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "xplane-sdk-mock.cpp"; sourceTree = "<group>"; };
+		F6C69C0C2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "laminar737-fcu-efis-profile.h"; sourceTree = "<group>"; };
+		F6C69C0D2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "laminar737-fcu-efis-profile.cpp"; sourceTree = "<group>"; };
 		F6C6E0272E8D5DAA00558F46 /* pap3-mcp-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pap3-mcp-aircraft-profile.h"; sourceTree = "<group>"; };
 		F6C6E0282E8D5DAA00558F46 /* pap3-mcp-lcd-segments.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pap3-mcp-lcd-segments.h"; sourceTree = "<group>"; };
 		F6C6E0292E8D5DAA00558F46 /* product-pap3-mcp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-pap3-mcp.h"; sourceTree = "<group>"; };
@@ -367,6 +371,8 @@
 				F6BB75722E32634700C2B21F /* toliss-fcu-efis-profile.cpp */,
 				F67FE8122E895BAC00C4243C /* laminar-fcu-efis-profile.h */,
 				F67FE8132E895BAC00C4243C /* laminar-fcu-efis-profile.cpp */,
+				F6C69C0C2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.h */,
+				F6C69C0D2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp */,
 			);
 			path = profiles;
 			sourceTree = "<group>";
@@ -531,6 +537,7 @@
 				F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
 				F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
 				F67110DE2E5AF429008D493B /* font.cpp in Sources */,
+				F6C69C0E2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp in Sources */,
 				F688808B2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */,
 				F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
@@ -585,6 +592,7 @@
 				F6C6E0312E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp in Sources */,
 				F6C6E0322E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp in Sources */,
 				F647201E2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
+				F6C69C0F2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp in Sources */,
 				5DBA92312E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */,
 				F67961962E31357E008031F1 /* usbdevice_lin.cpp in Sources */,
 				F635AD422E05697B005D6CDC /* bridge.mm in Sources */,
