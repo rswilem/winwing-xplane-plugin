@@ -49,7 +49,6 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/APPRilluminated");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/APVerticalMode");
 
-        // Unbind EFIS Right datarefs
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/FD2Engage");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/ILSonFO");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/NDShowCSTRFO");
@@ -58,7 +57,6 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/NDShowNDBFO");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/NDShowARPTFO");
 
-        // Unbind EFIS Left datarefs
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/FD1Engage");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/ILSonCapt");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/NDShowCSTRCapt");
