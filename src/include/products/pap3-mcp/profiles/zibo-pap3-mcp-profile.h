@@ -12,6 +12,7 @@ class ZiboPAP3MCPProfile : public PAP3MCPAircraftProfile {
         int readBankAngleIndex();
         void setBankAngleIndex(int target);
         void maybeToggle(const char *dataref, bool hwState, const char *toggleCmd);
+        bool isDisplayTestMode();
 
         // Hardware switch states
         bool hwFDCaptOn = false;
