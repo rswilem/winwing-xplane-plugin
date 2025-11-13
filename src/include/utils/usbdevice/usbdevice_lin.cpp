@@ -53,6 +53,9 @@ bool USBDevice::connect() {
     });
     inputThread.detach();
 
+    writeThreadRunning = true;
+    writeThread = std::thread(&USBDevice::writeThreadLoop, this);
+
     return true;
 }
 
@@ -86,6 +89,12 @@ void USBDevice::update() {
 void USBDevice::disconnect() {
     connected = false;
 
+    writeThreadRunning = false;
+    writeQueueCV.notify_all();
+    if (writeThread.joinable()) {
+        writeThread.join();
+    }
+
     // Give input thread time to exit
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
@@ -112,12 +121,43 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
         return false;
     }
 
-    ssize_t bytesWritten = write(hidDevice, data.data(), data.size());
-    if (bytesWritten == (ssize_t) data.size()) {
-        return true;
+    {
+        std::lock_guard<std::mutex> lock(writeQueueMutex);
+        writeQueue.push(std::move(data));
+        cachedWriteQueueSize.store(writeQueue.size());
     }
+    writeQueueCV.notify_one();
 
-    debug_force("Raw write failed: %s (wrote %zd of %zu bytes)\n", strerror(errno), bytesWritten, data.size());
-    return false;
+    return true;
+}
+
+void USBDevice::writeThreadLoop() {
+    while (writeThreadRunning) {
+        std::vector<uint8_t> data;
+
+        {
+            std::unique_lock<std::mutex> lock(writeQueueMutex);
+            writeQueueCV.wait(lock, [this] {
+                return !writeQueue.empty() || !writeThreadRunning;
+            });
+
+            if (!writeThreadRunning) {
+                break;
+            }
+
+            if (!writeQueue.empty()) {
+                data = std::move(writeQueue.front());
+                writeQueue.pop();
+                cachedWriteQueueSize.store(writeQueue.size());
+            }
+        }
+
+        if (!data.empty() && hidDevice >= 0 && connected) {
+            ssize_t bytesWritten = write(hidDevice, data.data(), data.size());
+            if (bytesWritten != (ssize_t) data.size()) {
+                debug_force("Raw write failed: %s (wrote %zd of %zu bytes)\n", strerror(errno), bytesWritten, data.size());
+            }
+        }
+    }
 }
 #endif

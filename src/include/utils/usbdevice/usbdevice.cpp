@@ -131,3 +131,19 @@ void USBDevice::processQueuedEvents() {
         didReceiveData(event.reportId, event.reportData.data(), event.reportLength);
     }
 }
+
+int USBDevice::getDisplayUpdateFrameInterval() {
+    size_t queueSize = cachedWriteQueueSize.load();
+
+    if (queueSize < 100) {
+        return 2;
+    } else if (queueSize < 200) {
+        return 4;
+    } else if (queueSize < 500) {
+        return 8;
+    } else if (queueSize < 1000) {
+        return 20;
+    }
+
+    return 100;
+}

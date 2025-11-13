@@ -109,7 +109,7 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
 }
 
 const char *ProductFCUEfis::classIdentifier() {
-    return "Product-FCU-EFIS";
+    return "FCU-EFIS";
 }
 
 bool ProductFCUEfis::connect() {
@@ -198,8 +198,7 @@ void ProductFCUEfis::update() {
 
     USBDevice::update();
 
-    // Rate limit display updates to ~30Hz, unless forced
-    if (++displayUpdateFrameCounter >= DISPLAY_UPDATE_FRAME_INTERVAL) {
+    if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval()) {
         displayUpdateFrameCounter = 0;
         updateDisplays();
     }

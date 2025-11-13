@@ -44,7 +44,7 @@ void ProductPAP3MCP::setProfileForCurrentAircraft() {
 }
 
 const char *ProductPAP3MCP::classIdentifier() {
-    return "Product-PAP3-MCP";
+    return "PAP3-MCP";
 }
 
 bool ProductPAP3MCP::connect() {
@@ -110,7 +110,7 @@ void ProductPAP3MCP::update() {
 
     USBDevice::update();
 
-    if (++displayUpdateFrameCounter >= DISPLAY_UPDATE_FRAME_INTERVAL) {
+    if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval()) {
         displayUpdateFrameCounter = 0;
         updateDisplays();
     }

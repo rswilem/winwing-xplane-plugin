@@ -76,16 +76,16 @@ void ProductFMC::setProfileForCurrentAircraft() {
 
 const char *ProductFMC::classIdentifier() {
     if (hardwareType == FMCHardwareType::HARDWARE_MCDU) {
-        return "Product FMC (MCDU)";
+        return "FMC (MCDU)";
     } else if (hardwareType == FMCHardwareType::HARDWARE_PFP3N) {
-        return "Product FMC (PFP3N)";
+        return "FMC (PFP3N)";
     } else if (hardwareType == FMCHardwareType::HARDWARE_PFP4) {
-        return "Product FMC (PFP4)";
+        return "FMC (PFP4)";
     } else if (hardwareType == FMCHardwareType::HARDWARE_PFP7) {
-        return "Product FMC (PFP7)";
+        return "FMC (PFP7)";
     }
 
-    return "Product FMC (unknown hardware)";
+    return "FMC (unknown hardware)";
 }
 
 bool ProductFMC::connect() {
@@ -185,7 +185,7 @@ void ProductFMC::update() {
 
     USBDevice::update();
 
-    if (++displayUpdateFrameCounter >= DISPLAY_UPDATE_FRAME_INTERVAL) {
+    if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval()) {
         displayUpdateFrameCounter = 0;
         updatePage();
     }
@@ -260,7 +260,8 @@ void ProductFMC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, ui
 
     FMCKey key = FMCHardwareMapping::ButtonIdentifierForIndex(hardwareType, hardwareButtonIndex);
     if (key == FMCKey::INVALID_UNKNOWN) {
-        debug_force("Received unknown key from hardwareType %i - hardwareButtonIndex: %i\n", (int) hardwareType, hardwareButtonIndex);
+        // For reference, we often get: [Winwing] Received unknown key from hardwareType 1 - hardwareButtonIndex: 207
+        debug("Received unknown key from hardwareType %i - hardwareButtonIndex: %i\n", (int) hardwareType, hardwareButtonIndex);
         return;
     }
 

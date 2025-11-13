@@ -49,6 +49,10 @@ bool USBDevice::connect() {
     }
 
     connected = true;
+
+    writeThreadRunning = true;
+    writeThread = std::thread(&USBDevice::writeThreadLoop, this);
+
     return true;
 }
 
@@ -71,6 +75,12 @@ void USBDevice::update() {
 void USBDevice::disconnect() {
     connected = false;
 
+    writeThreadRunning = false;
+    writeQueueCV.notify_all();
+    if (writeThread.joinable()) {
+        writeThread.join();
+    }
+
     if (hidDevice) {
         IOHIDQueueStop(hidQueue);
         IOHIDQueueUnscheduleFromRunLoop(hidQueue, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
@@ -91,7 +101,7 @@ void USBDevice::forceStateSync() {
     if (!connected || !hidDevice) {
         return;
     }
-    
+
     CFArrayRef elements = IOHIDDeviceCopyMatchingElements(hidDevice, nullptr, 0);
     for (CFIndex i = 0; i < CFArrayGetCount(elements); i++) {
         IOHIDElementRef element = (IOHIDElementRef) CFArrayGetValueAtIndex(elements, i);
@@ -104,7 +114,7 @@ void USBDevice::forceStateSync() {
             handleHIDValue(value);
         }
     }
-    
+
     CFRelease(elements);
 }
 
@@ -114,13 +124,45 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
         return false;
     }
 
-    uint8_t reportID = data[0];
-    IOReturn kr = IOHIDDeviceSetReport(hidDevice, kIOHIDReportTypeOutput, reportID, data.data(), data.size());
-    if (kr != kIOReturnSuccess) {
-        debug("IOHIDDeviceSetReport failed: %d\n", kr);
-        return false;
+    {
+        std::lock_guard<std::mutex> lock(writeQueueMutex);
+        writeQueue.push(std::move(data));
+        cachedWriteQueueSize.store(writeQueue.size());
     }
+    writeQueueCV.notify_one();
+
     return true;
+}
+
+void USBDevice::writeThreadLoop() {
+    while (writeThreadRunning) {
+        std::vector<uint8_t> data;
+
+        {
+            std::unique_lock<std::mutex> lock(writeQueueMutex);
+            writeQueueCV.wait(lock, [this] {
+                return !writeQueue.empty() || !writeThreadRunning;
+            });
+
+            if (!writeThreadRunning) {
+                break;
+            }
+
+            if (!writeQueue.empty()) {
+                data = std::move(writeQueue.front());
+                writeQueue.pop();
+                cachedWriteQueueSize.store(writeQueue.size());
+            }
+        }
+
+        if (!data.empty() && hidDevice && connected) {
+            uint8_t reportID = data[0];
+            IOReturn kr = IOHIDDeviceSetReport(hidDevice, kIOHIDReportTypeOutput, reportID, data.data(), data.size());
+            if (kr != kIOReturnSuccess) {
+                debug("IOHIDDeviceSetReport failed: %d\n", kr);
+            }
+        }
+    }
 }
 
 void USBDevice::handleHIDValue(IOHIDValueRef value) {

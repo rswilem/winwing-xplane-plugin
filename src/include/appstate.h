@@ -20,6 +20,7 @@ class AppState {
         static AppState *instance;
         std::vector<DelayedTask> taskQueue;
         void update();
+        std::string getPluginDirectory();
 
     public:
         static float Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon);
@@ -33,6 +34,9 @@ class AppState {
 
         void executeAfter(int milliseconds, std::function<void()> func);
         void executeAfterDebounced(std::string taskName, int milliseconds, std::function<void()> func);
+
+        std::string readPreference(const std::string &key, const std::string &defaultValue);
+        void writePreference(const std::string &key, const std::string &value);
 };
 
 #endif

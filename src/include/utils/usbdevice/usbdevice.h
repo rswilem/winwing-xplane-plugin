@@ -3,10 +3,13 @@
 
 #include "config.h"
 
+#include <atomic>
+#include <condition_variable>
 #include <cstdint>
 #include <mutex>
 #include <queue>
 #include <string>
+#include <thread>
 #include <vector>
 
 #if APL
@@ -34,7 +37,15 @@ class USBDevice {
         std::queue<InputEvent> eventQueue;
         std::mutex eventQueueMutex;
 
+        std::queue<std::vector<uint8_t>> writeQueue;
+        std::mutex writeQueueMutex;
+        std::condition_variable writeQueueCV;
+        std::thread writeThread;
+        std::atomic<bool> writeThreadRunning{false};
+        std::atomic<size_t> cachedWriteQueueSize{0};
+
         void processQueuedEvents();
+        void writeThreadLoop();
 
 #if APL
         IOHIDQueueRef hidQueue;
@@ -70,6 +81,7 @@ class USBDevice {
         void processOnMainThread(const InputEvent &event);
 
         bool writeData(std::vector<uint8_t> data);
+        int getDisplayUpdateFrameInterval();
 
         static USBDevice *Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
 };

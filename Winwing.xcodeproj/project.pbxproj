@@ -16,7 +16,6 @@
 		F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD492E05819E005D6CDC /* usbdevice_mac.cpp */; };
 		F635AD4B2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD492E05819E005D6CDC /* usbdevice_mac.cpp */; };
 		F635AD502E058FFC005D6CDC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F635AD4F2E058FFC005D6CDC /* IOKit.framework */; platformFilters = (ios, maccatalyst, macos, tvos, xros, ); };
-		F635AD532E059872005D6CDC /* path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD522E059872005D6CDC /* path.cpp */; };
 		F63BC99A2E30D73E00ACBBB0 /* appstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9ECB2D078ED400530297 /* appstate.cpp */; };
 		F647201E2E16CF6D00C9976B /* usbdevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F647201D2E16CF6D00C9976B /* usbdevice.cpp */; };
 		F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F647201D2E16CF6D00C9976B /* usbdevice.cpp */; };
@@ -38,6 +37,10 @@
 		F68164E62E3161FD00319E9D /* usbcontroller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F68164E42E3161FD00319E9D /* usbcontroller.cpp */; };
 		F6827E092E05652800382B28 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6827E042E05651E00382B28 /* ContentView.swift */; };
 		F6827E0A2E05652E00382B28 /* WinwingDesktopApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6827E052E05651E00382B28 /* WinwingDesktopApp.swift */; };
+		F68428612EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F684285E2EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp */; };
+		F68428622EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F684285E2EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp */; };
+		F68428652EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F68428642EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp */; };
+		F68428662EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F68428642EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp */; };
 		F688808B2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F688808A2E523DE900B10AFA /* xcrafts-fmc-profile.cpp */; };
 		F688808C2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F688808A2E523DE900B10AFA /* xcrafts-fmc-profile.cpp */; };
 		F691E46D2D0338E90000666C /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F691E46C2D0338E90000666C /* CoreFoundation.framework */; };
@@ -105,8 +108,6 @@
 		F635AD492E05819E005D6CDC /* usbdevice_mac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice_mac.cpp; sourceTree = "<group>"; };
 		F635AD4E2E058905005D6CDC /* Winwing.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Winwing.entitlements; sourceTree = "<group>"; };
 		F635AD4F2E058FFC005D6CDC /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-		F635AD512E059872005D6CDC /* path.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = path.h; sourceTree = "<group>"; };
-		F635AD522E059872005D6CDC /* path.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = path.cpp; sourceTree = "<group>"; };
 		F647201D2E16CF6D00C9976B /* usbdevice.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbdevice.cpp; sourceTree = "<group>"; };
 		F64BE3E32E1BF625003C1B73 /* usbcontroller_lin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_lin.cpp; sourceTree = "<group>"; };
 		F64BE3E42E1BF625003C1B73 /* usbcontroller_win.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = usbcontroller_win.cpp; sourceTree = "<group>"; };
@@ -125,6 +126,12 @@
 		F6827E052E05651E00382B28 /* WinwingDesktopApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinwingDesktopApp.swift; sourceTree = "<group>"; };
 		F6827E102E05664C00382B28 /* bridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = bridge.mm; sourceTree = "<group>"; };
 		F6827E122E05678E00382B28 /* bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridge.h; sourceTree = "<group>"; };
+		F684285C2EC6336D0027756D /* SimpleIni.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimpleIni.h; sourceTree = "<group>"; };
+		F684285D2EC6389D0027756D /* toliss-ursa-minor-joystick-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "toliss-ursa-minor-joystick-profile.h"; sourceTree = "<group>"; };
+		F684285E2EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "toliss-ursa-minor-joystick-profile.cpp"; sourceTree = "<group>"; };
+		F68428602EC6389D0027756D /* ursa-minor-joystick-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ursa-minor-joystick-aircraft-profile.h"; sourceTree = "<group>"; };
+		F68428632EC63F070027756D /* zibo-ursa-minor-joystick-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "zibo-ursa-minor-joystick-profile.h"; sourceTree = "<group>"; };
+		F68428642EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "zibo-ursa-minor-joystick-profile.cpp"; sourceTree = "<group>"; };
 		F68880892E523DE900B10AFA /* xcrafts-fmc-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xcrafts-fmc-profile.h"; sourceTree = "<group>"; };
 		F688808A2E523DE900B10AFA /* xcrafts-fmc-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "xcrafts-fmc-profile.cpp"; sourceTree = "<group>"; };
 		F691E46C2D0338E90000666C /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -300,6 +307,17 @@
 			path = desktop;
 			sourceTree = "<group>";
 		};
+		F684285F2EC6389D0027756D /* profiles */ = {
+			isa = PBXGroup;
+			children = (
+				F684285D2EC6389D0027756D /* toliss-ursa-minor-joystick-profile.h */,
+				F684285E2EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp */,
+				F68428632EC63F070027756D /* zibo-ursa-minor-joystick-profile.h */,
+				F68428642EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp */,
+			);
+			path = profiles;
+			sourceTree = "<group>";
+		};
 		F691E46B2D0338E90000666C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -354,10 +372,9 @@
 			isa = PBXGroup;
 			children = (
 				F635AD452E0579E9005D6CDC /* usbdevice */,
+				F684285C2EC6336D0027756D /* SimpleIni.h */,
 				F6AF9EBB2D06F84900530297 /* dataref.h */,
 				F6AF9EBC2D06F84900530297 /* dataref.cpp */,
-				F635AD512E059872005D6CDC /* path.h */,
-				F635AD522E059872005D6CDC /* path.cpp */,
 				F6C248442EBE498500617E89 /* plugins-menu.h */,
 				F6C248452EBE498500617E89 /* plugins-menu.cpp */,
 			);
@@ -402,6 +419,8 @@
 		F6F77AAE2E278F300060AFC0 /* ursa-minor-joystick */ = {
 			isa = PBXGroup;
 			children = (
+				F68428602EC6389D0027756D /* ursa-minor-joystick-aircraft-profile.h */,
+				F684285F2EC6389D0027756D /* profiles */,
 				F6F77AAC2E278F300060AFC0 /* product-ursa-minor-joystick.h */,
 				F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */,
 			);
@@ -531,8 +550,8 @@
 				F6BB757B2E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */,
 				F68164E62E3161FD00319E9D /* usbcontroller.cpp in Sources */,
 				F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */,
-				F635AD532E059872005D6CDC /* path.cpp in Sources */,
 				F6C248462EBE498500617E89 /* plugins-menu.cpp in Sources */,
+				F68428662EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */,
 				F67FE8142E895BAC00C4243C /* laminar-fcu-efis-profile.cpp in Sources */,
 				F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
 				F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
@@ -544,6 +563,7 @@
 				F671B5DF2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp in Sources */,
 				F64BE3EA2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
 				F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */,
+				F68428622EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp in Sources */,
 				F6A1492F2E4F03A400FB8395 /* product-fmc.cpp in Sources */,
 				F6A149302E4F03A400FB8395 /* toliss-fmc-profile.cpp in Sources */,
 				5DBA92322E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */,
@@ -565,9 +585,11 @@
 				F64BE3EB2E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F6BB75782E32634700C2B21F /* product-fcu-efis.cpp in Sources */,
+				F68428652EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */,
 				F6BB75792E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */,
 				F63BC99A2E30D73E00ACBBB0 /* appstate.cpp in Sources */,
 				F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
+				F68428612EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp in Sources */,
 				F68164E52E3161FD00319E9D /* usbcontroller.cpp in Sources */,
 				F6F77AB52E278F530060AFC0 /* product-ursa-minor-joystick.cpp in Sources */,
 				F6C345512E18797400D7C987 /* dataref.cpp in Sources */,

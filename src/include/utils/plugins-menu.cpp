@@ -31,6 +31,15 @@ void PluginsMenu::ensureMenuExists() {
 }
 
 void PluginsMenu::addMenuItemsToMenu(XPLMMenuID parentMenu, const std::vector<MenuItem> &items, bool persistent) {
+    int parentSubmenuId = -1;
+    // Find which submenu this parent menu belongs to
+    for (const auto &entry : submenus) {
+        if (entry.second.first == parentMenu) {
+            parentSubmenuId = entry.first;
+            break;
+        }
+    }
+
     for (const auto &item : items) {
         if (std::holds_alternative<std::function<void(int)>>(item.content)) {
             // Regular menu item with callback
@@ -40,6 +49,12 @@ void PluginsMenu::addMenuItemsToMenu(XPLMMenuID parentMenu, const std::vector<Me
             menuCallbacks[subItemId] = std::make_pair(subItemIndex, callback);
             itemNames[subItemId] = item.name;
             persistentItems[subItemId] = persistent;
+            itemToMenuId[subItemId] = parentMenu;
+
+            // Track this as a child of the parent submenu
+            if (parentSubmenuId != -1) {
+                submenuChildren[parentSubmenuId].push_back(subItemId);
+            }
 
             if (item.checked) {
                 XPLMCheckMenuItem(parentMenu, subItemIndex, xplm_Menu_Checked);
@@ -55,6 +70,12 @@ void PluginsMenu::addMenuItemsToMenu(XPLMMenuID parentMenu, const std::vector<Me
             submenus[subItemId] = std::make_pair(nestedSubmenuId, nestedItems);
             itemNames[subItemId] = item.name;
             persistentItems[subItemId] = persistent;
+            itemToMenuId[subItemId] = parentMenu;
+
+            // Track this as a child of the parent submenu
+            if (parentSubmenuId != -1) {
+                submenuChildren[parentSubmenuId].push_back(subItemId);
+            }
 
             // Recursively add items to nested submenu
             addMenuItemsToMenu(nestedSubmenuId, nestedItems, persistent);
@@ -150,9 +171,52 @@ void PluginsMenu::setItemName(int itemIndex, const std::string &name) {
     XPLMSetMenuItemName(mainMenuId, itemIndex, name.c_str(), 0);
 }
 
-void PluginsMenu::setItemChecked(int itemIndex, bool checked) {
+void PluginsMenu::setItemChecked(int itemId, bool checked) {
     ensureMenuExists();
-    XPLMCheckMenuItem(mainMenuId, itemIndex, checked ? xplm_Menu_Checked : xplm_Menu_Unchecked);
+
+    auto menuIt = itemToMenuId.find(itemId);
+    if (menuIt == itemToMenuId.end()) {
+        // Fallback to old behavior for backward compatibility
+        XPLMCheckMenuItem(mainMenuId, itemId, checked ? xplm_Menu_Checked : xplm_Menu_Unchecked);
+        return;
+    }
+
+    XPLMMenuID menuId = menuIt->second;
+    auto callbackIt = menuCallbacks.find(itemId);
+    if (callbackIt != menuCallbacks.end()) {
+        int itemIndex = callbackIt->second.first;
+        XPLMCheckMenuItem(menuId, itemIndex, checked ? xplm_Menu_Checked : xplm_Menu_Unchecked);
+    }
+}
+
+void PluginsMenu::uncheckSubmenuSiblings(int itemId) {
+    ensureMenuExists();
+
+    // Find which submenu this item belongs to
+    for (const auto &entry : submenuChildren) {
+        int submenuId = entry.first;
+        const auto &children = entry.second;
+
+        // Check if this item is in this submenu's children
+        if (std::find(children.begin(), children.end(), itemId) != children.end()) {
+            // Found the parent submenu, now uncheck all siblings
+            auto submenuIt = submenus.find(submenuId);
+            if (submenuIt != submenus.end()) {
+                XPLMMenuID menuId = submenuIt->second.first;
+
+                for (int siblingId : children) {
+                    if (siblingId != itemId) {
+                        auto callbackIt = menuCallbacks.find(siblingId);
+                        if (callbackIt != menuCallbacks.end()) {
+                            int itemIndex = callbackIt->second.first;
+                            XPLMCheckMenuItem(menuId, itemIndex, xplm_Menu_Unchecked);
+                        }
+                    }
+                }
+            }
+            return;
+        }
+    }
 }
 
 bool PluginsMenu::isItemChecked(int itemIndex) {
@@ -213,6 +277,8 @@ void PluginsMenu::clearAllItems() {
         itemNames.clear();
         persistentItems.clear();
         submenus.clear();
+        itemToMenuId.clear();
+        submenuChildren.clear();
         nextItemId = 0;
 
         // Re-add persistent items and submenus
@@ -230,8 +296,7 @@ void PluginsMenu::handleMenuAction(void *mRef, void *iRef) {
 
     auto it = self->menuCallbacks.find(itemId);
     if (it != self->menuCallbacks.end()) {
-        int itemIndex = it->second.first;
         auto &callback = it->second.second;
-        callback(itemIndex);
+        callback(itemId); // Pass itemId instead of itemIndex
     }
 }

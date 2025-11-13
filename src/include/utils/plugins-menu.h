@@ -30,6 +30,8 @@ class PluginsMenu {
         std::map<int, std::string> itemNames;                                  // itemId -> name
         std::map<int, bool> persistentItems;                                   // itemId -> isPersistent
         std::map<int, std::pair<XPLMMenuID, std::vector<MenuItem>>> submenus;  // itemId -> (submenuId, items)
+        std::map<int, XPLMMenuID> itemToMenuId;                                // itemId -> menuId (for locating which menu an item belongs to)
+        std::map<int, std::vector<int>> submenuChildren;                       // submenuId -> list of child itemIds
 
         static void handleMenuAction(void *mRef, void *iRef);
         void ensureMenuExists();
@@ -42,7 +44,8 @@ class PluginsMenu {
         int addPersistentItem(const std::string &name, const MenuItemContent &content, bool checked = false);
         void removeItem(int itemIndex);
         void setItemName(int itemIndex, const std::string &name);
-        void setItemChecked(int itemIndex, bool checked);
+        void setItemChecked(int itemId, bool checked);
+        void uncheckSubmenuSiblings(int itemId);
         bool isItemChecked(int itemIndex);
         void clearAllItems();
 };
