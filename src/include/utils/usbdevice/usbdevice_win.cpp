@@ -176,9 +176,10 @@ void USBDevice::writeThreadLoop() {
                 paddedData.resize(outputReportByteLength, 0);
             }
 
-            if (!HidD_SetOutputReport(hidDevice, paddedData.data(), (DWORD) paddedData.size())) {
+            DWORD bytesWritten;
+            if (!WriteFile(hidDevice, paddedData.data(), (DWORD) paddedData.size(), &bytesWritten, nullptr)) {
                 DWORD error = GetLastError();
-                debug_force("HidD_SetOutputReport failed: %lu\n", error);
+                debug_force("WriteFile failed: %lu\n", error);
             }
         }
     }
