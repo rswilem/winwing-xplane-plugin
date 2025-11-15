@@ -86,8 +86,6 @@ void USBDevice::disconnect() {
         IOHIDQueueUnscheduleFromRunLoop(hidQueue, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
         hidQueue = nullptr;
 
-        // Force run loop to process any remaining queued callbacks to drain them
-        // This ensures any pending callbacks are processed while connected=false
         for (int i = 0; i < 10; i++) {
             CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.001, true);
         }
@@ -126,6 +124,9 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
 
     {
         std::lock_guard<std::mutex> lock(writeQueueMutex);
+        if (!connected || !writeThreadRunning) {
+            return false;
+        }
         writeQueue.push(std::move(data));
         cachedWriteQueueSize.store(writeQueue.size());
     }
@@ -144,18 +145,16 @@ void USBDevice::writeThreadLoop() {
                 return !writeQueue.empty() || !writeThreadRunning;
             });
 
-            if (!writeThreadRunning) {
-                break;
-            }
-
             if (!writeQueue.empty()) {
                 data = std::move(writeQueue.front());
                 writeQueue.pop();
                 cachedWriteQueueSize.store(writeQueue.size());
+            } else if (!writeThreadRunning) {
+                break;
             }
         }
 
-        if (!data.empty() && hidDevice && connected) {
+        if (!data.empty() && hidDevice) {
             uint8_t reportID = data[0];
             IOReturn kr = IOHIDDeviceSetReport(hidDevice, kIOHIDReportTypeOutput, reportID, data.data(), data.size());
             if (kr != kIOReturnSuccess) {

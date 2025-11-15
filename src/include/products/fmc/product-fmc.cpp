@@ -185,7 +185,7 @@ void ProductFMC::update() {
 
     USBDevice::update();
 
-    if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval()) {
+    if (++displayUpdateFrameCounter >= std::max(getDisplayUpdateFrameInterval(), 4)) {
         displayUpdateFrameCounter = 0;
         updatePage();
     }
@@ -376,6 +376,8 @@ void ProductFMC::setFont(std::vector<std::vector<unsigned char>> font) {
     for (auto &fontBytes : font) {
         writeData(fontBytes);
     }
+    
+    showBackground(FMCBackgroundVariant::BLACK);
 }
 
 void ProductFMC::showBackground(FMCBackgroundVariant variant) {
