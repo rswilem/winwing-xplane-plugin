@@ -54,29 +54,29 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP3N, FMCDeviceVariant::VARIANT_OBSERVER, identifierByte);
         }
 
-        case 0xBB38: {                               // PFP 4 (Captain)
-            constexpr uint8_t identifierByte = 0x31; // TODO: Verify
+        case 0xBB38: { // PFP 4 (Captain)
+            constexpr uint8_t identifierByte = 0x34;
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP4, FMCDeviceVariant::VARIANT_CAPTAIN, identifierByte);
         }
-        case 0xBB40: {                               // PFP 4 (First Officer)
-            constexpr uint8_t identifierByte = 0x31; // TODO: Verify
+        case 0xBB40: { // PFP 4 (First Officer)
+            constexpr uint8_t identifierByte = 0x34;
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP4, FMCDeviceVariant::VARIANT_FIRSTOFFICER, identifierByte);
         }
-        case 0xBB3C: {                               // PFP 4 (Observer)
-            constexpr uint8_t identifierByte = 0x31; // TODO: Verify
+        case 0xBB3C: { // PFP 4 (Observer)
+            constexpr uint8_t identifierByte = 0x34;
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP4, FMCDeviceVariant::VARIANT_OBSERVER, identifierByte);
         }
 
-        case 0xBB37: {                               // PFP 7 (Captain)
-            constexpr uint8_t identifierByte = 0x31; // TODO: Verify
+        case 0xBB37: { // PFP 7 (Captain)
+            constexpr uint8_t identifierByte = 0x33;
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP7, FMCDeviceVariant::VARIANT_CAPTAIN, identifierByte);
         }
-        case 0xBB3F: {                               // PFP 7 (First Officer)
-            constexpr uint8_t identifierByte = 0x31; // TODO: Verify
+        case 0xBB3F: { // PFP 7 (First Officer)
+            constexpr uint8_t identifierByte = 0x33;
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP7, FMCDeviceVariant::VARIANT_FIRSTOFFICER, identifierByte);
         }
-        case 0xBB3B: {                               // PFP 7 (Observer)
-            constexpr uint8_t identifierByte = 0x31; // TODO: Verify
+        case 0xBB3B: { // PFP 7 (Observer)
+            constexpr uint8_t identifierByte = 0x33;
             return new ProductFMC(hidDevice, vendorId, productId, vendorName, productName, FMCHardwareType::HARDWARE_PFP7, FMCDeviceVariant::VARIANT_OBSERVER, identifierByte);
         }
 
