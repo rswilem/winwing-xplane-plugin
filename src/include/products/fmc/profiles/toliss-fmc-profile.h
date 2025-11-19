@@ -8,6 +8,7 @@
 class TolissFMCProfile : public FMCAircraftProfile {
     private:
         std::regex datarefRegex;
+        int clearKeyPressedCycleNumber;
 
     public:
         TolissFMCProfile(ProductFMC *product);

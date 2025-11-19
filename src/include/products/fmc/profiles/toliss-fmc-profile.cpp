@@ -6,6 +6,7 @@
 #include "product-fmc.h"
 
 #include <algorithm>
+#include <XPLMProcessing.h>
 
 TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
     FMCAircraftProfile(product) {
@@ -50,6 +51,10 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/MCDUIntegBrightness", [](std::vector<float> mcduTurnedOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+    });
+        
+    Dataref::getInstance()->bindExistingCommand("AirbusFBW/MCDU1KeyClear", [this](XPLMCommandPhase phase) {
+        clearKeyPressedCycleNumber = XPLMGetCycleNumber();
     });
 }
 
@@ -197,8 +202,8 @@ const std::vector<std::string> &TolissFMCProfile::displayDatarefs() const {
                         "AirbusFBW/" + mcdu + "scont5y",
                         "AirbusFBW/" + mcdu + "scont6y",
 
-                        "AirbusFBW/" + mcdu + "spw", // scratchpad
-                        "AirbusFBW/" + mcdu + "spa"  // scratchpad
+                        "AirbusFBW/" + mcdu + "spw", // scratchpad white
+                        "AirbusFBW/" + mcdu + "spa"  // scratchpad amber (must come second, amber overlays white)
                     })
         .first->second;
 }
@@ -378,8 +383,9 @@ void TolissFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t charac
 }
 
 void TolissFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
-    std::array<int, ProductFMC::PageBytesPerLine> spw_line{};
-    std::array<int, ProductFMC::PageBytesPerLine> spa_line{};
+    std::string scratchpad = "";
+    char scratchpadColor = 'w';
+    
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageCharsPerLine * ProductFMC::PageBytesPerChar, ' '));
 
     auto datarefManager = Dataref::getInstance();
@@ -397,14 +403,21 @@ void TolissFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
         bool fontSmall = match[2] == "s" || (type == "label" && match[5] != "L") || color == 's';
 
         std::string text = datarefManager->getCached<std::string>(ref.c_str());
+        
         if (text.empty()) {
+            continue;
+        }
+        
+        if (isScratchpad) {
+            scratchpad = text;
+            scratchpadColor = ref.size() >= 3 && ref.substr(ref.size() - 3) == "spa" ? 'a' : 'w';
             continue;
         }
 
         // Process text characters
         for (int i = 0; i < text.size(); ++i) {
             char c = text[i];
-            if (c == 0x00 || (c == 0x20 && !isScratchpad)) {
+            if (c == 0x00 || c == 0x20) {
                 continue;
             }
 
@@ -457,57 +470,29 @@ void TolissFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
                 product->writeLineToPage(page, lbl_line, i, std::string(1, c), targetColor, fontSmall);
             } else if (type.find("cont") != std::string::npos || type.find("scont") != std::string::npos) {
                 product->writeLineToPage(page, line, i, std::string(1, c), targetColor, fontSmall);
-            } else if (isScratchpad) {
-                if (ref.size() >= 3 && ref.substr(ref.size() - 3) == "spw") {
-                    spw_line[i] = c;
-                } else {
-                    if (i <= 21) {
-                        spa_line[i] = c;
-                    }
-                }
             }
         }
     }
-
-    for (int i = 0; i < ProductFMC::PageCharsPerLine; ++i) {
-        if (spw_line[i] == 0) {
-            std::fill(spw_line.begin() + i, spw_line.end(), 0);
-            break;
-        }
-    }
-    for (int i = 0; i < ProductFMC::PageCharsPerLine; ++i) {
-        if (spa_line[i] == 0) {
-            std::fill(spa_line.begin() + i, spa_line.end(), 0);
-            break;
-        }
-    }
-
-    // Merge spw and spa into line 13
+    
     int vertSlewType = Dataref::getInstance()->getCached<int>(product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? "AirbusFBW/MCDU1VertSlewKeys" : "AirbusFBW/MCDU2VertSlewKeys");
-    for (int i = 0; i < ProductFMC::PageCharsPerLine; ++i) {
-        bool smallFont = false;
-        char dispChar = ' ';
-        char dispColor = 'w';
-        if (spw_line[i] != 0 && spa_line[i] == 0) {
-            dispChar = spw_line[i];
-            dispColor = 'w';
-        } else if (spa_line[i] != 0) {
-            dispChar = spa_line[i];
-            dispColor = 'a';
-        }
-
-        if (vertSlewType > 0 && i >= ProductFMC::PageCharsPerLine - 2) {
-            if (i == ProductFMC::PageCharsPerLine - 2 && (vertSlewType == 1 || vertSlewType == 2)) {
-                dispChar = 30; // Up character
-            } else if (i == ProductFMC::PageCharsPerLine - 1 && (vertSlewType == 1 || vertSlewType == 3)) {
-                dispChar = 31; // Down character
+    if (scratchpad.length() || vertSlewType > 0) {
+        bool shouldAddScratchpadPadding = scratchpad == "CLR" && XPLMGetCycleNumber() - clearKeyPressedCycleNumber < 3;
+        if (shouldAddScratchpadPadding) {
+            scratchpad = std::string(5, ' ') + scratchpad;
+            if (scratchpad.size() > ProductFMC::PageCharsPerLine) {
+                scratchpad.resize(ProductFMC::PageCharsPerLine);
             }
-
-            dispColor = 'w';
-            smallFont = true;
         }
-
-        product->writeLineToPage(page, 13, i, std::string(1, dispChar), dispColor, smallFont);
+        
+        product->writeLineToPage(page, 13, 0, scratchpad, scratchpadColor, false);
+        
+        if (vertSlewType == 1 || vertSlewType == 2) { // Both, up only
+            product->writeLineToPage(page, 13, ProductFMC::PageCharsPerLine - 2, std::string(1, 30), 'w', true); // Up character
+        }
+        
+        if (vertSlewType == 1 || vertSlewType == 3) { // Both, down only
+            product->writeLineToPage(page, 13, ProductFMC::PageCharsPerLine - 1, std::string(1, 31), 'w', true); // Down character
+        }
     }
 }
 
