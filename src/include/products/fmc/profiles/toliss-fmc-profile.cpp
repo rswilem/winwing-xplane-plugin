@@ -15,8 +15,15 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
     product->setFont(Font::GlyphData(FontVariant::FontAirbus, product->identifierByte));
 
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
-        product->setLedBrightness(FMCLed::BACKLIGHT, target);
+        uint8_t backlightBrightness = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255 : 0;
+        
+        std::vector<float> mcduTurnedOn = Dataref::getInstance()->get<std::vector<float>>("AirbusFBW/MCDUIntegBrightness");
+        bool isTurnedOn = mcduTurnedOn[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 0 : 1] > std::numeric_limits<float>::epsilon();
+        if (!isTurnedOn) {
+            backlightBrightness = 0;
+        }
+        
+        product->setLedBrightness(FMCLed::BACKLIGHT, backlightBrightness);
     });
 
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/DUBrightness", [product](std::vector<float> brightness) {
@@ -24,11 +31,23 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
             return;
         }
 
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255.0f : 0;
-        product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
+        uint8_t screenBrightness = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255 : 0;
+        
+        std::vector<float> mcduTurnedOn = Dataref::getInstance()->get<std::vector<float>>("AirbusFBW/MCDUIntegBrightness");
+        bool isTurnedOn = mcduTurnedOn[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 0 : 1] > std::numeric_limits<float>::epsilon();
+        if (!isTurnedOn) {
+            screenBrightness = 0;
+        }
+        
+        product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, screenBrightness);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+    });
+    
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/MCDUIntegBrightness", [](std::vector<float> mcduTurnedOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
