@@ -20,7 +20,7 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
 
         bool hasPower = Dataref::getInstance()->get<bool>("AirbusFBW/FCUAvail");
 
-        uint8_t target = hasPower ? brightness[0] * 255.0f : 0;
+        uint8_t target = hasPower ? brightness[0] * 255 : 0;
         product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
@@ -31,7 +31,8 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
         product->setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, hasPower ? ledBrightness : 0);
         product->setLedBrightness(FCUEfisLed::EFISL_OVERALL_GREEN, hasPower ? ledBrightness : 0);
 
-        uint8_t screenBrightness = hasPower ? brightness[1] * 255.0f : 0;
+        constexpr uint8_t minimumScreenBrightness = 64;
+        uint8_t screenBrightness = hasPower ? minimumScreenBrightness + brightness[1] * (255 - minimumScreenBrightness) : 0;
         product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, screenBrightness);
