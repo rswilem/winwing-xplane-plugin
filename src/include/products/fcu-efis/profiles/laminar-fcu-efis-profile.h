@@ -30,4 +30,4 @@ class LaminarFCUEfisProfile : public FCUEfisAircraftProfile {
         void buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) override;
 };
 
-#endif // LAMINAR_FCU_EFIS_PROFILE_H
+#endif

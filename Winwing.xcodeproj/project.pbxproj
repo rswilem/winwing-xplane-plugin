@@ -81,6 +81,10 @@
 		F6C6E0332E8D5DAA00558F46 /* product-pap3-mcp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02A2E8D5DAA00558F46 /* product-pap3-mcp.cpp */; };
 		F6C6E0342E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02C2E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp */; };
 		F6C6E0352E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02E2E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp */; };
+		F6D8E6C72ED059390041C4FB /* product-ecam32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6D8E6C52ED059390041C4FB /* product-ecam32.cpp */; };
+		F6D8E6C82ED059390041C4FB /* toliss-ecam32-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6D8E6C12ED059390041C4FB /* toliss-ecam32-profile.cpp */; };
+		F6D8E6C92ED059390041C4FB /* product-ecam32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6D8E6C52ED059390041C4FB /* product-ecam32.cpp */; };
+		F6D8E6CA2ED059390041C4FB /* toliss-ecam32-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6D8E6C12ED059390041C4FB /* toliss-ecam32-profile.cpp */; };
 		F6F6F4E92EBF976E00321C19 /* ButtonIdentificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F6F4E72EBF976E00321C19 /* ButtonIdentificationView.swift */; };
 		F6F6F4EA2EBF976E00321C19 /* ButtonMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F6F4E82EBF976E00321C19 /* ButtonMapping.swift */; };
 		F6F77AB22E278F300060AFC0 /* product-ursa-minor-joystick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */; };
@@ -180,6 +184,11 @@
 		F6C6E02C2E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "laminar-pap3-mcp-profile.cpp"; sourceTree = "<group>"; };
 		F6C6E02D2E8D5DAA00558F46 /* zibo-pap3-mcp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "zibo-pap3-mcp-profile.h"; sourceTree = "<group>"; };
 		F6C6E02E2E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "zibo-pap3-mcp-profile.cpp"; sourceTree = "<group>"; };
+		F6D8E6C02ED059390041C4FB /* toliss-ecam32-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "toliss-ecam32-profile.h"; sourceTree = "<group>"; };
+		F6D8E6C12ED059390041C4FB /* toliss-ecam32-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "toliss-ecam32-profile.cpp"; sourceTree = "<group>"; };
+		F6D8E6C32ED059390041C4FB /* ecam32-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ecam32-aircraft-profile.h"; sourceTree = "<group>"; };
+		F6D8E6C42ED059390041C4FB /* product-ecam32.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-ecam32.h"; sourceTree = "<group>"; };
+		F6D8E6C52ED059390041C4FB /* product-ecam32.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-ecam32.cpp"; sourceTree = "<group>"; };
 		F6F6F4E72EBF976E00321C19 /* ButtonIdentificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonIdentificationView.swift; sourceTree = "<group>"; };
 		F6F6F4E82EBF976E00321C19 /* ButtonMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonMapping.swift; sourceTree = "<group>"; };
 		F6F77AAC2E278F300060AFC0 /* product-ursa-minor-joystick.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-ursa-minor-joystick.h"; sourceTree = "<group>"; };
@@ -416,6 +425,26 @@
 			path = profiles;
 			sourceTree = "<group>";
 		};
+		F6D8E6C22ED059390041C4FB /* profiles */ = {
+			isa = PBXGroup;
+			children = (
+				F6D8E6C02ED059390041C4FB /* toliss-ecam32-profile.h */,
+				F6D8E6C12ED059390041C4FB /* toliss-ecam32-profile.cpp */,
+			);
+			path = profiles;
+			sourceTree = "<group>";
+		};
+		F6D8E6C62ED059390041C4FB /* ecam32 */ = {
+			isa = PBXGroup;
+			children = (
+				F6D8E6C32ED059390041C4FB /* ecam32-aircraft-profile.h */,
+				F6D8E6C22ED059390041C4FB /* profiles */,
+				F6D8E6C42ED059390041C4FB /* product-ecam32.h */,
+				F6D8E6C52ED059390041C4FB /* product-ecam32.cpp */,
+			);
+			path = ecam32;
+			sourceTree = "<group>";
+		};
 		F6F77AAE2E278F300060AFC0 /* ursa-minor-joystick */ = {
 			isa = PBXGroup;
 			children = (
@@ -430,6 +459,7 @@
 		F6F77AAF2E278F300060AFC0 /* products */ = {
 			isa = PBXGroup;
 			children = (
+				F6D8E6C62ED059390041C4FB /* ecam32 */,
 				F6A1492E2E4F03A400FB8395 /* fmc */,
 				F6BB75772E32634700C2B21F /* fcu-efis */,
 				F6FC2A152E5C5377009A40E2 /* pap3-mcp */,
@@ -552,6 +582,8 @@
 				F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */,
 				F6C248462EBE498500617E89 /* plugins-menu.cpp in Sources */,
 				F68428662EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */,
+				F6D8E6C92ED059390041C4FB /* product-ecam32.cpp in Sources */,
+				F6D8E6CA2ED059390041C4FB /* toliss-ecam32-profile.cpp in Sources */,
 				F67FE8142E895BAC00C4243C /* laminar-fcu-efis-profile.cpp in Sources */,
 				F635AD4A2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
 				F647201F2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
@@ -620,6 +652,8 @@
 				F635AD422E05697B005D6CDC /* bridge.mm in Sources */,
 				F6F6F4E92EBF976E00321C19 /* ButtonIdentificationView.swift in Sources */,
 				F6F6F4EA2EBF976E00321C19 /* ButtonMapping.swift in Sources */,
+				F6D8E6C72ED059390041C4FB /* product-ecam32.cpp in Sources */,
+				F6D8E6C82ED059390041C4FB /* toliss-ecam32-profile.cpp in Sources */,
 				F6C248472EBE498500617E89 /* plugins-menu.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

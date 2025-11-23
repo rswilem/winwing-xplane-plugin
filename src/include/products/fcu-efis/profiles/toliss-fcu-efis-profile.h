@@ -33,4 +33,4 @@ class TolissFCUEfisProfile : public FCUEfisAircraftProfile {
         void buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) override;
 };
 
-#endif // TOLISS_FCU_EFIS_PROFILE_H
+#endif

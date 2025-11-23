@@ -48,6 +48,8 @@ bool ProductUrsaMinorJoystick::connect() {
     std::string vibrationPreference = AppState::getInstance()->readPreference("JoystickVibration", "normal");
     loadVibrationFactor(vibrationPreference);
 
+    std::string lightingPreference = AppState::getInstance()->readPreference("JoystickLighting", "enabled");
+
     menuItemId = PluginsMenu::getInstance()->addItem(
         classIdentifier(),
         std::vector<MenuItem>{
@@ -60,6 +62,7 @@ bool ProductUrsaMinorJoystick::connect() {
                  });
              }},
             {.name = "Vibration", .content = std::vector<MenuItem>{
+
                                       {.name = "Disabled", .checked = vibrationPreference == "disabled", .content = [this](int itemId) {
                                            AppState::getInstance()->writePreference("JoystickVibration", "disabled");
                                            loadVibrationFactor("disabled");
@@ -79,6 +82,21 @@ bool ProductUrsaMinorJoystick::connect() {
                                            PluginsMenu::getInstance()->setItemChecked(itemId, true);
                                        }},
                                   }},
+
+            {.name = "Lighting", .content = std::vector<MenuItem>{
+
+                                     {.name = "Disabled", .checked = lightingPreference == "disabled", .content = [this](int itemId) {
+                                          AppState::getInstance()->writePreference("JoystickLighting", "disabled");
+                                          setLedBrightness(0);
+                                          PluginsMenu::getInstance()->uncheckSubmenuSiblings(itemId);
+                                          PluginsMenu::getInstance()->setItemChecked(itemId, true);
+                                      }},
+                                     {.name = "Enabled", .checked = lightingPreference == "enabled", .content = [this](int itemId) {
+                                          AppState::getInstance()->writePreference("JoystickLighting", "enabled");
+                                          setLedBrightness(128);
+                                          PluginsMenu::getInstance()->uncheckSubmenuSiblings(itemId);
+                                          PluginsMenu::getInstance()->setItemChecked(itemId, true);
+                                      }}}},
         });
 
     return true;
@@ -90,7 +108,6 @@ void ProductUrsaMinorJoystick::disconnect() {
     PluginsMenu::getInstance()->removeItem(menuItemId);
 
     if (profile) {
-        profile->cleanup();
         delete profile;
         profile = nullptr;
     }
@@ -110,12 +127,16 @@ void ProductUrsaMinorJoystick::update() {
     }
 }
 
-bool ProductUrsaMinorJoystick::setVibration(uint8_t vibration) {
-    return writeData({0x02, identifierByte, 0xBF, 0x00, 0x00, 0x03, 0x49, 0x00, vibration, 0x00, 0x00, 0x00, 0x00, 0x00});
+void ProductUrsaMinorJoystick::setVibration(uint8_t vibration) {
+    writeData({0x02, identifierByte, 0xBF, 0x00, 0x00, 0x03, 0x49, 0x00, vibration, 0x00, 0x00, 0x00, 0x00, 0x00});
 }
 
-bool ProductUrsaMinorJoystick::setLedBrightness(uint8_t brightness) {
-    return writeData({0x02, 0x20, 0xBB, 0x00, 0x00, 0x03, 0x49, 0x00, brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
+void ProductUrsaMinorJoystick::setLedBrightness(uint8_t brightness) {
+    if (AppState::getInstance()->readPreference("JoystickLighting", "enabled") == "disabled") {
+        brightness = 0;
+    }
+
+    writeData({0x02, 0x20, 0xBB, 0x00, 0x00, 0x03, 0x49, 0x00, brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
 }
 
 void ProductUrsaMinorJoystick::loadVibrationFactor(const std::string &preference) {

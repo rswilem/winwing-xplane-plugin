@@ -38,4 +38,4 @@ class ZiboPAP3MCPProfile : public PAP3MCPAircraftProfile {
         void handleSwitchChanged(uint8_t byteOffset, uint8_t bitMask, bool state) override;
 };
 
-#endif // ZIBO_PAP3MCP_PROFILE_H
+#endif

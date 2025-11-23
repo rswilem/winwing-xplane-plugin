@@ -7,25 +7,8 @@
 #include <algorithm>
 #include <cmath>
 
-ZiboUrsaMinorJoystickProfile::ZiboUrsaMinorJoystickProfile(ProductUrsaMinorJoystick *product) :
-    UrsaMinorJoystickAircraftProfile(product) {
-}
-
-ZiboUrsaMinorJoystickProfile::~ZiboUrsaMinorJoystickProfile() {
-}
-
-bool ZiboUrsaMinorJoystickProfile::IsEligible() {
-    return Dataref::getInstance()->exists("laminar/B738/electric/panel_brightness");
-}
-
-void ZiboUrsaMinorJoystickProfile::initialize() {
-    if (!Dataref::getInstance()->exists("laminar/B738/electric/panel_brightness")) {
-        return;
-    }
-
-    didInitializeDatarefs = true;
-
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/panel_brightness", [this](std::vector<float> panelBrightness) {
+ZiboUrsaMinorJoystickProfile::ZiboUrsaMinorJoystickProfile(ProductUrsaMinorJoystick *product) : UrsaMinorJoystickAircraftProfile(product) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/panel_brightness", [product](std::vector<float> panelBrightness) {
         if (panelBrightness.size() < 4) {
             return;
         }
@@ -39,17 +22,22 @@ void ZiboUrsaMinorJoystickProfile::initialize() {
         }
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/panel_brightness");
     });
 }
 
-void ZiboUrsaMinorJoystickProfile::update() {
-    if (!didInitializeDatarefs) {
-        initialize();
-        return;
-    }
+ZiboUrsaMinorJoystickProfile::~ZiboUrsaMinorJoystickProfile() {
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
+    Dataref::getInstance()->unbind("laminar/B738/electric/panel_brightness");
+    Dataref::getInstance()->unbind("sim/flightmodel/failures/onground_any");
+}
 
+bool ZiboUrsaMinorJoystickProfile::IsEligible() {
+    return Dataref::getInstance()->exists("laminar/B738/electric/panel_brightness");
+}
+
+void ZiboUrsaMinorJoystickProfile::update() {
     if (Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on")) {
         float gForce = Dataref::getInstance()->get<float>("sim/flightmodel/forces/g_nrml");
         float delta = fabs(gForce - lastGForce);
@@ -71,9 +59,3 @@ void ZiboUrsaMinorJoystickProfile::update() {
     }
 }
 
-void ZiboUrsaMinorJoystickProfile::cleanup() {
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
-    Dataref::getInstance()->unbind("laminar/B738/electric/panel_brightness");
-    Dataref::getInstance()->unbind("sim/flightmodel/failures/onground_any");
-    didInitializeDatarefs = false;
-}

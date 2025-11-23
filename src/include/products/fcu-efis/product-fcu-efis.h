@@ -27,7 +27,9 @@ class ProductFCUEfis : public USBDevice {
         ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
         ~ProductFCUEfis();
 
-        static constexpr unsigned char IdentifierByte = 0x10;
+        static constexpr unsigned char FCUIdentifierByte = 0x10;
+        static constexpr unsigned char EfisRightIdentifierByte = 0x0E;
+        static constexpr unsigned char EfisLeftIdentifierByte = 0x0D;
 
         const char *classIdentifier() override;
         bool connect() override;

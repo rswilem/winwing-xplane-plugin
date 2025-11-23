@@ -7,25 +7,8 @@
 #include <algorithm>
 #include <cmath>
 
-TolissUrsaMinorJoystickProfile::TolissUrsaMinorJoystickProfile(ProductUrsaMinorJoystick *product) :
-    UrsaMinorJoystickAircraftProfile(product) {
-}
-
-TolissUrsaMinorJoystickProfile::~TolissUrsaMinorJoystickProfile() {
-}
-
-bool TolissUrsaMinorJoystickProfile::IsEligible() {
-    return Dataref::getInstance()->exists("AirbusFBW/PanelBrightnessLevel");
-}
-
-void TolissUrsaMinorJoystickProfile::initialize() {
-    if (!Dataref::getInstance()->exists("AirbusFBW/PanelBrightnessLevel")) {
-        return;
-    }
-
-    didInitializeDatarefs = true;
-
-    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [this](float brightness) {
+TolissUrsaMinorJoystickProfile::TolissUrsaMinorJoystickProfile(ProductUrsaMinorJoystick *product) : UrsaMinorJoystickAircraftProfile(product) {
+    Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
         uint8_t target = hasPower ? brightness * 255.0f : 0;
         product->setLedBrightness(target);
@@ -35,17 +18,22 @@ void TolissUrsaMinorJoystickProfile::initialize() {
         }
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
 }
 
-void TolissUrsaMinorJoystickProfile::update() {
-    if (!didInitializeDatarefs) {
-        initialize();
-        return;
-    }
+TolissUrsaMinorJoystickProfile::~TolissUrsaMinorJoystickProfile() {
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
+    Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
+    Dataref::getInstance()->unbind("sim/flightmodel/failures/onground_any");
+}
 
+bool TolissUrsaMinorJoystickProfile::IsEligible() {
+    return Dataref::getInstance()->exists("AirbusFBW/PanelBrightnessLevel");
+}
+
+void TolissUrsaMinorJoystickProfile::update() {
     if (Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on")) {
         float gForce = Dataref::getInstance()->get<float>("sim/flightmodel/forces/g_nrml");
         float delta = fabs(gForce - lastGForce);
@@ -67,9 +55,3 @@ void TolissUrsaMinorJoystickProfile::update() {
     }
 }
 
-void TolissUrsaMinorJoystickProfile::cleanup() {
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
-    Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
-    Dataref::getInstance()->unbind("sim/flightmodel/failures/onground_any");
-    didInitializeDatarefs = false;
-}
