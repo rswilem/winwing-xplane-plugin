@@ -192,12 +192,15 @@ template void Dataref::monitorExistingDataref<float>(const char *ref, DatarefMon
 template void Dataref::monitorExistingDataref<double>(const char *ref, DatarefMonitorChangedCallback<double> changeCallback);
 template void Dataref::monitorExistingDataref<std::string>(const char *ref, DatarefMonitorChangedCallback<std::string> changeCallback);
 template void Dataref::monitorExistingDataref<std::vector<float>>(const char *ref, DatarefMonitorChangedCallback<std::vector<float>> changeCallback);
+template void Dataref::monitorExistingDataref<std::vector<int>>(const char *ref, DatarefMonitorChangedCallback<std::vector<int>> changeCallback);
 
 template<typename T>
 void Dataref::monitorExistingDataref(const char *ref, DatarefMonitorChangedCallback<T> changeCallback) {
     if constexpr (std::is_same_v<T, std::string>) {
         set<T>(ref, "", true);
     } else if constexpr (std::is_same_v<T, std::vector<float>>) {
+        set<T>(ref, {}, true);
+    } else if constexpr (std::is_same_v<T, std::vector<int>>) {
         set<T>(ref, {}, true);
     } else {
         set<T>(ref, 0, true);
