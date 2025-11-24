@@ -7,7 +7,6 @@
 
 class TolissUrsaMinorJoystickProfile : public UrsaMinorJoystickAircraftProfile {
     private:
-        bool didInitializeDatarefs = false;
         int lastVibration = 0;
         float lastGForce = 0.0f;
 
@@ -17,10 +16,7 @@ class TolissUrsaMinorJoystickProfile : public UrsaMinorJoystickAircraftProfile {
 
         static bool IsEligible();
 
-        // Override base class methods
-        void initialize() override;
         void update() override;
-        void cleanup() override;
 };
 
-#endif // TOLISS_URSA_MINOR_JOYSTICK_PROFILE_H
+#endif

@@ -43,6 +43,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 | **PFP 7**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
 | **PAP3 / PAP3 Mag**         | 🔴          | 🔴           | 🔴          | 🔴               | 🟢       | 🔴       | 🔴         | 🔴      |
 | **FCU and EFIS L+R**        | 🟢          | 🟢           | 🟠          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
+| **ECAM32**                  | 🟢          | 🔴           | 🔴          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 
 #### Legend
 
@@ -67,6 +68,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@ColinM9991](https://github.com/ColinM9991) for the FF777 profile.
 - [@tukan68](https://github.com/tukan68) for FF767 profile.
 - [@verres1](https://github.com/verres1) for enriching the FF777 profile.
+- [@teropa] (https://forums.x-plane.org/profile/1028374-teropa/) for data capture and testing of multiple devices.
 
 ### Linux udev rules
 
@@ -96,6 +98,8 @@ KERNEL=="hidraw*", ATTRS{idProduct}=="bc1e", ATTRS{idVendor}=="4098", MODE="0666
 KERNEL=="hidraw*", ATTRS{idProduct}=="bc1d", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis_l"
 KERNEL=="hidraw*", ATTRS{idProduct}=="ba01", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis_lr"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bf0f", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pap3"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb70", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-ecam32"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb80", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-agp"
 ```
 
 ### Demonstration

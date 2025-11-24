@@ -23,4 +23,4 @@ class LaminarPAP3MCPProfile : public PAP3MCPAircraftProfile {
         void encoderRotated(const PAP3MCPEncoderDef *encoder, int8_t delta) override;
 };
 
-#endif // LAMINAR_PAP3MCP_PROFILE_H
+#endif

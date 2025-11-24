@@ -105,15 +105,20 @@ void USBDevice::update() {
 
 void USBDevice::disconnect() {
     connected = false;
+    
+    // Give input thread time to exit
+    std::this_thread::sleep_for(std::chrono::milliseconds(150));
 
     writeThreadRunning = false;
     writeQueueCV.notify_all();
     if (writeThread.joinable()) {
         writeThread.join();
     }
+    
 
     if (hidDevice != INVALID_HANDLE_VALUE) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        // Give input thread time to exit
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         CloseHandle(hidDevice);
         hidDevice = INVALID_HANDLE_VALUE;
     }

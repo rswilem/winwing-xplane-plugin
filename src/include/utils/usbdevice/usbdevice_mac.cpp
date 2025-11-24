@@ -74,6 +74,9 @@ void USBDevice::update() {
 
 void USBDevice::disconnect() {
     connected = false;
+    
+    // Give input thread time to exit
+    std::this_thread::sleep_for(std::chrono::milliseconds(150));
 
     writeThreadRunning = false;
     writeQueueCV.notify_all();
