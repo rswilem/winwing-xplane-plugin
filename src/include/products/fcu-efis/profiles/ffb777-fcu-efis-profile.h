@@ -15,11 +15,12 @@ class FF777FCUEfisProfile : public FCUEfisAircraftProfile {
         FF777FCUEfisProfile(ProductFCUEfis *product);
         ~FF777FCUEfisProfile();
 
+        // Méthode permettant de vérifier que le FFB777 est bien chargé
         static bool IsEligible();
 
         // Override base class methods
-        const std::vector<std::string> &displayDatarefs() const override;
-        const std::unordered_map<uint16_t, FCUEfisButtonDef> &buttonDefs() const override;
+        const std::vector <std::string> &displayDatarefs() const override;
+        const std::unordered_map <uint16_t, FCUEfisButtonDef> &buttonDefs() const override;
         void updateDisplayData(FCUDisplayData &data) override;
 
         bool hasEfisLeft() const override {
