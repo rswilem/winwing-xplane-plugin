@@ -10,6 +10,7 @@
 class RotateMD11PAP3MCPProfile : public PAP3MCPAircraftProfile {
     private:
         bool backlightInitialized = false;
+        bool hdgTrkSelInitialized = false;
 
     public:
         RotateMD11PAP3MCPProfile(ProductPAP3MCP *product);

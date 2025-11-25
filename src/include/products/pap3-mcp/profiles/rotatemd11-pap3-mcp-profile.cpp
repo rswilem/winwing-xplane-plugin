@@ -69,7 +69,7 @@ const std::vector<std::string> &RotateMD11PAP3MCPProfile::displayDatarefs() cons
         "Rotate/aircraft/systems/gcp_vs_sel_fpm",
         "Rotate/aircraft/systems/afs_fms_spd_engaged",
         "Rotate/aircraft/systems/afs_roll_mode",
-        "Rotate/aircraft/systems/gcp_hdg_trk_presel",
+        "Rotate/aircraft/systems/gcp_hdg_trk_presel_set",
         "sim/cockpit/radios/nav1_obs_degm",
         "sim/cockpit/radios/nav2_obs_degm",
     };
@@ -147,12 +147,9 @@ void RotateMD11PAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
         data.heading += 360;
     }
 
-    // HDG visibility: hide when roll mode is 1 (wings level?) and HDG/TRK presel is 0
-    int rollMode = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/afs_roll_mode");
-    int hdgTrkPresel = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/gcp_hdg_trk_presel");
-    // Note: In the new architecture, we don't have hdgVisible in PAP3MCPDisplayData
-    // The display will always show heading when enabled
-    // TODO: If needed, add hdgVisible to PAP3MCPDisplayData structure
+    // Control HDG LCD visibility
+    int hdgTrkSel = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/gcp_hdg_trk_presel_set");
+    data.headingVisible = (hdgTrkSel == 1);
 
     // Altitude
     data.altitude = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/gcp_alt_presel_ft");

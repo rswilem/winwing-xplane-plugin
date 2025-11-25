@@ -54,6 +54,7 @@ struct PAP3MCPDisplayData {
         float verticalSpeed = 0.0f;
         bool verticalSpeedVisible = true;
         bool speedVisible = true;
+        bool headingVisible = true;
         int crsCapt = 0;
         int crsFo = 0;
         bool showCourse = true;

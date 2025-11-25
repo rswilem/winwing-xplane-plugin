@@ -238,11 +238,12 @@ void FF777PAP3MCPProfile::handleSwitchChanged(uint8_t byteOffset, uint8_t bitMas
         return;
     }
 
-    // A/T ARM Left: byte 0x06, bit 0x01 = ARMED line, bit 0x02 = DISARMED line (for left switch)
+    // A/T ARM Left: byte 0x06, bit 0x01 = ARMED line, bit 0x02 = DISARMED line
     if (byteOffset == 0x06 && bitMask == 0x01) {
         if (state) {
             hwATLeftOn = true;
             maybeToggle("1-sim/ckpt/mcpAtSwitchL/anim", hwATLeftOn, "1-sim/command/mcpAtSwitchL_trigger");
+            maybeToggle("1-sim/ckpt/mcpAtSwitchR/anim", hwATLeftOn, "1-sim/command/mcpAtSwitchR_trigger");
         }
         return;
     }
@@ -250,26 +251,27 @@ void FF777PAP3MCPProfile::handleSwitchChanged(uint8_t byteOffset, uint8_t bitMas
         if (state) {
             hwATLeftOn = false;
             maybeToggle("1-sim/ckpt/mcpAtSwitchL/anim", hwATLeftOn, "1-sim/command/mcpAtSwitchL_trigger");
+            maybeToggle("1-sim/ckpt/mcpAtSwitchR/anim", hwATLeftOn, "1-sim/command/mcpAtSwitchR_trigger");
         }
         return;
     }
 
     // A/T ARM Right: Using right A/T switch for solenoid control
-    // Note: FF777 has two A/T switches - we can handle right switch separately if needed
-    // For now, mapping to the same toggle as Zibo (right switch)
-    if (byteOffset == 0x06 && bitMask == 0x04) {  // Hypothetical right armed line
+    if (byteOffset == 0x06 && bitMask == 0x04) {
         if (state) {
             hwATRightOn = true;
             product->setATSolenoid(true);
             maybeToggle("1-sim/ckpt/mcpAtSwitchR/anim", hwATRightOn, "1-sim/command/mcpAtSwitchR_trigger");
+            maybeToggle("1-sim/ckpt/mcpAtSwitchL/anim", hwATRightOn, "1-sim/command/mcpAtSwitchL_trigger");
         }
         return;
     }
-    if (byteOffset == 0x06 && bitMask == 0x08) {  // Hypothetical right disarmed line
+    if (byteOffset == 0x06 && bitMask == 0x08) {
         if (state) {
             hwATRightOn = false;
             product->setATSolenoid(false);
             maybeToggle("1-sim/ckpt/mcpAtSwitchR/anim", hwATRightOn, "1-sim/command/mcpAtSwitchR_trigger");
+            maybeToggle("1-sim/ckpt/mcpAtSwitchL/anim", hwATRightOn, "1-sim/command/mcpAtSwitchL_trigger");
         }
         return;
     }
