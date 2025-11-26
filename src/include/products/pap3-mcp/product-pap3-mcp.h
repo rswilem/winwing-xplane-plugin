@@ -3,6 +3,7 @@
 
 #include "pap3-mcp-aircraft-profile.h"
 #include "usbdevice.h"
+#include "packet-utils.h"
 
 #include <map>
 #include <set>
@@ -10,7 +11,7 @@
 
 class ProductPAP3MCP : public USBDevice {
     private:
-        uint8_t packetNumber = 1;
+        PacketUtils::PacketNumber packetNumber;
         PAP3MCPAircraftProfile *profile;
         PAP3MCPDisplayData displayData;
         int lastUpdateCycle;

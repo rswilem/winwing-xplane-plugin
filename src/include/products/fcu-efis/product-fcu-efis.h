@@ -3,13 +3,14 @@
 
 #include "fcu-efis-aircraft-profile.h"
 #include "usbdevice.h"
+#include "packet-utils.h"
 
 #include <map>
 #include <set>
 
 class ProductFCUEfis : public USBDevice {
     private:
-        uint8_t packetNumber = 1;
+        PacketUtils::PacketNumber packetNumber;
         FCUEfisAircraftProfile *profile;
         FCUDisplayData displayData;
         int lastUpdateCycle;

@@ -62,6 +62,12 @@
 		F6A149432E4F04AE00FB8395 /* ff777-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6A149362E4F04AE00FB8395 /* ff777-fmc-profile.cpp */; };
 		F6A149442E4F04AE00FB8395 /* ixeg733-fmc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6A149382E4F04AE00FB8395 /* ixeg733-fmc-profile.cpp */; };
 		F6A149462E4F37ED00FB8395 /* FMCControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A149452E4F37ED00FB8395 /* FMCControlView.swift */; };
+		F6A77E722ED3514600061D03 /* toliss-agp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6A77E6C2ED3514600061D03 /* toliss-agp-profile.cpp */; };
+		F6A77E732ED3514600061D03 /* product-agp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6A77E702ED3514600061D03 /* product-agp.cpp */; };
+		F6A77E742ED3514600061D03 /* toliss-agp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6A77E6C2ED3514600061D03 /* toliss-agp-profile.cpp */; };
+		F6A77E752ED3514600061D03 /* product-agp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6A77E702ED3514600061D03 /* product-agp.cpp */; };
+		F6A77E792ED3620600061D03 /* segment-display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6A77E782ED3620600061D03 /* segment-display.cpp */; };
+		F6A77E7A2ED3620600061D03 /* segment-display.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6A77E782ED3620600061D03 /* segment-display.cpp */; };
 		F6AF9EC12D06F84900530297 /* dataref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9EBC2D06F84900530297 /* dataref.cpp */; };
 		F6AF9EC62D078DB000530297 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6AF9EC52D078DB000530297 /* Cocoa.framework */; };
 		F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6AF9ECB2D078ED400530297 /* appstate.cpp */; };
@@ -165,6 +171,14 @@
 		F6A1493C2E4F04AE00FB8395 /* zibo-fmc-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "zibo-fmc-profile.cpp"; sourceTree = "<group>"; };
 		F6A149452E4F37ED00FB8395 /* FMCControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMCControlView.swift; sourceTree = "<group>"; };
 		F6A149472E4F552D00FB8395 /* fmc-hardware-mapping.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "fmc-hardware-mapping.h"; sourceTree = "<group>"; };
+		F6A77E6B2ED3514600061D03 /* toliss-agp-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "toliss-agp-profile.h"; sourceTree = "<group>"; };
+		F6A77E6C2ED3514600061D03 /* toliss-agp-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "toliss-agp-profile.cpp"; sourceTree = "<group>"; };
+		F6A77E6E2ED3514600061D03 /* agp-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "agp-aircraft-profile.h"; sourceTree = "<group>"; };
+		F6A77E6F2ED3514600061D03 /* product-agp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-agp.h"; sourceTree = "<group>"; };
+		F6A77E702ED3514600061D03 /* product-agp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-agp.cpp"; sourceTree = "<group>"; };
+		F6A77E762ED3620600061D03 /* packet-utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "packet-utils.h"; sourceTree = "<group>"; };
+		F6A77E772ED3620600061D03 /* segment-display.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "segment-display.h"; sourceTree = "<group>"; };
+		F6A77E782ED3620600061D03 /* segment-display.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "segment-display.cpp"; sourceTree = "<group>"; };
 		F6AF9EBB2D06F84900530297 /* dataref.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dataref.h; sourceTree = "<group>"; };
 		F6AF9EBC2D06F84900530297 /* dataref.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dataref.cpp; sourceTree = "<group>"; };
 		F6AF9EC52D078DB000530297 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -385,6 +399,26 @@
 			path = fmc;
 			sourceTree = "<group>";
 		};
+		F6A77E6D2ED3514600061D03 /* profiles */ = {
+			isa = PBXGroup;
+			children = (
+				F6A77E6B2ED3514600061D03 /* toliss-agp-profile.h */,
+				F6A77E6C2ED3514600061D03 /* toliss-agp-profile.cpp */,
+			);
+			path = profiles;
+			sourceTree = "<group>";
+		};
+		F6A77E712ED3514600061D03 /* agp */ = {
+			isa = PBXGroup;
+			children = (
+				F6A77E6D2ED3514600061D03 /* profiles */,
+				F6A77E6E2ED3514600061D03 /* agp-aircraft-profile.h */,
+				F6A77E6F2ED3514600061D03 /* product-agp.h */,
+				F6A77E702ED3514600061D03 /* product-agp.cpp */,
+			);
+			path = agp;
+			sourceTree = "<group>";
+		};
 		F6AF9EBF2D06F84900530297 /* utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -394,6 +428,9 @@
 				F6AF9EBC2D06F84900530297 /* dataref.cpp */,
 				F6C248442EBE498500617E89 /* plugins-menu.h */,
 				F6C248452EBE498500617E89 /* plugins-menu.cpp */,
+				F6A77E762ED3620600061D03 /* packet-utils.h */,
+				F6A77E772ED3620600061D03 /* segment-display.h */,
+				F6A77E782ED3620600061D03 /* segment-display.cpp */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -471,6 +508,7 @@
 		F6F77AAF2E278F300060AFC0 /* products */ = {
 			isa = PBXGroup;
 			children = (
+				F6A77E712ED3514600061D03 /* agp */,
 				F6D8E6C62ED059390041C4FB /* ecam32 */,
 				F6A1492E2E4F03A400FB8395 /* fmc */,
 				F6BB75772E32634700C2B21F /* fcu-efis */,
@@ -594,6 +632,8 @@
 				F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */,
 				F6C248462EBE498500617E89 /* plugins-menu.cpp in Sources */,
 				F68428662EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */,
+				F6A77E722ED3514600061D03 /* toliss-agp-profile.cpp in Sources */,
+				F6A77E732ED3514600061D03 /* product-agp.cpp in Sources */,
 				F6D8E6C92ED059390041C4FB /* product-ecam32.cpp in Sources */,
 				F6D8E6CA2ED059390041C4FB /* toliss-ecam32-profile.cpp in Sources */,
 				F67FE8142E895BAC00C4243C /* laminar-fcu-efis-profile.cpp in Sources */,
@@ -608,6 +648,7 @@
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F671B5DF2EA96BBE00141EF2 /* rotatemd11-fmc-profile.cpp in Sources */,
 				F64BE3EA2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
+				F6A77E7A2ED3620600061D03 /* segment-display.cpp in Sources */,
 				F6AF9ECC2D078ED400530297 /* appstate.cpp in Sources */,
 				F68428622EC6389D0027756D /* toliss-ursa-minor-joystick-profile.cpp in Sources */,
 				F6A1492F2E4F03A400FB8395 /* product-fmc.cpp in Sources */,
@@ -632,6 +673,8 @@
 				F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F6BB75782E32634700C2B21F /* product-fcu-efis.cpp in Sources */,
 				F68428652EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */,
+				F6A77E742ED3514600061D03 /* toliss-agp-profile.cpp in Sources */,
+				F6A77E752ED3514600061D03 /* product-agp.cpp in Sources */,
 				F6BB75792E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */,
 				F63BC99A2E30D73E00ACBBB0 /* appstate.cpp in Sources */,
 				F64BE3EE2E1BF625003C1B73 /* usbcontroller_lin.cpp in Sources */,
@@ -666,6 +709,7 @@
 				5DBA92312E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */,
 				F67961962E31357E008031F1 /* usbdevice_lin.cpp in Sources */,
 				F635AD422E05697B005D6CDC /* bridge.mm in Sources */,
+				F6A77E792ED3620600061D03 /* segment-display.cpp in Sources */,
 				F6F6F4E92EBF976E00321C19 /* ButtonIdentificationView.swift in Sources */,
 				F6F6F4EA2EBF976E00321C19 /* ButtonMapping.swift in Sources */,
 				F6D8E6C72ED059390041C4FB /* product-ecam32.cpp in Sources */,

@@ -3,9 +3,11 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
+#include "packet-utils.h"
 #include "profiles/laminar-fcu-efis-profile.h"
 #include "profiles/laminar737-fcu-efis-profile.h"
 #include "profiles/toliss-fcu-efis-profile.h"
+#include "segment-display.h"
 
 #include <algorithm>
 #include <cstring>
@@ -15,71 +17,6 @@
 #include <XPLMDisplay.h>
 #include <XPLMProcessing.h>
 #include <XPLMUtilities.h>
-
-uint8_t swapNibbles(uint8_t value) {
-    return ((value & 0x0F) << 4) | ((value & 0xF0) >> 4);
-}
-
-std::string fixStringLength(const std::string &value, int length) {
-    std::string result = value;
-    if (result.length() > length) {
-        result = result.substr(0, length);
-    }
-    while (result.length() < length) {
-        result = "0" + result;
-    }
-    return result;
-}
-
-std::vector<uint8_t> encodeString(int numSegments, const std::string &str) {
-    std::vector<uint8_t> data(numSegments, 0);
-
-    for (int i = 0; i < std::min(numSegments, static_cast<int>(str.length())); i++) {
-        char c = std::toupper(str[i]);
-        auto it = SEGMENT_REPRESENTATIONS.find(c);
-        if (it != SEGMENT_REPRESENTATIONS.end()) {
-            data[numSegments - 1 - i] = it->second;
-        }
-    }
-
-    return data;
-}
-
-std::vector<uint8_t> encodeStringSwapped(int numSegments, const std::string &str) {
-    std::vector<uint8_t> data = encodeString(numSegments, str);
-    data.push_back(0); // Add extra byte
-
-    // Fix weird segment mapping
-    for (int i = 0; i < data.size(); i++) {
-        data[i] = swapNibbles(data[i]);
-    }
-
-    for (int i = 0; i < data.size() - 1; i++) {
-        data[numSegments - i] = (data[numSegments - i] & 0x0F) | (data[numSegments - 1 - i] & 0xF0);
-        data[numSegments - 1 - i] = data[numSegments - 1 - i] & 0x0F;
-    }
-
-    return data;
-}
-
-std::vector<uint8_t> encodeStringEfis(int numSegments, const std::string &str) {
-    std::vector<uint8_t> data = encodeString(numSegments, str);
-    std::vector<uint8_t> result(numSegments, 0);
-
-    // Fix weird segment mapping for EFIS displays
-    for (int i = 0; i < data.size(); i++) {
-        result[i] |= (data[i] & 0x08) ? 0x01 : 0; // Upper left -> bit 0
-        result[i] |= (data[i] & 0x04) ? 0x02 : 0; // Middle -> bit 1
-        result[i] |= (data[i] & 0x02) ? 0x04 : 0; // Lower left -> bit 2
-        result[i] |= (data[i] & 0x10) ? 0x08 : 0; // Bottom -> bit 3
-        result[i] |= (data[i] & 0x80) ? 0x10 : 0; // Top -> bit 4
-        result[i] |= (data[i] & 0x40) ? 0x20 : 0; // Upper right -> bit 5
-        result[i] |= (data[i] & 0x20) ? 0x40 : 0; // Lower right -> bit 6
-        result[i] |= (data[i] & 0x01) ? 0x80 : 0; // Dot -> bit 7
-    }
-
-    return result;
-}
 
 ProductFCUEfis::ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) :
     USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
@@ -265,10 +202,10 @@ void ProductFCUEfis::clearDisplays() {
 
 void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string &heading, const std::string &altitude, const std::string &vs) {
     // Encode strings to 7-segment data
-    auto speedData = encodeString(3, fixStringLength(speed, 3));
-    auto headingData = encodeStringSwapped(3, fixStringLength(heading, 3));
-    auto altitudeData = encodeStringSwapped(5, fixStringLength(altitude, 5));
-    auto vsData = encodeStringSwapped(4, fixStringLength(vs, 4));
+    auto speedData = SegmentDisplay::encodeString(3, SegmentDisplay::fixStringLength(speed, 3));
+    auto headingData = SegmentDisplay::encodeStringSwapped(3, SegmentDisplay::fixStringLength(heading, 3));
+    auto altitudeData = SegmentDisplay::encodeStringSwapped(5, SegmentDisplay::fixStringLength(altitude, 5));
+    auto vsData = SegmentDisplay::encodeStringSwapped(4, SegmentDisplay::fixStringLength(vs, 4));
 
     // Create flag bytes array
     std::vector<uint8_t> flagBytes(17, 0);
@@ -358,7 +295,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
 
     // First request - send display data
     std::vector<uint8_t> data1 = {
-        0xF0, 0x00, packetNumber, 0x31, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0xF0, 0x00, packetNumber.next(), 0x31, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add speed data (3 bytes)
     data1.push_back(speedData[2]);
@@ -394,7 +331,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
 
     // Second request - commit display data
     std::vector<uint8_t> data2 = {
-        0xF0, 0x00, packetNumber, 0x11, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00};
+        0xF0, 0x00, packetNumber.current(), 0x11, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00};
 
     // Pad to 64 bytes
     while (data2.size() < 64) {
@@ -402,11 +339,6 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     }
 
     writeData(data2);
-
-    packetNumber++;
-    if (packetNumber == 0) {
-        packetNumber = 1;
-    }
 }
 
 void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRightSide) {
@@ -418,10 +350,10 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
 
     // EFIS display protocol
     std::vector<uint8_t> payload = {
-        0xF0, 0x00, packetNumber, 0x1A, static_cast<uint8_t>(isRightSide ? ProductFCUEfis::EfisRightIdentifierByte : ProductFCUEfis::EfisLeftIdentifierByte), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0xF0, 0x00, packetNumber.next(), 0x1A, static_cast<uint8_t>(isRightSide ? ProductFCUEfis::EfisRightIdentifierByte : ProductFCUEfis::EfisLeftIdentifierByte), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add barometric data
-    auto baroData = encodeStringEfis(4, fixStringLength(data->isStd ? "STD " : data->baro, 4));
+    auto baroData = SegmentDisplay::encodeStringEfis(4, SegmentDisplay::fixStringLength(data->isStd ? "STD " : data->baro, 4));
 
     if (!data->displayEnabled || data->displayTest) {
         std::fill(baroData.begin(), baroData.end(), data->displayTest ? 0xFF : 0);
@@ -443,12 +375,6 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
     }
 
     writeData(payload);
-
-    // Increment package number for next call
-    packetNumber++;
-    if (packetNumber == 0) {
-        packetNumber = 1;
-    }
 }
 
 void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {

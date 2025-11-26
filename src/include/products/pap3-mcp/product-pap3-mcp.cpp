@@ -3,6 +3,7 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
+#include "packet-utils.h"
 #include "pap3-mcp-lcd-segments.h"
 #include "profiles/ff777-pap3-mcp-profile.h"
 #include "profiles/laminar-pap3-mcp-profile.h"
@@ -185,7 +186,7 @@ void ProductPAP3MCP::initializeDisplays() {
     // Header
     initCmd[0] = 0xF0;
     initCmd[1] = 0x00;
-    initCmd[2] = (packetNumber == 0) ? 1 : packetNumber;
+    initCmd[2] = packetNumber.next();
     initCmd[3] = 0x12; // Init opcode
 
     // Init tail (starts at offset 4)
@@ -211,11 +212,6 @@ void ProductPAP3MCP::initializeDisplays() {
     initCmd[23] = 0x00;
 
     writeData(initCmd);
-
-    packetNumber++;
-    if (packetNumber == 0) {
-        packetNumber = 1;
-    }
 }
 
 void ProductPAP3MCP::clearDisplays() {
@@ -422,7 +418,7 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
     // Header (4 bytes at offset 0-3)
     data.push_back(0xF0);
     data.push_back(0x00);
-    data.push_back(packetNumber == 0 ? 1 : packetNumber);
+    data.push_back(packetNumber.next());
     data.push_back(0x38); // Opcode for LCD payload
 
     // Preamble (14 bytes at offset 4-17)
@@ -458,30 +454,20 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
 
     // Send two empty frames (opcode 0x38 with no payload)
     for (int i = 0; i < 2; i++) {
-        packetNumber++;
-        if (packetNumber == 0) {
-            packetNumber = 1;
-        }
-
         std::vector<uint8_t> emptyFrame(64, 0x00);
         emptyFrame[0] = 0xF0;
         emptyFrame[1] = 0x00;
-        emptyFrame[2] = packetNumber;
+        emptyFrame[2] = packetNumber.next();
         emptyFrame[3] = 0x38; // Same opcode
 
         writeData(emptyFrame);
     }
 
     // Send commit frame (opcode 0x2A)
-    packetNumber++;
-    if (packetNumber == 0) {
-        packetNumber = 1;
-    }
-
     std::vector<uint8_t> commitFrame(64, 0x00);
     commitFrame[0] = 0xF0;
     commitFrame[1] = 0x00;
-    commitFrame[2] = packetNumber;
+    commitFrame[2] = packetNumber.next();
     commitFrame[3] = 0x2A; // Commit opcode
 
     // Add commit constants at specific offsets (from working code)
@@ -494,11 +480,6 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
     commitFrame[0x27] = 0x50;
 
     writeData(commitFrame);
-
-    packetNumber++;
-    if (packetNumber == 0) {
-        packetNumber = 1;
-    }
 }
 
 void ProductPAP3MCP::setLedBrightness(PAP3MCPLed led, uint8_t brightness) {

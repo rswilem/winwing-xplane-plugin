@@ -1,10 +1,11 @@
 #include "usbdevice.h"
 
 #include "appstate.h"
+#include "product-agp.h"
+#include "product-ecam32.h"
 #include "product-fcu-efis.h"
 #include "product-fmc.h"
 #include "product-pap3-mcp.h"
-#include "product-ecam32.h"
 #include "product-ursa-minor-joystick.h"
 
 #include <XPLMUtilities.h>
@@ -92,18 +93,21 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
 
         case 0xBF0F: // PAP3-MCP
             return new ProductPAP3MCP(hidDevice, vendorId, productId, vendorName, productName);
-            
+
             //        case 0xBB61: // PAP3-MCP (3N PDC L)
             //        case 0xBB62: // PAP3-MCP (3N PDC R)
             //        case 0xBB51: // PAP3-MCP (3M PDC L)
             //        case 0xBB52: // PAP3-MCP (3M PDC R)
-               
+
         case 0xBB70: { // ECAM32
             return new ProductECAM32(hidDevice, vendorId, productId, vendorName, productName);
         }
-            
+
+        case 0xBB80: { // AGP
+            return new ProductAGP(hidDevice, vendorId, productId, vendorName, productName);
+        }
+
             //        case 0xB920: // ??
-            //        case 0xBB80: // ??
 
         default:
             debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X (%s)\n", vendorId, productId, productName.c_str());

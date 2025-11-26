@@ -15,6 +15,10 @@ TolissECAM32Profile::TolissECAM32Profile(ProductECAM32 *product) : ECAM32Aircraf
         product->setLedBrightness(ECAM32Led::EMER_CANC_BRIGHTNESS, backlightBrightness);
     });
 
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+    });
+
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/CLRillum", [product](bool enabled) {
         product->setLedBrightness(ECAM32Led::CLR_LEFT, enabled ? 1 : 0);
         product->setLedBrightness(ECAM32Led::CLR_RIGHT, enabled ? 1 : 0);
@@ -71,6 +75,7 @@ TolissECAM32Profile::TolissECAM32Profile(ProductECAM32 *product) : ECAM32Aircraf
 
 TolissECAM32Profile::~TolissECAM32Profile() {
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("AirbusFBW/CLRillum");
     Dataref::getInstance()->unbind("AirbusFBW/SDENG");
     Dataref::getInstance()->unbind("AirbusFBW/SDBLEED");

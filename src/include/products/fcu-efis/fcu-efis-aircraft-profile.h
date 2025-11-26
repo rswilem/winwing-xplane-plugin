@@ -1,6 +1,8 @@
 #ifndef FCUEFIS_AIRCRAFT_PROFILE_H
 #define FCUEFIS_AIRCRAFT_PROFILE_H
 
+#include "segment-display.h"
+
 #include <cfloat>
 #include <cmath>
 #include <cstdint>
@@ -12,11 +14,6 @@
 #include <unordered_map>
 #include <vector>
 #include <XPLMUtilities.h>
-
-// 7-segment display character representations
-// Bit mapping: 0x80=Top, 0x40=Upper Right, 0x20=Lower Right, 0x10=Bottom, 0x08=Upper Left, 0x04=Middle, 0x02=Lower Left, 0x01=Dot
-static const std::unordered_map<char, uint8_t> SEGMENT_REPRESENTATIONS = {
-    {'0', 0xFA}, {'1', 0x60}, {'2', 0xD6}, {'3', 0xF4}, {'4', 0x6C}, {'5', 0xBC}, {'6', 0xBE}, {'7', 0xE0}, {'8', 0xFE}, {'9', 0xFC}, {'A', 0xEE}, {'B', 0xFE}, {'C', 0x9A}, {'D', 0x76}, {'E', 0x9E}, {'F', 0x8E}, {'G', 0xBE}, {'H', 0x6E}, {'I', 0x60}, {'J', 0x70}, {'K', 0x0E}, {'L', 0x1A}, {'M', 0xA6}, {'N', 0x26}, {'O', 0xFA}, {'P', 0xCE}, {'Q', 0xEC}, {'R', 0x06}, {'S', 0xBC}, {'T', 0x1E}, {'U', 0x7A}, {'V', 0x32}, {'W', 0x58}, {'X', 0x6E}, {'Y', 0x7C}, {'Z', 0xD6}, {'-', 0x04}, {'#', 0x36}, {'/', 0x60}, {'\\', 0xA0}, {' ', 0x00}};
 
 enum class DisplayByteIndex : int {
     H0 = 0,

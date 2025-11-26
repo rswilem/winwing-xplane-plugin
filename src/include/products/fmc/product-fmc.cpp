@@ -123,16 +123,21 @@ bool ProductFMC::connect() {
             setProfileForCurrentAircraft();
         }
 
-        menuItemId = PluginsMenu::getInstance()->addItem(
-            classIdentifier(),
-            std::vector<MenuItem>{
-                {.name = "Identify", .content = [this](int menuId) {
-                     setLedBrightness(FMCLed::OVERALL_LEDS_BRIGHTNESS, 255);
-                     setAllLedsEnabled(true);
-                     AppState::getInstance()->executeAfter(2000, [this]() {
-                         setAllLedsEnabled(false);
-                     });
-                 }},
+        std::vector<MenuItem> menuItems = {
+            {.name = "Identify", .content = [this](int menuId) {
+                 setLedBrightness(FMCLed::OVERALL_LEDS_BRIGHTNESS, 255);
+                 setAllLedsEnabled(true);
+                 AppState::getInstance()->executeAfter(2000, [this]() {
+                     setAllLedsEnabled(false);
+                 });
+             }},
+        };
+
+        // For now, disable side switching on the PFP since it seems to cause
+        // the device to reboot as a MCDU in some cases.
+        // The sniffed packets are from an MCDU, which is probably why.
+        if (hardwareType == FMCHardwareType::HARDWARE_MCDU) {
+            menuItems.push_back(
                 {.name = "Device variant", .content = std::vector<MenuItem>{
                                                {.name = "Captain", .checked = deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN, .content = [this](int menuId) {
                                                     setDeviceVariant(FMCDeviceVariant::VARIANT_CAPTAIN);
@@ -143,8 +148,10 @@ bool ProductFMC::connect() {
                                                {.name = "Observer", .checked = deviceVariant == FMCDeviceVariant::VARIANT_OBSERVER, .content = [this](int menuId) {
                                                     setDeviceVariant(FMCDeviceVariant::VARIANT_OBSERVER);
                                                 }},
-                                           }},
-            });
+                                           }});
+        }
+
+        menuItemId = PluginsMenu::getInstance()->addItem(classIdentifier(), menuItems);
         return true;
     }
 
@@ -376,7 +383,7 @@ void ProductFMC::setFont(std::vector<std::vector<unsigned char>> font) {
     for (auto &fontBytes : font) {
         writeData(fontBytes);
     }
-    
+
     showBackground(FMCBackgroundVariant::BLACK);
 }
 
