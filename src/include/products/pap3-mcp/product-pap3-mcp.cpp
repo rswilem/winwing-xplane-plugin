@@ -4,7 +4,9 @@
 #include "config.h"
 #include "dataref.h"
 #include "pap3-mcp-lcd-segments.h"
+#include "profiles/ff777-pap3-mcp-profile.h"
 #include "profiles/laminar-pap3-mcp-profile.h"
+#include "profiles/rotatemd11-pap3-mcp-profile.h"
 #include "profiles/zibo-pap3-mcp-profile.h"
 
 #include <algorithm>
@@ -37,6 +39,12 @@ void ProductPAP3MCP::setProfileForCurrentAircraft() {
     if (ZiboPAP3MCPProfile::IsEligible()) {
         profile = new ZiboPAP3MCPProfile(this);
         profileReady = true;
+    } else if (FF777PAP3MCPProfile::IsEligible()) {
+        profile = new FF777PAP3MCPProfile(this);
+        profileReady = true;
+    } else if (RotateMD11PAP3MCPProfile::IsEligible()) {
+        profile = new RotateMD11PAP3MCPProfile(this);
+        profileReady = true;
     } else if (LaminarPAP3MCPProfile::IsEligible()) {
         profile = new LaminarPAP3MCPProfile(this);
         profileReady = true;
@@ -50,11 +58,10 @@ const char *ProductPAP3MCP::classIdentifier() {
 bool ProductPAP3MCP::connect() {
     if (USBDevice::connect()) {
         initializeDisplays();
-
-        // Set initial dimming values (channels 0-2)
-        setLedBrightness(PAP3MCPLed::BACKLIGHT, 255);              // Channel 0: Panel backlight at full
-        setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, 255);          // Channel 1: LCD at full
-        setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, 255); // Channel 2: LED brightness at full
+        
+        setLedBrightness(PAP3MCPLed::BACKLIGHT, 0);
+        setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, 0);
+        setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, 0);
 
         if (!profile) {
             setProfileForCurrentAircraft();
@@ -70,6 +77,7 @@ void ProductPAP3MCP::disconnect() {
     // Turn off all LEDs
     setLedBrightness(PAP3MCPLed::BACKLIGHT, 0);
     setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, 0);
+    setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, 0);
     setLedBrightness(PAP3MCPLed::N1, 0);
     setLedBrightness(PAP3MCPLed::SPEED, 0);
     setLedBrightness(PAP3MCPLed::VNAV, 0);
@@ -143,8 +151,13 @@ void ProductPAP3MCP::updateDisplays() {
         displayData.verticalSpeed != oldDisplayData.verticalSpeed ||
         displayData.verticalSpeedVisible != oldDisplayData.verticalSpeedVisible ||
         displayData.speedVisible != oldDisplayData.speedVisible ||
+        displayData.headingVisible != oldDisplayData.headingVisible ||
         displayData.crsCapt != oldDisplayData.crsCapt ||
         displayData.crsFo != oldDisplayData.crsFo ||
+        displayData.showCourse != oldDisplayData.showCourse ||
+        displayData.showLabels != oldDisplayData.showLabels ||
+        displayData.showDashesWhenInactive != oldDisplayData.showDashesWhenInactive ||
+        displayData.showLabelsWhenInactive != oldDisplayData.showLabelsWhenInactive ||
         displayData.digitA != oldDisplayData.digitA ||
         displayData.digitB != oldDisplayData.digitB ||
         displayData.displayEnabled != oldDisplayData.displayEnabled ||
@@ -280,7 +293,7 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
         }
 
         // CAPT CRS: 3 digits
-        {
+        if (displayData.showCourse) {
             int h, t, u;
             digits3(std::max(0, crsCapt), h, t, u);
             drawDigit(G0, payload, CPT_CRS_HUNDREDS, h);
@@ -290,8 +303,8 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
             setFlag(payload, OFF_19, DOT_CPT_CRS, false);
         }
 
-        // HDG: 3 digits
-        {
+        // HDG: 3 digits - only draw if heading is visible
+        if (displayData.headingVisible) {
             int h, t, u;
             int hdg = std::clamp(heading, 0, 359);
             digits3(hdg, h, t, u);
@@ -359,7 +372,7 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
         }
 
         // FO CRS: 3 digits
-        {
+        if (displayData.showCourse) {
             int h, t, u;
             digits3(std::max(0, crsFo), h, t, u);
             drawDigit(G3, payload, FO_CRS_HUNDREDS, h);
@@ -367,6 +380,32 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
             drawDigit(G3, payload, FO_CRS_UNITS, u);
             // No dot for FO CRS display
             setFlag(payload, OFF_1C, DOT_FO_CRS, false);
+        }
+
+        // Draw dashes for inactive displays if enabled
+        if (displayData.showDashesWhenInactive) {
+            if (!displayData.speedVisible) {
+                drawSpdDashes(payload);
+                // Show labels even when inactive if configured
+                if (displayData.showLabelsWhenInactive) {
+                    setFlag(payload, OFF_36, LBL_IAS, true);
+                }
+            }
+            if (!displayData.headingVisible) {
+                drawHdgDashes(payload);
+                // Show HDG label even when inactive if configured
+                if (displayData.showLabelsWhenInactive) {
+                    setFlag(payload, OFF_36, LBL_HDG_L, true);
+                    setFlag(payload, OFF_32, LBL_HDG_R, true);
+                }
+            }
+            if (!displayData.verticalSpeedVisible) {
+                drawVviDashes(payload);
+                // Show VS label even when inactive if configured
+                if (displayData.showLabelsWhenInactive) {
+                    setFlag(payload, OFF_38, LBL_VS, true);
+                }
+            }
         }
     }
 

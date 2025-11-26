@@ -187,6 +187,30 @@ namespace pap3mcp::lcd {
         u = value % 10;
     }
 
+    // Dash drawing functions - draw middle segment (G) for dash character
+    inline void drawDash(const GroupOffsets &g, Payload &p, uint8_t flag) {
+        applyOnePos(p, g.mid, flag, true);
+    }
+
+    inline void drawSpdDashes(Payload &p) {
+        drawDash(G0, p, SPD_HUNDREDS);
+        drawDash(G0, p, SPD_TENS);
+        drawDash(G0, p, SPD_UNITS);
+    }
+
+    inline void drawHdgDashes(Payload &p) {
+        drawDash(G1, p, HDG_HUNDREDS);
+        drawDash(G1, p, HDG_TENS);
+        drawDash(G1, p, HDG_UNITS);
+    }
+
+    inline void drawVviDashes(Payload &p) {
+        drawDash(G2, p, VSPD_KILO);
+        drawDash(G2, p, VSPD_HUNDREDS);
+        drawDash(G2, p, VSPD_TENS);
+        drawDash(G2, p, VSPD_UNITS);
+    }
+
 }
 
 #endif

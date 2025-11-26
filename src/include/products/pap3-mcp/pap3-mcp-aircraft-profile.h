@@ -54,13 +54,17 @@ struct PAP3MCPDisplayData {
         float verticalSpeed = 0.0f;
         bool verticalSpeedVisible = true;
         bool speedVisible = true;
+        bool headingVisible = true;
         int crsCapt = 0;
         int crsFo = 0;
+        bool showCourse = true;
 
         bool displayEnabled = true;
         bool displayTest = false; // Display test mode (all segments lit)
 
         bool showLabels = false;
+        bool showDashesWhenInactive = false; // Show dashes (---) when displays are inactive
+        bool showLabelsWhenInactive = false; // Show labels even when displays are inactive
 
         // Special display flags
         bool digitA = false; // Special 'A' digit for SPD/MACH mode
