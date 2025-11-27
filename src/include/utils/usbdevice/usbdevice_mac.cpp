@@ -73,11 +73,12 @@ void USBDevice::update() {
 }
 
 void USBDevice::disconnect() {
-    connected = false;
-    
-    // Give input thread time to exit
-    std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    // Wait for write queue to drain before disconnecting
+    while (cachedWriteQueueSize.load() > 0 && writeThreadRunning) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 
+    connected = false;
     writeThreadRunning = false;
     writeQueueCV.notify_all();
     if (writeThread.joinable()) {

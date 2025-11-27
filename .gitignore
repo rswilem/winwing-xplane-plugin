@@ -3,6 +3,9 @@ lib/mac_x64/
 lib/lin_x64/
 lib/win_x64/
 build/
+dist/
+.cache/
+.idea/
 
 CMakeLists.txt.user
 CMakeCache.txt
