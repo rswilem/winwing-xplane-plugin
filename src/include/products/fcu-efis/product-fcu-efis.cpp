@@ -106,6 +106,10 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
     } else if (LaminarFCUEfisProfile::IsEligible()) {
         profile = new LaminarFCUEfisProfile(this);
         profileReady = true;
+    // Ajout du Profil FF777
+    } else if (FF777FCUEfisProfile::IsEligible()) {
+        profile = new FF777FCUEfisProfile(this);
+        profileReady = true;
     }
 }
 
