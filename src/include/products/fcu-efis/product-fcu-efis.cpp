@@ -6,6 +6,7 @@
 #include "profiles/laminar-fcu-efis-profile.h"
 #include "profiles/laminar737-fcu-efis-profile.h"
 #include "profiles/toliss-fcu-efis-profile.h"
+#include "profiles/ffb777-fcu-efis-profile.h"
 
 #include <algorithm>
 #include <cstring>
