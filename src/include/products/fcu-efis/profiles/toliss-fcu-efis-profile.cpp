@@ -11,8 +11,7 @@
 #include <iomanip>
 #include <XPLMUtilities.h>
 
-TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) :
-    FCUEfisAircraftProfile(product) {
+TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/SupplLightLevelRehostats", [product](std::vector<float> brightness) {
         if (brightness.size() < 2) {
             return;
@@ -188,8 +187,7 @@ TolissFCUEfisProfile::~TolissFCUEfisProfile() {
 }
 
 bool TolissFCUEfisProfile::IsEligible() {
-    bool eligible = Dataref::getInstance()->exists("AirbusFBW/FCUAvail");
-    return eligible;
+    return Dataref::getInstance()->exists("AirbusFBW/FCUAvail");
 }
 
 const std::vector<std::string> &TolissFCUEfisProfile::displayDatarefs() const {

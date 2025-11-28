@@ -4,6 +4,7 @@
 #include "config.h"
 #include "dataref.h"
 #include "packet-utils.h"
+#include "profiles/ff777-fcu-efis-profile.h"
 #include "profiles/laminar-fcu-efis-profile.h"
 #include "profiles/laminar737-fcu-efis-profile.h"
 #include "profiles/toliss-fcu-efis-profile.h"
@@ -41,6 +42,10 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
         profileReady = true;
     } else if (LaminarFCUEfisProfile::IsEligible()) {
         profile = new LaminarFCUEfisProfile(this);
+        profileReady = true;
+        // Ajout du Profil FF777
+    } else if (FF777FCUEfisProfile::IsEligible()) {
+        profile = new FF777FCUEfisProfile(this);
         profileReady = true;
     }
 }
@@ -137,12 +142,12 @@ void ProductFCUEfis::update() {
 
     if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval()) {
         displayUpdateFrameCounter = 0;
-        updateDisplays();
+        updateDisplays(false);
     }
 }
 
-void ProductFCUEfis::updateDisplays() {
-    bool shouldUpdate = false;
+void ProductFCUEfis::updateDisplays(bool force) {
+    bool shouldUpdate = force;
     auto datarefManager = Dataref::getInstance();
     for (const std::string &dataref : profile->displayDatarefs()) {
         if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {

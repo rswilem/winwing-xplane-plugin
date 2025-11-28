@@ -22,7 +22,6 @@ class ProductPAP3MCP : public USBDevice {
         uint32_t lastButtonStateHi = 0;
 
         void setProfileForCurrentAircraft();
-        void updateDisplays();
 
     public:
         ProductPAP3MCP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
@@ -37,6 +36,8 @@ class ProductPAP3MCP : public USBDevice {
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
         void didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count = 1) override;
         void forceStateSync() override;
+    
+        void updateDisplays(bool force = true);
 
         void setLedBrightness(PAP3MCPLed led, uint8_t brightness);
         void setATSolenoid(bool engaged);
