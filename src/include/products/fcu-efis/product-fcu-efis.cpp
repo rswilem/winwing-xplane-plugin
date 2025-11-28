@@ -205,12 +205,12 @@ void ProductFCUEfis::update() {
 
     if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval()) {
         displayUpdateFrameCounter = 0;
-        updateDisplays();
+        updateDisplays(false);
     }
 }
 
-void ProductFCUEfis::updateDisplays() {
-    bool shouldUpdate = false;
+void ProductFCUEfis::updateDisplays(bool force) {
+    bool shouldUpdate = force;
     auto datarefManager = Dataref::getInstance();
     for (const std::string &dataref : profile->displayDatarefs()) {
         if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {

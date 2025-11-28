@@ -10,6 +10,8 @@
 class FF777FCUEfisProfile : public FCUEfisAircraftProfile {
     private:
         bool isTestMode();
+        bool isStdCaptain;
+        bool isStdFirstOfficer;
 
     public:
         FF777FCUEfisProfile(ProductFCUEfis *product);
@@ -29,11 +31,7 @@ class FF777FCUEfisProfile : public FCUEfisAircraftProfile {
             return true;
         }
 
-        void buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) override;
-
-        bool isBaroSTD(const char *side);
-
-        float valBaroInHg(const char *datarefValBaro);
+        void buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) override;        
 };
 
 #endif

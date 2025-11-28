@@ -25,78 +25,141 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
         product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, screenBrightness);
 
+        uint8_t ledBrightness = 255;
+        product->setLedBrightness(FCUEfisLed::OVERALL_GREEN, hasPower ? ledBrightness : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, hasPower ? ledBrightness : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_OVERALL_GREEN, hasPower ? ledBrightness : 0);
+
         product->forceStateSync();
+    });
+
+    // We abuse the GPU hatch dataref to trigger an update when the UI is closed.
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/anim/hatchGPU", [product](bool gpuHatchOpen) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/output/mcp/ok");
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/output/mcp/ok", [product](bool hasPower) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lights/glareshield");
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/output/mcp/ap_engage_a", [this, product](int engaged) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/mcpCaptAP", [this, product](bool engaged) {
         product->setLedBrightness(FCUEfisLed::AP1_GREEN, engaged || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/output/mcp/ap_engage_b", [this, product](int engaged) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/mcpFoAP", [this, product](bool engaged) {
         product->setLedBrightness(FCUEfisLed::AP2_GREEN, engaged || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/output/mcp/autothrottle_arm", [this, product](int armed) {
+    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/output/mcp/autothrottle_arm", [this, product](bool armed) {
         product->setLedBrightness(FCUEfisLed::ATHR_GREEN, armed || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/output/mcp/loc", [this, product](int armed) {
+    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/lampsGlow/mcpLOC", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::LOC_GREEN, armed || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/output/mcp/app", [this, product](int armed) {
+    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/lampsGlow/mcpAPP", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::APPR_GREEN, armed || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/output/mcp/fd_capt", [this, product](int on) {
+    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/lampsGlow/mcpAT", [this, product](int armed) {
+        product->setLedBrightness(FCUEfisLed::ATHR_GREEN, armed || isTestMode() ? 1 : 0);
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/mcpFdLSwitch/anim", [this, product](bool on) {
         product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, on || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/capt/wpt_toggle", [this, product](int on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, on || isTestMode() ? 1 : 0);
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/capt/arpt_toggle", [this, product](int on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, on || isTestMode() ? 1 : 0);
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/capt/data_toggle", [this, product](int on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, on || isTestMode() ? 1 : 0);
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/output/mcp/fd_fo", [this, product](int on) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/mcpFdRSwitch/anim", [this, product](bool on) {
         product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, on || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/fo/wpt_toggle", [this, product](int on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, on || isTestMode() ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/cptCAUTION", [this, product](bool isCaution) {
+        bool isWarning = Dataref::getInstance()->getCached<bool>("1-sim/ckpt/lampsGlow/cptWARNING");
+        product->setLedBrightness(FCUEfisLed::EFISL_CSTR_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_WPT_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_VORD_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_NDB_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/fo/arpt_toggle", [this, product](int on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, on || isTestMode() ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/foCAUTION", [this, product](bool isCaution) {
+        bool isWarning = Dataref::getInstance()->getCached<bool>("1-sim/ckpt/lampsGlow/foWARNING");
+        product->setLedBrightness(FCUEfisLed::EFISR_CSTR_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_WPT_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_VORD_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_NDB_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
+        product->setLedBrightness(FCUEfisLed::EFISR_ARPT_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/fo/data_toggle", [this, product](int on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, on || isTestMode() ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/cptWARNING", [this, product](bool on) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/cptCAUTION");
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/foWARNING", [this, product](bool on) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/foCAUTION");
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/indLightTestSwitch/anim", [this, product](int isTest) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/output/mcp/ok");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/mcpCaptAP");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/mcpFoAP");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/output/mcp/autothrottle_arm");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/mcpLOC");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/mcpAPP");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/mcpAT");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/mcpFdLSwitch/anim");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/mcpFdRSwitch/anim");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/cptWARNING");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lampsGlow/foWARNING");
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<float>("1-sim/ckpt/cptHsiStdButton/anim", [this, product](float animValue) {
+        AppState::getInstance()->executeAfterDebounced("cptStdChanged", 100, [this, product]() {
+            isStdCaptain = !isStdCaptain;
+
+            float baroValue = Dataref::getInstance()->get<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
+            if (isStdCaptain && fabs(baroValue - 29.92f) > std::numeric_limits<float>::epsilon()) {
+                isStdCaptain = false;
+            }
+            
+            product->updateDisplays();
+        });
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<float>("1-sim/ckpt/foHsiStdButton/anim", [this, product](float animValue) {
+        AppState::getInstance()->executeAfterDebounced("foStdChanged", 100, [this, product]() {
+            isStdFirstOfficer = !isStdCaptain;
+            
+            float baroValue = Dataref::getInstance()->get<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
+            if (isStdFirstOfficer && fabs(baroValue - 29.92f) > std::numeric_limits<float>::epsilon()) {
+                isStdFirstOfficer = false;
+            }
+            
+            product->updateDisplays();
+        });
     });
 }
 
 FF777FCUEfisProfile::~FF777FCUEfisProfile() {
-    Dataref::getInstance()->unbind("1-sim/output/mcp/ok");
     Dataref::getInstance()->unbind("1-sim/ckpt/lights/glareshield");
-
-    Dataref::getInstance()->unbind("1-sim/output/mcp/ap_engage_a");
-    Dataref::getInstance()->unbind("1-sim/output/mcp/ap_engage_b");
+    Dataref::getInstance()->unbind("1-sim/anim/hatchGPU");
+    Dataref::getInstance()->unbind("1-sim/output/mcp/ok");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/mcpCaptAP");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/mcpFoAP");
     Dataref::getInstance()->unbind("1-sim/output/mcp/autothrottle_arm");
-    Dataref::getInstance()->unbind("1-sim/output/mcp/loc");
-    Dataref::getInstance()->unbind("1-sim/output/mcp/app");
-
-    Dataref::getInstance()->unbind("1-sim/output/mcp/fd_capt");
-    Dataref::getInstance()->unbind("1-sim/output/mcp/fd_fo");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/mcpLOC");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/mcpAPP");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/mcpAT");
+    Dataref::getInstance()->unbind("1-sim/ckpt/mcpFdLSwitch/anim");
+    Dataref::getInstance()->unbind("1-sim/ckpt/mcpFdRSwitch/anim");
+    Dataref::getInstance()->unbind("1-sim/ckpt/indLightTestSwitch/anim");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/cptCAUTION");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/foCAUTION");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/cptWARNING");
+    Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/foWARNING");
+    Dataref::getInstance()->unbind("1-sim/ckpt/cptHsiStdButton/anim");
+    Dataref::getInstance()->unbind("1-sim/ckpt/foHsiStdButton/anim");
 }
 
 bool FF777FCUEfisProfile::IsEligible() {
@@ -138,12 +201,8 @@ const std::vector<std::string> &FF777FCUEfisProfile::displayDatarefs() const {
         "1-sim/output/mcp/fma_vs_mode",
 
         // EFIS - Barometric settings
-        // "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
-        // "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot",
-        "1-sim/output/efis/capt/baro_value",
-        "1-sim/output/efis/fo/baro_value",
-        "777/displays/captain_baro_std", // DATAREF À TROUVER
-        "777/displays/fo_baro_std",      // DATAREF À TROUVER
+        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot",
+        "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot",
         // "777/displays/captain_baro_unit", // 0=inHg, 1=hPa
         // "777/displays/fo_baro_unit",
         "1-sim/output/efis/capt/baro_mode", // 0=inHg, 1=hPa
@@ -159,6 +218,7 @@ const std::vector<std::string> &FF777FCUEfisProfile::displayDatarefs() const {
         "1-sim/efis/capt/nd_range",
         "1-sim/efis/fo/nd_range",
 
+        "1-sim/ckpt/indLightTestSwitch/anim",
     };
 
     return datarefs;
@@ -170,10 +230,10 @@ const std::unordered_map<uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butto
         {0, {"SPD", "1-sim/command/mcpIasMachButton_button"}},
         {1, {"LOC", "1-sim/command/mcpLocButton_button"}},
         {2, {"HDG/TRK", "1-sim/command/mcpHdgTrkButton_button"}},
-        {3, {"LNAV", "1-sim/command/mcpLnavButton_button"}},
-        {4, {"VNAV", "1-sim/command/mcpVnavButton_button"}},
+        {3, {"AP1", "1-sim/command/mcpApLButton_button"}},
+        {4, {"AP2", "1-sim/command/mcpVnavButton_button"}},
         {5, {"A/THR", "1-sim/command/mcpAtButton_button"}},
-        {6, {"A/P L", "1-sim/command/mcpApLButton_button"}},
+        {6, {"EXPED", "1-sim/command/mcpApLButton_button"}},
         {7, {"VS/FPA", "1-sim/command/mcpVsFpaButton_button"}},
         {8, {"APP", "1-sim/command/mcpAppButton_button"}},
         // {"CMD R", ""}
@@ -188,7 +248,7 @@ const std::unordered_map<uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butto
         // Rotary encoders - Heading
         {13, {"HDG DEC", "1-sim/command/mcpHdgRotary_rotary-"}},
         {14, {"HDG INC", "1-sim/command/mcpHdgRotary_rotary+"}},
-        {15, {"HDG PUSH", "1-sim/command/mcpHdgRotary_push"}},
+        {15, {"HDG PUSH", "1-sim/command/mcpLnavButton_button"}},
         {16, {"HDG HOLD", "1-sim/command/mcpHdgHoldButton_button"}},
         // Commande orpheline :
         // {"CO", ""}
@@ -223,7 +283,7 @@ const std::unordered_map<uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butto
 
         // BARO
         {39, {"L_BARO PUSH", "1-sim/command/cptHsiStdButton_button"}},
-        //{40, {"R_BARO PULL", "777/displays/captain_baro_pull"}},
+        {40, {"R_BARO PULL", "1-sim/command/cptHsiStdButton_button"}},
         {41, {"L_BARO DEC", "1-sim/command/cptHsiBaroRotary_rotary-"}},
         {42, {"L_BARO INC", "1-sim/command/cptHsiBaroRotary_rotary+"}},
         {43, {"L_inHg", "1-sim/command/cptHsiBaroModeRotary_set_0"}},
@@ -273,7 +333,7 @@ const std::unordered_map<uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butto
 
         // BARO
         {71, {"R_BARO PUSH", "1-sim/command/foHsiStdButton_button"}},
-        //{72, {"R_BARO PULL", "777/displays/fo_baro_pull"}},
+        {72, {"R_BARO PULL", "1-sim/command/foHsiStdButton_button"}},
         {73, {"R_BARO DEC", "1-sim/command/foHsiBaroRotary_rotary-"}},
         {74, {"R_BARO INC", "1-sim/command/foHsiBaroRotary_rotary+"}},
         {75, {"R_inHg", "1-sim/command/foHsiBaroModeRotary_set_0"}},
@@ -385,24 +445,18 @@ void FF777FCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     for (int i = 0; i < 2; i++) {
         bool isCaptain = i == 0;
 
-        const char *side = (isCaptain ? "capt" : "fo");
-        bool isStd = isBaroSTD(side);
-
-        bool isBaroHpa = datarefManager->getCached<bool>(
-            isCaptain ? "1-sim/output/efis/capt/baro_mode" : "1-sim/output/efis/fo/baro_mode");
-
-        float baroValue = datarefManager->getCached<float>(
-            isCaptain ? "1-sim/output/efis/cpt/baro_value" : "1-sim/output/efis/fo/baro_value");
+        bool isBaroHpa = datarefManager->getCached<bool>(isCaptain ? "1-sim/ckpt/cptHsiBaroModeRotary/anim" : "1-sim/ckpt/foHsiBaroModeRotary/anim");
+        float baroValue = datarefManager->getCached<float>(isCaptain ? "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot" : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
 
         EfisDisplayValue value = {
             .displayEnabled = data.displayEnabled,
             .displayTest = data.displayTest,
             .baro = "",
-            .unitIsInHg = !isBaroHpa,
-            .isStd = isStd,
+            .unitIsInHg = false,
+            .isStd = (isCaptain && isStdCaptain) || (!isCaptain && isStdFirstOfficer),
         };
 
-        if (!isStd && baroValue > 0) {
+        if (!value.isStd && baroValue > 0) {
             value.setBaro(baroValue, !isBaroHpa);
         }
 
@@ -421,39 +475,7 @@ void FF777FCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMComm
 
     auto datarefManager = Dataref::getInstance();
 
-    if (phase == xplm_CommandBegin &&
-        (button->datarefType == FCUEfisDatarefType::BAROMETER_PILOT ||
-            button->datarefType == FCUEfisDatarefType::BAROMETER_FO)) {
-        bool isCaptain = button->datarefType == FCUEfisDatarefType::BAROMETER_PILOT;
-
-        bool isStd = isBaroSTD(isCaptain ? "capt" : "fo");
-
-        if (isStd) {
-            return;
-        }
-
-        bool isBaroHpa =
-            datarefManager->getCached<bool>(isCaptain ? "1-sim/output/efis/capt/baro_mode" : "1-sim/output/efis/fo/baro_mode");
-
-        const char *datarefName =
-            isCaptain ? "1-sim/output/efis/capt/baro_value" : "1-sim/output/efis/fo/baro_value";
-
-        float baroValue = valBaroInHg(datarefName);
-
-        bool increase = button->value > 0;
-
-        if (isBaroHpa) {
-            float hpaValue = baroValue * 33.8639f;
-            hpaValue += increase ? 1.0f : -1.0f;
-            baroValue = hpaValue / 33.8639f;
-        } else {
-            baroValue += increase ? 0.01f : -0.01f;
-        }
-
-        datarefManager->set<float>(datarefName, baroValue);
-    }
-
-    else if (phase == xplm_CommandBegin && button->datarefType == FCUEfisDatarefType::SET_VALUE) {
+    if (phase == xplm_CommandBegin && button->datarefType == FCUEfisDatarefType::SET_VALUE) {
         datarefManager->set<float>(button->dataref.c_str(), button->value);
     }
 
@@ -469,41 +491,5 @@ void FF777FCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMComm
 }
 
 bool FF777FCUEfisProfile::isTestMode() {
-    // TODO: Identifier la dataref de mode test pour le B777
-    // Exemple hypothétique: "777/test/display_test"
-
-    // return Dataref::getInstance()->get<int>("777/test/display_test") == 1;           // DATAREF À TROUVER
-    return false;
-}
-
-bool FF777FCUEfisProfile::isBaroSTD(const char *side) {
-    char myDataref[100];
-    const char *part1 = "1-sim/output/efis/";
-    const char *part2 = "/baro_value";
-
-    strcpy(myDataref, part1);
-    strcat(myDataref, side);
-    strcat(myDataref, part2);
-
-    auto datarefManager = Dataref::getInstance();
-
-    if (datarefManager->getCached<float>(myDataref) == 1013 ||
-        datarefManager->getCached<float>(myDataref) * 100 == 2992) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-float FF777FCUEfisProfile::valBaroInHg(const char *datarefValBaro) {
-    auto datarefManager = Dataref::getInstance();
-    float valInHg = datarefManager->getCached<float>(datarefValBaro);
-
-    if (valInHg > 450) {
-        valInHg = valInHg / 33.8639;
-    }
-
-    valInHg = (int) (valInHg * 100) / 100;
-
-    return valInHg;
+    return Dataref::getInstance()->get<int>("1-sim/ckpt/indLightTestSwitch/anim") == 2;
 }
