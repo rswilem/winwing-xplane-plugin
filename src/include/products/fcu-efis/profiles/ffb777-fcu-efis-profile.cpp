@@ -249,12 +249,12 @@ const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butt
         
         {0, {"SPD",     "1-sim/command/mcpIasMachButton_button"}},      // Bouton FCU "MACH"
         {1, {"LOC",     "1-sim/command/mcpLocButton_button"}},          // Bouton FCU "LOC"
-        //{2, },                                                        // Bouton FCU "TRK" à affecter
-        {3, {"LNAV",    "1-sim/command/mcpLnavButton_button"}},         // Bouton FCU "AP1" DÉTOURNÉ vers LNAV
-        {4, {"VNAV",    "1-sim/command/mcpVnavButton_button"}},         // Bouton FCU "AP2" DÉTOURNÉ vers VNAV
+        {2, {"HDG/TRK", "1-sim/command/mcpHdgTrkButton_button"}},       // Bouton FCU "TRK"
+        {3, {"LNAV",    "1-sim/command/mcpLnavButton_button"}},         // Bouton FCU "AP1"    DÉTOURNÉ vers LNAV
+        {4, {"VNAV",    "1-sim/command/mcpVnavButton_button"}},         // Bouton FCU "AP2"    DÉTOURNÉ vers VNAV
         {5, {"A/THR",   "1-sim/command/mcpAtButton_button"}},           // Bouton FCU "A/THR"
-        {6, {"A/P L",   "1-sim/command/mcpApLButton_button"}},          // Bouton FCU "EXPED" DÉTOURNÉ vers A/P ?
-        //{7, },                                                        // Bouton FCU "METRIC" à affecter
+        {6, {"A/P L",   "1-sim/command/mcpApLButton_button"}},          // Bouton FCU "EXPED"  DÉTOURNÉ vers A/P
+        {7, {"VS/FPA",     "1-sim/command/mcpVsFpaButton_button"}},     // Bouton FCU "METRIC" DÉTOURNÉ vers V/S FPA
         {8, {"APP",     "1-sim/command/mcpAppButton_button"}},          // Bouton FCU "APPR"
         // Commandes orphelines :
         // {"CMD R", ""}
@@ -269,22 +269,22 @@ const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butt
         // Rotary encoders - Heading
         {13, {"HDG DEC",  "1-sim/command/mcpHdgRotary_rotary-"}},       // Bouton FCU "HDG -"
         {14, {"HDG INC",  "1-sim/command/mcpHdgRotary_rotary+"}},       // Bouton FCU "HDG +"
-        {15, {"HDG HOLD", "1-sim/command/mcpHdgHoldButton_button"}},    // Bouton FCU "HDG PUSH"
-        //{16, },                                                       // Bouton FCU "HDG PULL" à affecter ?
+        {15, {"HDG PUSH", "1-sim/command/mcpHdgRotary_push"}},          // Bouton FCU "HDG PUSH"
+        {16, {"HDG HOLD", "1-sim/command/mcpHdgHoldButton_button"}},    // Bouton FCU "HDG PULL" DÉTOURNÉ vers Hold
         // Commande orpheline :
         // {"CO", ""}
         
         // Rotary encoders - Altitude
         {17, {"ALT DEC",  "1-sim/command/mcpAltRotary_rotary-"}},       // Bouton FCU "ALT -"
         {18, {"ALT INC",  "1-sim/command/mcpAltRotary_rotary+"}},       // Bouton FCU "ALT +"
-        {19, {"ALT HOLD", "1-sim/command/mcpAltRotary_push"}},          // Bouton FCU "ALT PUSH"
-        //{20, },                                                       // Bouton FCU "ALT PULL" à affecter ?
+        {19, {"ALT PUSH", "1-sim/command/mcpAltRotary_push"}},          // Bouton FCU "ALT PUSH"
+        {20, {"ALT HOLD", "1-sim/command/mcpAltHoldButton_button"}},    // Bouton FCU "ALT PULL" DÉTOURNÉ vers Hold
         
         // Rotary encoders - Vertical Speed
         {21, {"VS DEC", "1-sim/command/mcpVsRotary_rotary-"}},          // Bouton FCU "VS -"
         {22, {"VS INC", "1-sim/command/mcpVsRotary_rotary+"}},          // Bouton FCU "VS +"
         {23, {"V/S",    "1-sim/command/mcpVsButton_button"}},           // Bouton FCU "VS PUSH"
-        //{24, },                                                       // Bouton FCU "VS PULL" à affecter
+        //{24, },                                                       // Bouton FCU "VS PULL" à affecter ?
         
         // Altitude par 100/1000
         {25, {"ALT 100",  "1-sim/command/mcpAltModeSwitch_set_0"}},     // Bouton FCU "ALT 100"
@@ -297,7 +297,7 @@ const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butt
         
         // Boutons FD et LS
         {32, {"L_FD", "1-sim/command/mcpFdLSwitch_trigger"}},           // Bouton EFIS-L "FD"
-        //{33, },                                                       // Bouton EFIS-L "LS" à affecter
+        //{33, },                                                       // Bouton EFIS-L "LS" à affecter ?
         // Commande orpheline à défaut de bouton existant
         // {"R_MINIMUMS", ""}
         
