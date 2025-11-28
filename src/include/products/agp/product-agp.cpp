@@ -230,10 +230,6 @@ void ProductAGP::didReceiveData(int reportId, uint8_t *report, int reportLength)
 void ProductAGP::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
     USBDevice::didReceiveButton(hardwareButtonIndex, pressed, count);
 
-    if (pressed) {
-        debug_force("AGP button pressed: %i\n", hardwareButtonIndex);
-    }
-
     auto &buttons = profile->buttonDefs();
     auto it = buttons.find(hardwareButtonIndex);
     if (it == buttons.end()) {

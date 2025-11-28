@@ -21,7 +21,7 @@ ProductUrsaMinorThrottle::~ProductUrsaMinorThrottle() {
 }
 
 const char *ProductUrsaMinorThrottle::classIdentifier() {
-    return "UrsaMinorThrottle";
+    return "Ursa Minor Throttle";
 }
 
 void ProductUrsaMinorThrottle::setProfileForCurrentAircraft() {
