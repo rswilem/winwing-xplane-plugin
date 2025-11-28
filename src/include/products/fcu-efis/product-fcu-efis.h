@@ -21,7 +21,6 @@ class ProductFCUEfis : public USBDevice {
         uint32_t lastButtonStateHi = 0;
 
         void setProfileForCurrentAircraft();
-        void updateDisplays();
 
     public:
         ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
@@ -38,6 +37,8 @@ class ProductFCUEfis : public USBDevice {
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
         void didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count = 1) override;
         void forceStateSync() override;
+    
+        void updateDisplays(bool force = true);
 
         void setLedBrightness(FCUEfisLed led, uint8_t brightness);
 
