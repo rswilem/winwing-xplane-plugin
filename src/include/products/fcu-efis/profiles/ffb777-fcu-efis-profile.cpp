@@ -228,16 +228,13 @@ const std::vector <std::string> &FF777FCUEfisProfile::displayDatarefs() const {
 } // !displayDatarefs
 
 
-// OK ===============================================================================================================
-// MÉTHODE RENVOYANT LE MAPPAGE DES BOUTONS FCU+EFIS AVEC LEUR DATAREF (commande/action) ASSOCIÉE
+// ===============================================================================================================
+// MÉTHODE RENVOYANT LE MAPPAGE DES BOUTONS FCU+EFIS AVEC LES COMMANDES ASSOCIÉES
 /*
-En l'état ce mapping est hypothétique et doit être adapté selon la disposition physique du matériel
-et les datarefs réelles du FF B777v2.
-Les FCU EFIS Winwing étant conçus pour la gamme Airbus, il est nécessaire de garder en tête
-à quel n° de bouton est associé l'action attendue sur Airbus (identifiable par le nom du bouton)
-et de lui affecter ce qui s'y rapporte le plus sur le B777.
+Les FCU EFIS Winwing étant conçus pour Airbus, il est important de garder en tête à quel n° de bouton est associée
+l'action attendue sur Airbus (indiquée par le bouton) et de lui affecter ce qui s'y rapporte le mieux sur le B777.
 Les associations Airbus sont rappelées en commentaire, face à chaque bouton.
-Dans la majorité des cas la tranposition est naturelle, mais il y a quelques exceptions :
+Dans la majorité des cas la tranposition est naturelle, mais il y a qq exceptions qui créent autant d'entorses :
     - AP1 Airbus sera utilisé en tant que LNAV Boeing
     - AP2                                 VNAV
     - EXPED                               A/P
@@ -250,48 +247,48 @@ const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butt
         // MCP - MODE CONTROL PANEL (Centre)
         // ====================================================================
         
-        {0, {"SPD",     "1-sim/input/mcp/spd_sel"}},                    // Bouton FCU "MACH"
-        {1, {"LOC",     "1-sim/input/mcp/loc_button"}},                 // Bouton FCU "LOC"
+        {0, {"SPD",     "1-sim/command/mcpIasMachButton_button"}},      // Bouton FCU "MACH"
+        {1, {"LOC",     "1-sim/command/mcpLocButton_button"}},          // Bouton FCU "LOC"
         //{2, },                                                        // Bouton FCU "TRK" à affecter
-        {3, {"LNAV",    "1-sim/input/mcp/lnav_button"}},                // Bouton FCU "AP1" DÉTOURNÉ vers LNAV
-        {4, {"VNAV",    "1-sim/input/mcp/vnav_button"}},                // Bouton FCU "AP2" DÉTOURNÉ vers VNAV
-        {5, {"A/THR",   "1-sim/input/mcp/autothrottle_arm_button"}},    // Bouton FCU "A/THR"
-        {6, {"A/P L",   "1-sim/input/mcp/ap_engage_a_button"}},         // Bouton FCU "EXPED" DÉTOURNÉ vers A/P ?
+        {3, {"LNAV",    "1-sim/command/mcpLnavButton_button"}},         // Bouton FCU "AP1" DÉTOURNÉ vers LNAV
+        {4, {"VNAV",    "1-sim/command/mcpVnavButton_button"}},         // Bouton FCU "AP2" DÉTOURNÉ vers VNAV
+        {5, {"A/THR",   "1-sim/command/mcpAtButton_button"}},           // Bouton FCU "A/THR"
+        {6, {"A/P L",   "1-sim/command/mcpApLButton_button"}},          // Bouton FCU "EXPED" DÉTOURNÉ vers A/P ?
         //{7, },                                                        // Bouton FCU "METRIC" à affecter
-        {8, {"APP",     "1-sim/input/mcp/app_button"}},                 // Bouton FCU "APPR"
-        // Datarefs orphelines :
-        // {"CMD R", "777/MCP/cmd_right_button"}
-        // {"FLCH", "777/MCP/flch_button"}
+        {8, {"APP",     "1-sim/command/mcpAppButton_button"}},          // Bouton FCU "APPR"
+        // Commandes orphelines :
+        // {"CMD R", ""}
+        // {"FLCH", ""}
         
         // Rotary encoders - Speed
-        {9,  {"SPD DEC", "1-sim/input/mcp/spd_dec"}},                   // Bouton FCU "SPEED -"
-        {10, {"SPD INC", "1-sim/input/mcp/spd_inc"}},                   // Bouton FCU "SPEED +"
-        {11, {"SPD",     "1-sim/input/mcp/spd_push"}},                  // Bouton FCU "SPEED PUSH"
+        {9,  {"SPD DEC", "1-sim/command/mcpSpdRotary_rotary-"}},        // Bouton FCU "SPEED -"
+        {10, {"SPD INC", "1-sim/command/mcpSpdRotary_rotary+"}},        // Bouton FCU "SPEED +"
+        {11, {"SPD",     "1-sim/command/mcpSpdRotary_push"}},           // Bouton FCU "SPEED PUSH"
         //{12, },                                                       // Bouton FCU "SPEED PULL" à affecter ?
         
         // Rotary encoders - Heading
-        {13, {"HDG DEC",  "1-sim/input/mcp/hdg_dec"}},                  // Bouton FCU "HDG -"
-        {14, {"HDG INC",  "1-sim/input/mcp/hdg_inc"}},                  // Bouton FCU "HDG +"
-        {15, {"HDG HOLD", "1-sim/input/mcp/hdg_push"}},                 // Bouton FCU "HDG PUSH"
+        {13, {"HDG DEC",  "1-sim/command/mcpHdgRotary_rotary-"}},       // Bouton FCU "HDG -"
+        {14, {"HDG INC",  "1-sim/command/mcpHdgRotary_rotary+"}},       // Bouton FCU "HDG +"
+        {15, {"HDG HOLD", "1-sim/command/mcpHdgHoldButton_button"}},    // Bouton FCU "HDG PUSH"
         //{16, },                                                       // Bouton FCU "HDG PULL" à affecter ?
-        // Dataref orpheline :
-        // {"CO", "777/MCP/co_button"}
+        // Commande orpheline :
+        // {"CO", ""}
         
         // Rotary encoders - Altitude
-        {17, {"ALT DEC",  "1-sim/input/mcp/alt_dec"}},                  // Bouton FCU "ALT -"
-        {18, {"ALT INC",  "1-sim/input/mcp/alt_inc"}},                  // Bouton FCU "ALT +"
-        {19, {"ALT HOLD", "1-sim/input/mcp/alt_push"}},                 // Bouton FCU "ALT PUSH"
+        {17, {"ALT DEC",  "1-sim/command/mcpAltRotary_rotary-"}},       // Bouton FCU "ALT -"
+        {18, {"ALT INC",  "1-sim/command/mcpAltRotary_rotary+"}},       // Bouton FCU "ALT +"
+        {19, {"ALT HOLD", "1-sim/command/mcpAltRotary_push"}},          // Bouton FCU "ALT PUSH"
         //{20, },                                                       // Bouton FCU "ALT PULL" à affecter ?
         
         // Rotary encoders - Vertical Speed
-        {21, {"VS DEC", "1-sim/input/mcp/vs_dec"}},                     // Bouton FCU "VS -"
-        {22, {"VS INC", "1-sim/input/mcp/vs_inc"}},                     // Bouton FCU "VS +"
-        {23, {"V/S",    "1-sim/input/mcp/vs_button"}},                  // Bouton FCU "VS PUSH"
+        {21, {"VS DEC", "1-sim/command/mcpVsRotary_rotary-"}},          // Bouton FCU "VS -"
+        {22, {"VS INC", "1-sim/command/mcpVsRotary_rotary+"}},          // Bouton FCU "VS +"
+        {23, {"V/S",    "1-sim/command/mcpVsButton_button"}},           // Bouton FCU "VS PUSH"
         //{24, },                                                       // Bouton FCU "VS PULL" à affecter
         
         // Altitude par 100/1000
-        {25, {"ALT 100",  "1-sim/input/mcp/alt_inc_1000", FCUEfisDatarefType::SET_VALUE, 0.0}},     // Bouton FCU "ALT 100"
-        {26, {"ALT 1000", "1-sim/input/mcp/alt_inc_1000", FCUEfisDatarefType::SET_VALUE, 1.0}},     // Bouton FCU "ALT 1000"
+        {25, {"ALT 100",  "1-sim/command/mcpAltModeSwitch_set_0"}},     // Bouton FCU "ALT 100"
+        {26, {"ALT 1000", "1-sim/command/mcpAltModeSwitch_set_1"}},     // Bouton FCU "ALT 1000"
         
         
         // ====================================================================
@@ -299,60 +296,59 @@ const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butt
         // ====================================================================
         
         // Boutons FD et LS
-        {32, {"L_FD", "1-sim/input/mcp/fd_capt_button"}},               // Bouton EFIS-L "FD"
+        {32, {"L_FD", "1-sim/command/mcpFdLSwitch_trigger"}},           // Bouton EFIS-L "FD"
         //{33, },                                                       // Bouton EFIS-L "LS" à affecter
-        // Dataref orpheline :
-        // {"R_MINIMUMS", "777/displays/captain_minimums_toggle"}
+        // Commande orpheline à défaut de bouton existant
+        // {"R_MINIMUMS", ""}
         
         // ND Options
         // Les boutons seront sans doute à redistribuer car il n'y a pas de vraie correspondance entre Airbus et Boeing
-        {34, {"L_DATA", "1-sim/input/efis/capt/data_button"}},          // Bouton EFIS-L "CSTR"
-        {35, {"L_WPT",  "1-sim/input/efis/capt/wpt_button"}},           // Bouton EFIS-L "WPT"
-        {36, {"L_STA",  "1-sim/input/efis/capt/sta_button"}},           // Bouton EFIS-L "VOR.D" - Usage détourné
+        {34, {"L_DATA", "1-sim/command/cptHsiDataButton_button"}},      // Bouton EFIS-L "CSTR"
+        {35, {"L_WPT",  "1-sim/command/cptHsiWptButton_button"}},       // Bouton EFIS-L "WPT"
+        {36, {"L_STA",  "1-sim/command/cptHsiStaButton_button"}},       // Bouton EFIS-L "VOR.D" - Usage détourné
         //{37, },                                                       // Bouton EFIS-L "NDB" à affecter
-        {38, {"L_ARPT", "1-sim/input/efis/capt/arpt_button"}},          // Bouton EFIS-L "ARPT"
+        {38, {"L_ARPT", "1-sim/command/cptHsiArpButton_button"}},       // Bouton EFIS-L "ARPT"
         
         // BARO
-        {39, {"L_BARO PUSH", "1-sim/input/efis/capt/baro_sel"}},                                          // Bouton EFIS-L "STD PUSH"
-        //{40, {"R_BARO PULL", "777/displays/captain_baro_pull"}},                                        // Bouton EFIS-L "STD PULL" existe ?
-        {41, {"L_BARO DEC",  "1-sim/input/efis/capt/baro_dec"}},                                          // Bouton EFIS-L "PRESS -"
-        {42, {"L_BARO INC",  "1-sim/input/efis/capt/baro_inc"}},                                          // Bouton EFIS-L "PRESS +"
-        {43, {"L_inHg",      "1-sim/input/efis/capt/baro_mode_sel", FCUEfisDatarefType::SET_VALUE, 0.0}}, // Bouton EFIS-L "INHG"
-        {44, {"L_hPa",       "1-sim/input/efis/capt/baro_mode_sel", FCUEfisDatarefType::SET_VALUE, 1.0}}, // Bouton EFIS-L "HPA"
+        {39, {"L_BARO PUSH", "1-sim/command/cptHsiStdButton_button"}},      // Bouton EFIS-L "STD PUSH"
+        //{40, {"R_BARO PULL", "777/displays/captain_baro_pull"}},          // Bouton EFIS-L "STD PULL" existe ?
+        {41, {"L_BARO DEC",  "1-sim/command/cptHsiBaroRotary_rotary-"}},    // Bouton EFIS-L "PRESS -"
+        {42, {"L_BARO INC",  "1-sim/command/cptHsiBaroRotary_rotary+"}},    // Bouton EFIS-L "PRESS +"
+        {43, {"L_inHg",      "1-sim/command/cptHsiBaroModeRotary_set_0"}},  // Bouton EFIS-L "INHG"
+        {44, {"L_hPa",       "1-sim/command/cptHsiBaroModeRotary_set_1"}},  // Bouton EFIS-L "HPA"
         
         // ND Mode selector
         // Les positions seront sans doute à redistribuer après tests
-        {45, {"L_MODE APP",  "1-sim/input/efis/capt/nd_mode_sel", FCUEfisDatarefType::SET_VALUE, 0.0}},   // Bouton EFIS-L "MODE LS"
-        {45, {"L_MODE VOR",  "1-sim/input/efis/capt/nd_mode_sel", FCUEfisDatarefType::SET_VALUE, 1.0}},   // Bouton EFIS-L "MODE VOR"
-        //{47, },                                                                                         // Bouton EFIS-L "MODE NAV" à affecter?
-        {48, {"L_MODE MAP",  "1-sim/input/efis/capt/nd_mode_sel", FCUEfisDatarefType::SET_VALUE, 2.0}},   // Bouton EFIS-L "MODE ARC"
-        {49, {"L_MODE PLAN", "1-sim/input/efis/capt/nd_mode_sel", FCUEfisDatarefType::SET_VALUE, 3.0}},   // Bouton EFIS-L "MODE PLAN"
+        {45, {"L_MODE APP",  "1-sim/command/cptHsiModeSwitch_set_0"}},  // Bouton EFIS-L "MODE LS"
+        {46, {"L_MODE VOR",  "1-sim/command/cptHsiModeSwitch_set_1"}},  // Bouton EFIS-L "MODE VOR"
+        //{47, },                                                       // Bouton EFIS-L "MODE NAV" à affecter?
+        {48, {"L_MODE MAP",  "1-sim/command/cptHsiModeSwitch_set_2"}},  // Bouton EFIS-L "MODE ARC"
+        {49, {"L_MODE PLAN", "1-sim/command/cptHsiModeSwitch_set_3"}},  // Bouton EFIS-L "MODE PLAN"
         
         // ND Range selector
         // Les positions seront sans doute à redistribuer après tests
-        {50, {"L_RANGE 10",  "1-sim/input/efis/capt/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 1.0}},  // Bouton EFIS-L "RANGE 10"
-        {51, {"L_RANGE 20",  "1-sim/input/efis/capt/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 2.0}},  // Bouton EFIS-L "RANGE 20"
-        {52, {"L_RANGE 40",  "1-sim/input/efis/capt/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 3.0}},  // Bouton EFIS-L "RANGE 40"
-        {53, {"L_RANGE 80",  "1-sim/input/efis/capt/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 4.0}},  // Bouton EFIS-L "RANGE 80"
-        {54, {"L_RANGE 160", "1-sim/input/efis/capt/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 5.0}},  // Bouton EFIS-L "RANGE 160"
-        {55, {"L_RANGE 320", "1-sim/input/efis/capt/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 6.0}},  // Bouton EFIS-L "RANGE 320"
-        // Datarefs orphelines (inexistantes sur l'avion ou l'EFIS) :
-        // {"R_RANGE 5",   "1-sim/input/efis/capt/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 0.0}      // Position inexistante dans le B777
-        // {"R_RANGE 640", "1-sim/input/efis/capt/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 7.0}      // Position inexistante sur l'EFIS
+        {50, {"L_RANGE 10",  "1-sim/command/cptHsiRangeSwitch_set_0"}}, // Bouton EFIS-L "RANGE 10"
+        {51, {"L_RANGE 20",  "1-sim/command/cptHsiRangeSwitch_set_1"}}, // Bouton EFIS-L "RANGE 20"
+        {52, {"L_RANGE 40",  "1-sim/command/cptHsiRangeSwitch_set_2"}}, // Bouton EFIS-L "RANGE 40"
+        {53, {"L_RANGE 80",  "1-sim/command/cptHsiRangeSwitch_set_3"}}, // Bouton EFIS-L "RANGE 80"
+        {54, {"L_RANGE 160", "1-sim/command/cptHsiRangeSwitch_set_4"}}, // Bouton EFIS-L "RANGE 160"
+        {55, {"L_RANGE 320", "1-sim/command/cptHsiRangeSwitch_set_5"}}, // Bouton EFIS-L "RANGE 320"
+        // Commandes orphelines (inexistantes sur l'avion ou l'EFIS) :
+        // {"R_RANGE 5", }                                              // Position inexistante dans le B777
+        // {"R_RANGE 640", }                                            // Position inexistante sur l'EFIS
         
-        // VOR/ADF selectors (NON inversés par rapport à Captain)
-        // !! ATTENTION - DATAREFS INCERTAINES !!
+        // VOR/ADF selectors
         // Les positions seront sans doute à redistribuer après tests
-        {56, {"L_VORL VOR", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0}},   // OK? Bouton EFIS-L "L-VOR"
-        {57, {"L_VORL OFF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0}},   // OK? Bouton EFIS-L "L-OFF"
-        {58, {"L_VORL ADF", "sim/cockpit2/EFIS/EFIS_1_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0}},   // OK? Bouton EFIS-L "L-ADF"
-        {59, {"L_VORR VOR", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 2.0}},   // OK? Bouton EFIS-L "R-VOR"
-        {60, {"L_VORR OFF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 1.0}},   // OK? Bouton EFIS-L "R-OFF"
-        {61, {"L_VORR ADF", "sim/cockpit2/EFIS/EFIS_2_selection_pilot", FCUEfisDatarefType::SET_VALUE, 0.0}},   // OK? Bouton EFIS-L "R-ADF"
+        {56, {"L_VORL VOR", "1-sim/command/cptHsiVorLSwitch_trigger"}}, // Bouton EFIS-L "L-VOR"
+        {57, {"L_VORL OFF", "1-sim/command/cptHsiVorLSwitch_trigger"}}, // Bouton EFIS-L "L-OFF"
+        {58, {"L_VORL ADF", "1-sim/command/cptHsiVorLSwitch_trigger"}}, // Bouton EFIS-L "L-ADF"
+        {59, {"L_VORR VOR", "1-sim/command/cptHsiVorRSwitch_trigger"}}, // Bouton EFIS-L "R-VOR"
+        {60, {"L_VORR OFF", "1-sim/command/cptHsiVorRSwitch_trigger"}}, // Bouton EFIS-L "R-OFF"
+        {61, {"L_VORR ADF", "1-sim/command/cptHsiVorRSwitch_trigger"}}, // Bouton EFIS-L "R-ADF"
         
-        // DATAREFS EN ATTENTE D'UN BOUTON ERGONOMIQUEMENT ACCEPTABLE PARMI CEUX ENCORE LIBRES SUR LE FCU/EFIS AIRBUS
-        // {XX, {"R_POS",  "1-sim/input/efis/fo/pos_button"}},                                  // Bouton EFIS-L "POS"
-        // {XX, {"R_TERR", "1-sim/input/efis/fo/terr_button"}},                                 // Bouton EFIS-L "TERR"
+        // COMMANDES EN ATTENTE D'UN BOUTON ERGONOMIQUEMENT ACCEPTABLE PARMI CEUX ENCORE LIBRES SUR LE FCU/EFIS AIRBUS
+        // {XX, {"R_POS",  ""}},                                        // Bouton EFIS-L "POS"
+        // {XX, {"R_TERR", ""}},                                        // Bouton EFIS-L "TERR"
         
         // BOUTONS RÉSERVÉS
         //{62, },   // Bouton ????
@@ -364,60 +360,59 @@ const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butt
         // ====================================================================
         
         // Boutons FD et LS
-        {64, {"R_FD", "1-sim/input/mcp/fd_fo_button"}},         // Bouton EFIS-R "FD"
-        //{65, },                                               // Bouton EFIS-R "LS" à affecter
-        // Dataref orpheline :
+        {64, {"R_FD", "1-sim/command/mcpFdRSwitch_trigger"}},           // Bouton EFIS-R "FD"
+        //{65, },                                                       // Bouton EFIS-R "LS" à affecter
+        // Commande orpheline :
         // {"R_MINIMUMS", "777/displays/fo_minimums_toggle"}
         
         // ND Options
         // Les boutons seront sans doute à redistribuer car il n'y a pas de vraie correspondance entre Airbus et Boeing
-        {66, {"R_DATA", "1-sim/input/efis/fo/data_button"}},    // Bouton EFIS-R "CSTR"
-        {67, {"R_WPT",  "1-sim/input/efis/fo/wpt_button"}},     // Bouton EFIS-R "WPT"
-        {68, {"R_STA",  "1-sim/input/efis/fo/sta_button"}},     // Bouton EFIS-R "VOR.D" - Usage détourné
-        //{69, },                                               // Bouton EFIS-R "NDB" à affecter
-        {70, {"R_ARPT", "1-sim/input/efis/fo/arpt_button"}},    // Bouton EFIS-R "ARPT"
+        {66, {"R_DATA", "1-sim/command/foHsiDataButton_button"}},       // Bouton EFIS-R "CSTR"
+        {67, {"R_WPT",  "1-sim/command/foHsiWptButton_button"}},        // Bouton EFIS-R "WPT"
+        {68, {"R_STA",  "1-sim/command/foHsiStaButton_button"}},        // Bouton EFIS-R "VOR.D" - Usage détourné
+        //{69, },                                                       // Bouton EFIS-R "NDB" à affecter
+        {70, {"R_ARPT", "1-sim/command/foHsiArpButton_button"}},        // Bouton EFIS-R "ARPT"
         
         // BARO
-        {71, {"R_BARO PUSH", "1-sim/input/efis/fo/baro_sel"}},                                          // Bouton EFIS-R "STD PUSH"
-        //{72, {"R_BARO PULL", "777/displays/fo_baro_pull"}},                                           // Bouton EFIS-R "STD PULL" existe ?
-        {73, {"R_BARO DEC",  "1-sim/input/efis/fo/baro_dec"}},                                          // Bouton EFIS-R "PRESS -"
-        {74, {"R_BARO INC",  "1-sim/input/efis/fo/baro_inc"}},                                          // Bouton EFIS-R "PRESS +"
-        {75, {"R_inHg",      "1-sim/input/efis/fo/baro_mode_sel", FCUEfisDatarefType::SET_VALUE, 0.0}}, // Bouton EFIS-R "INHG"
-        {76, {"R_hPa",       "1-sim/input/efis/fo/baro_mode_sel", FCUEfisDatarefType::SET_VALUE, 1.0}}, // Bouton EFIS-R "HPA"
+        {71, {"R_BARO PUSH", "1-sim/command/foHsiStdButton_button"}},       // Bouton EFIS-R "STD PUSH"
+        //{72, {"R_BARO PULL", "777/displays/fo_baro_pull"}},               // Bouton EFIS-R "STD PULL" existe ?
+        {73, {"R_BARO DEC",  "1-sim/command/foHsiBaroRotary_rotary-"}},     // Bouton EFIS-R "PRESS -"
+        {74, {"R_BARO INC",  "1-sim/command/foHsiBaroRotary_rotary+"}},     // Bouton EFIS-R "PRESS +"
+        {75, {"R_inHg",      "1-sim/command/foHsiBaroModeRotary_set_0"}},   // Bouton EFIS-R "INHG"
+        {76, {"R_hPa",       "1-sim/command/foHsiBaroModeRotary_set_1"}},   // Bouton EFIS-R "HPA"
         
         // ND Mode selector
         // Les positions seront sans doute à redistribuer après tests
-        {77, {"R_MODE APP",  "1-sim/input/efis/fo/nd_mode_sel", FCUEfisDatarefType::SET_VALUE, 0.0}},   // Bouton EFIS-R "MODE LS"
-        {78, {"R_MODE VOR",  "1-sim/input/efis/fo/nd_mode_sel", FCUEfisDatarefType::SET_VALUE, 1.0}},   // Bouton EFIS-R "MODE VOR"
-        //{79, },                                                                                       // Bouton EFIS-R "MODE NAV" à affecter
-        {80, {"R_MODE MAP",  "1-sim/input/efis/fo/nd_mode_sel", FCUEfisDatarefType::SET_VALUE, 2.0}},   // Bouton EFIS-R "MODE ARC"
-        {81, {"R_MODE PLAN", "1-sim/input/efis/fo/nd_mode_sel", FCUEfisDatarefType::SET_VALUE, 3.0}},   // Bouton EFIS-R "MODE PLAN"
+        {77, {"R_MODE APP",  "1-sim/command/foHsiModeSwitch_set_0"}},   // Bouton EFIS-R "MODE LS"
+        {78, {"R_MODE VOR",  "1-sim/command/foHsiModeSwitch_set_1"}},   // Bouton EFIS-R "MODE VOR"
+        //{79, },                                                       // Bouton EFIS-R "MODE NAV" à affecter
+        {80, {"R_MODE MAP",  "1-sim/command/foHsiModeSwitch_set_2"}},   // Bouton EFIS-R "MODE ARC"
+        {81, {"R_MODE PLAN", "1-sim/command/foHsiModeSwitch_set_3"}},   // Bouton EFIS-R "MODE PLAN"
         
         // ND Range selector
         // Les positions seront sans doute à redistribuer après tests
-        {82, {"R_RANGE 10",  "1-sim/input/efis/fo/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 1.0}},  // Bouton EFIS-R "RANGE 10"
-        {83, {"R_RANGE 20",  "1-sim/input/efis/fo/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 2.0}},  // Bouton EFIS-R "RANGE 20"
-        {84, {"R_RANGE 40",  "1-sim/input/efis/fo/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 3.0}},  // Bouton EFIS-R "RANGE 40"
-        {85, {"R_RANGE 80",  "1-sim/input/efis/fo/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 4.0}},  // Bouton EFIS-R "RANGE 80"
-        {86, {"R_RANGE 160", "1-sim/input/efis/fo/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 5.0}},  // Bouton EFIS-R "RANGE 160"
-        {87, {"R_RANGE 320", "1-sim/input/efis/fo/nd_range_sel", FCUEfisDatarefType::SET_VALUE, 6.0}},  // Bouton EFIS-R "RANGE 320"
-        // Datarefs orphelines :
-        // {"R_RANGE 5", "777/displays/fo_nd_range", FCUEfisDatarefType::SET_VALUE, 0.0}        // Position inexistante dans le B777
-        // {"R_RANGE 640", "777/displays/fo_nd_range", FCUEfisDatarefType::SET_VALUE, 7.0}      // Position inexistante sur l'EFIS
+        {82, {"R_RANGE 10",  "1-sim/command/foHsiRangeSwitch_set_0"}},  // Bouton EFIS-R "RANGE 10"
+        {83, {"R_RANGE 20",  "1-sim/command/foHsiRangeSwitch_set_1"}},  // Bouton EFIS-R "RANGE 20"
+        {84, {"R_RANGE 40",  "1-sim/command/foHsiRangeSwitch_set_2"}},  // Bouton EFIS-R "RANGE 40"
+        {85, {"R_RANGE 80",  "1-sim/command/foHsiRangeSwitch_set_3"}},  // Bouton EFIS-R "RANGE 80"
+        {86, {"R_RANGE 160", "1-sim/command/foHsiRangeSwitch_set_4"}},  // Bouton EFIS-R "RANGE 160"
+        {87, {"R_RANGE 320", "1-sim/command/foHsiRangeSwitch_set_5"}},  // Bouton EFIS-R "RANGE 320"
+        // Commandes orphelines :
+        // {"R_RANGE 5", }                                              // Position inexistante dans le B777
+        // {"R_RANGE 640", }                                            // Position inexistante sur l'EFIS
         
-        // VOR/ADF selectors (NON inversés par rapport à Captain)
-        // !! ATTENTION - DATAREFS À TROUVER !!
+        // VOR/ADF selectors
         // Les positions seront sans doute à redistribuer après tests
-        {88, {"R_VORL VOR", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0}}, // OK? Bouton EFIS-R "L-VOR"
-        {89, {"R_VORL OFF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0}}, // OK? Bouton EFIS-R "L-OFF"
-        {90, {"R_VORL ADF", "sim/cockpit2/EFIS/EFIS_1_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0}}, // OK? Bouton EFIS-R "L-ADF"
-        {91, {"R_VORR VOR", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 2.0}}, // OK? Bouton EFIS-R "R-VOR"
-        {92, {"R_VORR OFF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 1.0}}, // OK? Bouton EFIS-R "R-OFF"
-        {93, {"R_VORR ADF", "sim/cockpit2/EFIS/EFIS_2_selection_copilot", FCUEfisDatarefType::SET_VALUE, 0.0}}, // OK? Bouton EFIS-R "R-ADF"
+        {88, {"R_VORL VOR", "1-sim/command/foHsiVorLSwitch_trigger"}},  // Bouton EFIS-R "L-VOR"
+        {89, {"R_VORL OFF", "1-sim/command/foHsiVorLSwitch_trigger"}},  // Bouton EFIS-R "L-OFF"
+        {90, {"R_VORL ADF", "1-sim/command/foHsiVorLSwitch_trigger"}},  // Bouton EFIS-R "L-ADF"
+        {91, {"R_VORR VOR", "1-sim/command/foHsiVorRSwitch_trigger"}},  // Bouton EFIS-R "R-VOR"
+        {92, {"R_VORR OFF", "1-sim/command/foHsiVorRSwitch_trigger"}},  // Bouton EFIS-R "R-OFF"
+        {93, {"R_VORR ADF", "1-sim/command/foHsiVorRSwitch_trigger"}},  // Bouton EFIS-R "R-ADF"
         
-        // DATAREFS EN ATTENTE D'UN BOUTON ERGONOMIQUEMENT ACCEPTABLE PARMI CEUX ENCORE LIBRES SUR LE FCU/EFIS AIRBUS
-        // {XX, {"R_POS",  "1-sim/input/efis/fo/pos_button"}},                                  // Bouton EFIS-R "POS"
-        // {XX, {"R_TERR", "1-sim/input/efis/fo/terr_button"}},                                 // Bouton EFIS-R "TERR"
+        // COMMANDES EN ATTENTE D'UN BOUTON ERGONOMIQUEMENT ACCEPTABLE PARMI CEUX ENCORE LIBRES SUR LE FCU/EFIS AIRBUS
+        // {XX, {"R_POS",  ""}},                                        // Bouton EFIS-R "POS"
+        // {XX, {"R_TERR", ""}},                                        // Bouton EFIS-R "TERR"
         
         // BOUTONS RÉSERVÉS
         //{94, }, // Bouton ????
@@ -429,8 +424,8 @@ const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butt
 } // !buttonDefs
 
 
-// KO ===============================================================================================================
-// Méthode pour mise à jour des données affichées par les afficheurs
+// ===============================================================================================================
+// Méthode pour mise à jour des données affichées dans les cadrans
 void FF777FCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     auto datarefManager = Dataref::getInstance();
     
@@ -565,7 +560,7 @@ void FF777FCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
 
 
 // ===============================================================================================================
-// Méthode qui...
+// Méthode qui gère l'appui sur un bouton selon sa nature
 void FF777FCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCommandPhase phase) {
     if (!button || button->dataref.empty() || phase == xplm_CommandContinue) {
         return;
@@ -576,7 +571,7 @@ void FF777FCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMComm
     // =======================
     // GESTION DES BAROMETERS
     // =======================
-    // ATTENTION LOGIQUE DE CE BLOC 'GESTION DES BAROMÈTRES' À REVOIR .....
+    // TODO : LOGIQUE DE CE BLOC 'GESTION DES BAROMÈTRES' À S'APPROPRIER ...
     if (phase == xplm_CommandBegin &&
         (button->datarefType == FCUEfisDatarefType::BAROMETER_PILOT ||
          button->datarefType == FCUEfisDatarefType::BAROMETER_FO)) {
@@ -594,10 +589,8 @@ void FF777FCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMComm
         }
         
         /* Si comme je le suppose 'baro_mode' vaut 1 quand hPa, et O quand quand inHg, alors le code fonctionne */
-        bool isBaroHpa = datarefManager->getCached<bool>(
-            isCaptain ? "1-sim/output/efis/capt/baro_mode" : "1-sim/output/efis/fo/baro_mode"       // Dataref à CONFIRMER
-                                                         );
-        
+        bool isBaroHpa =
+        datarefManager->getCached<bool>(isCaptain ? "1-sim/output/efis/capt/baro_mode": "1-sim/output/efis/fo/baro_mode");
         
         /* DÉBUT DU BLOC ABANDONNÉ POUR CONTOURNER L'ABSENCE DE DATAREF =================== */
         //
@@ -606,14 +599,13 @@ void FF777FCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMComm
         //    : "sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot";                // DATAREF INTROUVABLE
         //
         // float baroValue = datarefManager->getCached<float>(datarefName);
-        
+        //
         const char *datarefName =
         isCaptain ? "1-sim/output/efis/capt/baro_value" : "1-sim/output/efis/fo/baro_value" ;   // Dataref intermédiaire
         // Appel à Méthode permettant de déterminer la valeur Baro en inHg
         float baroValue = valBaroInHg(datarefName);                                             // Méthode palliative
         //
         /* FIN DU BLOC DE SUBSTITUTION ==================================================== */
-        
         
         bool increase = button->value > 0;
         
@@ -656,7 +648,7 @@ void FF777FCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMComm
 } // !buttonPressed
 
 
-// OK ===============================================================================================================
+// ===============================================================================================================
 // Méthode lançant le mode test d'affichage
 bool FF777FCUEfisProfile::isTestMode() {
     // TODO: Identifier la dataref de mode test pour le B777
@@ -668,44 +660,46 @@ bool FF777FCUEfisProfile::isTestMode() {
 } // !isTestMode
 
 
-// OK ===============================================================================================================
+// ===============================================================================================================
 // Méthode permettant de déterminer si Baro est en mode STD (à défaut d'avoir trouvé la dataref qui va bien)
 bool FF777FCUEfisProfile::isBaroSTD(const char *side) {
     
     // reconstituer le 'const char' "1-sim/output/efis/capt/baro_value"
     //                           ou "1-sim/output/efis/fo/baro_value" selon le cas
+    // avec insertion d'une variable remplaçant 'cpt' ou 'fo'
     char myDataref[100];
-    const char* a = "1-sim/output/efis/";
-    const char* b = "/baro_value";
+    const char* part1 = "1-sim/output/efis/";
+    const char* part2 = "/baro_value";
 
-    strcpy(myDataref, a);       // recopie de a                         "1-sim/output/efis/"
-    strcat(myDataref, side);    // concaténation avec side (=capt p.e.) "1-sim/output/efis/capt"
-    strcat(myDataref, b);       // concaténation avec b                 "1-sim/output/efis/capt/baro_value"
+    strcpy(myDataref, part1);       // recopie de part1                         "1-sim/output/efis/"
+    strcat(myDataref, side);        // concaténation avec side (=capt p.e.)     "1-sim/output/efis/capt"
+    strcat(myDataref, part2);       // concaténation avec part2                 "1-sim/output/efis/capt/baro_value"
 
     auto datarefManager = Dataref::getInstance();
     
     if (datarefManager->getCached<float>(myDataref) == 1013 ||
         datarefManager->getCached<float>(myDataref) *100 == 2992) {
         
-            return true;
+        return true;
     }
     else return false;
     
 } // !isBaroSTD
 
 
-// OK ===============================================================================================================
-// Méthode permettant de déterminer la valeur de Baro en inHg (à défaut d'avoir trouvé la dataref qui va bien)
+// ===============================================================================================================
+// Méthode permettant de déterminer la valeur Baro en inHg (à défaut d'avoir trouvé la dataref qui va bien)
 float FF777FCUEfisProfile::valBaroInHg(const char *datarefValBaro) {
     
     // Détermination de la valeur de pression atmo
     auto datarefManager = Dataref::getInstance();
     float valInHg = datarefManager->getCached<float>(datarefValBaro) ;
     
-    // Si la valeur est en hPa, on la ramène en inHg
+    // Si la valeur est sup à 450, c'est qu'elle est en hPa,
+    // on la ramène alors en inHg
     if (valInHg > 450) valInHg = valInHg / 33.8639;
     
-    // Troncature à 2 chiffres après la virgule
+    // Troncature (un arrondi serait p.e. préférable) à 2 chiffres après la virgule
     valInHg = (int) (valInHg*100) / 100;
     
     return valInHg;
