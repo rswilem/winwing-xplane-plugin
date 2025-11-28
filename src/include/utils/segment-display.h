@@ -22,7 +22,7 @@ namespace SegmentDisplay {
     std::vector<uint8_t> encodeStringEfis(int numSegments, const std::string &str);
 
     // Fix string length with leading zeros
-    std::string fixStringLength(const std::string &value, int length);
+    std::string fixStringLength(const std::string &value, int length, char fillChar = '0');
 
     // Swap nibbles in a byte
     uint8_t swapNibbles(uint8_t value);

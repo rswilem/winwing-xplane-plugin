@@ -40,7 +40,7 @@ void TolissUrsaMinorJoystickProfile::update() {
         lastGForce = gForce;
 
         bool onGround = Dataref::getInstance()->getCached<bool>("sim/flightmodel/failures/onground_any");
-        uint8_t vibration = (uint8_t) std::min(255.0f, delta * (onGround ? product->vibrationFactor : product->vibrationFactor / 2.0f));
+        uint8_t vibration = (uint8_t) std::min(255.0f, delta * (onGround ? product->vibrationMultiplier : product->vibrationMultiplier / 2.0f));
         if (vibration < 6) {
             vibration = 0;
         }
@@ -54,4 +54,3 @@ void TolissUrsaMinorJoystickProfile::update() {
         product->setVibration(lastVibration);
     }
 }
-

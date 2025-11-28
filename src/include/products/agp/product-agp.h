@@ -41,6 +41,7 @@ class ProductAGP : public USBDevice {
     private:
         AGPAircraftProfile *profile;
         int menuItemId;
+        int displayUpdateFrameCounter = 0;
         uint64_t lastButtonStateLo;
         uint32_t lastButtonStateHi;
         std::set<int> pressedButtonIndices;

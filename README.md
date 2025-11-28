@@ -1,16 +1,16 @@
-## Winwing plugin for X-Plane 12
+## Winwing plugin for X-Plane
 
-For X-Plane 12 only.
+For X-Plane 11 and X-Plane 12
 
-This plugin allows you to use Winwing devices in X-Plane 12 on MacOS and Linux.
+This plugin allows you to use Winwing devices in X-Plane on MacOS and Linux.
 The plugin theoretically works on Windows, but is not required there, as Winwing provides a native Windows driver through the SimAppPro software.
 
 ### Installation
 
 1. Download the latest release from the releases page.
 2. Unzip the downloaded file.
-3. Copy the `Winwing` folder to your X-Plane 12 `Resources/plugins` directory.
-4. Start X-Plane 12.
+3. Copy the `Winwing` folder to your X-Plane `Resources/plugins` directory.
+4. Start X-Plane.
 5. Updating can be done by replacing the `Winwing` folder or using Skunkcrafts Updater if you have it installed.
 
 For linux, see the [Linux udev rules](#linux-udev-rules) section below to ensure proper permissions.
@@ -18,10 +18,10 @@ For linux, see the [Linux udev rules](#linux-udev-rules) section below to ensure
 ### Contributing
 
 - Fork the repository.
-- Download the latest X-Plane 12 SDK from https://developer.x-plane.com/sdk/plugin-sdk-downloads/.
+- Download the latest X-Plane SDK from https://developer.x-plane.com/sdk/plugin-sdk-downloads/.
 - Unzip and copy the `SDK/` folder to the root of the repository.
 - Make your changes.
-- Test your changes in X-Plane 12. Datareftool plugin recommented, and make sure you uninstall FlyWithLua as it can interfere with the "Reload Plugins" functionality.
+- Test your changes in X-Plane. Datareftool plugin recommented, and make sure you uninstall FlyWithLua as it can interfere with the "Reload Plugins" functionality.
 - Commit your changes and push to your fork.
 - Create a pull request with a description of your changes.
 

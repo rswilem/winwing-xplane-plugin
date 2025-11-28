@@ -19,57 +19,73 @@ TolissECAM32Profile::TolissECAM32Profile(ProductECAM32 *product) : ECAM32Aircraf
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/CLRillum", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::CLR_LEFT, enabled ? 1 : 0);
-        product->setLedBrightness(ECAM32Led::CLR_RIGHT, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this](int annunMode) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/CLRillum");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDENG");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDBLEED");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDPRESS");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDELEC");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDHYD");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDFUEL");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDAPU");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDCOND");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDDOOR");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDWHEEL");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDFCTL");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SDSTATUS");
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDENG", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::ENG, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/CLRillum", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::CLR_LEFT, enabled || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(ECAM32Led::CLR_RIGHT, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDBLEED", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::BLEED, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDENG", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::ENG, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDPRESS", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::PRESS, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDBLEED", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::BLEED, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDELEC", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::ELEC, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDPRESS", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::PRESS, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDHYD", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::HYD, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDELEC", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::ELEC, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDFUEL", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::FUEL, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDHYD", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::HYD, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDAPU", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::APU, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDFUEL", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::FUEL, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDCOND", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::COND, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDAPU", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::APU, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDDOOR", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::DOOR, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDCOND", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::COND, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDWHEEL", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::WHEEL, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDDOOR", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::DOOR, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDFCTL", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::F_CTL, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDWHEEL", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::WHEEL, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDSTATUS", [product](bool enabled) {
-        product->setLedBrightness(ECAM32Led::STS, enabled ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDFCTL", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::F_CTL, enabled || isAnnunTest() ? 1 : 0);
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/SDSTATUS", [this, product](bool enabled) {
+        product->setLedBrightness(ECAM32Led::STS, enabled || isAnnunTest() ? 1 : 0);
     });
 }
 
@@ -129,4 +145,8 @@ void TolissECAM32Profile::buttonPressed(const ECAM32ButtonDef *button, XPLMComma
 
     auto datarefManager = Dataref::getInstance();
     datarefManager->executeCommand(button->dataref.c_str(), phase);
+}
+
+bool TolissECAM32Profile::isAnnunTest() {
+    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2;
 }

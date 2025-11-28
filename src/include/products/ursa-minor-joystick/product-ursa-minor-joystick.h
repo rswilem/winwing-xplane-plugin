@@ -10,14 +10,14 @@ class ProductUrsaMinorJoystick : public USBDevice {
         int menuItemId;
 
         void setProfileForCurrentAircraft();
-        void loadVibrationFactor(const std::string &preference);
+        void loadVibrationSetting(const std::string &preference);
 
     public:
         ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, unsigned char identifierByte);
         ~ProductUrsaMinorJoystick();
 
         const unsigned char identifierByte;
-        float vibrationFactor;
+        float vibrationMultiplier;
 
         const char *classIdentifier() override;
         bool connect() override;

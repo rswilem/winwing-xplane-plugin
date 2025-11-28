@@ -295,7 +295,7 @@ void XCraftsFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
 }
 
 void XCraftsFMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) {
-    if (std::fabs(button->value) > DBL_EPSILON) {
+    if (std::fabs(button->value) > std::numeric_limits<double>::epsilon()) {
         // Handle buttons with values (like brightness controls)
         if (phase != xplm_CommandBegin) {
             return;

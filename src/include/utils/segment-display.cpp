@@ -192,13 +192,13 @@ namespace SegmentDisplay {
         return ((value & 0x0F) << 4) | ((value & 0xF0) >> 4);
     }
 
-    std::string fixStringLength(const std::string &value, int length) {
+    std::string fixStringLength(const std::string &value, int length, char fillChar) {
         std::string result = value;
         if (result.length() > static_cast<size_t>(length)) {
             result = result.substr(result.length() - length);
         }
         while (result.length() < static_cast<size_t>(length)) {
-            result = "0" + result;
+            result = fillChar + result;
         }
         return result;
     }

@@ -7,9 +7,17 @@
 
 class ProductAGP;
 
+enum class AGPDatarefType : unsigned char {
+    EXECUTE_CMD = 1,
+    SET_VALUE,
+    TERRAIN_ON_ND,
+    LANDING_GEAR
+};
+
 struct AGPButtonDef {
         std::string name;
         std::string dataref;
+        AGPDatarefType datarefType = AGPDatarefType::EXECUTE_CMD;
         double value = 0.0;
 };
 
@@ -23,6 +31,8 @@ class AGPAircraftProfile {
 
         virtual const std::unordered_map<uint16_t, AGPButtonDef> &buttonDefs() const = 0;
         virtual void buttonPressed(const AGPButtonDef *button, XPLMCommandPhase phase) = 0;
+
+        virtual void updateDisplays() = 0;
 };
 
 #endif

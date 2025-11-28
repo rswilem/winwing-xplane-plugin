@@ -340,7 +340,7 @@ void IXEG733FMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPha
         std::get<FMCKey>(button->key) == FMCKey::CLR) {
         Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
     } else {
-        if (std::fabs(button->value) > DBL_EPSILON) {
+        if (std::fabs(button->value) > std::numeric_limits<double>::epsilon()) {
             if (phase != xplm_CommandBegin) {
                 return;
             }

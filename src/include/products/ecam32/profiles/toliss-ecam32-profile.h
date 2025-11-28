@@ -7,6 +7,7 @@
 
 class TolissECAM32Profile : public ECAM32AircraftProfile {
     private:
+        bool isAnnunTest();
 
     public:
         TolissECAM32Profile(ProductECAM32 *product);
@@ -14,7 +15,7 @@ class TolissECAM32Profile : public ECAM32AircraftProfile {
 
         static bool IsEligible();
         const std::unordered_map<uint16_t, ECAM32ButtonDef> &buttonDefs() const override;
-    
+
         void buttonPressed(const ECAM32ButtonDef *button, XPLMCommandPhase phase) override;
 };
 

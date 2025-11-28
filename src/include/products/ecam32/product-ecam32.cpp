@@ -78,14 +78,6 @@ void ProductECAM32::disconnect() {
     USBDevice::disconnect();
 }
 
-void ProductECAM32::update() {
-    if (!connected) {
-        return;
-    }
-
-    USBDevice::update();
-}
-
 void ProductECAM32::setAllLedsEnabled(bool enable) {
     unsigned char start = static_cast<unsigned char>(ECAM32Led::_START);
     unsigned char end = static_cast<unsigned char>(ECAM32Led::_END);

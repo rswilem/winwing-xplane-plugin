@@ -7,6 +7,8 @@
 
 class TolissAGPProfile : public AGPAircraftProfile {
     private:
+        bool isAnnunTest();
+
     public:
         TolissAGPProfile(ProductAGP *product);
         ~TolissAGPProfile();
@@ -15,6 +17,8 @@ class TolissAGPProfile : public AGPAircraftProfile {
         const std::unordered_map<uint16_t, AGPButtonDef> &buttonDefs() const override;
 
         void buttonPressed(const AGPButtonDef *button, XPLMCommandPhase phase) override;
+
+        void updateDisplays() override;
 };
 
 #endif

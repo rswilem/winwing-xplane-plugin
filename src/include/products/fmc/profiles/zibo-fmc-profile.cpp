@@ -335,7 +335,7 @@ void ZiboFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
 }
 
 void ZiboFMCProfile::buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) {
-    if (std::fabs(button->value) > DBL_EPSILON) {
+    if (std::fabs(button->value) > std::numeric_limits<double>::epsilon()) {
         if (phase != xplm_CommandBegin) {
             return;
         }
