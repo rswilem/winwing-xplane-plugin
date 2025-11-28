@@ -115,27 +115,27 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
     });
 
     Dataref::getInstance()->monitorExistingDataref<float>("1-sim/ckpt/cptHsiStdButton/anim", [this, product](float animValue) {
-        AppState::getInstance()->executeAfterDebounced("cptStdChanged", 100, [this, product]() {
+        AppState::getInstance()->executeAfterDebounced("cptStdChanged", 50, [this, product]() {
             isStdCaptain = !isStdCaptain;
 
             float baroValue = Dataref::getInstance()->get<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
             if (isStdCaptain && fabs(baroValue - 29.92f) > std::numeric_limits<float>::epsilon()) {
                 isStdCaptain = false;
             }
-            
+
             product->updateDisplays();
         });
     });
 
     Dataref::getInstance()->monitorExistingDataref<float>("1-sim/ckpt/foHsiStdButton/anim", [this, product](float animValue) {
-        AppState::getInstance()->executeAfterDebounced("foStdChanged", 100, [this, product]() {
-            isStdFirstOfficer = !isStdCaptain;
-            
+        AppState::getInstance()->executeAfterDebounced("foStdChanged", 50, [this, product]() {
+            isStdFirstOfficer = !isStdFirstOfficer;
+
             float baroValue = Dataref::getInstance()->get<float>("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
             if (isStdFirstOfficer && fabs(baroValue - 29.92f) > std::numeric_limits<float>::epsilon()) {
                 isStdFirstOfficer = false;
             }
-            
+
             product->updateDisplays();
         });
     });
