@@ -3,10 +3,10 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
+#include "profiles/ff777-fcu-efis-profile.h"
 #include "profiles/laminar-fcu-efis-profile.h"
 #include "profiles/laminar737-fcu-efis-profile.h"
 #include "profiles/toliss-fcu-efis-profile.h"
-#include "profiles/ffb777-fcu-efis-profile.h"
 
 #include <algorithm>
 #include <cstring>
@@ -106,7 +106,7 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
     } else if (LaminarFCUEfisProfile::IsEligible()) {
         profile = new LaminarFCUEfisProfile(this);
         profileReady = true;
-    // Ajout du Profil FF777
+        // Ajout du Profil FF777
     } else if (FF777FCUEfisProfile::IsEligible()) {
         profile = new FF777FCUEfisProfile(this);
         profileReady = true;
