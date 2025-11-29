@@ -271,31 +271,10 @@ void Dataref::clearCache() {
     cachedValues.clear();
 }
 
-void Dataref::forceRefreshCache() {
-    for (auto &[key, data] : cachedValues) {
-        data.dirty = true;
-    }
-}
-
 void Dataref::update() {
     const int currentCycle = XPLMGetCycleNumber();
 
     for (auto &[key, data] : cachedValues) {
-        // Skip if not dirty and was updated recently (within last 2 cycles)
-        if (!data.dirty && (currentCycle - data.lastUpdateCycleNumber) < 2) {
-            continue;
-        }
-
-        // Use cached handle if available
-        XPLMDataRef handle = data.handle;
-        if (!handle) {
-            handle = findRef(key.c_str());
-            data.handle = handle;
-        }
-        if (!handle) {
-            continue;
-        }
-
         std::visit([&](auto &&value) {
             using T = std::decay_t<decltype(value)>;
             T newValue = get<T>(key.c_str());
@@ -309,11 +288,7 @@ void Dataref::update() {
             if (didChange) {
                 data.value = newValue;
                 data.lastUpdateCycleNumber = currentCycle;
-                data.dirty = false;
                 executeChangedCallbacksForDataref(key.c_str());
-            } else {
-                data.dirty = false;
-                data.lastUpdateCycleNumber = currentCycle;
             }
         },
             data.value);
@@ -388,7 +363,6 @@ T Dataref::getCached(const char *ref) {
         cachedValues[ref] = {
             .value = val,
             .lastUpdateCycleNumber = XPLMGetCycleNumber(),
-            .dirty = false,
             .handle = handle};
         return val;
     }
@@ -508,7 +482,6 @@ void Dataref::set(const char *ref, T value, bool setCacheOnly) {
     cachedValues[ref] = {
         .value = value,
         .lastUpdateCycleNumber = XPLMGetCycleNumber(),
-        .dirty = false,
         .handle = handle};
 
     executeChangedCallbacksForDataref(ref);

@@ -30,7 +30,6 @@ struct BoundCommand {
 struct CachedValue {
         DataRefValueType value;
         int lastUpdateCycleNumber;
-        bool dirty;         // Marked dirty when needs re-fetch from sim
         XPLMDataRef handle; // Cached handle for fast access
 };
 
@@ -74,7 +73,6 @@ class Dataref {
         void executeCommandMultiple(const char *command, int count);
 
         void clearCache();
-        void forceRefreshCache();
 };
 
 #endif

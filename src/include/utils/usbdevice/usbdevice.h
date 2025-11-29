@@ -38,7 +38,7 @@ class USBDevice {
         std::queue<InputEvent> eventQueue;
         std::mutex eventQueueMutex;
 
-        std::deque<std::vector<uint8_t>> writeQueue;
+        std::queue<std::vector<uint8_t>> writeQueue;
         std::mutex writeQueueMutex;
         std::condition_variable writeQueueCV;
         std::thread writeThread;
