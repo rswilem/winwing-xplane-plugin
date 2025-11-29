@@ -44,6 +44,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 | **PAP3 / PAP3 Mag**         | 🔴          | 🔴           | 🔴          | 🔴               | 🟢       | 🔴       | 🔴         | 🔴      |
 | **FCU and EFIS L+R**        | 🟢          | 🟢           | 🟠          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 | **ECAM32**                  | 🟢          | 🔴           | 🔴          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
+| **AGP**                     | 🟢          | 🔴           | 🔴          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 
 #### Legend
 
@@ -69,6 +70,8 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@tukan68](https://github.com/tukan68) for FF767 profile.
 - [@verres1](https://github.com/verres1) for enriching the FF777 profile.
 - [@teropa] (https://forums.x-plane.org/profile/1028374-teropa/) for data capture and testing of multiple devices.
+- [@SoarByWire] (https://forums.x-plane.org/profile/411164-soarbywire/) for the testing of multiple devices.
+- [@MortyMars] (https://github.com/MortyMars) for the FCU/EFIS FF777 profile.
 
 ### Linux udev rules
 
