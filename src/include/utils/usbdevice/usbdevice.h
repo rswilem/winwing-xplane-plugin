@@ -6,6 +6,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
+#include <deque>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -37,7 +38,7 @@ class USBDevice {
         std::queue<InputEvent> eventQueue;
         std::mutex eventQueueMutex;
 
-        std::queue<std::vector<uint8_t>> writeQueue;
+        std::deque<std::vector<uint8_t>> writeQueue;
         std::mutex writeQueueMutex;
         std::condition_variable writeQueueCV;
         std::thread writeThread;
@@ -81,6 +82,7 @@ class USBDevice {
         void processOnMainThread(const InputEvent &event);
 
         bool writeData(std::vector<uint8_t> data);
+
         int getDisplayUpdateFrameInterval();
 
         static USBDevice *Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);

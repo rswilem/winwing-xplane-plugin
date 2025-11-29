@@ -3,7 +3,6 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
-#include "packet-utils.h"
 #include "profiles/ff777-fcu-efis-profile.h"
 #include "profiles/laminar-fcu-efis-profile.h"
 #include "profiles/laminar737-fcu-efis-profile.h"
@@ -147,14 +146,9 @@ void ProductFCUEfis::update() {
 }
 
 void ProductFCUEfis::updateDisplays(bool force) {
-    bool shouldUpdate = force;
     auto datarefManager = Dataref::getInstance();
-    for (const std::string &dataref : profile->displayDatarefs()) {
-        if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {
-            shouldUpdate = true;
-            break;
-        }
-    }
+    int maxDatarefCycle = datarefManager->getMaxCachedLastUpdate(profile->displayDatarefs());
+    bool shouldUpdate = force || !lastUpdateCycle || maxDatarefCycle > lastUpdateCycle;
 
     if (!shouldUpdate) {
         return;
@@ -300,7 +294,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
 
     // First request - send display data
     std::vector<uint8_t> data1 = {
-        0xF0, 0x00, packetNumber.next(), 0x31, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0xF0, 0x00, packetNumber, 0x31, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add speed data (3 bytes)
     data1.push_back(speedData[2]);
@@ -336,7 +330,7 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
 
     // Second request - commit display data
     std::vector<uint8_t> data2 = {
-        0xF0, 0x00, packetNumber.current(), 0x11, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00};
+        0xF0, 0x00, packetNumber, 0x11, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00};
 
     // Pad to 64 bytes
     while (data2.size() < 64) {
@@ -344,6 +338,10 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     }
 
     writeData(data2);
+
+    if (++packetNumber == 0) {
+        packetNumber = 1;
+    }
 }
 
 void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRightSide) {
@@ -355,7 +353,7 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
 
     // EFIS display protocol
     std::vector<uint8_t> payload = {
-        0xF0, 0x00, packetNumber.next(), 0x1A, static_cast<uint8_t>(isRightSide ? ProductFCUEfis::EfisRightIdentifierByte : ProductFCUEfis::EfisLeftIdentifierByte), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0xF0, 0x00, packetNumber, 0x1A, static_cast<uint8_t>(isRightSide ? ProductFCUEfis::EfisRightIdentifierByte : ProductFCUEfis::EfisLeftIdentifierByte), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add barometric data
     auto baroData = SegmentDisplay::encodeStringEfis(4, SegmentDisplay::fixStringLength(data->isStd ? "STD " : data->baro, 4));
@@ -380,6 +378,10 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
     }
 
     writeData(payload);
+
+    if (++packetNumber == 0) {
+        packetNumber = 1;
+    }
 }
 
 void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {

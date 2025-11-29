@@ -124,7 +124,7 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
 
     {
         std::lock_guard<std::mutex> lock(writeQueueMutex);
-        writeQueue.push(std::move(data));
+        writeQueue.push_back(std::move(data));
         cachedWriteQueueSize.store(writeQueue.size());
     }
     writeQueueCV.notify_one();
@@ -148,7 +148,7 @@ void USBDevice::writeThreadLoop() {
 
             if (!writeQueue.empty()) {
                 data = std::move(writeQueue.front());
-                writeQueue.pop();
+                writeQueue.pop_front();
                 cachedWriteQueueSize.store(writeQueue.size());
             }
         }

@@ -30,6 +30,8 @@ struct BoundCommand {
 struct CachedValue {
         DataRefValueType value;
         int lastUpdateCycleNumber;
+        bool dirty;         // Marked dirty when needs re-fetch from sim
+        XPLMDataRef handle; // Cached handle for fast access
 };
 
 class Dataref {
@@ -60,6 +62,7 @@ class Dataref {
         bool exists(const char *ref);
         void executeChangedCallbacksForDataref(const char *ref);
         int getCachedLastUpdate(const char *ref);
+        int getMaxCachedLastUpdate(const std::vector<std::string> &refs);
         template<typename T>
         T getCached(const char *ref);
         template<typename T>
@@ -68,8 +71,10 @@ class Dataref {
         void set(const char *ref, T value, bool setCacheOnly = false);
 
         void executeCommand(const char *command, XPLMCommandPhase phase = -1);
+        void executeCommandMultiple(const char *command, int count);
 
         void clearCache();
+        void forceRefreshCache();
 };
 
 #endif

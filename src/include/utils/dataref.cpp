@@ -73,114 +73,114 @@ void Dataref::createDataref(const char *ref, T *value, bool writable, DatarefSho
         handle = XPLMRegisterDataAccessor(ref, xplmType_Int, writable ? 1 : 0, [](void *inRefcon) -> int {
             return *static_cast<T *>(inRefcon);
         },
-                                          [](void *inRefcon, int inValue) {
-                                              BoundRef *info = static_cast<BoundRef *>(inRefcon);
-                                              T *valuePtr = static_cast<T *>(info->valuePointer);
+            [](void *inRefcon, int inValue) {
+                BoundRef *info = static_cast<BoundRef *>(inRefcon);
+                T *valuePtr = static_cast<T *>(info->valuePointer);
 
-                                              if (info->changeCallbacks.size()) {
-                                                  if (info->changeCallbacks[0](inValue)) {
-                                                      *valuePtr = inValue;
-                                                  }
-                                              } else {
-                                                  *valuePtr = inValue;
-                                              }
-                                          },
-                                          nullptr,
-                                          nullptr, // Float
-                                          nullptr,
-                                          nullptr, // Double
-                                          nullptr,
-                                          nullptr, // Int array
-                                          nullptr,
-                                          nullptr, // Float array
-                                          nullptr,
-                                          nullptr,          // Binary
-                                          value,            // Read refcon
-                                          &boundRefs[ref]); // Write refcon
+                if (info->changeCallbacks.size()) {
+                    if (info->changeCallbacks[0](inValue)) {
+                        *valuePtr = inValue;
+                    }
+                } else {
+                    *valuePtr = inValue;
+                }
+            },
+            nullptr,
+            nullptr, // Float
+            nullptr,
+            nullptr, // Double
+            nullptr,
+            nullptr, // Int array
+            nullptr,
+            nullptr, // Float array
+            nullptr,
+            nullptr,          // Binary
+            value,            // Read refcon
+            &boundRefs[ref]); // Write refcon
     } else if constexpr (std::is_same_v<T, float>) {
         handle = XPLMRegisterDataAccessor(ref, xplmType_Float, writable ? 1 : 0, nullptr, nullptr, // Int
-                                          [](void *inRefcon) -> T {
-                                              return *static_cast<T *>(inRefcon);
-                                          },
-                                          [](void *inRefcon, T inValue) {
-                                              BoundRef *info = static_cast<BoundRef *>(inRefcon);
-                                              T *valuePtr = static_cast<T *>(info->valuePointer);
+            [](void *inRefcon) -> T {
+                return *static_cast<T *>(inRefcon);
+            },
+            [](void *inRefcon, T inValue) {
+                BoundRef *info = static_cast<BoundRef *>(inRefcon);
+                T *valuePtr = static_cast<T *>(info->valuePointer);
 
-                                              if (info->changeCallbacks.size()) {
-                                                  if (info->changeCallbacks[0](inValue)) {
-                                                      *valuePtr = inValue;
-                                                  }
-                                              } else {
-                                                  *valuePtr = inValue;
-                                              }
-                                          },
-                                          nullptr,
-                                          nullptr, // Double
-                                          nullptr,
-                                          nullptr, // Int array
-                                          nullptr,
-                                          nullptr, // Float array
-                                          nullptr,
-                                          nullptr,          // Binary
-                                          value,            // Read refcon
-                                          &boundRefs[ref]); // Write refcon
+                if (info->changeCallbacks.size()) {
+                    if (info->changeCallbacks[0](inValue)) {
+                        *valuePtr = inValue;
+                    }
+                } else {
+                    *valuePtr = inValue;
+                }
+            },
+            nullptr,
+            nullptr, // Double
+            nullptr,
+            nullptr, // Int array
+            nullptr,
+            nullptr, // Float array
+            nullptr,
+            nullptr,          // Binary
+            value,            // Read refcon
+            &boundRefs[ref]); // Write refcon
     } else if constexpr (std::is_same_v<T, double>) {
         handle = XPLMRegisterDataAccessor(ref, xplmType_Double, writable ? 1 : 0, nullptr, nullptr, // Int
-                                          nullptr,
-                                          nullptr, // Float
-                                          [](void *inRefcon) -> T {
-                                              return *static_cast<T *>(inRefcon);
-                                          },
-                                          [](void *inRefcon, T inValue) {
-                                              BoundRef *info = static_cast<BoundRef *>(inRefcon);
-                                              T *valuePtr = static_cast<T *>(info->valuePointer);
+            nullptr,
+            nullptr, // Float
+            [](void *inRefcon) -> T {
+                return *static_cast<T *>(inRefcon);
+            },
+            [](void *inRefcon, T inValue) {
+                BoundRef *info = static_cast<BoundRef *>(inRefcon);
+                T *valuePtr = static_cast<T *>(info->valuePointer);
 
-                                              if (info->changeCallbacks.size()) {
-                                                  if (info->changeCallbacks[0](inValue)) {
-                                                      *valuePtr = inValue;
-                                                  }
-                                              } else {
-                                                  *valuePtr = inValue;
-                                              }
-                                          },
-                                          nullptr,
-                                          nullptr, // Int array
-                                          nullptr,
-                                          nullptr, // Float array
-                                          nullptr,
-                                          nullptr,          // Binary
-                                          value,            // Read refcon
-                                          &boundRefs[ref]); // Write refcon
+                if (info->changeCallbacks.size()) {
+                    if (info->changeCallbacks[0](inValue)) {
+                        *valuePtr = inValue;
+                    }
+                } else {
+                    *valuePtr = inValue;
+                }
+            },
+            nullptr,
+            nullptr, // Int array
+            nullptr,
+            nullptr, // Float array
+            nullptr,
+            nullptr,          // Binary
+            value,            // Read refcon
+            &boundRefs[ref]); // Write refcon
     } else if constexpr (std::is_same_v<T, std::string>) {
         handle = XPLMRegisterDataAccessor(ref, xplmType_Data, writable ? 1 : 0, nullptr, nullptr, // Int
-                                          nullptr,
-                                          nullptr, // Float
-                                          nullptr,
-                                          nullptr, // Double
-                                          nullptr,
-                                          nullptr, // Int array
-                                          nullptr,
-                                          nullptr, // Float array
-                                          [](void *inRefcon, void *outValue, int inOffset, int inMaxLength) -> int {
-                                              T value = *static_cast<T *>(inRefcon);
-                                              strncpy(static_cast<char *>(outValue), value.c_str(), inMaxLength);
-                                              return static_cast<int>(value.length());
-                                          },
-                                          [](void *inRefcon, void *inValue, int inOffset, int inMaxLength) {
-                                              BoundRef *info = static_cast<BoundRef *>(inRefcon);
-                                              T *valuePtr = static_cast<T *>(info->valuePointer);
+            nullptr,
+            nullptr, // Float
+            nullptr,
+            nullptr, // Double
+            nullptr,
+            nullptr, // Int array
+            nullptr,
+            nullptr, // Float array
+            [](void *inRefcon, void *outValue, int inOffset, int inMaxLength) -> int {
+                T value = *static_cast<T *>(inRefcon);
+                strncpy(static_cast<char *>(outValue), value.c_str(), inMaxLength);
+                return static_cast<int>(value.length());
+            },
+            [](void *inRefcon, void *inValue, int inOffset, int inMaxLength) {
+                BoundRef *info = static_cast<BoundRef *>(inRefcon);
+                T *valuePtr = static_cast<T *>(info->valuePointer);
 
-                                              if (info->changeCallbacks.size()) {
-                                                  std::string newValue = std::string(static_cast<const char *>(inValue));
-                                                  if (info->changeCallbacks[0](newValue)) {
-                                                      *valuePtr = (const char *) inValue;
-                                                  }
-                                              } else {
-                                                  *valuePtr = (const char *) inValue;
-                                              }
-                                          },
-                                          value,            // Read refcon
-                                          &boundRefs[ref]); // Write refcon
+                if (info->changeCallbacks.size()) {
+                    std::string newValue = std::string(static_cast<const char *>(inValue));
+                    if (info->changeCallbacks[0](newValue)) {
+                        *valuePtr = (const char *) inValue;
+                    }
+                } else {
+                    *valuePtr = (const char *) inValue;
+                }
+            },
+            value,            // Read refcon
+            &boundRefs[ref]); // Write refcon
     }
 
     boundRefs[ref].handle = handle;
@@ -271,8 +271,31 @@ void Dataref::clearCache() {
     cachedValues.clear();
 }
 
-void Dataref::update() {
+void Dataref::forceRefreshCache() {
     for (auto &[key, data] : cachedValues) {
+        data.dirty = true;
+    }
+}
+
+void Dataref::update() {
+    const int currentCycle = XPLMGetCycleNumber();
+
+    for (auto &[key, data] : cachedValues) {
+        // Skip if not dirty and was updated recently (within last 2 cycles)
+        if (!data.dirty && (currentCycle - data.lastUpdateCycleNumber) < 2) {
+            continue;
+        }
+
+        // Use cached handle if available
+        XPLMDataRef handle = data.handle;
+        if (!handle) {
+            handle = findRef(key.c_str());
+            data.handle = handle;
+        }
+        if (!handle) {
+            continue;
+        }
+
         std::visit([&](auto &&value) {
             using T = std::decay_t<decltype(value)>;
             T newValue = get<T>(key.c_str());
@@ -284,20 +307,23 @@ void Dataref::update() {
             }
 
             if (didChange) {
-                cachedValues[key] = {
-                    .value = newValue,
-                    .lastUpdateCycleNumber = XPLMGetCycleNumber()};
-
+                data.value = newValue;
+                data.lastUpdateCycleNumber = currentCycle;
+                data.dirty = false;
                 executeChangedCallbacksForDataref(key.c_str());
+            } else {
+                data.dirty = false;
+                data.lastUpdateCycleNumber = currentCycle;
             }
         },
-                   data.value);
+            data.value);
     }
 }
 
 XPLMDataRef Dataref::findRef(const char *ref) {
-    if (refs.find(ref) != refs.end()) {
-        return refs[ref];
+    auto it = refs.find(ref);
+    if (it != refs.end()) {
+        return it->second;
     }
 
     XPLMDataRef handle = XPLMFindDataRef(ref);
@@ -305,8 +331,7 @@ XPLMDataRef Dataref::findRef(const char *ref) {
         return nullptr;
     }
 
-    refs[ref] = handle;
-    return refs[ref];
+    return refs.emplace(ref, handle).first->second;
 }
 
 bool Dataref::exists(const char *ref) {
@@ -314,10 +339,13 @@ bool Dataref::exists(const char *ref) {
 }
 
 void Dataref::executeChangedCallbacksForDataref(const char *ref) {
-    auto it = boundRefs.find(ref);
-    if (it != boundRefs.end()) {
-        for (auto callback : boundRefs[ref].changeCallbacks) {
-            callback(cachedValues[ref].value);
+    auto boundIt = boundRefs.find(ref);
+    if (boundIt != boundRefs.end()) {
+        auto cachedIt = cachedValues.find(ref);
+        if (cachedIt != cachedValues.end()) {
+            for (const auto &callback : boundIt->second.changeCallbacks) {
+                callback(cachedIt->second.value);
+            }
         }
     }
 }
@@ -329,6 +357,17 @@ int Dataref::getCachedLastUpdate(const char *ref) {
     }
 
     return it->second.lastUpdateCycleNumber;
+}
+
+int Dataref::getMaxCachedLastUpdate(const std::vector<std::string> &refs) {
+    int maxCycle = 0;
+    for (const auto &ref : refs) {
+        auto it = cachedValues.find(ref);
+        if (it != cachedValues.end() && it->second.lastUpdateCycleNumber > maxCycle) {
+            maxCycle = it->second.lastUpdateCycleNumber;
+        }
+    }
+    return maxCycle;
 }
 
 template float Dataref::getCached<float>(const char *ref);
@@ -345,9 +384,12 @@ T Dataref::getCached(const char *ref) {
     auto it = cachedValues.find(ref);
     if (it == cachedValues.end()) {
         auto val = get<T>(ref);
+        XPLMDataRef handle = findRef(ref);
         cachedValues[ref] = {
             .value = val,
-            .lastUpdateCycleNumber = XPLMGetCycleNumber()};
+            .lastUpdateCycleNumber = XPLMGetCycleNumber(),
+            .dirty = false,
+            .handle = handle};
         return val;
     }
 
@@ -465,7 +507,9 @@ void Dataref::set(const char *ref, T value, bool setCacheOnly) {
 
     cachedValues[ref] = {
         .value = value,
-        .lastUpdateCycleNumber = XPLMGetCycleNumber()};
+        .lastUpdateCycleNumber = XPLMGetCycleNumber(),
+        .dirty = false,
+        .handle = handle};
 
     executeChangedCallbacksForDataref(ref);
 
@@ -506,6 +550,22 @@ void Dataref::executeCommand(const char *command, XPLMCommandPhase phase) {
         XPLMCommandBegin(handle);
     } else if (phase == xplm_CommandEnd) {
         XPLMCommandEnd(handle);
+    }
+}
+
+void Dataref::executeCommandMultiple(const char *command, int count) {
+    if (count <= 0) {
+        return;
+    }
+
+    XPLMCommandRef handle = XPLMFindCommand(command);
+    if (!handle) {
+        debug("Command not found: %s\n", command);
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        XPLMCommandOnce(handle);
     }
 }
 

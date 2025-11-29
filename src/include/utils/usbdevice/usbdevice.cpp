@@ -6,8 +6,8 @@
 #include "product-fcu-efis.h"
 #include "product-fmc.h"
 #include "product-pap3-mcp.h"
-#include "product-ursa-minor-throttle.h"
 #include "product-ursa-minor-joystick.h"
+#include "product-ursa-minor-throttle.h"
 
 #include <XPLMUtilities.h>
 

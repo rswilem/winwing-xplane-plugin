@@ -227,25 +227,27 @@ const std::vector<PAP3MCPEncoderDef> &ZiboPAP3MCPProfile::encoderDefs() const {
 }
 
 void ZiboPAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
+    auto dataref = Dataref::getInstance();
+
     data.showLabels = false; // Zibo MCP does not have labels on the display
-    data.speed = Dataref::getInstance()->getCached<float>("laminar/B738/autopilot/mcp_speed_dial_kts_mach");
-    data.heading = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/mcp_hdg_dial");
-    data.altitude = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/mcp_alt_dial");
-    data.verticalSpeed = Dataref::getInstance()->getCached<float>("sim/cockpit2/autopilot/vvi_dial_fpm");
-    data.verticalSpeedVisible = Dataref::getInstance()->getCached<bool>("laminar/B738/autopilot/vvi_dial_show");
-    data.speedVisible = Dataref::getInstance()->getCached<bool>("laminar/B738/autopilot/show_ias");
-    data.crsCapt = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/course_pilot");
-    data.crsFo = Dataref::getInstance()->getCached<int>("laminar/B738/autopilot/course_copilot");
+    data.speed = dataref->getCached<float>("laminar/B738/autopilot/mcp_speed_dial_kts_mach");
+    data.heading = dataref->getCached<int>("laminar/B738/autopilot/mcp_hdg_dial");
+    data.altitude = dataref->getCached<int>("laminar/B738/autopilot/mcp_alt_dial");
+    data.verticalSpeed = dataref->getCached<float>("sim/cockpit2/autopilot/vvi_dial_fpm");
+    data.verticalSpeedVisible = dataref->getCached<bool>("laminar/B738/autopilot/vvi_dial_show");
+    data.speedVisible = dataref->getCached<bool>("laminar/B738/autopilot/show_ias");
+    data.crsCapt = dataref->getCached<int>("laminar/B738/autopilot/course_pilot");
+    data.crsFo = dataref->getCached<int>("laminar/B738/autopilot/course_copilot");
 
     // Special display digits
-    data.digitA = Dataref::getInstance()->getCached<bool>("laminar/B738/mcp/digit_A");
-    data.digitB = Dataref::getInstance()->getCached<bool>("laminar/B738/mcp/digit_8");
+    data.digitA = dataref->getCached<bool>("laminar/B738/mcp/digit_A");
+    data.digitB = dataref->getCached<bool>("laminar/B738/mcp/digit_8");
 
     // Display test mode (all segments lit when test mode is 1, no segments when 2)
-    std::vector<float> displayTest = Dataref::getInstance()->getCached<std::vector<float>>("laminar/B738/dspl_light_test");
+    std::vector<float> displayTest = dataref->getCached<std::vector<float>>("laminar/B738/dspl_light_test");
     uint8_t displayTestMode = static_cast<uint8_t>(displayTest.size() > 0 ? displayTest[0] : 0.0f);
     data.displayTest = displayTestMode >= 1;
-    data.displayEnabled = displayTestMode != 2 && Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on");
+    data.displayEnabled = displayTestMode != 2 && dataref->getCached<bool>("sim/cockpit/electrical/avionics_on");
 }
 
 void ZiboPAP3MCPProfile::buttonPressed(const PAP3MCPButtonDef *button, XPLMCommandPhase phase) {
@@ -274,9 +276,7 @@ void ZiboPAP3MCPProfile::encoderRotated(const PAP3MCPEncoderDef *encoder, int8_t
     const char *cmd = (delta > 0) ? encoder->incCmd.c_str() : encoder->decCmd.c_str();
     int steps = std::abs(static_cast<int>(delta));
 
-    for (int i = 0; i < steps; i++) {
-        Dataref::getInstance()->executeCommand(cmd);
-    }
+    Dataref::getInstance()->executeCommandMultiple(cmd, steps);
 }
 
 // Bank angle switch handling (5-position rotary switch)

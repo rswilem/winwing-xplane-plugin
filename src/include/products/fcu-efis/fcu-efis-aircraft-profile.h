@@ -108,7 +108,16 @@ struct EfisDisplayValue {
         bool showQfe = false;
 
         bool operator==(const EfisDisplayValue &other) const {
-            return showQfe == other.showQfe && baro == other.baro && unitIsInHg == other.unitIsInHg && isStd == other.isStd && displayEnabled == other.displayEnabled && displayTest == other.displayTest;
+            return displayEnabled == other.displayEnabled &&
+                   displayTest == other.displayTest &&
+                   baro == other.baro &&
+                   unitIsInHg == other.unitIsInHg &&
+                   isStd == other.isStd &&
+                   showQfe == other.showQfe;
+        }
+
+        bool operator!=(const EfisDisplayValue &other) const {
+            return !(*this == other);
         }
 
         void setBaro(float inHgValue, bool isBaroInHg) {
@@ -160,6 +169,10 @@ struct FCUDisplayData {
                    heading == other.heading &&
                    altitude == other.altitude &&
                    verticalSpeed == other.verticalSpeed &&
+                   efisLeft == other.efisLeft &&
+                   efisRight == other.efisRight &&
+                   displayEnabled == other.displayEnabled &&
+                   displayTest == other.displayTest &&
                    spdMach == other.spdMach &&
                    hdgTrk == other.hdgTrk &&
                    altManaged == other.altManaged &&
@@ -167,8 +180,21 @@ struct FCUDisplayData {
                    hdgManaged == other.hdgManaged &&
                    vsMode == other.vsMode &&
                    fpaMode == other.fpaMode &&
-                   displayEnabled == other.displayEnabled &&
-                   displayTest == other.displayTest;
+                   latMode == other.latMode &&
+                   altIndication == other.altIndication &&
+                   vsHorizontalLine == other.vsHorizontalLine &&
+                   vsVerticalLine == other.vsVerticalLine &&
+                   lvlChange == other.lvlChange &&
+                   lvlChangeLeft == other.lvlChangeLeft &&
+                   lvlChangeRight == other.lvlChangeRight &&
+                   vsIndication == other.vsIndication &&
+                   fpaIndication == other.fpaIndication &&
+                   fpaComma == other.fpaComma &&
+                   vsSign == other.vsSign;
+        }
+
+        bool operator!=(const FCUDisplayData &other) const {
+            return !(*this == other);
         }
 };
 

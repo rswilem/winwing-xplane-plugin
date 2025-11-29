@@ -114,11 +114,13 @@ const std::vector<PAP3MCPEncoderDef> &RotateMD11PAP3MCPProfile::encoderDefs() co
 }
 
 void RotateMD11PAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
-    data.showLabels = true; // MD-11 MCP has labels on the display
+    auto dataref = Dataref::getInstance();
+
+    data.showLabels = true;             // MD-11 MCP has labels on the display
     data.showDashesWhenInactive = true; // Show dashes (---) when displays are inactive
     data.showLabelsWhenInactive = true; // Show labels even when displays are inactive
-    data.showCourse = false; // MD-11 doesn't have CRS displays on the MCP
-    bool hasPower = Dataref::getInstance()->getCached<bool>("Rotate/aircraft/systems/elec_dc_batt_bus_pwrd");
+    data.showCourse = false;            // MD-11 doesn't have CRS displays on the MCP
+    bool hasPower = dataref->getCached<bool>("Rotate/aircraft/systems/elec_dc_batt_bus_pwrd");
     data.displayEnabled = hasPower;
 
     if (!hasPower) {
@@ -126,41 +128,41 @@ void RotateMD11PAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
     }
 
     // Speed - check if IAS or MACH mode
-    int iasMachMode = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/gcp_active_ias_mach_mode");
+    int iasMachMode = dataref->getCached<int>("Rotate/aircraft/systems/gcp_active_ias_mach_mode");
     if (iasMachMode == 0) {
         // IAS mode
-        data.speed = Dataref::getInstance()->getCached<float>("Rotate/aircraft/systems/gcp_spd_presel_ias");
+        data.speed = dataref->getCached<float>("Rotate/aircraft/systems/gcp_spd_presel_ias");
     } else {
         // MACH mode
-        data.speed = Dataref::getInstance()->getCached<float>("Rotate/aircraft/systems/gcp_spd_presel_mach");
+        data.speed = dataref->getCached<float>("Rotate/aircraft/systems/gcp_spd_presel_mach");
     }
 
     // Control SPD LCD visibility based on FMS SPD engagement
     // When FMS SPD is engaged (value = 1), hide the SPD display
-    int fmsSpdEngaged = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/afs_fms_spd_engaged");
+    int fmsSpdEngaged = dataref->getCached<int>("Rotate/aircraft/systems/afs_fms_spd_engaged");
     data.speedVisible = (fmsSpdEngaged != 1);
 
     // Heading
-    int hdgRaw = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/gcp_hdg_presel_deg");
+    int hdgRaw = dataref->getCached<int>("Rotate/aircraft/systems/gcp_hdg_presel_deg");
     data.heading = hdgRaw % 360;
     if (data.heading < 0) {
         data.heading += 360;
     }
 
     // Control HDG LCD visibility
-    int hdgTrkSel = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/gcp_hdg_trk_presel_set");
+    int hdgTrkSel = dataref->getCached<int>("Rotate/aircraft/systems/gcp_hdg_trk_presel_set");
     data.headingVisible = (hdgTrkSel == 1);
 
     // Altitude
-    data.altitude = Dataref::getInstance()->getCached<int>("Rotate/aircraft/systems/gcp_alt_presel_ft");
+    data.altitude = dataref->getCached<int>("Rotate/aircraft/systems/gcp_alt_presel_ft");
 
     // Vertical speed - only show when V/S is non-zero
-    data.verticalSpeed = Dataref::getInstance()->getCached<float>("Rotate/aircraft/systems/gcp_vs_sel_fpm");
+    data.verticalSpeed = dataref->getCached<float>("Rotate/aircraft/systems/gcp_vs_sel_fpm");
     data.verticalSpeedVisible = (std::abs(data.verticalSpeed) > 0.5f);
 
     // Course - MD-11 doesn't have CRS displays on the MCP (using standard datarefs for reference)
-    data.crsCapt = Dataref::getInstance()->getCached<int>("sim/cockpit/radios/nav1_obs_degm");
-    data.crsFo = Dataref::getInstance()->getCached<int>("sim/cockpit/radios/nav2_obs_degm");
+    data.crsCapt = dataref->getCached<int>("sim/cockpit/radios/nav1_obs_degm");
+    data.crsFo = dataref->getCached<int>("sim/cockpit/radios/nav2_obs_degm");
 
     // MD-11 doesn't have special digit flags
     data.digitA = false;
@@ -222,7 +224,5 @@ void RotateMD11PAP3MCPProfile::encoderRotated(const PAP3MCPEncoderDef *encoder, 
     const char *cmd = (delta > 0) ? encoder->incCmd.c_str() : encoder->decCmd.c_str();
     int steps = std::abs(static_cast<int>(delta));
 
-    for (int i = 0; i < steps; i++) {
-        Dataref::getInstance()->executeCommand(cmd);
-    }
+    Dataref::getInstance()->executeCommandMultiple(cmd, steps);
 }

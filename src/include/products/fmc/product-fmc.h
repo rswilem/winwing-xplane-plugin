@@ -54,7 +54,7 @@ class ProductFMC : public USBDevice {
 
         void clearDisplay();
         void showBackground(FMCBackgroundVariant variant);
-    
+
         void setDeviceVariant(FMCDeviceVariant variant);
 };
 

@@ -285,12 +285,12 @@ void ProductFMC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, ui
 
 void ProductFMC::updatePage() {
     auto datarefManager = Dataref::getInstance();
-    for (const std::string &dataref : profile->displayDatarefs()) {
-        if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {
-            profile->updatePage(page);
-            lastUpdateCycle = XPLMGetCycleNumber();
-            draw();
-        }
+    int maxDatarefCycle = datarefManager->getMaxCachedLastUpdate(profile->displayDatarefs());
+
+    if (!lastUpdateCycle || maxDatarefCycle > lastUpdateCycle) {
+        profile->updatePage(page);
+        lastUpdateCycle = XPLMGetCycleNumber();
+        draw();
     }
 }
 

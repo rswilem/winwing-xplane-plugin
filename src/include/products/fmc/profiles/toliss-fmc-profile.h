@@ -8,7 +8,7 @@
 class TolissFMCProfile : public FMCAircraftProfile {
     private:
         std::regex datarefRegex;
-        int clearKeyPressedCycleNumber;
+        bool scratchpadPaddingActive = false;
 
     public:
         TolissFMCProfile(ProductFMC *product);
