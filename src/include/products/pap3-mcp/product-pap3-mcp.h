@@ -3,7 +3,6 @@
 
 #include "pap3-mcp-aircraft-profile.h"
 #include "usbdevice.h"
-#include "packet-utils.h"
 
 #include <map>
 #include <set>
@@ -11,7 +10,7 @@
 
 class ProductPAP3MCP : public USBDevice {
     private:
-        PacketUtils::PacketNumber packetNumber;
+        uint8_t packetNumber = 1;
         PAP3MCPAircraftProfile *profile;
         PAP3MCPDisplayData displayData;
         int lastUpdateCycle;
@@ -36,7 +35,7 @@ class ProductPAP3MCP : public USBDevice {
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
         void didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count = 1) override;
         void forceStateSync() override;
-    
+
         void updateDisplays(bool force = true);
 
         void setLedBrightness(PAP3MCPLed led, uint8_t brightness);

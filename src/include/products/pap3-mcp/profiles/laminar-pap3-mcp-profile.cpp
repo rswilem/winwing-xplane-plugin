@@ -80,19 +80,20 @@ const std::vector<PAP3MCPEncoderDef> &LaminarPAP3MCPProfile::encoderDefs() const
 
 void LaminarPAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
     // Use getCached() for performance
-    data.speed = Dataref::getInstance()->getCached<float>("sim/cockpit2/autopilot/airspeed_dial_kts_mach");
-    data.heading = static_cast<int>(Dataref::getInstance()->getCached<float>("sim/cockpit/autopilot/heading_mag"));
-    data.altitude = static_cast<int>(Dataref::getInstance()->getCached<float>("sim/cockpit2/autopilot/altitude_dial_ft"));
-    data.verticalSpeed = Dataref::getInstance()->getCached<float>("sim/cockpit2/autopilot/vvi_dial_fpm");
+    auto dataref = Dataref::getInstance();
+    data.speed = dataref->getCached<float>("sim/cockpit2/autopilot/airspeed_dial_kts_mach");
+    data.heading = static_cast<int>(dataref->getCached<float>("sim/cockpit/autopilot/heading_mag"));
+    data.altitude = static_cast<int>(dataref->getCached<float>("sim/cockpit2/autopilot/altitude_dial_ft"));
+    data.verticalSpeed = dataref->getCached<float>("sim/cockpit2/autopilot/vvi_dial_fpm");
     data.verticalSpeedVisible = true; // Always show for Laminar
-    data.crsCapt = static_cast<int>(Dataref::getInstance()->getCached<float>("sim/cockpit/radios/nav1_obs_degm"));
-    data.crsFo = static_cast<int>(Dataref::getInstance()->getCached<float>("sim/cockpit/radios/nav2_obs_degm"));
+    data.crsCapt = static_cast<int>(dataref->getCached<float>("sim/cockpit/radios/nav1_obs_degm"));
+    data.crsFo = static_cast<int>(dataref->getCached<float>("sim/cockpit/radios/nav2_obs_degm"));
 
     data.digitA = false;
     data.digitB = false;
 
     // Check if displays should be enabled based on power
-    data.displayEnabled = Dataref::getInstance()->getCached<bool>("sim/cockpit2/autopilot/autopilot_has_power");
+    data.displayEnabled = dataref->getCached<bool>("sim/cockpit2/autopilot/autopilot_has_power");
 }
 
 void LaminarPAP3MCPProfile::buttonPressed(const PAP3MCPButtonDef *button, XPLMCommandPhase phase) {

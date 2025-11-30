@@ -3,14 +3,13 @@
 
 #include "fcu-efis-aircraft-profile.h"
 #include "usbdevice.h"
-#include "packet-utils.h"
 
 #include <map>
 #include <set>
 
 class ProductFCUEfis : public USBDevice {
     private:
-        PacketUtils::PacketNumber packetNumber;
+        uint8_t packetNumber = 1;
         FCUEfisAircraftProfile *profile;
         FCUDisplayData displayData;
         int lastUpdateCycle;
@@ -38,7 +37,7 @@ class ProductFCUEfis : public USBDevice {
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
         void didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count = 1) override;
         void forceStateSync() override;
-    
+
         void updateDisplays(bool force = true);
 
         void setLedBrightness(FCUEfisLed led, uint8_t brightness);
