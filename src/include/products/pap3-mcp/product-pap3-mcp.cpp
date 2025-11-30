@@ -143,7 +143,23 @@ void ProductPAP3MCP::updateDisplays(bool force) {
     profile->updateDisplayData(displayData);
 
     // Update LCD if data changed
-    if (!(displayData == oldDisplayData)) {
+    if (displayData.speed != oldDisplayData.speed ||
+        displayData.heading != oldDisplayData.heading ||
+        displayData.altitude != oldDisplayData.altitude ||
+        displayData.verticalSpeed != oldDisplayData.verticalSpeed ||
+        displayData.verticalSpeedVisible != oldDisplayData.verticalSpeedVisible ||
+        displayData.speedVisible != oldDisplayData.speedVisible ||
+        displayData.headingVisible != oldDisplayData.headingVisible ||
+        displayData.crsCapt != oldDisplayData.crsCapt ||
+        displayData.crsFo != oldDisplayData.crsFo ||
+        displayData.showCourse != oldDisplayData.showCourse ||
+        displayData.showLabels != oldDisplayData.showLabels ||
+        displayData.showDashesWhenInactive != oldDisplayData.showDashesWhenInactive ||
+        displayData.showLabelsWhenInactive != oldDisplayData.showLabelsWhenInactive ||
+        displayData.digitA != oldDisplayData.digitA ||
+        displayData.digitB != oldDisplayData.digitB ||
+        displayData.displayEnabled != oldDisplayData.displayEnabled ||
+        displayData.displayTest != oldDisplayData.displayTest) {
         // Pass values directly - encoding happens in sendLCDDisplay
         sendLCDDisplay("", displayData.heading, displayData.altitude, "", displayData.crsCapt, displayData.crsFo);
     }

@@ -87,8 +87,6 @@ struct PAP3MCPDisplayData {
         bool ledATArm = false;
         bool ledMaCapt = false;
         bool ledMaFO = false;
-
-        bool operator==(const PAP3MCPDisplayData &other) const = default;
 };
 
 struct PAP3MCPEncoderDef {
