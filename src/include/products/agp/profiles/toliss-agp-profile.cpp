@@ -18,7 +18,7 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         product->setLedBrightness(AGPLed::OVERALL_LEDS_BRIGHTNESS, hasPower ? 255 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this](int annunMode) {
+    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this, product](int annunMode) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/NoseGearInd");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/LeftGearInd");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/RightGearInd");
@@ -27,6 +27,8 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AutoBrkLo");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/BrakeFan");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/BrakeTemperatureArray");
+
+        product->setLedBrightness(AGPLed::LDG_GEAR_LEVER_RED, isAnnunTest() ? 255 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/NoseGearInd", [this, product](int indicator) {

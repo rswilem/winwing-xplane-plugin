@@ -73,114 +73,114 @@ void Dataref::createDataref(const char *ref, T *value, bool writable, DatarefSho
         handle = XPLMRegisterDataAccessor(ref, xplmType_Int, writable ? 1 : 0, [](void *inRefcon) -> int {
             return *static_cast<T *>(inRefcon);
         },
-                                          [](void *inRefcon, int inValue) {
-                                              BoundRef *info = static_cast<BoundRef *>(inRefcon);
-                                              T *valuePtr = static_cast<T *>(info->valuePointer);
+            [](void *inRefcon, int inValue) {
+                BoundRef *info = static_cast<BoundRef *>(inRefcon);
+                T *valuePtr = static_cast<T *>(info->valuePointer);
 
-                                              if (info->changeCallbacks.size()) {
-                                                  if (info->changeCallbacks[0](inValue)) {
-                                                      *valuePtr = inValue;
-                                                  }
-                                              } else {
-                                                  *valuePtr = inValue;
-                                              }
-                                          },
-                                          nullptr,
-                                          nullptr, // Float
-                                          nullptr,
-                                          nullptr, // Double
-                                          nullptr,
-                                          nullptr, // Int array
-                                          nullptr,
-                                          nullptr, // Float array
-                                          nullptr,
-                                          nullptr,          // Binary
-                                          value,            // Read refcon
-                                          &boundRefs[ref]); // Write refcon
+                if (info->changeCallbacks.size()) {
+                    if (info->changeCallbacks[0](inValue)) {
+                        *valuePtr = inValue;
+                    }
+                } else {
+                    *valuePtr = inValue;
+                }
+            },
+            nullptr,
+            nullptr, // Float
+            nullptr,
+            nullptr, // Double
+            nullptr,
+            nullptr, // Int array
+            nullptr,
+            nullptr, // Float array
+            nullptr,
+            nullptr,          // Binary
+            value,            // Read refcon
+            &boundRefs[ref]); // Write refcon
     } else if constexpr (std::is_same_v<T, float>) {
         handle = XPLMRegisterDataAccessor(ref, xplmType_Float, writable ? 1 : 0, nullptr, nullptr, // Int
-                                          [](void *inRefcon) -> T {
-                                              return *static_cast<T *>(inRefcon);
-                                          },
-                                          [](void *inRefcon, T inValue) {
-                                              BoundRef *info = static_cast<BoundRef *>(inRefcon);
-                                              T *valuePtr = static_cast<T *>(info->valuePointer);
+            [](void *inRefcon) -> T {
+                return *static_cast<T *>(inRefcon);
+            },
+            [](void *inRefcon, T inValue) {
+                BoundRef *info = static_cast<BoundRef *>(inRefcon);
+                T *valuePtr = static_cast<T *>(info->valuePointer);
 
-                                              if (info->changeCallbacks.size()) {
-                                                  if (info->changeCallbacks[0](inValue)) {
-                                                      *valuePtr = inValue;
-                                                  }
-                                              } else {
-                                                  *valuePtr = inValue;
-                                              }
-                                          },
-                                          nullptr,
-                                          nullptr, // Double
-                                          nullptr,
-                                          nullptr, // Int array
-                                          nullptr,
-                                          nullptr, // Float array
-                                          nullptr,
-                                          nullptr,          // Binary
-                                          value,            // Read refcon
-                                          &boundRefs[ref]); // Write refcon
+                if (info->changeCallbacks.size()) {
+                    if (info->changeCallbacks[0](inValue)) {
+                        *valuePtr = inValue;
+                    }
+                } else {
+                    *valuePtr = inValue;
+                }
+            },
+            nullptr,
+            nullptr, // Double
+            nullptr,
+            nullptr, // Int array
+            nullptr,
+            nullptr, // Float array
+            nullptr,
+            nullptr,          // Binary
+            value,            // Read refcon
+            &boundRefs[ref]); // Write refcon
     } else if constexpr (std::is_same_v<T, double>) {
         handle = XPLMRegisterDataAccessor(ref, xplmType_Double, writable ? 1 : 0, nullptr, nullptr, // Int
-                                          nullptr,
-                                          nullptr, // Float
-                                          [](void *inRefcon) -> T {
-                                              return *static_cast<T *>(inRefcon);
-                                          },
-                                          [](void *inRefcon, T inValue) {
-                                              BoundRef *info = static_cast<BoundRef *>(inRefcon);
-                                              T *valuePtr = static_cast<T *>(info->valuePointer);
+            nullptr,
+            nullptr, // Float
+            [](void *inRefcon) -> T {
+                return *static_cast<T *>(inRefcon);
+            },
+            [](void *inRefcon, T inValue) {
+                BoundRef *info = static_cast<BoundRef *>(inRefcon);
+                T *valuePtr = static_cast<T *>(info->valuePointer);
 
-                                              if (info->changeCallbacks.size()) {
-                                                  if (info->changeCallbacks[0](inValue)) {
-                                                      *valuePtr = inValue;
-                                                  }
-                                              } else {
-                                                  *valuePtr = inValue;
-                                              }
-                                          },
-                                          nullptr,
-                                          nullptr, // Int array
-                                          nullptr,
-                                          nullptr, // Float array
-                                          nullptr,
-                                          nullptr,          // Binary
-                                          value,            // Read refcon
-                                          &boundRefs[ref]); // Write refcon
+                if (info->changeCallbacks.size()) {
+                    if (info->changeCallbacks[0](inValue)) {
+                        *valuePtr = inValue;
+                    }
+                } else {
+                    *valuePtr = inValue;
+                }
+            },
+            nullptr,
+            nullptr, // Int array
+            nullptr,
+            nullptr, // Float array
+            nullptr,
+            nullptr,          // Binary
+            value,            // Read refcon
+            &boundRefs[ref]); // Write refcon
     } else if constexpr (std::is_same_v<T, std::string>) {
         handle = XPLMRegisterDataAccessor(ref, xplmType_Data, writable ? 1 : 0, nullptr, nullptr, // Int
-                                          nullptr,
-                                          nullptr, // Float
-                                          nullptr,
-                                          nullptr, // Double
-                                          nullptr,
-                                          nullptr, // Int array
-                                          nullptr,
-                                          nullptr, // Float array
-                                          [](void *inRefcon, void *outValue, int inOffset, int inMaxLength) -> int {
-                                              T value = *static_cast<T *>(inRefcon);
-                                              strncpy(static_cast<char *>(outValue), value.c_str(), inMaxLength);
-                                              return static_cast<int>(value.length());
-                                          },
-                                          [](void *inRefcon, void *inValue, int inOffset, int inMaxLength) {
-                                              BoundRef *info = static_cast<BoundRef *>(inRefcon);
-                                              T *valuePtr = static_cast<T *>(info->valuePointer);
+            nullptr,
+            nullptr, // Float
+            nullptr,
+            nullptr, // Double
+            nullptr,
+            nullptr, // Int array
+            nullptr,
+            nullptr, // Float array
+            [](void *inRefcon, void *outValue, int inOffset, int inMaxLength) -> int {
+                T value = *static_cast<T *>(inRefcon);
+                strncpy(static_cast<char *>(outValue), value.c_str(), inMaxLength);
+                return static_cast<int>(value.length());
+            },
+            [](void *inRefcon, void *inValue, int inOffset, int inMaxLength) {
+                BoundRef *info = static_cast<BoundRef *>(inRefcon);
+                T *valuePtr = static_cast<T *>(info->valuePointer);
 
-                                              if (info->changeCallbacks.size()) {
-                                                  std::string newValue = std::string(static_cast<const char *>(inValue));
-                                                  if (info->changeCallbacks[0](newValue)) {
-                                                      *valuePtr = (const char *) inValue;
-                                                  }
-                                              } else {
-                                                  *valuePtr = (const char *) inValue;
-                                              }
-                                          },
-                                          value,            // Read refcon
-                                          &boundRefs[ref]); // Write refcon
+                if (info->changeCallbacks.size()) {
+                    std::string newValue = std::string(static_cast<const char *>(inValue));
+                    if (info->changeCallbacks[0](newValue)) {
+                        *valuePtr = (const char *) inValue;
+                    }
+                } else {
+                    *valuePtr = (const char *) inValue;
+                }
+            },
+            value,            // Read refcon
+            &boundRefs[ref]); // Write refcon
     }
 
     boundRefs[ref].handle = handle;
@@ -291,13 +291,14 @@ void Dataref::update() {
                 executeChangedCallbacksForDataref(key.c_str());
             }
         },
-                   data.value);
+            data.value);
     }
 }
 
 XPLMDataRef Dataref::findRef(const char *ref) {
-    if (refs.find(ref) != refs.end()) {
-        return refs[ref];
+    auto it = refs.find(ref);
+    if (it != refs.end()) {
+        return it->second;
     }
 
     XPLMDataRef handle = XPLMFindDataRef(ref);
@@ -305,8 +306,7 @@ XPLMDataRef Dataref::findRef(const char *ref) {
         return nullptr;
     }
 
-    refs[ref] = handle;
-    return refs[ref];
+    return refs.emplace(ref, handle).first->second;
 }
 
 bool Dataref::exists(const char *ref) {
