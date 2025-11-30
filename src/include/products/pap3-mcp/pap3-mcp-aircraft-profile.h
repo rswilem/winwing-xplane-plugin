@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 #include <XPLMUtilities.h>
 
 enum class PAP3MCPLed : int {
@@ -87,6 +87,10 @@ struct PAP3MCPDisplayData {
         bool ledATArm = false;
         bool ledMaCapt = false;
         bool ledMaFO = false;
+
+        bool operator==(const PAP3MCPDisplayData &other) const {
+            return memcmp(this, &other, sizeof(PAP3MCPDisplayData)) == 0;
+        }
 };
 
 struct PAP3MCPEncoderDef {

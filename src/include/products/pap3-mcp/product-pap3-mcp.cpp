@@ -138,30 +138,12 @@ void ProductPAP3MCP::updateDisplays(bool force) {
         return;
     }
 
-    debug("PAP3MCP: Updating displays (lastUpdateCycle=%d)\n", lastUpdateCycle);
-
     // Save old display data for comparison
     PAP3MCPDisplayData oldDisplayData = displayData;
     profile->updateDisplayData(displayData);
 
     // Update LCD if data changed
-    if (displayData.speed != oldDisplayData.speed ||
-        displayData.heading != oldDisplayData.heading ||
-        displayData.altitude != oldDisplayData.altitude ||
-        displayData.verticalSpeed != oldDisplayData.verticalSpeed ||
-        displayData.verticalSpeedVisible != oldDisplayData.verticalSpeedVisible ||
-        displayData.speedVisible != oldDisplayData.speedVisible ||
-        displayData.headingVisible != oldDisplayData.headingVisible ||
-        displayData.crsCapt != oldDisplayData.crsCapt ||
-        displayData.crsFo != oldDisplayData.crsFo ||
-        displayData.showCourse != oldDisplayData.showCourse ||
-        displayData.showLabels != oldDisplayData.showLabels ||
-        displayData.showDashesWhenInactive != oldDisplayData.showDashesWhenInactive ||
-        displayData.showLabelsWhenInactive != oldDisplayData.showLabelsWhenInactive ||
-        displayData.digitA != oldDisplayData.digitA ||
-        displayData.digitB != oldDisplayData.digitB ||
-        displayData.displayEnabled != oldDisplayData.displayEnabled ||
-        displayData.displayTest != oldDisplayData.displayTest) {
+    if (!(displayData == oldDisplayData)) {
         // Pass values directly - encoding happens in sendLCDDisplay
         sendLCDDisplay("", displayData.heading, displayData.altitude, "", displayData.crsCapt, displayData.crsFo);
     }
@@ -172,8 +154,6 @@ void ProductPAP3MCP::updateDisplays(bool force) {
 }
 
 void ProductPAP3MCP::initializeDisplays() {
-    debug("PAP3MCP: Initializing displays\n");
-
     // Send LCD initialization command (opcode 0x12)
     // Structure from working code:
     // - Bytes 0-3: Header [F0 00 SEQ 12]
@@ -520,10 +500,6 @@ void ProductPAP3MCP::setLedBrightness(PAP3MCPLed led, uint8_t brightness) {
     if (ledValue >= 3) {
         // Individual LED - convert brightness to binary on/off
         data[8] = (brightness > 0) ? 0x01 : 0x00;
-        debug("PAP3MCP: Setting LED %d to %s\n", ledValue, (brightness > 0) ? "ON" : "OFF");
-    } else {
-        // Dimming channel - use full brightness value
-        debug("PAP3MCP: Setting dimming channel %d to brightness %d\n", ledValue, brightness);
     }
 
     writeData(data);
