@@ -272,6 +272,8 @@ void Dataref::clearCache() {
 }
 
 void Dataref::update() {
+    std::vector<std::pair<std::string, CachedValue>> updates;
+
     for (auto &[key, data] : cachedValues) {
         std::visit([&](auto &&value) {
             using T = std::decay_t<decltype(value)>;
@@ -284,14 +286,18 @@ void Dataref::update() {
             }
 
             if (didChange) {
-                cachedValues[key] = {
-                    .value = newValue,
-                    .lastUpdateCycleNumber = XPLMGetCycleNumber()};
-
-                executeChangedCallbacksForDataref(key.c_str());
+                updates.emplace_back(key, CachedValue{
+                                              .value = newValue,
+                                              .lastUpdateCycleNumber = XPLMGetCycleNumber(),
+                                          });
             }
         },
             data.value);
+    }
+
+    for (auto &[key, newData] : updates) {
+        cachedValues[key] = newData;
+        executeChangedCallbacksForDataref(key.c_str());
     }
 }
 
