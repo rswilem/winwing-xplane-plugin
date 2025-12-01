@@ -6,8 +6,8 @@
 #include "product-fcu-efis.h"
 #include "product-fmc.h"
 #include "product-pap3-mcp.h"
-#include "product-ursa-minor-throttle.h"
 #include "product-ursa-minor-joystick.h"
+#include "product-ursa-minor-throttle.h"
 
 #include <XPLMUtilities.h>
 
@@ -141,8 +141,12 @@ void USBDevice::processQueuedEvents() {
     }
 }
 
+size_t USBDevice::getWriteQueueSize() {
+    return writeQueueSize.load();
+}
+
 int USBDevice::getDisplayUpdateFrameInterval() {
-    size_t queueSize = cachedWriteQueueSize.load();
+    size_t queueSize = writeQueueSize.load();
 
     if (queueSize < 50) {
         return 2;

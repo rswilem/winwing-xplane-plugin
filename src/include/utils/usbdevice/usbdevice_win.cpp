@@ -105,7 +105,7 @@ void USBDevice::update() {
 
 void USBDevice::disconnect() {
     // Wait for write queue to drain before disconnecting
-    while (cachedWriteQueueSize.load() > 0 && writeThreadRunning) {
+    while (writeQueueSize.load() > 0 && writeThreadRunning) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
@@ -114,7 +114,6 @@ void USBDevice::disconnect() {
     if (writeThread.joinable()) {
         writeThread.join();
     }
-    
 
     if (hidDevice != INVALID_HANDLE_VALUE) {
         // Give input thread time to exit
@@ -147,7 +146,7 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
     {
         std::lock_guard<std::mutex> lock(writeQueueMutex);
         writeQueue.push(std::move(data));
-        cachedWriteQueueSize.store(writeQueue.size());
+        writeQueueSize.store(writeQueue.size());
     }
     writeQueueCV.notify_one();
 
@@ -171,7 +170,7 @@ void USBDevice::writeThreadLoop() {
             if (!writeQueue.empty()) {
                 data = std::move(writeQueue.front());
                 writeQueue.pop();
-                cachedWriteQueueSize.store(writeQueue.size());
+                writeQueueSize.store(writeQueue.size());
             }
         }
 
