@@ -88,9 +88,10 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
             return temp > 300.0f;
         });
 
-        if (anyHot != brakesHot || isAnnunTest()) {
-            brakesHot = anyHot;
-            product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, brakesHot || isAnnunTest() ? 1 : 0);
+        bool oldBrakesHot = brakesHot;
+        brakesHot = anyHot || isAnnunTest();
+        if (brakesHot != oldBrakesHot) {
+            product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, brakesHot ? 1 : 0);
         }
     });
 }
