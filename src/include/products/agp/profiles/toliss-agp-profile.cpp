@@ -28,7 +28,7 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/TerrainSelectedND2");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AutoBrkLo");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/BrakeFan");
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/BrakeTemperatureArray");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/OHPLightsATA32");
 
         product->setLedBrightness(AGPLed::LDG_GEAR_LEVER_RED, isAnnunTest() ? 255 : 0);
     });
@@ -83,13 +83,13 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         product->setLedBrightness(AGPLed::BRAKE_FAN_ON, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<std::vector<int>>("AirbusFBW/OHPLightsATA32", [this, product](std::vector<int> panelLights) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/OHPLightsATA32", [this, product](std::vector<float> panelLights) {
         if (panelLights.size() < 12) {
             return;
         }
 
         bool oldBrakesHot = brakesHot;
-        brakesHot = panelLights[11] > 0 || isAnnunTest();
+        brakesHot = panelLights[11] > std::numeric_limits<float>::epsilon() || isAnnunTest();
         if (brakesHot != oldBrakesHot) {
             product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, brakesHot ? 1 : 0);
         }
@@ -107,7 +107,7 @@ TolissAGPProfile::~TolissAGPProfile() {
     Dataref::getInstance()->unbind("AirbusFBW/AutoBrkMed");
     Dataref::getInstance()->unbind("AirbusFBW/AutoBrkMax");
     Dataref::getInstance()->unbind("AirbusFBW/BrakeFan");
-    Dataref::getInstance()->unbind("AirbusFBW/BrakeTemperatureArray");
+    Dataref::getInstance()->unbind("AirbusFBW/OHPLightsATA32");
 }
 
 bool TolissAGPProfile::IsEligible() {
