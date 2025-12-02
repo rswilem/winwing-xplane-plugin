@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <memory>
 #include <XPLMDisplay.h>
 #include <XPLMPlugin.h>
 #include <XPLMProcessing.h>
@@ -65,9 +66,9 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
                 debug_force("- (vendorId: 0x%04X, productId: 0x%04X, handler: %s) %s\n", device->vendorId, device->productId, device->classIdentifier(), device->productName.c_str());
             }
 
-            std::function<void()> action;
-            action = [&action, debugLoggingEnabled]() {
-                if (!debugLoggingEnabled) {
+            auto action = std::make_shared<std::function<void()>>();
+            *action = [action]() {
+                if (!AppState::getInstance()->debuggingEnabled) {
                     return;
                 }
 
@@ -90,10 +91,10 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
                     debug_force("[%s.%03lld] - %s: %zu pending packets\n", timeBuffer, nowMs.count(), device->classIdentifier(), device->getWriteQueueSize());
                 }
 
-                AppState::getInstance()->executeAfter(5000, action);
+                AppState::getInstance()->executeAfter(5000, *action);
             };
 
-            action();
+            (*action)();
         } else {
             debug_force("Debug logging was disabled.\n");
         }
