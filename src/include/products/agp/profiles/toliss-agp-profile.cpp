@@ -83,13 +83,13 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         product->setLedBrightness(AGPLed::BRAKE_FAN_ON, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/BrakeTemperatureArray", [this, product](std::vector<float> temperatures) {
-        bool anyHot = std::any_of(temperatures.begin(), temperatures.end(), [](float temp) {
-            return temp > 300.0f;
-        });
+    Dataref::getInstance()->monitorExistingDataref<std::vector<int>>("AirbusFBW/OHPLightsATA32", [this, product](std::vector<int> panelLights) {
+        if (panelLights.size() < 12) {
+            return;
+        }
 
         bool oldBrakesHot = brakesHot;
-        brakesHot = anyHot || isAnnunTest();
+        brakesHot = panelLights[11] > 0 || isAnnunTest();
         if (brakesHot != oldBrakesHot) {
             product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, brakesHot ? 1 : 0);
         }
