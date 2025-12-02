@@ -82,7 +82,7 @@ class USBDevice {
 
         bool writeData(std::vector<uint8_t> data);
         size_t getWriteQueueSize();
-        int getDisplayUpdateFrameInterval();
+        int getDisplayUpdateFrameInterval(int minWaitFrames = 0);
 
         static USBDevice *Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
 };

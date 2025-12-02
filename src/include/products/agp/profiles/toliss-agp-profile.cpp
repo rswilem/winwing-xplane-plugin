@@ -9,6 +9,8 @@
 #include <cmath>
 
 TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(product) {
+    brakesHot = false;
+
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
         uint8_t backlightBrightness = hasPower ? brightness * 255 : 0;
@@ -85,7 +87,11 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         bool anyHot = std::any_of(temperatures.begin(), temperatures.end(), [](float temp) {
             return temp > 300.0f;
         });
-        product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, anyHot || isAnnunTest() ? 1 : 0);
+
+        if (anyHot != brakesHot || isAnnunTest()) {
+            brakesHot = anyHot;
+            product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, brakesHot || isAnnunTest() ? 1 : 0);
+        }
     });
 }
 
@@ -148,10 +154,18 @@ void TolissAGPProfile::buttonPressed(const AGPButtonDef *button, XPLMCommandPhas
     if (button->datarefType == AGPDatarefType::LANDING_GEAR) {
         datarefManager->executeCommand(button->dataref.c_str(), phase);
         datarefManager->set<int>("ckpt/gearHandle", static_cast<int>(button->value));
-    } else if (phase == xplm_CommandBegin && button->datarefType == AGPDatarefType::TERRAIN_ON_ND) {
+    } else if (button->datarefType == AGPDatarefType::TERRAIN_ON_ND) {
+        if (phase != xplm_CommandBegin) {
+            return;
+        }
+
         std::string dataref = (product->terrainNDPreference == AGPTerrainNDPreference::CAPTAIN) ? "AirbusFBW/TerrainSelectedND1" : "AirbusFBW/TerrainSelectedND2";
         datarefManager->set<int>(dataref.c_str(), datarefManager->get<bool>(dataref.c_str()) ? 0 : 1);
-    } else if (phase == xplm_CommandBegin && button->datarefType == AGPDatarefType::SET_VALUE) {
+    } else if (button->datarefType == AGPDatarefType::SET_VALUE) {
+        if (phase != xplm_CommandBegin) {
+            return;
+        }
+
         datarefManager->set<int>(button->dataref.c_str(), static_cast<int>(button->value));
     } else {
         datarefManager->executeCommand(button->dataref.c_str(), phase);

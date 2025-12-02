@@ -111,7 +111,7 @@ void ProductAGP::update() {
 
     USBDevice::update();
 
-    if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval()) {
+    if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval(10)) {
         displayUpdateFrameCounter = 0;
 
         if (profile) {
