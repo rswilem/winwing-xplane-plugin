@@ -60,7 +60,7 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
         AppState::getInstance()->debuggingEnabled = debugLoggingEnabled;
 
         if (debugLoggingEnabled) {
-            debug_force("Debug logging was enabled. Currently connected devices (%lu):\n", USBController::getInstance()->devices.size());
+            debug_force("Debug logging was enabled for plugin version %s. Currently connected devices (%lu):\n", VERSION, USBController::getInstance()->devices.size());
 
             for (auto &device : USBController::getInstance()->devices) {
                 debug_force("- (vendorId: 0x%04X, productId: 0x%04X, handler: %s) %s\n", device->vendorId, device->productId, device->classIdentifier(), device->productName.c_str());
