@@ -31,6 +31,7 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/OHPLightsATA32_Raw");
 
         product->setLedBrightness(AGPLed::LDG_GEAR_LEVER_RED, isAnnunTest() ? 255 : 0);
+        updateDisplays();
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/NoseGearInd", [this, product](int indicator) {
