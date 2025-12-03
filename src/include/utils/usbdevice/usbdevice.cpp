@@ -151,13 +151,13 @@ int USBDevice::getDisplayUpdateFrameInterval(int minWaitFrames) {
     int interval;
     if (queueSize < 50) {
         interval = 2;
-    } else if (queueSize < 100) {
+    } else if (queueSize < 250) {
         interval = 4;
-    } else if (queueSize < 200) {
-        interval = 8;
     } else if (queueSize < 500) {
-        interval = 16;
+        interval = 8;
     } else if (queueSize < 1000) {
+        interval = 16;
+    } else if (queueSize < 2000) {
         interval = 32;
     } else {
         interval = 100;
