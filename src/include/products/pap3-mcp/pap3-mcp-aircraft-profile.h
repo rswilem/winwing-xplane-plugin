@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 #include <XPLMUtilities.h>
 
 enum class PAP3MCPLed : int {

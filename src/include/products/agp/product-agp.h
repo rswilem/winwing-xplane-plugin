@@ -2,7 +2,6 @@
 #define PRODUCT_AGP_H
 
 #include "agp-aircraft-profile.h"
-#include "packet-utils.h"
 #include "usbdevice.h"
 
 #include <set>
@@ -45,7 +44,7 @@ class ProductAGP : public USBDevice {
         uint64_t lastButtonStateLo;
         uint32_t lastButtonStateHi;
         std::set<int> pressedButtonIndices;
-        PacketUtils::PacketNumber packetNumber;
+        uint8_t packetNumber = 1;
 
         void setProfileForCurrentAircraft();
 

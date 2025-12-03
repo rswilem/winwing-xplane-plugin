@@ -42,7 +42,7 @@ class USBDevice {
         std::condition_variable writeQueueCV;
         std::thread writeThread;
         std::atomic<bool> writeThreadRunning{false};
-        std::atomic<size_t> cachedWriteQueueSize{0};
+        std::atomic<size_t> writeQueueSize{0};
 
         void processQueuedEvents();
         void writeThreadLoop();
@@ -81,7 +81,8 @@ class USBDevice {
         void processOnMainThread(const InputEvent &event);
 
         bool writeData(std::vector<uint8_t> data);
-        int getDisplayUpdateFrameInterval();
+        size_t getWriteQueueSize();
+        int getDisplayUpdateFrameInterval(int minWaitFrames = 0);
 
         static USBDevice *Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);
 };

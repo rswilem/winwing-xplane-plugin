@@ -3,7 +3,6 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
-#include "packet-utils.h"
 #include "plugins-menu.h"
 #include "profiles/toliss-agp-profile.h"
 #include "segment-display.h"
@@ -112,7 +111,7 @@ void ProductAGP::update() {
 
     USBDevice::update();
 
-    if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval()) {
+    if (++displayUpdateFrameCounter >= getDisplayUpdateFrameInterval(12)) {
         displayUpdateFrameCounter = 0;
 
         if (profile) {
@@ -137,7 +136,7 @@ void ProductAGP::setLedBrightness(AGPLed led, uint8_t brightness) {
 
 void ProductAGP::setLCDText(const std::string &chrono, const std::string &utcTime, const std::string &elapsedTime) {
     std::vector<uint8_t> packet = {
-        0xF0, 0x00, packetNumber.next(), 0x35, ProductAGP::IdentifierByte,
+        0xF0, 0x00, packetNumber, 0x35, ProductAGP::IdentifierByte,
         0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00,
         0x00, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     packet.resize(64, 0x00);
@@ -175,10 +174,13 @@ void ProductAGP::setLCDText(const std::string &chrono, const std::string &utcTim
     writeData(packet);
 
     std::vector<uint8_t> commitPacket = {
-        0xF0, 0x00, packetNumber.current(), 0x11, ProductAGP::IdentifierByte,
+        0xF0, 0x00, packetNumber, 0x11, ProductAGP::IdentifierByte,
         0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00};
     commitPacket.resize(64, 0x00);
     writeData(commitPacket);
+    if (++packetNumber == 0) {
+        packetNumber = 1;
+    }
 }
 
 void ProductAGP::didReceiveData(int reportId, uint8_t *report, int reportLength) {

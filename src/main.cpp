@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <memory>
 #include <XPLMDisplay.h>
 #include <XPLMPlugin.h>
 #include <XPLMProcessing.h>
@@ -64,6 +65,36 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
             for (auto &device : USBController::getInstance()->devices) {
                 debug_force("- (vendorId: 0x%04X, productId: 0x%04X, handler: %s) %s\n", device->vendorId, device->productId, device->classIdentifier(), device->productName.c_str());
             }
+
+            auto action = std::make_shared<std::function<void()>>();
+            *action = [action]() {
+                if (!AppState::getInstance()->debuggingEnabled) {
+                    return;
+                }
+
+                auto now = std::chrono::system_clock::now();
+                auto nowTimeT = std::chrono::system_clock::to_time_t(now);
+                auto nowMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+
+                std::tm localTime;
+#if IBM
+                localtime_s(&localTime, &nowTimeT);
+#else
+                localtime_r(&nowTimeT, &localTime);
+#endif
+
+                char timeBuffer[9];
+                strftime(timeBuffer, sizeof(timeBuffer), "%H:%M:%S", &localTime);
+
+                debug_force("[%s.%03lld] Write queue sizes:\n", timeBuffer, nowMs.count());
+                for (auto &device : USBController::getInstance()->devices) {
+                    debug_force("[%s.%03lld] - %s: %zu pending packets\n", timeBuffer, nowMs.count(), device->classIdentifier(), device->getWriteQueueSize());
+                }
+
+                AppState::getInstance()->executeAfter(5000, *action);
+            };
+
+            (*action)();
         } else {
             debug_force("Debug logging was disabled.\n");
         }

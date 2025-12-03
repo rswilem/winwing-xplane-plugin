@@ -3,7 +3,6 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
-#include "packet-utils.h"
 #include "profiles/ff777-fcu-efis-profile.h"
 #include "profiles/laminar-fcu-efis-profile.h"
 #include "profiles/laminar737-fcu-efis-profile.h"
@@ -299,51 +298,54 @@ void ProductFCUEfis::sendFCUDisplay(const std::string &speed, const std::string 
     }
 
     // First request - send display data
-    std::vector<uint8_t> data1 = {
-        0xF0, 0x00, packetNumber.next(), 0x31, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    std::vector<uint8_t> packet = {
+        0xF0, 0x00, packetNumber, 0x31, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add speed data (3 bytes)
-    data1.push_back(speedData[2]);
-    data1.push_back(speedData[1] | flagBytes[static_cast<int>(DisplayByteIndex::S1)]);
-    data1.push_back(speedData[0]);
+    packet.push_back(speedData[2]);
+    packet.push_back(speedData[1] | flagBytes[static_cast<int>(DisplayByteIndex::S1)]);
+    packet.push_back(speedData[0]);
 
     // Add heading data (4 bytes)
-    data1.push_back(headingData[3] | flagBytes[static_cast<int>(DisplayByteIndex::H3)]);
-    data1.push_back(headingData[2]);
-    data1.push_back(headingData[1]);
-    data1.push_back(headingData[0] | flagBytes[static_cast<int>(DisplayByteIndex::H0)]);
+    packet.push_back(headingData[3] | flagBytes[static_cast<int>(DisplayByteIndex::H3)]);
+    packet.push_back(headingData[2]);
+    packet.push_back(headingData[1]);
+    packet.push_back(headingData[0] | flagBytes[static_cast<int>(DisplayByteIndex::H0)]);
 
     // Add altitude data (6 bytes)
-    data1.push_back(altitudeData[5] | flagBytes[static_cast<int>(DisplayByteIndex::A5)]);
-    data1.push_back(altitudeData[4] | flagBytes[static_cast<int>(DisplayByteIndex::A4)]);
-    data1.push_back(altitudeData[3] | flagBytes[static_cast<int>(DisplayByteIndex::A3)]);
-    data1.push_back(altitudeData[2] | flagBytes[static_cast<int>(DisplayByteIndex::A2)]);
-    data1.push_back(altitudeData[1] | flagBytes[static_cast<int>(DisplayByteIndex::A1)]);
-    data1.push_back(altitudeData[0] | vsData[4] | flagBytes[static_cast<int>(DisplayByteIndex::A0)]);
+    packet.push_back(altitudeData[5] | flagBytes[static_cast<int>(DisplayByteIndex::A5)]);
+    packet.push_back(altitudeData[4] | flagBytes[static_cast<int>(DisplayByteIndex::A4)]);
+    packet.push_back(altitudeData[3] | flagBytes[static_cast<int>(DisplayByteIndex::A3)]);
+    packet.push_back(altitudeData[2] | flagBytes[static_cast<int>(DisplayByteIndex::A2)]);
+    packet.push_back(altitudeData[1] | flagBytes[static_cast<int>(DisplayByteIndex::A1)]);
+    packet.push_back(altitudeData[0] | vsData[4] | flagBytes[static_cast<int>(DisplayByteIndex::A0)]);
 
     // Add vertical speed data (4 bytes)
-    data1.push_back(vsData[3] | flagBytes[static_cast<int>(DisplayByteIndex::V3)]);
-    data1.push_back(vsData[2] | flagBytes[static_cast<int>(DisplayByteIndex::V2)]);
-    data1.push_back(vsData[1] | flagBytes[static_cast<int>(DisplayByteIndex::V1)]);
-    data1.push_back(vsData[0] | flagBytes[static_cast<int>(DisplayByteIndex::V0)]);
+    packet.push_back(vsData[3] | flagBytes[static_cast<int>(DisplayByteIndex::V3)]);
+    packet.push_back(vsData[2] | flagBytes[static_cast<int>(DisplayByteIndex::V2)]);
+    packet.push_back(vsData[1] | flagBytes[static_cast<int>(DisplayByteIndex::V1)]);
+    packet.push_back(vsData[0] | flagBytes[static_cast<int>(DisplayByteIndex::V0)]);
 
     // Pad to 64 bytes
-    while (data1.size() < 64) {
-        data1.push_back(0x00);
+    while (packet.size() < 64) {
+        packet.push_back(0x00);
     }
 
-    writeData(data1);
+    writeData(packet);
 
     // Second request - commit display data
-    std::vector<uint8_t> data2 = {
-        0xF0, 0x00, packetNumber.current(), 0x11, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00};
+    std::vector<uint8_t> commitPacket = {
+        0xF0, 0x00, packetNumber, 0x11, ProductFCUEfis::FCUIdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x02, 0x00};
 
     // Pad to 64 bytes
-    while (data2.size() < 64) {
-        data2.push_back(0x00);
+    while (commitPacket.size() < 64) {
+        commitPacket.push_back(0x00);
     }
 
-    writeData(data2);
+    writeData(commitPacket);
+    if (++packetNumber == 0) {
+        packetNumber = 1;
+    }
 }
 
 void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRightSide) {
@@ -355,7 +357,7 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
 
     // EFIS display protocol
     std::vector<uint8_t> payload = {
-        0xF0, 0x00, packetNumber.next(), 0x1A, static_cast<uint8_t>(isRightSide ? ProductFCUEfis::EfisRightIdentifierByte : ProductFCUEfis::EfisLeftIdentifierByte), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        0xF0, 0x00, packetNumber, 0x1A, static_cast<uint8_t>(isRightSide ? ProductFCUEfis::EfisRightIdentifierByte : ProductFCUEfis::EfisLeftIdentifierByte), 0xBF, 0x00, 0x00, 0x02, 0x01, 0x00, 0x00, 0xFF, 0xFF, 0x1D, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
     // Add barometric data
     auto baroData = SegmentDisplay::encodeStringEfis(4, SegmentDisplay::fixStringLength(data->isStd ? "STD " : data->baro, 4));
@@ -380,6 +382,9 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
     }
 
     writeData(payload);
+    if (++packetNumber == 0) {
+        packetNumber = 1;
+    }
 }
 
 void ProductFCUEfis::setLedBrightness(FCUEfisLed led, uint8_t brightness) {

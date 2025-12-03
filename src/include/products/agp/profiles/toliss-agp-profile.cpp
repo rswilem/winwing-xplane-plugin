@@ -9,6 +9,8 @@
 #include <cmath>
 
 TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(product) {
+    brakesHot = false;
+
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
         uint8_t backlightBrightness = hasPower ? brightness * 255 : 0;
@@ -18,7 +20,7 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         product->setLedBrightness(AGPLed::OVERALL_LEDS_BRIGHTNESS, hasPower ? 255 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this](int annunMode) {
+    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this, product](int annunMode) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/NoseGearInd");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/LeftGearInd");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/RightGearInd");
@@ -26,7 +28,10 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/TerrainSelectedND2");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AutoBrkLo");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/BrakeFan");
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/BrakeTemperatureArray");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/OHPLightsATA32_Raw");
+
+        product->setLedBrightness(AGPLed::LDG_GEAR_LEVER_RED, isAnnunTest() ? 255 : 0);
+        updateDisplays();
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/NoseGearInd", [this, product](int indicator) {
@@ -79,11 +84,16 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         product->setLedBrightness(AGPLed::BRAKE_FAN_ON, enabled || isAnnunTest() ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/BrakeTemperatureArray", [this, product](std::vector<float> temperatures) {
-        bool anyHot = std::any_of(temperatures.begin(), temperatures.end(), [](float temp) {
-            return temp > 300.0f;
-        });
-        product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, anyHot || isAnnunTest() ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/OHPLightsATA32_Raw", [this, product](std::vector<float> panelLights) {
+        if (panelLights.size() < 12) {
+            return;
+        }
+
+        bool oldBrakesHot = brakesHot;
+        brakesHot = panelLights[11] > std::numeric_limits<float>::epsilon() || isAnnunTest();
+        if (brakesHot != oldBrakesHot) {
+            product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, brakesHot ? 1 : 0);
+        }
     });
 }
 
@@ -98,7 +108,7 @@ TolissAGPProfile::~TolissAGPProfile() {
     Dataref::getInstance()->unbind("AirbusFBW/AutoBrkMed");
     Dataref::getInstance()->unbind("AirbusFBW/AutoBrkMax");
     Dataref::getInstance()->unbind("AirbusFBW/BrakeFan");
-    Dataref::getInstance()->unbind("AirbusFBW/BrakeTemperatureArray");
+    Dataref::getInstance()->unbind("AirbusFBW/OHPLightsATA32_Raw");
 }
 
 bool TolissAGPProfile::IsEligible() {
@@ -146,10 +156,18 @@ void TolissAGPProfile::buttonPressed(const AGPButtonDef *button, XPLMCommandPhas
     if (button->datarefType == AGPDatarefType::LANDING_GEAR) {
         datarefManager->executeCommand(button->dataref.c_str(), phase);
         datarefManager->set<int>("ckpt/gearHandle", static_cast<int>(button->value));
-    } else if (phase == xplm_CommandBegin && button->datarefType == AGPDatarefType::TERRAIN_ON_ND) {
+    } else if (button->datarefType == AGPDatarefType::TERRAIN_ON_ND) {
+        if (phase != xplm_CommandBegin) {
+            return;
+        }
+
         std::string dataref = (product->terrainNDPreference == AGPTerrainNDPreference::CAPTAIN) ? "AirbusFBW/TerrainSelectedND1" : "AirbusFBW/TerrainSelectedND2";
         datarefManager->set<int>(dataref.c_str(), datarefManager->get<bool>(dataref.c_str()) ? 0 : 1);
-    } else if (phase == xplm_CommandBegin && button->datarefType == AGPDatarefType::SET_VALUE) {
+    } else if (button->datarefType == AGPDatarefType::SET_VALUE) {
+        if (phase != xplm_CommandBegin) {
+            return;
+        }
+
         datarefManager->set<int>(button->dataref.c_str(), static_cast<int>(button->value));
     } else {
         datarefManager->executeCommand(button->dataref.c_str(), phase);

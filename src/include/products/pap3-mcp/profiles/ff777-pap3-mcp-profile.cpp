@@ -108,14 +108,14 @@ const std::vector<std::string> &FF777PAP3MCPProfile::displayDatarefs() const {
 const std::unordered_map<uint16_t, PAP3MCPButtonDef> &FF777PAP3MCPProfile::buttonDefs() const {
     static const std::unordered_map<uint16_t, PAP3MCPButtonDef> buttons = {
         // Row 1 (byte 0x01) - Main autopilot mode buttons
-        {0, {"CLB/N1", "1-sim/command/mcpClbButton_button"}},      // CLB (THR REF) / N1 equivalent
-        {1, {"SPEED", "1-sim/command/mcpAtButton_button"}},        // SPEED
-        {2, {"VNAV", "1-sim/command/mcpVnavButton_button"}},       // VNAV
+        {0, {"CLB/N1", "1-sim/command/mcpClbButton_button"}},        // CLB (THR REF) / N1 equivalent
+        {1, {"SPEED", "1-sim/command/mcpAtButton_button"}},          // SPEED
+        {2, {"VNAV", "1-sim/command/mcpVnavButton_button"}},         // VNAV
         {3, {"FLCH/LVL CHG", "1-sim/command/mcpFlchButton_button"}}, // FLCH (LVL CHG)
-        {4, {"HDG SEL", "1-sim/command/mcpHdgCelButton_button"}},  // HDG SEL
-        {5, {"LNAV", "1-sim/command/mcpLnavButton_button"}},       // LNAV
-        {6, {"LOC/VORLOC", "1-sim/command/mcpLocButton_button"}},  // LOC (VORLOC)
-        {7, {"APP", "1-sim/command/mcpAppButton_button"}},         // APP
+        {4, {"HDG SEL", "1-sim/command/mcpHdgCelButton_button"}},    // HDG SEL
+        {5, {"LNAV", "1-sim/command/mcpLnavButton_button"}},         // LNAV
+        {6, {"LOC/VORLOC", "1-sim/command/mcpLocButton_button"}},    // LOC (VORLOC)
+        {7, {"APP", "1-sim/command/mcpAppButton_button"}},           // APP
 
         // Row 2 (byte 0x02) - Additional autopilot buttons
         {8, {"ALT HLD", "1-sim/command/mcpAltHoldButton_button"}}, // ALT HOLD
@@ -128,43 +128,44 @@ const std::unordered_map<uint16_t, PAP3MCPButtonDef> &FF777PAP3MCPProfile::butto
         {15, {"SPD INTV", "1-sim/command/mcpSpdRotary_push"}},     // SPD INTERV (SPD push)
 
         // Row 3 (byte 0x03)
-        {16, {"ALT INTV", "1-sim/command/mcpAltRotary_push"}}};    // ALT INTERV (ALT push)
+        {16, {"ALT INTV", "1-sim/command/mcpAltRotary_push"}}}; // ALT INTERV (ALT push)
     return buttons;
 }
 
 const std::vector<PAP3MCPEncoderDef> &FF777PAP3MCPProfile::encoderDefs() const {
     static std::vector<PAP3MCPEncoderDef> encoders = {
-        {0, "CRS CAPT", "", ""},  // 777 doesn't have course on MCP (it's on EFIS panel)
+        {0, "CRS CAPT", "", ""}, // 777 doesn't have course on MCP (it's on EFIS panel)
         {1, "SPD", "1-sim/command/mcpSpdRotary_rotary+", "1-sim/command/mcpSpdRotary_rotary-"},
         {2, "HDG", "1-sim/command/mcpHdgRotary_rotary+", "1-sim/command/mcpHdgRotary_rotary-"},
         {3, "ALT", "1-sim/command/mcpAltRotary_rotary+", "1-sim/command/mcpAltRotary_rotary-"},
         {4, "V/S", "1-sim/command/mcpVsRotary_rotary+", "1-sim/command/mcpVsRotary_rotary-"},
-        {5, "CRS FO", "", ""}};  // 777 doesn't have course on MCP (it's on EFIS panel)
+        {5, "CRS FO", "", ""}}; // 777 doesn't have course on MCP (it's on EFIS panel)
     return encoders;
 }
 
 void FF777PAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
-    data.showLabels = true; // FF777 MCP has labels on the display
+    auto dataref = Dataref::getInstance();
+    data.showLabels = true;              // FF777 MCP has labels on the display
     data.showDashesWhenInactive = false; // FF777 doesn't show dashes when inactive
     data.showLabelsWhenInactive = false; // FF777 labels only show when displays are active
-    data.showCourse = false; // 777 doesn't have course on MCP (it's on EFIS panel)
-    bool hasPower = Dataref::getInstance()->getCached<bool>("sim/cockpit2/autopilot/autopilot_has_power");
+    data.showCourse = false;             // 777 doesn't have course on MCP (it's on EFIS panel)
+    bool hasPower = dataref->getCached<bool>("sim/cockpit2/autopilot/autopilot_has_power");
     data.displayEnabled = hasPower;
 
     if (!hasPower) {
         return;
     }
 
-    data.speed = Dataref::getInstance()->getCached<float>("1-sim/output/mcp/spd");
-    data.heading = Dataref::getInstance()->getCached<int>("1-sim/output/mcp/hdg");
-    data.altitude = Dataref::getInstance()->getCached<int>("1-sim/output/mcp/alt");
-    data.verticalSpeed = Dataref::getInstance()->getCached<float>("1-sim/output/mcp/vs");
-    data.speedVisible = Dataref::getInstance()->getCached<bool>("1-sim/output/mcp/isSpdOpen");
-    data.verticalSpeedVisible = Dataref::getInstance()->getCached<bool>("1-sim/output/mcp/isVsOpen");
+    data.speed = dataref->getCached<float>("1-sim/output/mcp/spd");
+    data.heading = dataref->getCached<int>("1-sim/output/mcp/hdg");
+    data.altitude = dataref->getCached<int>("1-sim/output/mcp/alt");
+    data.verticalSpeed = dataref->getCached<float>("1-sim/output/mcp/vs");
+    data.speedVisible = dataref->getCached<bool>("1-sim/output/mcp/isSpdOpen");
+    data.verticalSpeedVisible = dataref->getCached<bool>("1-sim/output/mcp/isVsOpen");
 
     // 777 doesn't have course on MCP (it's on EFIS panel), but we read standard X-Plane datarefs for reference
-    data.crsCapt = Dataref::getInstance()->getCached<int>("sim/cockpit/radios/nav1_obs_degm");
-    data.crsFo = Dataref::getInstance()->getCached<int>("sim/cockpit/radios/nav2_obs_degm");
+    data.crsCapt = dataref->getCached<int>("sim/cockpit/radios/nav1_obs_degm");
+    data.crsFo = dataref->getCached<int>("sim/cockpit/radios/nav2_obs_degm");
 
     // FF777 doesn't have special digit flags
     data.digitA = false;

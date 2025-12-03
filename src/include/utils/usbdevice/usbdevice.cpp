@@ -6,8 +6,8 @@
 #include "product-fcu-efis.h"
 #include "product-fmc.h"
 #include "product-pap3-mcp.h"
-#include "product-ursa-minor-throttle.h"
 #include "product-ursa-minor-joystick.h"
+#include "product-ursa-minor-throttle.h"
 
 #include <XPLMUtilities.h>
 
@@ -102,9 +102,9 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBB80: // AGP
             return new ProductAGP(hidDevice, vendorId, productId, vendorName, productName);
 
-        case 0xB920: // URSA MINOR 32 Throttle Metal L
-            //case 0xB930:
-            return new ProductUrsaMinorThrottle(hidDevice, vendorId, productId, vendorName, productName);
+            // case 0xB920: // URSA MINOR 32 Throttle Metal L
+            //     //case 0xB930:
+            //     return new ProductUrsaMinorThrottle(hidDevice, vendorId, productId, vendorName, productName);
 
         default:
             debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X (%s)\n", vendorId, productId, productName.c_str());
@@ -141,20 +141,27 @@ void USBDevice::processQueuedEvents() {
     }
 }
 
-int USBDevice::getDisplayUpdateFrameInterval() {
-    size_t queueSize = cachedWriteQueueSize.load();
+size_t USBDevice::getWriteQueueSize() {
+    return writeQueueSize.load();
+}
 
+int USBDevice::getDisplayUpdateFrameInterval(int minWaitFrames) {
+    size_t queueSize = writeQueueSize.load();
+
+    int interval;
     if (queueSize < 50) {
-        return 2;
+        interval = 2;
     } else if (queueSize < 100) {
-        return 4;
+        interval = 4;
     } else if (queueSize < 200) {
-        return 8;
+        interval = 8;
     } else if (queueSize < 500) {
-        return 16;
+        interval = 16;
     } else if (queueSize < 1000) {
-        return 32;
+        interval = 32;
+    } else {
+        interval = 100;
     }
 
-    return 100;
+    return std::max(interval, minWaitFrames);
 }
