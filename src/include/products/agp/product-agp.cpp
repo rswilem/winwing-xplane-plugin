@@ -134,6 +134,42 @@ void ProductAGP::setLedBrightness(AGPLed led, uint8_t brightness) {
     writeData({0x02, ProductAGP::IdentifierByte, 0xBB, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(led), brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
 }
 
+void ProductAGP::parseSegment(const std::string &text, int expectedLength, std::string &outDigits, uint16_t &colonMask, int digitOffset) {
+    std::string digits;
+    uint16_t localColonMask = 0; // Track colons relative to current segment (0-based)
+
+    for (size_t i = 0; i < text.length(); ++i) {
+        char c = text[i];
+        if (c == ':') {
+            // Colon follows the previous digit
+            if (!digits.empty()) {
+                localColonMask |= (1 << (digits.length() - 1));
+            }
+        } else {
+            // Regular character (digit, letter, space, etc.)
+            digits += c;
+        }
+    }
+
+    // Calculate padding amount before modifying digits
+    int paddingAmount = 0;
+    if (digits.length() < static_cast<size_t>(expectedLength)) {
+        paddingAmount = expectedLength - static_cast<int>(digits.length());
+    }
+
+    // Shift colon positions by padding amount and add to global mask with offset
+    colonMask |= (localColonMask << paddingAmount) << digitOffset;
+
+    // Pad or truncate to expected length
+    while (digits.length() < static_cast<size_t>(expectedLength)) {
+        digits = ' ' + digits; // Left-pad with spaces
+    }
+    if (digits.length() > static_cast<size_t>(expectedLength)) {
+        digits = digits.substr(digits.length() - expectedLength);
+    }
+    outDigits += digits;
+}
+
 void ProductAGP::setLCDText(const std::string &chrono, const std::string &utcTime, const std::string &elapsedTime) {
     std::vector<uint8_t> packet = {
         0xF0, 0x00, packetNumber, 0x35, ProductAGP::IdentifierByte,
@@ -141,16 +177,18 @@ void ProductAGP::setLCDText(const std::string &chrono, const std::string &utcTim
         0x00, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     packet.resize(64, 0x00);
 
-    // Row offsets are the starting bytes for segments A, B, C, D, E, F, G
-    const int rowOffsets[7] = {25, 29, 33, 37, 41, 45, 49};
+    // Row offsets are the starting bytes for segments A, B, C, D, E, F, G, and DP (dot/colon)
+    const int rowOffsets[8] = {25, 29, 33, 37, 41, 45, 49, 53};
 
-    std::string fullText = "";
-    fullText += SegmentDisplay::fixStringLength(chrono, 4, ' ');      // Bits 0-3
-    fullText += SegmentDisplay::fixStringLength(utcTime, 6, ' ');     // Bits 4-9
-    fullText += SegmentDisplay::fixStringLength(elapsedTime, 4, ' '); // Bits 10-13
+    std::string allDigits;
+    uint16_t colonMask = 0;
+
+    parseSegment(chrono, 4, allDigits, colonMask, 0);       // Chrono: 4 digits (positions 0-3)
+    parseSegment(utcTime, 6, allDigits, colonMask, 4);      // UTC: 6 digits (positions 4-9)
+    parseSegment(elapsedTime, 4, allDigits, colonMask, 10); // Elapsed: 4 digits (positions 10-13)
 
     for (int digitIndex = 0; digitIndex < 14; ++digitIndex) {
-        char c = fullText[digitIndex];
+        char c = allDigits[digitIndex];
         uint8_t charMask = SegmentDisplay::getAGPSegmentMask(c);
 
         // Iterate through the 7 segments (rows)
@@ -168,6 +206,13 @@ void ProductAGP::setLCDText(const std::string &chrono, const std::string &utcTim
                 // Set the bit
                 packet[byteOffset] |= (1 << bitPos);
             }
+        }
+
+        // Check if colon/dot should be enabled for this digit position
+        if (colonMask & (1 << digitIndex)) {
+            int byteOffset = rowOffsets[7] + (digitIndex / 8); // Row 7 is the DP/colon row at offset 53
+            int bitPos = digitIndex % 8;
+            packet[byteOffset] |= (1 << bitPos);
         }
     }
 

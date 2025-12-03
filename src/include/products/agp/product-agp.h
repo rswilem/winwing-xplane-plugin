@@ -47,6 +47,7 @@ class ProductAGP : public USBDevice {
         uint8_t packetNumber = 1;
 
         void setProfileForCurrentAircraft();
+        void parseSegment(const std::string &text, int expectedLength, std::string &outDigits, uint16_t &colonMask, int digitOffset);
 
     public:
         ProductAGP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName);

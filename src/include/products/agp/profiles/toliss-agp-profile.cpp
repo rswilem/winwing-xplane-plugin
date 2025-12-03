@@ -184,7 +184,11 @@ void TolissAGPProfile::updateDisplays() {
     std::string chrono = "";
     float chronoSeconds = datarefManager->get<float>("AirbusFBW/ClockChronoValue");
     if (chronoSeconds > std::numeric_limits<float>::epsilon()) {
-        chrono = SegmentDisplay::fixStringLength(std::to_string((int) std::floor(chronoSeconds)), 4);
+        int totalSeconds = static_cast<int>(std::floor(chronoSeconds));
+        int mins = totalSeconds / 60;
+        int secs = totalSeconds % 60;
+        chrono = SegmentDisplay::fixStringLength(std::to_string(mins), 2) + ":" +
+                 SegmentDisplay::fixStringLength(std::to_string(secs), 2);
     }
 
     std::string utc = "";
@@ -222,13 +226,13 @@ void TolissAGPProfile::updateDisplays() {
     } else {
         double zuluTime = datarefManager->get<double>("sim/time/zulu_time_sec");
 
-        // Convert zulu time in seconds to HHMMSS
+        // Convert zulu time in seconds to HH:MM:SS
         int hours = static_cast<int>(zuluTime / 3600) % 24;
         int minutes = static_cast<int>(zuluTime / 60) % 60;
         int seconds = static_cast<int>(zuluTime) % 60;
 
-        utc = SegmentDisplay::fixStringLength(std::to_string(hours), 2) +
-              SegmentDisplay::fixStringLength(std::to_string(minutes), 2) +
+        utc = SegmentDisplay::fixStringLength(std::to_string(hours), 2) + ":" +
+              SegmentDisplay::fixStringLength(std::to_string(minutes), 2) + ":" +
               SegmentDisplay::fixStringLength(std::to_string(seconds), 2);
     }
 
@@ -236,13 +240,14 @@ void TolissAGPProfile::updateDisplays() {
     if (datarefManager->get<bool>("AirbusFBW/ClockShowsET")) {
         int hours = datarefManager->get<int>("AirbusFBW/ClockETHours");
         int minutes = datarefManager->get<int>("AirbusFBW/ClockETMinutes");
-        elapsedTime = SegmentDisplay::fixStringLength(std::to_string(hours), 2) + SegmentDisplay::fixStringLength(std::to_string(minutes), 2);
+        elapsedTime = SegmentDisplay::fixStringLength(std::to_string(hours), 2) + ":" +
+                      SegmentDisplay::fixStringLength(std::to_string(minutes), 2);
     }
 
     if (isAnnunTest()) {
-        chrono = "8888";
-        utc = "888888";
-        elapsedTime = "8888";
+        chrono = "88:88";
+        utc = "88:88:88";
+        elapsedTime = "88:88";
     }
 
     product->setLCDText(chrono, utc, elapsedTime);
