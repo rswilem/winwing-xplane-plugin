@@ -136,17 +136,32 @@ void ProductAGP::setLedBrightness(AGPLed led, uint8_t brightness) {
 
 void ProductAGP::parseSegment(const std::string &text, int expectedLength, std::string &outDigits, uint16_t &colonMask, int digitOffset) {
     std::string digits;
-    uint16_t localColonMask = 0; // Track colons relative to current segment (0-based)
+    uint16_t localColonMask = 0;
 
     for (size_t i = 0; i < text.length(); ++i) {
         char c = text[i];
-        if (c == ':') {
-            // Colon follows the previous digit
+        if (c == ':' || c == '.') {
             if (!digits.empty()) {
-                localColonMask |= (1 << (digits.length() - 1));
+                if (expectedLength >= 6) {
+                    // Standard: Enable bit for digit before (Left) and digit after (Right)
+
+                    if (c == ':') {
+                        localColonMask |= (1 << (digits.length() - 1)); // Upper Dot
+                    }
+
+                    localColonMask |= (1 << digits.length()); // Lower Dot
+                } else {
+                    // 4-Digit Displays: Enable bit for digit after (Right) and next digit (Right + 1)
+                    // The digit 'digits.length()' is the one we are about to add next.
+
+                    if (c == ':') {
+                        localColonMask |= (1 << digits.length()); // Upper Dot
+                    }
+
+                    localColonMask |= (1 << (digits.length() + 1)); // Lower Dot
+                }
             }
         } else {
-            // Regular character (digit, letter, space, etc.)
             digits += c;
         }
     }

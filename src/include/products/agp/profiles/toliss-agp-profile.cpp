@@ -220,8 +220,8 @@ void TolissAGPProfile::updateDisplays() {
         }
 
         // Format the date as MMDDYY
-        utc = (month < 10 ? "0" : "") + std::to_string(month) +
-              (day < 10 ? "0" : "") + std::to_string(day) +
+        utc = (month < 10 ? "0" : "") + std::to_string(month)  + ":" +
+              (day < 10 ? "0" : "") + std::to_string(day)  + ":" +
               std::to_string(year % 100);
     } else {
         double zuluTime = datarefManager->get<double>("sim/time/zulu_time_sec");
