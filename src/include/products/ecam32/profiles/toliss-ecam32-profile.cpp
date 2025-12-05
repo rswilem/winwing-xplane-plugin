@@ -9,13 +9,19 @@
 
 TolissECAM32Profile::TolissECAM32Profile(ProductECAM32 *product) : ECAM32AircraftProfile(product) {
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
-        uint8_t backlightBrightness = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255 : 0;
+        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+        bool ecpAvailable = Dataref::getInstance()->get<bool>("AirbusFBW/ECPAvail");
+        uint8_t backlightBrightness = hasPower && ecpAvailable ? brightness * 255 : 0;
 
         product->setLedBrightness(ECAM32Led::BACKLIGHT, backlightBrightness);
         product->setLedBrightness(ECAM32Led::EMER_CANC_BRIGHTNESS, backlightBrightness);
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/ECPAvail", [this, product](bool enabled) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
 
@@ -92,6 +98,7 @@ TolissECAM32Profile::TolissECAM32Profile(ProductECAM32 *product) : ECAM32Aircraf
 TolissECAM32Profile::~TolissECAM32Profile() {
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
+    Dataref::getInstance()->unbind("AirbusFBW/ECPAvail");
     Dataref::getInstance()->unbind("AirbusFBW/CLRillum");
     Dataref::getInstance()->unbind("AirbusFBW/SDENG");
     Dataref::getInstance()->unbind("AirbusFBW/SDBLEED");
