@@ -15,6 +15,10 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
     product->setFont(Font::GlyphData(FontVariant::FontAirbus, product->identifierByte));
 
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/MCDUIntegBrightness_Raw", [product](std::vector<float> brightness) {
+        if (brightness.size() < 2) {
+            return;
+        }
+        
         uint8_t backlightBrightness = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 0 : 1] * 255 : 0;
 
         product->setLedBrightness(FMCLed::BACKLIGHT, backlightBrightness);
@@ -63,7 +67,7 @@ TolissFMCProfile::~TolissFMCProfile() {
     Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("AirbusFBW/ElecConnectors");
-    Dataref::getInstance()->unbind("AirbusFBW/MCDU2KeyClear");
+    Dataref::getInstance()->unbind("AirbusFBW/MCDU1KeyClear");
     Dataref::getInstance()->unbind("AirbusFBW/MCDU2KeyClear");
 }
 
