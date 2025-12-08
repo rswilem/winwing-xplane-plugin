@@ -12,6 +12,7 @@
 #include <cmath>
 #include <cstring>
 #include <memory>
+#include <vector>
 #include <XPLMDisplay.h>
 #include <XPLMPlugin.h>
 #include <XPLMProcessing.h>
@@ -55,7 +56,7 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
     PluginsMenu::getInstance()->addPersistentItem("Enable debug logging", [](int itemIndex) {
         bool debugLoggingEnabled = !PluginsMenu::getInstance()->isItemChecked(itemIndex);
 
-        PluginsMenu::getInstance()->setItemName(itemIndex, debugLoggingEnabled ? "Disable debug logging" : "Enable debug logging");
+        PluginsMenu::getInstance()->setItemName(itemIndex, debugLoggingEnabled ? "Debug logging enabled" : "Enable debug logging");
         PluginsMenu::getInstance()->setItemChecked(itemIndex, debugLoggingEnabled);
         AppState::getInstance()->debuggingEnabled = debugLoggingEnabled;
 
@@ -89,6 +90,23 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
                 debug_force("[%s.%03lld] Write queue sizes:\n", timeBuffer, nowMs.count());
                 for (auto &device : USBController::getInstance()->devices) {
                     debug_force("[%s.%03lld] - %s: %zu pending packets\n", timeBuffer, nowMs.count(), device->classIdentifier(), device->getWriteQueueSize());
+                }
+
+                // Report top dataref accesses
+                auto &stats = Dataref::getInstance()->getAccessStats();
+                if (!stats.empty()) {
+                    std::vector<std::pair<std::string, uint64_t>> sorted(stats.begin(), stats.end());
+                    std::sort(sorted.begin(), sorted.end(), [](const auto &a, const auto &b) {
+                        return a.second > b.second;
+                    });
+
+                    debug_force("[%s.%03lld] Top dataref accesses (last 5s):\n", timeBuffer, nowMs.count());
+                    size_t count = std::min(sorted.size(), size_t(10));
+                    for (size_t i = 0; i < count; i++) {
+                        debug_force("[%s.%03lld] - %s: %llu calls (%.1f/sec)\n",
+                            timeBuffer, nowMs.count(), sorted[i].first.c_str(), sorted[i].second, sorted[i].second / 5.0);
+                    }
+                    Dataref::getInstance()->resetAccessStats();
                 }
 
                 AppState::getInstance()->executeAfter(5000, *action);

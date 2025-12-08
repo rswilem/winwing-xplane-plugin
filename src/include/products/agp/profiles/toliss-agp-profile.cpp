@@ -16,8 +16,12 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
         uint8_t backlightBrightness = hasPower ? brightness * 255 : 0;
 
         product->setLedBrightness(AGPLed::BACKLIGHT, backlightBrightness);
-        product->setLedBrightness(AGPLed::LCD_BRIGHTNESS, backlightBrightness);
+        product->setLedBrightness(AGPLed::LCD_BRIGHTNESS, hasPower ? 255 : 0);
         product->setLedBrightness(AGPLed::OVERALL_LEDS_BRIGHTNESS, hasPower ? 255 : 0);
+    });
+    
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this, product](int annunMode) {
@@ -99,6 +103,7 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
 
 TolissAGPProfile::~TolissAGPProfile() {
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
+    Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("AirbusFBW/NoseGearInd");
     Dataref::getInstance()->unbind("AirbusFBW/LeftGearInd");
     Dataref::getInstance()->unbind("AirbusFBW/RightGearInd");

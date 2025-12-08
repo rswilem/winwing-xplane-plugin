@@ -70,6 +70,10 @@ class Dataref {
         void executeCommand(const char *command, XPLMCommandPhase phase = -1);
 
         void clearCache();
+
+        // Debug tracking
+        static std::unordered_map<std::string, uint64_t> &getAccessStats();
+        static void resetAccessStats();
 };
 
 #endif

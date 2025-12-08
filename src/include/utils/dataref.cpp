@@ -12,6 +12,7 @@
 using namespace std;
 
 Dataref *Dataref::instance = nullptr;
+static std::unordered_map<std::string, uint64_t> debugAccessStats;
 
 int handleCommandCallback(XPLMCommandRef inCommand, XPLMCommandPhase inPhase, void *inRefcon) {
     return Dataref::getInstance()->_commandCallback(inCommand, inPhase, inRefcon);
@@ -322,6 +323,10 @@ bool Dataref::exists(const char *ref) {
 void Dataref::executeChangedCallbacksForDataref(const char *ref) {
     auto it = boundRefs.find(ref);
     if (it != boundRefs.end()) {
+        if (AppState::getInstance()->debuggingEnabled) {
+            debugAccessStats[ref]++;
+        }
+
         for (auto callback : boundRefs[ref].changeCallbacks) {
             callback(cachedValues[ref].value);
         }
@@ -552,4 +557,12 @@ int Dataref::_commandCallback(XPLMCommandRef inCommand, XPLMCommandPhase inPhase
     }
 
     return 1;
+}
+
+std::unordered_map<std::string, uint64_t> &Dataref::getAccessStats() {
+    return debugAccessStats;
+}
+
+void Dataref::resetAccessStats() {
+    debugAccessStats.clear();
 }
