@@ -13,6 +13,9 @@
 
 FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
     
+    // Log.txt debug info verifying the loading of FF777 profile
+    XPLMDebugString("===== FF777 PROFILE CONSTRUCTOR CALLED =====\n");
+    
     Dataref::getInstance()->monitorExistingDataref<float>("1-sim/ckpt/lights/glareshield", [product](float brightness) {
         bool hasPower = Dataref::getInstance()->getCached<bool>("1-sim/output/mcp/ok");
         uint8_t target = hasPower ? brightness * 255 : 0;
@@ -206,8 +209,8 @@ FF777FCUEfisProfile::~FF777FCUEfisProfile() {
 }
 
 bool FF777FCUEfisProfile::IsEligible() {
-    return Dataref::getInstance()->exists("1-sim/ckpt/mcpApLButton/anim") ||
-           Dataref::getInstance()->exists("1-sim/ckpt/cptHsiRangeSwitch/anim") ||
+    // FF777 datarefs that don't exist on the FF767
+    return Dataref::getInstance()->exists("1-sim/ckpt/mcpApLButton/anim") &&
            Dataref::getInstance()->exists("1-sim/output/mcp/ok");
 }
 
