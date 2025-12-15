@@ -18,7 +18,7 @@ IXEG733FMCProfile::IXEG733FMCProfile(ProductFMC *product) :
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
     Dataref::getInstance()->monitorExistingDataref<float>("ixeg/733/rheostats/light_fmc_pt_act", [product](float brightness) {
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255.0f : 0;
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness * 255 : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });

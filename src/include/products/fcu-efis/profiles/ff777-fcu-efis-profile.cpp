@@ -12,7 +12,6 @@
 #include <XPLMUtilities.h>
 
 FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
-    
     Dataref::getInstance()->monitorExistingDataref<float>("1-sim/ckpt/lights/glareshield", [product](float brightness) {
         bool hasPower = Dataref::getInstance()->getCached<bool>("1-sim/output/mcp/ok");
         uint8_t target = hasPower ? brightness * 255 : 0;
@@ -43,7 +42,7 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
         Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lights/glareshield");
     });
 
-   // ========== LEDs =================================================================================================
+    // ========== LEDs =================================================================================================
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/mcpLNAV", [this, product](bool engaged) {
         product->setLedBrightness(FCUEfisLed::AP1_GREEN, engaged || isTestMode() ? 1 : 0);
     });
@@ -63,7 +62,7 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/lampsGlow/mcpAPP", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::APPR_GREEN, armed || isTestMode() ? 1 : 0);
     });
-    
+
     // ========== LEDs ajoutées
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/lampsGlow/mcpCaptAP", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EXPED_GREEN, armed || isTestMode() ? 1 : 0);
@@ -78,28 +77,28 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/fo/data_toggle", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISR_CSTR_GREEN, armed || isTestMode() ? 1 : 0);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/capt/wpt_toggle", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISL_WPT_GREEN, armed || isTestMode() ? 1 : 0);
     });
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/fo/wpt_toggle", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISR_WPT_GREEN, armed || isTestMode() ? 1 : 0);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/capt/sta_toggle", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISL_VORD_GREEN, armed || isTestMode() ? 1 : 0);
     });
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/fo/sta_toggle", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISR_VORD_GREEN, armed || isTestMode() ? 1 : 0);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/capt/arpt_toggle", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, armed || isTestMode() ? 1 : 0);
     });
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/efis/fo/arpt_toggle", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISR_ARPT_GREEN, armed || isTestMode() ? 1 : 0);
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/mcpApDiscSwitch/anim", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISL_LS_GREEN, (armed ? 0 : 1) || isTestMode() ? 1 : 0);
     });
@@ -114,7 +113,7 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
         product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, on || isTestMode() ? 1 : 0);
     });
     // ========== Fin LEDs ============================================================================================
-    
+
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/cptCAUTION", [this, product](bool isCaution) {
         bool isWarning = Dataref::getInstance()->getCached<bool>("1-sim/ckpt/lampsGlow/cptWARNING");
         product->setLedBrightness(FCUEfisLed::EFISL_CSTR_GREEN, isCaution || isWarning || isTestMode() ? 1 : 0);
@@ -267,135 +266,135 @@ const std::vector<std::string> &FF777FCUEfisProfile::displayDatarefs() const {
     return datarefs;
 }
 
-const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::buttonDefs() const {
+const std::unordered_map<uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::buttonDefs() const {
     static const std::unordered_map<uint16_t, FCUEfisButtonDef> buttons = {
 
-        {0, {"SPD",     "1-sim/command/mcpIasMachButton_button"}},
-        {1, {"LOC",     "1-sim/command/mcpLocButton_button"}},
+        {0, {"SPD", "1-sim/command/mcpIasMachButton_button"}},
+        {1, {"LOC", "1-sim/command/mcpLocButton_button"}},
         {2, {"HDG/TRK", "1-sim/command/mcpHdgTrkButton_button"}},
-        {3, {"AP1",     "1-sim/command/mcpLnavButton_button"}},
-        {4, {"AP2",     "1-sim/command/mcpVnavButton_button"}},
-        {5, {"A/THR",   "1-sim/command/mcpAtButton_button"}},
-        {6, {"EXPED",   "1-sim/command/mcpApLButton_button"}},
-        {7, {"VS/FPA",  "1-sim/command/mcpVsFpaButton_button"}},
-        {8, {"APP",     "1-sim/command/mcpAppButton_button"}},
+        {3, {"AP1", "1-sim/command/mcpLnavButton_button"}},
+        {4, {"AP2", "1-sim/command/mcpVnavButton_button"}},
+        {5, {"A/THR", "1-sim/command/mcpAtButton_button"}},
+        {6, {"EXPED", "1-sim/command/mcpApLButton_button"}},
+        {7, {"VS/FPA", "1-sim/command/mcpVsFpaButton_button"}},
+        {8, {"APP", "1-sim/command/mcpAppButton_button"}},
         // {"CMD R", ""}
         // {"FLCH", ""}
 
         // Rotary encoders - Speed
-        {9,  {"SPD DEC",  "1-sim/command/mcpSpdRotary_rotary-"}},
-        {10, {"SPD INC",  "1-sim/command/mcpSpdRotary_rotary+"}},
-        {11, {"SPD",      "1-sim/command/mcpSpdRotary_push"}},
+        {9, {"SPD DEC", "1-sim/command/mcpSpdRotary_rotary-"}},
+        {10, {"SPD INC", "1-sim/command/mcpSpdRotary_rotary+"}},
+        {11, {"SPD", "1-sim/command/mcpSpdRotary_push"}},
         //{12, },
 
         // Rotary encoders - Heading
-        {13, {"HDG DEC",  "1-sim/command/mcpHdgRotary_rotary-"}},
-        {14, {"HDG INC",  "1-sim/command/mcpHdgRotary_rotary+"}},
+        {13, {"HDG DEC", "1-sim/command/mcpHdgRotary_rotary-"}},
+        {14, {"HDG INC", "1-sim/command/mcpHdgRotary_rotary+"}},
         {15, {"HDG PUSH", "1-sim/command/mcpHdgCelButton_button"}},
         {16, {"HDG HOLD", "1-sim/command/mcpHdgHoldButton_button"}},
         // Commande orpheline :
         // {"CO", ""}
 
         // Rotary encoders - Altitude
-        {17, {"ALT DEC",  "1-sim/command/mcpAltRotary_rotary-"}},
-        {18, {"ALT INC",  "1-sim/command/mcpAltRotary_rotary+"}},
+        {17, {"ALT DEC", "1-sim/command/mcpAltRotary_rotary-"}},
+        {18, {"ALT INC", "1-sim/command/mcpAltRotary_rotary+"}},
         {19, {"ALT PUSH", "1-sim/command/mcpAltRotary_push"}},
         {20, {"ALT HOLD", "1-sim/command/mcpAltHoldButton_button"}},
 
         // Rotary encoders - Vertical Speed
-        {21, {"VS DEC",   "1-sim/command/mcpVsRotary_rotary-"}},
-        {22, {"VS INC",   "1-sim/command/mcpVsRotary_rotary+"}},
-        {23, {"V/S",      "1-sim/command/mcpVsButton_button"}},
+        {21, {"VS DEC", "1-sim/command/mcpVsRotary_rotary-"}},
+        {22, {"VS INC", "1-sim/command/mcpVsRotary_rotary+"}},
+        {23, {"V/S", "1-sim/command/mcpVsButton_button"}},
         //{24, },
 
         // Altitude par 100/1000
-        {25, {"ALT 100",  "1-sim/command/mcpAltModeSwitch_set_0"}},
+        {25, {"ALT 100", "1-sim/command/mcpAltModeSwitch_set_0"}},
         {26, {"ALT 1000", "1-sim/command/mcpAltModeSwitch_set_1"}},
 
-        {32, {"L_FD",     "1-sim/command/mcpFdLSwitch_trigger"}},
-        {33, {"AP DISC",  "1-sim/command/mcpApDiscSwitch_trigger"}},
+        {32, {"L_FD", "1-sim/command/mcpFdLSwitch_trigger"}},
+        {33, {"AP DISC", "1-sim/command/mcpApDiscSwitch_trigger"}},
 
         // {"R_MINIMUMS", ""}
 
         // ND Options
-        {34, {"L_DATA",   "1-sim/command/cptHsiDataButton_button"}},
-        {35, {"L_WPT",    "1-sim/command/cptHsiWptButton_button"}},
-        {36, {"L_STA",    "1-sim/command/cptHsiStaButton_button"}},
+        {34, {"L_DATA", "1-sim/command/cptHsiDataButton_button"}},
+        {35, {"L_WPT", "1-sim/command/cptHsiWptButton_button"}},
+        {36, {"L_STA", "1-sim/command/cptHsiStaButton_button"}},
         //{37, },
-        {38, {"L_ARPT",   "1-sim/command/cptHsiArptButton_button"}},
+        {38, {"L_ARPT", "1-sim/command/cptHsiArptButton_button"}},
 
         // BARO
         {39, {"L_BARO PUSH", "1-sim/command/cptHsiStdButton_button"}},
         {40, {"R_BARO PULL", "1-sim/command/cptHsiStdButton_button"}},
-        {41, {"L_BARO DEC",  "1-sim/command/cptHsiBaroRotary_rotary-"}},
-        {42, {"L_BARO INC",  "1-sim/command/cptHsiBaroRotary_rotary+"}},
-        {43, {"L_inHg",      "1-sim/command/cptHsiBaroModeRotary_set_0"}},
-        {44, {"L_hPa",       "1-sim/command/cptHsiBaroModeRotary_set_1"}},
+        {41, {"L_BARO DEC", "1-sim/command/cptHsiBaroRotary_rotary-"}},
+        {42, {"L_BARO INC", "1-sim/command/cptHsiBaroRotary_rotary+"}},
+        {43, {"L_inHg", "1-sim/command/cptHsiBaroModeRotary_set_0"}},
+        {44, {"L_hPa", "1-sim/command/cptHsiBaroModeRotary_set_1"}},
 
         // ND Mode selector
-        {45, {"L_MODE APP",  "1-sim/command/cptHsiModeSwitch_set_0"}},
-        {46, {"L_MODE VOR",  "1-sim/command/cptHsiModeSwitch_set_1"}},
+        {45, {"L_MODE APP", "1-sim/command/cptHsiModeSwitch_set_0"}},
+        {46, {"L_MODE VOR", "1-sim/command/cptHsiModeSwitch_set_1"}},
         //{47, },
-        {48, {"L_MODE MAP",  "1-sim/command/cptHsiModeSwitch_set_2"}},
+        {48, {"L_MODE MAP", "1-sim/command/cptHsiModeSwitch_set_2"}},
         {49, {"L_MODE PLAN", "1-sim/command/cptHsiModeSwitch_set_3"}},
 
         // ND Range selector
-        {50, {"L_RANGE 10",  "1-sim/command/cptHsiRangeSwitch_set_0"}},
-        {51, {"L_RANGE 20",  "1-sim/command/cptHsiRangeSwitch_set_1"}},
-        {52, {"L_RANGE 40",  "1-sim/command/cptHsiRangeSwitch_set_2"}},
-        {53, {"L_RANGE 80",  "1-sim/command/cptHsiRangeSwitch_set_3"}},
+        {50, {"L_RANGE 10", "1-sim/command/cptHsiRangeSwitch_set_0"}},
+        {51, {"L_RANGE 20", "1-sim/command/cptHsiRangeSwitch_set_1"}},
+        {52, {"L_RANGE 40", "1-sim/command/cptHsiRangeSwitch_set_2"}},
+        {53, {"L_RANGE 80", "1-sim/command/cptHsiRangeSwitch_set_3"}},
         {54, {"L_RANGE 160", "1-sim/command/cptHsiRangeSwitch_set_4"}},
         {55, {"L_RANGE 320", "1-sim/command/cptHsiRangeSwitch_set_5"}},
         // {"R_RANGE 5", }       // Position inexistante dans le B777
         // {"R_RANGE 640", }     // Position inexistante sur l'EFIS
 
         // VOR/ADF selectors
-        {56, {"L_VORL VOR",  "1-sim/command/cptHsiVorLSwitch_trigger"}},
-        {57, {"L_VORL OFF",  "1-sim/command/cptHsiVorLSwitch_trigger"}},
-        {58, {"L_VORL ADF",  "1-sim/command/cptHsiVorLSwitch_trigger"}},
-        {59, {"L_VORR VOR",  "1-sim/command/cptHsiVorRSwitch_trigger"}},
-        {60, {"L_VORR OFF",  "1-sim/command/cptHsiVorRSwitch_trigger"}},
-        {61, {"L_VORR ADF",  "1-sim/command/cptHsiVorRSwitch_trigger"}},
+        {56, {"L_VORL VOR", "1-sim/command/cptHsiVorLSwitch_trigger"}},
+        {57, {"L_VORL OFF", "1-sim/command/cptHsiVorLSwitch_trigger"}},
+        {58, {"L_VORL ADF", "1-sim/command/cptHsiVorLSwitch_trigger"}},
+        {59, {"L_VORR VOR", "1-sim/command/cptHsiVorRSwitch_trigger"}},
+        {60, {"L_VORR OFF", "1-sim/command/cptHsiVorRSwitch_trigger"}},
+        {61, {"L_VORR ADF", "1-sim/command/cptHsiVorRSwitch_trigger"}},
         // {XX, {"R_POS",  ""}},
         // {XX, {"R_TERR", ""}},
 
         //{62, },
         //{63, },
 
-        {64, {"R_FD",     "1-sim/command/mcpFdRSwitch_trigger"}},
-        {65, {"AP DISC",  "1-sim/command/mcpApDiscSwitch_trigger"}},
+        {64, {"R_FD", "1-sim/command/mcpFdRSwitch_trigger"}},
+        {65, {"AP DISC", "1-sim/command/mcpApDiscSwitch_trigger"}},
         // {"R_MINIMUMS", "777/displays/fo_minimums_toggle"}
 
         // ND Options
 
-        {66, {"R_DATA",   "1-sim/command/foHsiDataButton_button"}},
-        {67, {"R_WPT",    "1-sim/command/foHsiWptButton_button"}},
-        {68, {"R_STA",    "1-sim/command/foHsiStaButton_button"}},
+        {66, {"R_DATA", "1-sim/command/foHsiDataButton_button"}},
+        {67, {"R_WPT", "1-sim/command/foHsiWptButton_button"}},
+        {68, {"R_STA", "1-sim/command/foHsiStaButton_button"}},
         //{69, },
-        {70, {"R_ARPT",   "1-sim/command/foHsiArptButton_button"}},
+        {70, {"R_ARPT", "1-sim/command/foHsiArptButton_button"}},
 
         // BARO
         {71, {"R_BARO PUSH", "1-sim/command/foHsiStdButton_button"}},
         {72, {"R_BARO PULL", "1-sim/command/foHsiStdButton_button"}},
-        {73, {"R_BARO DEC",  "1-sim/command/foHsiBaroRotary_rotary-"}},
-        {74, {"R_BARO INC",  "1-sim/command/foHsiBaroRotary_rotary+"}},
-        {75, {"R_inHg",      "1-sim/command/foHsiBaroModeRotary_set_0"}},
-        {76, {"R_hPa",       "1-sim/command/foHsiBaroModeRotary_set_1"}},
+        {73, {"R_BARO DEC", "1-sim/command/foHsiBaroRotary_rotary-"}},
+        {74, {"R_BARO INC", "1-sim/command/foHsiBaroRotary_rotary+"}},
+        {75, {"R_inHg", "1-sim/command/foHsiBaroModeRotary_set_0"}},
+        {76, {"R_hPa", "1-sim/command/foHsiBaroModeRotary_set_1"}},
 
         // ND Mode selector
 
-        {77, {"R_MODE APP",  "1-sim/command/foHsiModeSwitch_set_0"}},
-        {78, {"R_MODE VOR",  "1-sim/command/foHsiModeSwitch_set_1"}},
+        {77, {"R_MODE APP", "1-sim/command/foHsiModeSwitch_set_0"}},
+        {78, {"R_MODE VOR", "1-sim/command/foHsiModeSwitch_set_1"}},
         //{79, },
-        {80, {"R_MODE MAP",  "1-sim/command/foHsiModeSwitch_set_2"}},
+        {80, {"R_MODE MAP", "1-sim/command/foHsiModeSwitch_set_2"}},
         {81, {"R_MODE PLAN", "1-sim/command/foHsiModeSwitch_set_3"}},
 
         // ND Range selector
 
-        {82, {"R_RANGE 10",  "1-sim/command/foHsiRangeSwitch_set_0"}},
-        {83, {"R_RANGE 20",  "1-sim/command/foHsiRangeSwitch_set_1"}},
-        {84, {"R_RANGE 40",  "1-sim/command/foHsiRangeSwitch_set_2"}},
-        {85, {"R_RANGE 80",  "1-sim/command/foHsiRangeSwitch_set_3"}},
+        {82, {"R_RANGE 10", "1-sim/command/foHsiRangeSwitch_set_0"}},
+        {83, {"R_RANGE 20", "1-sim/command/foHsiRangeSwitch_set_1"}},
+        {84, {"R_RANGE 40", "1-sim/command/foHsiRangeSwitch_set_2"}},
+        {85, {"R_RANGE 80", "1-sim/command/foHsiRangeSwitch_set_3"}},
         {86, {"R_RANGE 160", "1-sim/command/foHsiRangeSwitch_set_4"}},
         {87, {"R_RANGE 320", "1-sim/command/foHsiRangeSwitch_set_5"}},
         // {"R_RANGE 5", }
@@ -403,12 +402,12 @@ const std::unordered_map <uint16_t, FCUEfisButtonDef> &FF777FCUEfisProfile::butt
 
         // VOR/ADF selectors
 
-        {88, {"R_VORL VOR",  "1-sim/command/foHsiVorLSwitch_trigger"}},
-        {89, {"R_VORL OFF",  "1-sim/command/foHsiVorLSwitch_trigger"}},
-        {90, {"R_VORL ADF",  "1-sim/command/foHsiVorLSwitch_trigger"}},
-        {91, {"R_VORR VOR",  "1-sim/command/foHsiVorRSwitch_trigger"}},
-        {92, {"R_VORR OFF",  "1-sim/command/foHsiVorRSwitch_trigger"}},
-        {93, {"R_VORR ADF",  "1-sim/command/foHsiVorRSwitch_trigger"}},
+        {88, {"R_VORL VOR", "1-sim/command/foHsiVorLSwitch_trigger"}},
+        {89, {"R_VORL OFF", "1-sim/command/foHsiVorLSwitch_trigger"}},
+        {90, {"R_VORL ADF", "1-sim/command/foHsiVorLSwitch_trigger"}},
+        {91, {"R_VORR VOR", "1-sim/command/foHsiVorRSwitch_trigger"}},
+        {92, {"R_VORR OFF", "1-sim/command/foHsiVorRSwitch_trigger"}},
+        {93, {"R_VORR ADF", "1-sim/command/foHsiVorRSwitch_trigger"}},
         // {XX, {"R_POS",  ""}},
         // {XX, {"R_TERR", ""}},
 

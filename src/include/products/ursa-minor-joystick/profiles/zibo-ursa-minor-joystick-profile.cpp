@@ -14,7 +14,7 @@ ZiboUrsaMinorJoystickProfile::ZiboUrsaMinorJoystickProfile(ProductUrsaMinorJoyst
         }
 
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
-        uint8_t target = hasPower ? panelBrightness[3] * 255.0f : 0;
+        uint8_t target = hasPower ? panelBrightness[3] * 255 : 0;
         product->setLedBrightness(target);
 
         if (!hasPower) {

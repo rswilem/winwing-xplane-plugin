@@ -9,110 +9,76 @@
 #include <cmath>
 
 TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(product) {
-    brakesHot = false;
-
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
+        bool hasEssentialBusPower = Dataref::getInstance()->get<bool>("AirbusFBW/FCUAvail");
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
         uint8_t backlightBrightness = hasPower ? brightness * 255 : 0;
 
         product->setLedBrightness(AGPLed::BACKLIGHT, backlightBrightness);
-        product->setLedBrightness(AGPLed::LCD_BRIGHTNESS, hasPower ? 255 : 0);
-        product->setLedBrightness(AGPLed::OVERALL_LEDS_BRIGHTNESS, hasPower ? 255 : 0);
+        product->setLedBrightness(AGPLed::LCD_BRIGHTNESS, hasEssentialBusPower ? 255 : 0);
+        product->setLedBrightness(AGPLed::OVERALL_LEDS_BRIGHTNESS, hasEssentialBusPower ? 255 : 0);
     });
-    
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/FCUAvail", [](bool poweredOn) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+    });
+
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this, product](int annunMode) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/NoseGearInd");
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/LeftGearInd");
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/RightGearInd");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/TerrainSelectedND1");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/TerrainSelectedND2");
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AutoBrkLo");
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/BrakeFan");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/OHPLightsATA32_Raw");
 
         product->setLedBrightness(AGPLed::LDG_GEAR_LEVER_RED, isAnnunTest() ? 255 : 0);
         updateDisplays();
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/NoseGearInd", [this, product](int indicator) {
-        product->setLedBrightness(AGPLed::LDG_GEAR_UNLK_CENTER, (indicator & 1) || isAnnunTest() ? 1 : 0);
-        product->setLedBrightness(AGPLed::LDG_GEAR_ARROW_GREEN_CENTER, (indicator & 2) || isAnnunTest() ? 1 : 0);
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/LeftGearInd", [this, product](int indicator) {
-        product->setLedBrightness(AGPLed::LDG_GEAR_UNLK_LEFT, (indicator & 1) || isAnnunTest() ? 1 : 0);
-        product->setLedBrightness(AGPLed::LDG_GEAR_ARROW_GREEN_LEFT, (indicator & 2) || isAnnunTest() ? 1 : 0);
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/RightGearInd", [this, product](int indicator) {
-        product->setLedBrightness(AGPLed::LDG_GEAR_UNLK_RIGHT, (indicator & 1) || isAnnunTest() ? 1 : 0);
-        product->setLedBrightness(AGPLed::LDG_GEAR_ARROW_GREEN_RIGHT, (indicator & 2) || isAnnunTest() ? 1 : 0);
-    });
-
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/TerrainSelectedND1", [this, product](bool enabled) {
         if (product->terrainNDPreference == AGPTerrainNDPreference::CAPTAIN) {
-            product->setLedBrightness(AGPLed::TERRAIN_ON, enabled || isAnnunTest() ? 1 : 0);
+            bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+            product->setLedBrightness(AGPLed::TERRAIN_ON, hasPower && (enabled || isAnnunTest()) ? 1 : 0);
         }
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/TerrainSelectedND2", [this, product](bool enabled) {
         if (product->terrainNDPreference == AGPTerrainNDPreference::FIRST_OFFICER) {
-            product->setLedBrightness(AGPLed::TERRAIN_ON, enabled || isAnnunTest() ? 1 : 0);
+            bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+            product->setLedBrightness(AGPLed::TERRAIN_ON, hasPower && (enabled || isAnnunTest()) ? 1 : 0);
         }
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AutoBrkLo", [this, product](int brakeMinimumIndicator) {
-        int brakeMediumIndicator = Dataref::getInstance()->getCached<int>("AirbusFBW/AutoBrkMed");
-        int brakeMaximumIndicator = Dataref::getInstance()->getCached<int>("AirbusFBW/AutoBrkMax");
-        product->setLedBrightness(AGPLed::AUTOBRK_LO_ON, isAnnunTest() || brakeMinimumIndicator >= 1);
-        product->setLedBrightness(AGPLed::AUTOBRK_MED_ON, isAnnunTest() || brakeMediumIndicator >= 1);
-        product->setLedBrightness(AGPLed::AUTOBRK_HI_ON, isAnnunTest() || brakeMaximumIndicator >= 1);
-        product->setLedBrightness(AGPLed::AUTOBRK_DECEL_LO, isAnnunTest() || brakeMinimumIndicator == 2);
-        product->setLedBrightness(AGPLed::AUTOBRK_DECEL_MED, isAnnunTest() || brakeMediumIndicator == 2);
-        product->setLedBrightness(AGPLed::AUTOBRK_DECEL_HI, isAnnunTest() || brakeMaximumIndicator == 2);
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AutoBrkMed", [](int indicator) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AutoBrkLo");
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AutoBrkMax", [](int indicator) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AutoBrkLo");
-    });
-
-    Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/BrakeFan", [this, product](bool enabled) {
-        product->setLedBrightness(AGPLed::BRAKE_FAN_ON, enabled || isAnnunTest() ? 1 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/OHPLightsATA32_Raw", [this, product](std::vector<float> panelLights) {
-        if (panelLights.size() < 12) {
+        if (panelLights.size() < 18) {
             return;
         }
 
-        bool oldBrakesHot = brakesHot;
-        brakesHot = panelLights[11] > std::numeric_limits<float>::epsilon() || isAnnunTest();
-        if (brakesHot != oldBrakesHot) {
-            product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, brakesHot ? 1 : 0);
-        }
+        product->setLedBrightness(AGPLed::LDG_GEAR_ARROW_GREEN_CENTER, panelLights[0] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::LDG_GEAR_UNLK_CENTER, panelLights[1] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::LDG_GEAR_ARROW_GREEN_LEFT, panelLights[2] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::LDG_GEAR_UNLK_LEFT, panelLights[3] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::LDG_GEAR_ARROW_GREEN_RIGHT, panelLights[4] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::LDG_GEAR_UNLK_RIGHT, panelLights[5] || isAnnunTest() ? 1 : 0);
+
+        product->setLedBrightness(AGPLed::BRAKE_FAN_ON, panelLights[10] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::BRAKE_FAN_HOT, panelLights[11] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::AUTOBRK_LO_ON, panelLights[12] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::AUTOBRK_LO_DECEL, panelLights[13] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::AUTOBRK_MED_ON, panelLights[14] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::AUTOBRK_MED_DECEL, panelLights[15] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::AUTOBRK_MAX_ON, panelLights[16] || isAnnunTest() ? 1 : 0);
+        product->setLedBrightness(AGPLed::AUTOBRK_MAX_DECEL, panelLights[17] || isAnnunTest() ? 1 : 0);
     });
 }
 
 TolissAGPProfile::~TolissAGPProfile() {
     Dataref::getInstance()->unbind("AirbusFBW/PanelBrightnessLevel");
+    Dataref::getInstance()->unbind("AirbusFBW/FCUAvail");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
-    Dataref::getInstance()->unbind("AirbusFBW/NoseGearInd");
-    Dataref::getInstance()->unbind("AirbusFBW/LeftGearInd");
-    Dataref::getInstance()->unbind("AirbusFBW/RightGearInd");
     Dataref::getInstance()->unbind("AirbusFBW/TerrainSelectedND1");
     Dataref::getInstance()->unbind("AirbusFBW/TerrainSelectedND2");
-    Dataref::getInstance()->unbind("AirbusFBW/AutoBrkLo");
-    Dataref::getInstance()->unbind("AirbusFBW/AutoBrkMed");
-    Dataref::getInstance()->unbind("AirbusFBW/AutoBrkMax");
-    Dataref::getInstance()->unbind("AirbusFBW/BrakeFan");
     Dataref::getInstance()->unbind("AirbusFBW/OHPLightsATA32_Raw");
 }
 
@@ -259,5 +225,5 @@ void TolissAGPProfile::updateDisplays() {
 }
 
 bool TolissAGPProfile::isAnnunTest() {
-    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2;
+    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2 && Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
 }

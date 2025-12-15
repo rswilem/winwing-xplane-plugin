@@ -21,7 +21,7 @@ SSG748FMCProfile::SSG748FMCProfile(ProductFMC *product) :
             return;
         }
 
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255.0f : 0;
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[10] * 255 : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });

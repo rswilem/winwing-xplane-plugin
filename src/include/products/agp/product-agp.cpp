@@ -192,40 +192,31 @@ void ProductAGP::setLCDText(const std::string &chrono, const std::string &utcTim
         0x00, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     packet.resize(64, 0x00);
 
-    // Row offsets are the starting bytes for segments A, B, C, D, E, F, G, and DP (dot/colon)
     const int rowOffsets[8] = {25, 29, 33, 37, 41, 45, 49, 53};
 
     std::string allDigits;
     uint16_t colonMask = 0;
 
-    parseSegment(chrono, 4, allDigits, colonMask, 0);       // Chrono: 4 digits (positions 0-3)
-    parseSegment(utcTime, 6, allDigits, colonMask, 4);      // UTC: 6 digits (positions 4-9)
-    parseSegment(elapsedTime, 4, allDigits, colonMask, 10); // Elapsed: 4 digits (positions 10-13)
+    parseSegment(chrono, 4, allDigits, colonMask, 0);
+    parseSegment(utcTime, 6, allDigits, colonMask, 4);
+    parseSegment(elapsedTime, 4, allDigits, colonMask, 10);
 
     for (int digitIndex = 0; digitIndex < 14; ++digitIndex) {
         char c = allDigits[digitIndex];
-        uint8_t charMask = SegmentDisplay::getAGPSegmentMask(c);
+        uint8_t charMask = SegmentDisplay::getSegmentMask(c);
 
-        // Iterate through the 7 segments (rows)
         for (int segIndex = 0; segIndex < 7; ++segIndex) {
-            // Check if this segment (A..G) is active for this character
             if (charMask & (1 << segIndex)) {
-                // Calculate Target Byte
-                // If digitIndex < 8, use the base offset (Low Byte)
-                // If digitIndex >= 8, use base offset + 1 (High Byte)
                 int byteOffset = rowOffsets[segIndex] + (digitIndex / 8);
 
-                // Calculate Bit Position (0-7)
                 int bitPos = digitIndex % 8;
 
-                // Set the bit
                 packet[byteOffset] |= (1 << bitPos);
             }
         }
 
-        // Check if colon/dot should be enabled for this digit position
         if (colonMask & (1 << digitIndex)) {
-            int byteOffset = rowOffsets[7] + (digitIndex / 8); // Row 7 is the DP/colon row at offset 53
+            int byteOffset = rowOffsets[7] + (digitIndex / 8);
             int bitPos = digitIndex % 8;
             packet[byteOffset] |= (1 << bitPos);
         }

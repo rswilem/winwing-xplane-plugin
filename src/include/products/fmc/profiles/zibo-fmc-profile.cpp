@@ -22,8 +22,7 @@ ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) :
             return;
         }
 
-        // brightness[11] is fmc2 screen
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? screenBrightness[10] * 255.0f : 0;
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? screenBrightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 10 : 11] * 255 : 0;
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
 
@@ -32,7 +31,7 @@ ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) :
             return;
         }
 
-        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? panelBrightness[3] * 255.0f : 0;
+        uint8_t target = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? panelBrightness[3] * 255 : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
     });
 

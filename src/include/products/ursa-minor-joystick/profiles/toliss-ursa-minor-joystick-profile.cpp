@@ -10,7 +10,7 @@
 TolissUrsaMinorJoystickProfile::TolissUrsaMinorJoystickProfile(ProductUrsaMinorJoystick *product) : UrsaMinorJoystickAircraftProfile(product) {
     Dataref::getInstance()->monitorExistingDataref<float>("AirbusFBW/PanelBrightnessLevel", [product](float brightness) {
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
-        uint8_t target = hasPower ? brightness * 255.0f : 0;
+        uint8_t target = hasPower ? brightness * 255 : 0;
         product->setLedBrightness(target);
 
         if (!hasPower) {

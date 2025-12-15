@@ -97,7 +97,7 @@ namespace SegmentDisplay {
         }
     }
 
-    uint8_t getAGPSegmentMask(char c) {
+    uint8_t getSegmentMask(char c) {
         char upperC = std::toupper(c);
         switch (upperC) {
                 // Numbers

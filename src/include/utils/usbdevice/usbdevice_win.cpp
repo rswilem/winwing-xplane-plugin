@@ -183,7 +183,16 @@ void USBDevice::writeThreadLoop() {
             DWORD bytesWritten;
             if (!WriteFile(hidDevice, paddedData.data(), (DWORD) paddedData.size(), &bytesWritten, nullptr)) {
                 DWORD error = GetLastError();
-                debug_force("WriteFile failed: %lu\n", error);
+                const char *errorName = "UNKNOWN";
+                if (error == ERROR_DEVICE_NOT_CONNECTED) {
+                    errorName = "DEVICE_NOT_CONNECTED";
+                } else if (error == ERROR_INVALID_HANDLE) {
+                    errorName = "INVALID_HANDLE";
+                } else if (error == ERROR_IO_DEVICE) {
+                    errorName = "IO_DEVICE";
+                }
+                debug_force("WriteFile failed for %s (vendorId: 0x%04X, productId: 0x%04X): %lu (%s)\n",
+                    productName.empty() ? "Unknown" : productName.c_str(), vendorId, productId, error, errorName);
             }
         }
     }

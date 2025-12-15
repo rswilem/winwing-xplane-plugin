@@ -17,7 +17,7 @@ LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) :
             return;
         }
 
-        uint8_t target = Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255.0f : 0;
+        uint8_t target = Dataref::getInstance()->getCached<bool>("sim/cockpit/electrical/avionics_on") ? brightness[6] * 255 : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });

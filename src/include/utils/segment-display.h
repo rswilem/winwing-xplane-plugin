@@ -10,7 +10,7 @@ namespace SegmentDisplay {
     // Get 7-segment representation for a character
     uint8_t getSegmentRepresentation(char c);
 
-    uint8_t getAGPSegmentMask(char c);
+    uint8_t getSegmentMask(char c);
 
     // Basic 7-segment string encoding (right-aligned)
     std::vector<uint8_t> encodeString(int numSegments, const std::string &str);

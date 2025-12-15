@@ -23,7 +23,7 @@ XCraftsFMCProfile::XCraftsFMCProfile(ProductFMC *product) :
     const std::string cdu = product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? "CDU1" : "CDU2";
     Dataref::getInstance()->monitorExistingDataref<float>(("XCrafts/FMS/" + cdu + "_brt").c_str(), [product](float rawBrightness) {
         bool poweredOn = Dataref::getInstance()->getCached<bool>("XCrafts/FMS/power_stat");
-        uint8_t brightness = poweredOn ? rawBrightness * 255.0f : 0;
+        uint8_t brightness = poweredOn ? rawBrightness * 255 : 0;
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, brightness);
         product->setLedBrightness(FMCLed::BACKLIGHT, brightness);
     });

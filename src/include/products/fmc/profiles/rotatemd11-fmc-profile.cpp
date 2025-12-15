@@ -16,7 +16,7 @@ RotateMD11FMCProfile::RotateMD11FMCProfile(ProductFMC *product) :
         // Power is on if either AC bus 1 or emergency AC bus is powered
         bool hasPower = Dataref::getInstance()->get<bool>("Rotate/aircraft/systems/elec_ac_bus_1_pwrd") ||
                         Dataref::getInstance()->get<bool>("Rotate/aircraft/systems/elec_emer_ac_bus_l_pwrd");
-        uint8_t target = hasPower ? brightness * 255.0f : 0;
+        uint8_t target = hasPower ? brightness * 255 : 0;
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, target);
     });
 
@@ -24,7 +24,7 @@ RotateMD11FMCProfile::RotateMD11FMCProfile(ProductFMC *product) :
         // Power is on if either AC bus 1 or emergency AC bus is powered
         bool hasPower = Dataref::getInstance()->get<bool>("Rotate/aircraft/systems/elec_ac_bus_1_pwrd") ||
                         Dataref::getInstance()->get<bool>("Rotate/aircraft/systems/elec_emer_ac_bus_l_pwrd");
-        uint8_t target = hasPower ? brightness * 255.0f : 0;
+        uint8_t target = hasPower ? brightness * 255 : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, target);
     });
 
