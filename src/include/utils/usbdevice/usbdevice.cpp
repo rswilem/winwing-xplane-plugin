@@ -107,7 +107,7 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
             return new ProductUrsaMinorThrottle(hidDevice, vendorId, productId, vendorName, productName);
 
         default:
-            debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X (%s)\n", vendorId, productId, productName.c_str());
+            debug("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X (%s)\n", vendorId, productId, productName.c_str());
             return nullptr;
     }
 }

@@ -7,7 +7,7 @@
 
 class TolissAGPProfile : public AGPAircraftProfile {
     private:
-        bool isAnnunTest();
+        bool isAnnunTest(bool checkPowered = true);
 
     public:
         TolissAGPProfile(ProductAGP *product);
