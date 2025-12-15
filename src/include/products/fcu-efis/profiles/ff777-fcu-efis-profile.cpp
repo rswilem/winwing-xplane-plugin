@@ -42,7 +42,6 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
         Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lights/glareshield");
     });
 
-    // ========== LEDs =================================================================================================
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/mcpLNAV", [this, product](bool engaged) {
         product->setLedBrightness(FCUEfisLed::AP1_GREEN, engaged || isTestMode() ? 1 : 0);
     });
@@ -63,7 +62,6 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
         product->setLedBrightness(FCUEfisLed::APPR_GREEN, armed || isTestMode() ? 1 : 0);
     });
 
-    // ========== LEDs ajoutées
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/lampsGlow/mcpCaptAP", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EXPED_GREEN, armed || isTestMode() ? 1 : 0);
     });
@@ -105,14 +103,13 @@ FF777FCUEfisProfile::FF777FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircr
     Dataref::getInstance()->monitorExistingDataref<int>("1-sim/ckpt/mcpApDiscSwitch/anim", [this, product](int armed) {
         product->setLedBrightness(FCUEfisLed::EFISR_LS_GREEN, (armed ? 0 : 1) || isTestMode() ? 1 : 0);
     });
-    // ========== Fin LEDs ajoutées
+
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/mcpFdLSwitch/anim", [this, product](bool on) {
         product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, on || isTestMode() ? 1 : 0);
     });
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/mcpFdRSwitch/anim", [this, product](bool on) {
         product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, on || isTestMode() ? 1 : 0);
     });
-    // ========== Fin LEDs ============================================================================================
 
     Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/ckpt/lampsGlow/cptCAUTION", [this, product](bool isCaution) {
         bool isWarning = Dataref::getInstance()->getCached<bool>("1-sim/ckpt/lampsGlow/cptWARNING");
@@ -205,8 +202,8 @@ FF777FCUEfisProfile::~FF777FCUEfisProfile() {
 }
 
 bool FF777FCUEfisProfile::IsEligible() {
-    return Dataref::getInstance()->exists("1-sim/ckpt/mcpApLButton/anim") ||
-           Dataref::getInstance()->exists("1-sim/ckpt/cptHsiRangeSwitch/anim") ||
+    // FF777 datarefs that don't exist on the FF767
+    return Dataref::getInstance()->exists("1-sim/ckpt/mcpApLButton/anim") &&
            Dataref::getInstance()->exists("1-sim/output/mcp/ok");
 }
 
