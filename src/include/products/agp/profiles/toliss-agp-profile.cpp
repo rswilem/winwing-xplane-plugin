@@ -215,7 +215,7 @@ void TolissAGPProfile::updateDisplays() {
                       SegmentDisplay::fixStringLength(std::to_string(minutes), 2);
     }
 
-    if (isAnnunTest(false)) {
+    if (isAnnunTest(true)) {
         chrono = "88:88";
         utc = "88:88:88";
         elapsedTime = "88:88";
@@ -224,6 +224,6 @@ void TolissAGPProfile::updateDisplays() {
     product->setLCDText(chrono, utc, elapsedTime);
 }
 
-bool TolissAGPProfile::isAnnunTest(bool checkPowered) {
-    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2 && checkPowered ? Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") : true;
+bool TolissAGPProfile::isAnnunTest(bool allowEssentialBusPowerOnly) {
+    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2 && allowEssentialBusPowerOnly ? Dataref::getInstance()->get<bool>("AirbusFBW/FCUAvail") : Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
 }

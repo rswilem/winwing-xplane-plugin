@@ -155,5 +155,5 @@ void TolissECAM32Profile::buttonPressed(const ECAM32ButtonDef *button, XPLMComma
 }
 
 bool TolissECAM32Profile::isAnnunTest() {
-    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2;
+    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2 && Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
 }

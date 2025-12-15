@@ -135,10 +135,6 @@ const std::unordered_map<uint16_t, UrsaMinorThrottleButtonDef> &TolissUrsaMinorT
 }
 
 void TolissUrsaMinorThrottleProfile::buttonPressed(const UrsaMinorThrottleButtonDef *button, XPLMCommandPhase phase) {
-    if (button && button->dataref.empty() && button->datarefType == UrsaMinorThrottleDatarefType::EXECUTE_CMD) {
-        debug_force("Throttle button '%s' was pressed.\n", button->name.c_str());
-    }
-
     if (!button || button->dataref.empty() || phase == xplm_CommandContinue) {
         return;
     }
@@ -179,8 +175,10 @@ void TolissUrsaMinorThrottleProfile::updateDisplays() {
     std::string newTrimText = std::string(1, trim < -0.01f ? 'L' : 'R') + (v < 10.0f ? " " : "") + buf;
 
     if (isAnnunTest()) {
-        product->setLCDText("R88.8");
-    } else if (newTrimText != trimText) {
+        newTrimText = "R88.8";
+    }
+    
+    if (newTrimText != trimText) {
         trimText = newTrimText;
         product->setLCDText(trimText);
     }

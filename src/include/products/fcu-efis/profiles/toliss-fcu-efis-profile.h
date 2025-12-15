@@ -9,7 +9,7 @@
 
 class TolissFCUEfisProfile : public FCUEfisAircraftProfile {
     private:
-        bool isAnnunTest();
+        bool isAnnunTest(bool allowEssentialBusPowerOnly = false);
 
     public:
         TolissFCUEfisProfile(ProductFCUEfis *product);

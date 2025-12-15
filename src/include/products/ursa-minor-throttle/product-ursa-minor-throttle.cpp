@@ -46,7 +46,7 @@ bool ProductUrsaMinorThrottle::connect() {
 
     setProfileForCurrentAircraft();
 
-    std::string vibrationPreference = AppState::getInstance()->readPreference("ThrottleVibration", "normal");
+    std::string vibrationPreference = AppState::getInstance()->readPreference("ThrottleVibration", "disabled"); // For the throttle, we disable vibration by default.
     loadVibrationSetting(vibrationPreference);
 
     menuItemId = PluginsMenu::getInstance()->addItem(
@@ -302,9 +302,7 @@ void ProductUrsaMinorThrottle::didReceiveButton(uint16_t hardwareButtonIndex, bo
     }
 
     const UrsaMinorThrottleButtonDef *buttonDef = &it->second;
-
     if (buttonDef->dataref.empty()) {
-        debug_force("Unknown throttle button index %d was pressed.\n", hardwareButtonIndex);
         return;
     }
 
