@@ -20,7 +20,7 @@ ZiboPAP3MCPProfile::ZiboPAP3MCPProfile(ProductPAP3MCP *product) :
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
         bool hasMainBus = Dataref::getInstance()->get<bool>("laminar/B738/electric/main_bus");
         float ratio = std::clamp(hasMainBus ? panelBrightness[0] : 0.5f, 0.0f, 1.0f);
-        uint8_t brightness = hasPower ? static_cast<uint8_t>(ratio * 255.0f) : 0;
+        uint8_t brightness = hasPower ? ratio * 255 : 0;
         product->setLedBrightness(PAP3MCPLed::BACKLIGHT, brightness);
 
         uint8_t ledBrightness = hasPower && hasMainBus ? 128 : 0;

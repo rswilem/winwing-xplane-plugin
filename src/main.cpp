@@ -1,5 +1,5 @@
-#ifndef XPLM410
-#error This is made to be compiled against the XPLM410 SDK for XP12
+#ifndef XPLM420
+#error This is made to be compiled against the XPLM420 SDK for XP12
 #endif
 
 #include "appstate.h"

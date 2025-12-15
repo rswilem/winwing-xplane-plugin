@@ -10,8 +10,7 @@
 #include <iomanip>
 #include <XPLMUtilities.h>
 
-RotateMD11PAP3MCPProfile::RotateMD11PAP3MCPProfile(ProductPAP3MCP *product) :
-    PAP3MCPAircraftProfile(product) {
+RotateMD11PAP3MCPProfile::RotateMD11PAP3MCPProfile(ProductPAP3MCP *product) : PAP3MCPAircraftProfile(product) {
     // Monitor power and brightness - MD-11 specific behavior
     Dataref::getInstance()->monitorExistingDataref<bool>("Rotate/aircraft/systems/elec_dc_batt_bus_pwrd", [this, product](bool hasPower) {
         if (hasPower) {
@@ -26,7 +25,7 @@ RotateMD11PAP3MCPProfile::RotateMD11PAP3MCPProfile(ProductPAP3MCP *product) :
             } else {
                 // Use FGS panel brightness for button backlight
                 float panelLights = Dataref::getInstance()->getCached<float>("Rotate/aircraft/systems/light_fgs_panel_brt_ratio");
-                uint8_t brightness = std::clamp(panelLights, 0.0f, 1.0f) * 255.0f;
+                uint8_t brightness = std::clamp(panelLights, 0.0f, 1.0f) * 255;
                 product->setLedBrightness(PAP3MCPLed::BACKLIGHT, brightness);
                 product->setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, brightness);
             }

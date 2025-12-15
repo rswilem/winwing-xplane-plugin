@@ -10,12 +10,11 @@
 #include <iomanip>
 #include <XPLMUtilities.h>
 
-LaminarPAP3MCPProfile::LaminarPAP3MCPProfile(ProductPAP3MCP *product) :
-    PAP3MCPAircraftProfile(product) {
+LaminarPAP3MCPProfile::LaminarPAP3MCPProfile(ProductPAP3MCP *product) : PAP3MCPAircraftProfile(product) {
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio_manual", [product](std::vector<float> brightness) {
         if (brightness.size() >= 16) {
             bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit2/autopilot/autopilot_has_power");
-            uint8_t target = hasPower ? brightness[15] * 255.0f : 0;
+            uint8_t target = hasPower ? brightness[15] * 255 : 0;
             product->setLedBrightness(PAP3MCPLed::BACKLIGHT, target);
             product->setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, target);
             product->forceStateSync();

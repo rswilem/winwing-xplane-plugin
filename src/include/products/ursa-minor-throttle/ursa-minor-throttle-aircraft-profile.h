@@ -7,9 +7,16 @@
 
 class ProductUrsaMinorThrottle;
 
+enum class UrsaMinorThrottleDatarefType : unsigned char {
+    EXECUTE_CMD = 1,
+    SET_VALUE,
+    SPEEDBRAKE_ARM
+};
+
 struct UrsaMinorThrottleButtonDef {
         std::string name;
         std::string dataref;
+        UrsaMinorThrottleDatarefType datarefType = UrsaMinorThrottleDatarefType::EXECUTE_CMD;
         double value = 0.0;
 };
 
@@ -25,6 +32,8 @@ class UrsaMinorThrottleAircraftProfile {
 
         virtual const std::unordered_map<uint16_t, UrsaMinorThrottleButtonDef> &buttonDefs() const = 0;
         virtual void buttonPressed(const UrsaMinorThrottleButtonDef *button, XPLMCommandPhase phase) = 0;
+
+        virtual void updateDisplays() = 0;
 };
 
 #endif

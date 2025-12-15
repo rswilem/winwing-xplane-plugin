@@ -8,7 +8,6 @@
 class TolissAGPProfile : public AGPAircraftProfile {
     private:
         bool isAnnunTest();
-        bool brakesHot;
 
     public:
         TolissAGPProfile(ProductAGP *product);

@@ -18,9 +18,8 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
         if (brightness.size() < 2) {
             return;
         }
-        
-        uint8_t backlightBrightness = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 0 : 1] * 255 : 0;
 
+        uint8_t backlightBrightness = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 0 : 1] * 255 : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, backlightBrightness);
     });
 

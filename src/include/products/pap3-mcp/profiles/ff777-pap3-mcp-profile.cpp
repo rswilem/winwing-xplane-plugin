@@ -17,13 +17,13 @@ FF777PAP3MCPProfile::FF777PAP3MCPProfile(ProductPAP3MCP *product) :
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit2/autopilot/autopilot_has_power");
 
         float ratio = std::clamp(brightness, 0.0f, 1.0f);
-        uint8_t panelBrightness = hasPower ? static_cast<uint8_t>(ratio * 255.0f) : 0;
+        uint8_t panelBrightness = hasPower ? static_cast<uint8_t>(ratio * 255) : 0;
         product->setLedBrightness(PAP3MCPLed::BACKLIGHT, panelBrightness);
 
         uint8_t lcdBrightness = hasPower ? 128 : 0;
         product->setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, lcdBrightness);
 
-        uint8_t ledBrightness = hasPower ? std::max(static_cast<uint8_t>(ratio * 255.0f), static_cast<uint8_t>(153)) : 0; // At least 0.6 brightness
+        uint8_t ledBrightness = hasPower ? std::max(static_cast<uint8_t>(ratio * 255), static_cast<uint8_t>(153)) : 0; // At least 0.6 brightness
         product->setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, ledBrightness);
 
         product->forceStateSync();

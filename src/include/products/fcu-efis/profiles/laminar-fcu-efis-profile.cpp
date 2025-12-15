@@ -19,7 +19,7 @@ LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
         }
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/battery_on");
 
-        uint8_t target = hasPower ? brightness[14] * 255.0f : 0;
+        uint8_t target = hasPower ? brightness[14] * 255 : 0;
         product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
@@ -28,7 +28,7 @@ LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
         product->setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, hasPower ? 255 : 0);
         product->setLedBrightness(FCUEfisLed::EFISL_OVERALL_GREEN, hasPower ? 255 : 0);
 
-        uint8_t screenBrightness = hasPower ? brightness[10] * 255.0f : 0;
+        uint8_t screenBrightness = hasPower ? brightness[10] * 255 : 0;
         product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, screenBrightness);

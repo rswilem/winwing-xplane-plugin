@@ -426,8 +426,8 @@
 		F6A77E712ED3514600061D03 /* agp */ = {
 			isa = PBXGroup;
 			children = (
-				F6A77E6D2ED3514600061D03 /* profiles */,
 				F6A77E6E2ED3514600061D03 /* agp-aircraft-profile.h */,
+				F6A77E6D2ED3514600061D03 /* profiles */,
 				F6A77E6F2ED3514600061D03 /* product-agp.h */,
 				F6A77E702ED3514600061D03 /* product-agp.cpp */,
 			);
@@ -525,10 +525,10 @@
 		F6E73EE02ED9CCA7000A8B6A /* ursa-minor-throttle */ = {
 			isa = PBXGroup;
 			children = (
+				F6E73EDF2ED9CCA7000A8B6A /* ursa-minor-throttle-aircraft-profile.h */,
 				F6E73EDC2ED9CCA7000A8B6A /* profiles */,
 				F6E73EDD2ED9CCA7000A8B6A /* product-ursa-minor-throttle.h */,
 				F6E73EDE2ED9CCA7000A8B6A /* product-ursa-minor-throttle.cpp */,
-				F6E73EDF2ED9CCA7000A8B6A /* ursa-minor-throttle-aircraft-profile.h */,
 			);
 			path = "ursa-minor-throttle";
 			sourceTree = "<group>";
@@ -814,6 +814,7 @@
 					"XPLM303=1",
 					"XPLM400=1",
 					"XPLM410=1",
+					"XPLM420=1",
 					"DEBUG=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -884,6 +885,7 @@
 					"XPLM303=1",
 					"XPLM400=1",
 					"XPLM410=1",
+					"XPLM420=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_VERSION = "";
@@ -1199,6 +1201,7 @@
 					"XPLM303=1",
 					"XPLM400=1",
 					"XPLM410=1",
+					"XPLM420=1",
 					"DEBUG=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;

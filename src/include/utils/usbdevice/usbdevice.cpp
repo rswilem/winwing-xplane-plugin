@@ -102,9 +102,9 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBB80: // AGP
             return new ProductAGP(hidDevice, vendorId, productId, vendorName, productName);
 
-            // case 0xB920: // URSA MINOR 32 Throttle Metal L
-            //     //case 0xB930:
-            //     return new ProductUrsaMinorThrottle(hidDevice, vendorId, productId, vendorName, productName);
+        case 0xB920: // URSA MINOR 32 Throttle Metal L
+        case 0xB930: // URSA MINOR 32 Throttle Metal R
+            return new ProductUrsaMinorThrottle(hidDevice, vendorId, productId, vendorName, productName);
 
         default:
             debug_force("Unknown Winwing device - vendorId: 0x%04X, productId: 0x%04X (%s)\n", vendorId, productId, productName.c_str());

@@ -128,6 +128,10 @@ void ProductUrsaMinorJoystick::update() {
 }
 
 void ProductUrsaMinorJoystick::setVibration(uint8_t vibration) {
+    if (vibrationMultiplier <= std::numeric_limits<float>::epsilon()) {
+        return;
+    }
+
     writeData({0x02, identifierByte, 0xBF, 0x00, 0x00, 0x03, 0x49, 0x00, vibration, 0x00, 0x00, 0x00, 0x00, 0x00});
 }
 
@@ -141,6 +145,8 @@ void ProductUrsaMinorJoystick::setLedBrightness(uint8_t brightness) {
 
 void ProductUrsaMinorJoystick::loadVibrationSetting(const std::string &preference) {
     if (preference == "disabled") {
+        vibrationMultiplier = 1.0f;
+        setVibration(0);
         vibrationMultiplier = 0.0f;
     } else if (preference == "strong") {
         vibrationMultiplier = 1400.0f;
