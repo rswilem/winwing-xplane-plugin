@@ -21,10 +21,12 @@ TolissAGPProfile::TolissAGPProfile(ProductAGP *product) : AGPAircraftProfile(pro
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/FCUAvail", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AnnunMode");
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AnnunMode");
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this, product](int annunMode) {
@@ -225,5 +227,5 @@ void TolissAGPProfile::updateDisplays() {
 }
 
 bool TolissAGPProfile::isAnnunTest(bool allowEssentialBusPowerOnly) {
-    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2 && allowEssentialBusPowerOnly ? Dataref::getInstance()->get<bool>("AirbusFBW/FCUAvail") : Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2 && (allowEssentialBusPowerOnly ? Dataref::getInstance()->get<bool>("AirbusFBW/FCUAvail") : Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on"));
 }

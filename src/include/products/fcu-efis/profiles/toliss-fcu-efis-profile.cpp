@@ -41,7 +41,7 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this](int annunMode) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SupplLightLevelRehostats");
-
+        
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AP1Engage");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AP2Engage");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/ATHRmode");
@@ -67,7 +67,7 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/FCUAvail", [](bool poweredOn) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SupplLightLevelRehostats");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AnnunMode");
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/AP1Engage", [this, product](bool engaged) {
@@ -519,5 +519,5 @@ void TolissFCUEfisProfile::buttonPressed(const FCUEfisButtonDef *button, XPLMCom
 }
 
 bool TolissFCUEfisProfile::isAnnunTest(bool allowEssentialBusPowerOnly) {
-    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2 && allowEssentialBusPowerOnly ? Dataref::getInstance()->get<bool>("AirbusFBW/FCUAvail") : Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+    return Dataref::getInstance()->get<int>("AirbusFBW/AnnunMode") == 2 && (allowEssentialBusPowerOnly ? Dataref::getInstance()->get<bool>("AirbusFBW/FCUAvail") : Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on"));
 }

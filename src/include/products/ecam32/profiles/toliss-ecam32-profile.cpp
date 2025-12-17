@@ -19,10 +19,12 @@ TolissECAM32Profile::TolissECAM32Profile(ProductECAM32 *product) : ECAM32Aircraf
 
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AnnunMode");
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("AirbusFBW/ECPAvail", [this, product](bool enabled) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/PanelBrightnessLevel");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AnnunMode");
     });
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this](int annunMode) {
