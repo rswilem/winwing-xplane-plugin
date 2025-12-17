@@ -9,6 +9,8 @@ class TolissFMCProfile : public FMCAircraftProfile {
     private:
         std::regex datarefRegex;
         bool scratchpadPaddingActive;
+        bool isSelfTest;
+        unsigned char selfTestDisplayHelper;
 
     public:
         TolissFMCProfile(ProductFMC *product);

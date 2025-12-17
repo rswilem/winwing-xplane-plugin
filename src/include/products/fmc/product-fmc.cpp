@@ -283,9 +283,9 @@ void ProductFMC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, ui
     }
 }
 
-void ProductFMC::updatePage() {
+void ProductFMC::updatePage(bool forceUpdate) {
     auto datarefManager = Dataref::getInstance();
-    bool shouldUpdate = false;
+    bool shouldUpdate = forceUpdate;
 
     for (const std::string &dataref : profile->displayDatarefs()) {
         if (!lastUpdateCycle || datarefManager->getCachedLastUpdate(dataref.c_str()) > lastUpdateCycle) {

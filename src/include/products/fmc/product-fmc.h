@@ -19,7 +19,6 @@ class ProductFMC : public USBDevice {
         uint32_t lastButtonStateHi;
         int menuItemId;
 
-        void updatePage();
         void draw(const std::vector<std::vector<char>> *pagePtr = nullptr);
         std::pair<uint8_t, uint8_t> dataFromColFont(char color, bool fontSmall = false);
 
@@ -43,6 +42,7 @@ class ProductFMC : public USBDevice {
         void disconnect() override;
         void unloadProfile();
         void update() override;
+        void updatePage(bool forceUpdate = false);
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
         void didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count = 1) override;
 

@@ -47,6 +47,85 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/MCDUIntegBrightness_Raw");
     });
+    
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/DUSelfTestTimeLeft", [this, product](std::vector<float> selfTestSecondsRemaining) {
+        if (selfTestSecondsRemaining.size() < 8) {
+            return;
+        }
+        
+        float secondsRemaining = selfTestSecondsRemaining[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7];
+        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+        
+        if (!hasPower || secondsRemaining < std::numeric_limits<double>::epsilon()) {
+            if (isSelfTest) {
+                product->showBackground(FMCBackgroundVariant::BLACK);
+                
+                isSelfTest = false;
+                selfTestDisplayHelper = 0;
+                product->updatePage(true);
+            }
+            return;
+        }
+        else if (!isSelfTest) {
+            isSelfTest = true;
+            selfTestDisplayHelper = 0;
+            product->clearDisplay();
+            
+            product->showBackground(FMCBackgroundVariant::BLUE);
+        }
+        
+        if (!isSelfTest) {
+            return;
+        }
+        
+        // Initial blue flash back to black
+        if (secondsRemaining < 15.5f && selfTestDisplayHelper == 0) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLACK);
+        }
+        // Single flash
+        else if (secondsRemaining < 4.0f && selfTestDisplayHelper == 1) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLUE);
+        }
+        else if (secondsRemaining < 3.8f && selfTestDisplayHelper == 2) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLACK);
+        }
+        // Rapid flashes
+        else if (secondsRemaining < 2.7f && selfTestDisplayHelper == 3) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLUE);
+        }
+        else if (secondsRemaining < 2.5f && selfTestDisplayHelper == 4) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLACK);
+        }
+        else if (secondsRemaining < 2.2f && selfTestDisplayHelper == 5) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLUE);
+        }
+        else if (secondsRemaining < 2.0f && selfTestDisplayHelper == 6) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLACK);
+        }
+        else if (secondsRemaining < 1.8f && selfTestDisplayHelper == 5) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLUE);
+        }
+        else if (secondsRemaining < 1.5f && selfTestDisplayHelper == 6) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLACK);
+        }
+        else if (secondsRemaining < 0.5f && selfTestDisplayHelper == 7) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLUE);
+        }
+        else if (secondsRemaining < 0.3f && selfTestDisplayHelper == 8) {
+            selfTestDisplayHelper++;
+            product->showBackground(FMCBackgroundVariant::BLACK);
+        }
+    });
 
     Dataref::getInstance()->bindExistingCommand("AirbusFBW/MCDU1KeyClear", [this, product](XPLMCommandPhase phase) {
         if (phase == xplm_CommandBegin && product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN) {
@@ -389,6 +468,10 @@ void TolissFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t charac
 }
 
 void TolissFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
+    if (isSelfTest) {
+        return;
+    }
+    
     std::string scratchpad = "";
     char scratchpadColor = 'w';
 

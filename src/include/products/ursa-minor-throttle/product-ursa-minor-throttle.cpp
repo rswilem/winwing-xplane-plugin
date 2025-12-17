@@ -129,7 +129,7 @@ void ProductUrsaMinorThrottle::setLedBrightness(UrsaMinorThrottleLed led, uint8_
     writeData({0x02, ProductUrsaMinorThrottle::ThrottleIdentifierByte, 0xB9, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(led), brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
 
     if (led < UrsaMinorThrottleLed::_START) {
-        writeData({0x02, ProductUrsaMinorThrottle::PACIdentifierByte, 0xB9, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(led), brightness, 0x00, 0x00, 0x00, 0x00, 0x00});
+        writeData({0x02, ProductUrsaMinorThrottle::PACIdentifierByte, 0xB9, 0x00, 0x00, 0x03, 0x49, static_cast<uint8_t>(led), std::min<uint8_t>(brightness + 10, 255), 0x00, 0x00, 0x00, 0x00, 0x00});
     }
 }
 

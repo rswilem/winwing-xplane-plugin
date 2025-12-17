@@ -172,7 +172,7 @@ void TolissUrsaMinorThrottleProfile::updateDisplays() {
     float v = std::round(std::fabs(trim) * 10.0f) / 10.0f;
     char buf[8];
     std::snprintf(buf, sizeof(buf), "%.1f", v);
-    std::string newTrimText = std::string(1, trim < -0.01f ? 'L' : 'R') + (v < 10.0f ? " " : "") + buf;
+    std::string newTrimText = std::string(1, trim < -0.0f ? 'L' : 'R') + (v < 10.0f ? " " : "") + buf;
 
     if (isAnnunTest()) {
         newTrimText = "R88.8";
