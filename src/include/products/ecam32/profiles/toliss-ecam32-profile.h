@@ -6,9 +6,6 @@
 #include <string>
 
 class TolissECAM32Profile : public ECAM32AircraftProfile {
-    private:
-        bool isAnnunTest();
-
     public:
         TolissECAM32Profile(ProductECAM32 *product);
         ~TolissECAM32Profile();
