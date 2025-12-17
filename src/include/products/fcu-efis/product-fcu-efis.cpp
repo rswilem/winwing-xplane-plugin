@@ -367,16 +367,24 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
     // Add barometric data
     auto baroData = SegmentDisplay::encodeStringEfis(4, SegmentDisplay::fixStringLength(data->isStd ? "STD " : data->baro, 4));
 
-    if (!data->displayEnabled || data->displayTest) {
-        std::fill(baroData.begin(), baroData.end(), data->displayTest ? 0xFF : 0);
-        std::fill(flagBytes.begin(), flagBytes.end(), data->displayTest ? 0xFF : 0);
+    if (data->displayTest) {
+        payload.push_back(SegmentDisplay::getSegmentMask('8'));
+        payload.push_back(SegmentDisplay::getSegmentMask('8') | 0x80);
+        payload.push_back(SegmentDisplay::getSegmentMask('8'));
+        payload.push_back(SegmentDisplay::getSegmentMask('8'));
+        payload.push_back(0xFF);
+    } else {
+        payload.push_back(baroData[3]);
+        payload.push_back(baroData[2] | flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)]);
+        payload.push_back(baroData[1]);
+        payload.push_back(baroData[0]);
+        payload.push_back(flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B0 : DisplayByteIndex::EFISL_B0)]);
     }
 
-    payload.push_back(baroData[3]);
-    payload.push_back(baroData[2] | flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B2 : DisplayByteIndex::EFISL_B2)]);
-    payload.push_back(baroData[1]);
-    payload.push_back(baroData[0]);
-    payload.push_back(flagBytes[static_cast<int>(isRightSide ? DisplayByteIndex::EFISR_B0 : DisplayByteIndex::EFISL_B0)]);
+    if (!data->displayEnabled) {
+        std::fill(baroData.begin(), baroData.end(), 0);
+        std::fill(flagBytes.begin(), flagBytes.end(), 0);
+    }
 
     // Add second command
     payload.insert(payload.end(), {0x0E, 0xBF, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x4C, 0x0C, 0x1D});
