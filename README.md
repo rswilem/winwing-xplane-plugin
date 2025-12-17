@@ -37,12 +37,13 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 | Device                      | Toliss A3xx | Laminar A330 | Laminar 737 | AeroGenesis A330 | Zibo 737 | IXEG 737 | FF 767/777 | SSG 747 |
 | --------------------------- | ----------- | ------------ | ----------- | ---------------- | -------- | -------- | ---------- | ------- |
 | **URSA MINOR Joystick L+R** | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟢      |
+| **URSA MINOR Throttle**     | 🟢          | 🔴           | 🔴          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 | **MCDU-32**                 | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
 | **PFP 3N**                  | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
 | **PFP 4**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
 | **PFP 7**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢       | 🟢       | 🟢         | 🟠      |
 | **PAP3 / PAP3 Mag**         | 🔴          | 🔴           | 🔴          | 🔴               | 🟢       | 🔴       | 🔴         | 🔴      |
-| **FCU and EFIS L+R**        | 🟢          | 🟢           | 🟠          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
+| **FCU and EFIS L+R**        | 🟢          | 🟢           | 🟠          | 🔴               | 🔴       | 🔴       | 🟢         | 🔴      |
 | **ECAM32**                  | 🟢          | 🔴           | 🔴          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 | **AGP**                     | 🟢          | 🔴           | 🔴          | 🔴               | 🔴       | 🔴       | 🔴         | 🔴      |
 
@@ -71,7 +72,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@verres1](https://github.com/verres1) for enriching the FF777 profile.
 - [@teropa] (https://forums.x-plane.org/profile/1028374-teropa/) for data capture and testing of multiple devices.
 - [@SoarByWire] (https://forums.x-plane.org/profile/411164-soarbywire/) for the testing of multiple devices.
-- [@MortyMars] (https://github.com/MortyMars) for the FCU/EFIS FF777 profile.
+- [@MortyMars] (https://github.com/MortyMars) for the FCU/EFIS FF777 and FF767 profile.
 
 ### Linux udev rules
 
@@ -103,6 +104,8 @@ KERNEL=="hidraw*", ATTRS{idProduct}=="ba01", ATTRS{idVendor}=="4098", MODE="0666
 KERNEL=="hidraw*", ATTRS{idProduct}=="bf0f", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pap3"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb70", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-ecam32"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb80", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-agp"
+KERNEL=="hidraw*", ATTRS{idProduct}=="b920", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-throttle-l"
+KERNEL=="hidraw*", ATTRS{idProduct}=="b930", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-throttle-r"
 ```
 
 ### Demonstration
