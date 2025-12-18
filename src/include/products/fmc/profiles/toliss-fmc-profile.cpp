@@ -89,65 +89,28 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
             return;
         }
 
-        // Initial blue flash back to black
-        if (secondsRemaining < 16.0f && selfTestDisplayHelper == 0) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 15.5f && selfTestDisplayHelper == 1) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
-            selfTestDisplayHelper++;
-        }
-        // Brightness flash
-        else if (secondsRemaining < 14.0f && selfTestDisplayHelper == 2) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 128);
-            product->showBackground(FMCBackgroundVariant::BLACK);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 13.0f && selfTestDisplayHelper == 3) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 12.7f && selfTestDisplayHelper == 4) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 12.2f && selfTestDisplayHelper == 5) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 11.5f && selfTestDisplayHelper == 6) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
-            product->showBackground(FMCBackgroundVariant::BLACK);
-            selfTestDisplayHelper++;
-        }
-        // Single flash
-        else if (secondsRemaining < 4.0f && selfTestDisplayHelper == 7) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 170);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 3.8f && selfTestDisplayHelper == 8) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 120);
-            selfTestDisplayHelper++;
-        }
-        // Rapid flashes
-        else if (secondsRemaining < 2.7f && selfTestDisplayHelper == 9) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 190);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 2.5f && selfTestDisplayHelper == 10) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 2.2f && selfTestDisplayHelper == 11) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 150);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 2.0f && selfTestDisplayHelper == 12) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 40);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 1.8f && selfTestDisplayHelper == 13) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 1.5f && selfTestDisplayHelper == 14) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 0.5f && selfTestDisplayHelper == 15) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 10);
-            selfTestDisplayHelper++;
-        } else if (secondsRemaining < 0.3f && selfTestDisplayHelper == 16) {
-            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
+        constexpr float flashSteps[][2] = {
+            {16.0f, 255},
+            {15.5f, 0},
+            {14.0f, 128},
+            {13.0f, 0},
+            {12.7f, 255},
+            {12.2f, 0},
+            {11.5f, 255},
+            {4.0f, 150},
+            {3.8f, 210},
+            {2.7f, 190},
+            {2.5f, 0},
+            {2.2f, 130},
+            {2.0f, 40},
+            {1.8f, 255},
+            {1.5f, 0},
+            {0.5f, 10},
+            {0.3f, 255},
+        };
+
+        if (secondsRemaining <= flashSteps[selfTestDisplayHelper][0]) {
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, flashSteps[selfTestDisplayHelper][1]);
             selfTestDisplayHelper++;
         }
     });
