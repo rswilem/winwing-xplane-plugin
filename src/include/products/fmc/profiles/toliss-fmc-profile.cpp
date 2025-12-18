@@ -10,6 +10,7 @@
 TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
     FMCAircraftProfile(product) {
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
+    isSelfTest = false;
 
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::FontAirbus, product->identifierByte));
@@ -19,7 +20,8 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
             return;
         }
 
-        uint8_t backlightBrightness = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 0 : 1] * 255 : 0;
+        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
+        uint8_t backlightBrightness = hasPower ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 0 : 1] * 255 : 0;
         product->setLedBrightness(FMCLed::BACKLIGHT, backlightBrightness);
     });
 
@@ -28,8 +30,16 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
             return;
         }
 
-        uint8_t screenBrightness = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on") ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7] * 255 : 0;
+        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
 
+        std::vector<float> selfTestSecondsRemaining = Dataref::getInstance()->get<std::vector<float>>("AirbusFBW/DUSelfTestTimeLeft");
+        float secondsRemaining = selfTestSecondsRemaining[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7];
+        if (hasPower && secondsRemaining > 1.0f) {
+            // Don't control brightness when a self test is in progress
+            return;
+        }
+
+        uint8_t screenBrightness = hasPower ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7] * 255 : 0;
         std::vector<int> elecConnectors = Dataref::getInstance()->get<std::vector<int>>("AirbusFBW/ElecConnectors");
         if (elecConnectors.size() > 19 && elecConnectors[19] == 0) {
             screenBrightness = 0;
@@ -47,83 +57,98 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/MCDUIntegBrightness_Raw");
     });
-    
+
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/DUSelfTestTimeLeft", [this, product](std::vector<float> selfTestSecondsRemaining) {
         if (selfTestSecondsRemaining.size() < 8) {
             return;
         }
-        
+
         float secondsRemaining = selfTestSecondsRemaining[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7];
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
-        
+
         if (!hasPower || secondsRemaining < std::numeric_limits<double>::epsilon()) {
             if (isSelfTest) {
                 product->showBackground(FMCBackgroundVariant::BLACK);
-                
+
                 isSelfTest = false;
                 selfTestDisplayHelper = 0;
                 product->updatePage(true);
+                Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
             }
             return;
-        }
-        else if (!isSelfTest) {
-            isSelfTest = true;
-            selfTestDisplayHelper = 0;
+        } else if (!isSelfTest) {
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
             product->clearDisplay();
-            
-            product->showBackground(FMCBackgroundVariant::BLUE);
+            selfTestDisplayHelper = 0;
+            isSelfTest = true;
+            return;
         }
-        
+
         if (!isSelfTest) {
             return;
         }
-        
+
         // Initial blue flash back to black
-        if (secondsRemaining < 15.5f && selfTestDisplayHelper == 0) {
+        if (secondsRemaining < 16.0f && selfTestDisplayHelper == 0) {
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
+            product->showBackground(FMCBackgroundVariant::BLUE);
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 15.5f && selfTestDisplayHelper == 1) {
             product->showBackground(FMCBackgroundVariant::BLACK);
+            selfTestDisplayHelper++;
+        }
+        // Brightness flash
+        else if (secondsRemaining < 14.0f && selfTestDisplayHelper == 2) {
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 128);
+            product->showBackground(FMCBackgroundVariant::BLACK);
+            selfTestDisplayHelper++;
+        } else if (secondsRemaining < 13.0f && selfTestDisplayHelper == 3) {
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
+            selfTestDisplayHelper++;
+        } else if (secondsRemaining < 12.7f && selfTestDisplayHelper == 4) {
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
+            selfTestDisplayHelper++;
+        } else if (secondsRemaining < 12.2f && selfTestDisplayHelper == 5) {
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
+            selfTestDisplayHelper++;
+        } else if (secondsRemaining < 11.5f && selfTestDisplayHelper == 6) {
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
+            product->showBackground(FMCBackgroundVariant::BLACK);
+            selfTestDisplayHelper++;
         }
         // Single flash
-        else if (secondsRemaining < 4.0f && selfTestDisplayHelper == 1) {
-            selfTestDisplayHelper++;
+        else if (secondsRemaining < 4.0f && selfTestDisplayHelper == 7) {
             product->showBackground(FMCBackgroundVariant::BLUE);
-        }
-        else if (secondsRemaining < 3.8f && selfTestDisplayHelper == 2) {
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 3.8f && selfTestDisplayHelper == 8) {
             product->showBackground(FMCBackgroundVariant::BLACK);
+            selfTestDisplayHelper++;
         }
         // Rapid flashes
-        else if (secondsRemaining < 2.7f && selfTestDisplayHelper == 3) {
-            selfTestDisplayHelper++;
+        else if (secondsRemaining < 2.7f && selfTestDisplayHelper == 9) {
             product->showBackground(FMCBackgroundVariant::BLUE);
-        }
-        else if (secondsRemaining < 2.5f && selfTestDisplayHelper == 4) {
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 2.5f && selfTestDisplayHelper == 10) {
             product->showBackground(FMCBackgroundVariant::BLACK);
-        }
-        else if (secondsRemaining < 2.2f && selfTestDisplayHelper == 5) {
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 2.2f && selfTestDisplayHelper == 11) {
             product->showBackground(FMCBackgroundVariant::BLUE);
-        }
-        else if (secondsRemaining < 2.0f && selfTestDisplayHelper == 6) {
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 2.0f && selfTestDisplayHelper == 12) {
             product->showBackground(FMCBackgroundVariant::BLACK);
-        }
-        else if (secondsRemaining < 1.8f && selfTestDisplayHelper == 5) {
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 1.8f && selfTestDisplayHelper == 13) {
             product->showBackground(FMCBackgroundVariant::BLUE);
-        }
-        else if (secondsRemaining < 1.5f && selfTestDisplayHelper == 6) {
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 1.5f && selfTestDisplayHelper == 14) {
             product->showBackground(FMCBackgroundVariant::BLACK);
-        }
-        else if (secondsRemaining < 0.5f && selfTestDisplayHelper == 7) {
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 0.5f && selfTestDisplayHelper == 15) {
             product->showBackground(FMCBackgroundVariant::BLUE);
-        }
-        else if (secondsRemaining < 0.3f && selfTestDisplayHelper == 8) {
             selfTestDisplayHelper++;
+        } else if (secondsRemaining < 0.3f && selfTestDisplayHelper == 16) {
             product->showBackground(FMCBackgroundVariant::BLACK);
+            selfTestDisplayHelper++;
         }
     });
 
@@ -145,6 +170,7 @@ TolissFMCProfile::~TolissFMCProfile() {
     Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
     Dataref::getInstance()->unbind("AirbusFBW/ElecConnectors");
+    Dataref::getInstance()->unbind("AirbusFBW/DUSelfTestTimeLeft");
     Dataref::getInstance()->unbind("AirbusFBW/MCDU1KeyClear");
     Dataref::getInstance()->unbind("AirbusFBW/MCDU2KeyClear");
 }
@@ -469,9 +495,10 @@ void TolissFMCProfile::mapCharacter(std::vector<uint8_t> *buffer, uint8_t charac
 
 void TolissFMCProfile::updatePage(std::vector<std::vector<char>> &page) {
     if (isSelfTest) {
+        product->clearDisplay();
         return;
     }
-    
+
     std::string scratchpad = "";
     char scratchpadColor = 'w';
 

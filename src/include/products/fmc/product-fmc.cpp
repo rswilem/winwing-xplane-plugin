@@ -369,6 +369,8 @@ void ProductFMC::writeLineToPage(std::vector<std::vector<char>> &page, int line,
 }
 
 void ProductFMC::clearDisplay() {
+    page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageBytesPerLine, ' '));
+    
     std::vector<uint8_t> blankLine = {};
     blankLine.push_back(0xf2);
     for (int i = 0; i < ProductFMC::PageCharsPerLine; ++i) {
