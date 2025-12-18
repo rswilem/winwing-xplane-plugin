@@ -69,6 +69,7 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
         if (!hasPower || secondsRemaining < std::numeric_limits<double>::epsilon()) {
             if (isSelfTest) {
                 product->showBackground(FMCBackgroundVariant::BLACK);
+                product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
 
                 isSelfTest = false;
                 selfTestDisplayHelper = 0;
@@ -91,10 +92,9 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
         // Initial blue flash back to black
         if (secondsRemaining < 16.0f && selfTestDisplayHelper == 0) {
             product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
-            product->showBackground(FMCBackgroundVariant::BLUE);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 15.5f && selfTestDisplayHelper == 1) {
-            product->showBackground(FMCBackgroundVariant::BLACK);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
             selfTestDisplayHelper++;
         }
         // Brightness flash
@@ -118,36 +118,36 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
         }
         // Single flash
         else if (secondsRemaining < 4.0f && selfTestDisplayHelper == 7) {
-            product->showBackground(FMCBackgroundVariant::BLUE);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 170);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 3.8f && selfTestDisplayHelper == 8) {
-            product->showBackground(FMCBackgroundVariant::BLACK);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 120);
             selfTestDisplayHelper++;
         }
         // Rapid flashes
         else if (secondsRemaining < 2.7f && selfTestDisplayHelper == 9) {
-            product->showBackground(FMCBackgroundVariant::BLUE);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 190);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 2.5f && selfTestDisplayHelper == 10) {
-            product->showBackground(FMCBackgroundVariant::BLACK);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 2.2f && selfTestDisplayHelper == 11) {
-            product->showBackground(FMCBackgroundVariant::BLUE);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 150);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 2.0f && selfTestDisplayHelper == 12) {
-            product->showBackground(FMCBackgroundVariant::BLACK);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 40);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 1.8f && selfTestDisplayHelper == 13) {
-            product->showBackground(FMCBackgroundVariant::BLUE);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 1.5f && selfTestDisplayHelper == 14) {
-            product->showBackground(FMCBackgroundVariant::BLACK);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 0.5f && selfTestDisplayHelper == 15) {
-            product->showBackground(FMCBackgroundVariant::BLUE);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 10);
             selfTestDisplayHelper++;
         } else if (secondsRemaining < 0.3f && selfTestDisplayHelper == 16) {
-            product->showBackground(FMCBackgroundVariant::BLACK);
+            product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 255);
             selfTestDisplayHelper++;
         }
     });
