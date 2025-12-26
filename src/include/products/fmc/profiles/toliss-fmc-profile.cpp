@@ -41,7 +41,8 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
 
         uint8_t screenBrightness = hasPower ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7] * 255 : 0;
         std::vector<int> elecConnectors = Dataref::getInstance()->get<std::vector<int>>("AirbusFBW/ElecConnectors");
-        if (elecConnectors.size() > 19 && elecConnectors[19] == 0) {
+        
+        if (elecConnectors.size() > 11 && elecConnectors[11] != 1) {
             screenBrightness = 0;
         }
 
