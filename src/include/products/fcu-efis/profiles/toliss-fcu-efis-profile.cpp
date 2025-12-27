@@ -12,10 +12,6 @@
 #include <XPLMUtilities.h>
 
 TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
-    
-    // Log.txt debug info verifying the loading of TOLISS profile
-    XPLMDebugString("===== TOLISS PROFILE CONSTRUCTOR CALLED ====\n");
-    
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/SupplLightLevelRehostats", [product](std::vector<float> brightness) {
         if (brightness.size() < 2) {
             return;
@@ -45,7 +41,7 @@ TolissFCUEfisProfile::TolissFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAir
 
     Dataref::getInstance()->monitorExistingDataref<int>("AirbusFBW/AnnunMode", [this](int annunMode) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/SupplLightLevelRehostats");
-        
+
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AP1Engage");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/AP2Engage");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/ATHRmode");

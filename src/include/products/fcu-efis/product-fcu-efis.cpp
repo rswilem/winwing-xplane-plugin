@@ -36,7 +36,6 @@ ProductFCUEfis::~ProductFCUEfis() {
 
 void ProductFCUEfis::setProfileForCurrentAircraft() {
     if (FF350FCUEfisProfile::IsEligible()) {
-        // Add profile FF350 - To be placed before the ‘ToLiss’ test
         profile = new FF350FCUEfisProfile(this);
         profileReady = true;
     } else if (TolissFCUEfisProfile::IsEligible()) {
@@ -49,11 +48,9 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
         profile = new LaminarFCUEfisProfile(this);
         profileReady = true;
     } else if (FF777FCUEfisProfile::IsEligible()) {
-        // Add profile FF777
         profile = new FF777FCUEfisProfile(this);
         profileReady = true;
     } else if (FF767FCUEfisProfile::IsEligible()) {
-        // Add profile FF767
         profile = new FF767FCUEfisProfile(this);
         profileReady = true;
     }
