@@ -10,8 +10,7 @@
 #include <iomanip>
 #include <XPLMUtilities.h>
 
-ZiboPAP3MCPProfile::ZiboPAP3MCPProfile(ProductPAP3MCP *product) :
-    PAP3MCPAircraftProfile(product) {
+ZiboPAP3MCPProfile::ZiboPAP3MCPProfile(ProductPAP3MCP *product) : PAP3MCPAircraftProfile(product) {
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/panel_brightness", [this, product](std::vector<float> panelBrightness) {
         if (panelBrightness.size() < 1) {
             return;

@@ -147,7 +147,7 @@ void FF777PAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
     auto dataref = Dataref::getInstance();
     data.showLabels = true;              // FF777 MCP has labels on the display
     data.showDashesWhenInactive = false; // FF777 doesn't show dashes when inactive
-    data.showLabelsWhenInactive = false; // FF777 labels only show when displays are active
+    data.showLabelsWhenInactive = true;  // FF777 shows labels even when displays are inactive
     data.showCourse = false;             // 777 doesn't have course on MCP (it's on EFIS panel)
     bool hasPower = dataref->getCached<bool>("sim/cockpit2/autopilot/autopilot_has_power");
     data.displayEnabled = hasPower;
@@ -278,16 +278,39 @@ void FF777PAP3MCPProfile::handleSwitchChanged(uint8_t byteOffset, uint8_t bitMas
     }
 
     // AP DISCONNECT: byte 0x04, bit 0x80 = UP line (inverted), byte 0x05, bit 0x01 = DOWN line
+    // Only handle the UP line transition to avoid double-toggling when switch moves through both lines
     if (byteOffset == 0x04 && bitMask == 0x80) {
         // UP line: pressed = engaged, released = disengaged
-        hwApDiscEngaged = !state;
-        maybeToggle("1-sim/ckpt/mcpApDiscSwitch/anim", hwApDiscEngaged, "1-sim/command/mcpApDiscSwitch_trigger");
+        bool newEngagedState = !state;
+        if (newEngagedState != hwApDiscEngaged) {
+            hwApDiscEngaged = newEngagedState;
+            maybeToggle("1-sim/ckpt/mcpApDiscSwitch/anim", hwApDiscEngaged, "1-sim/command/mcpApDiscSwitch_trigger");
+        }
         return;
     }
-    if (byteOffset == 0x05 && bitMask == 0x01) {
-        // DOWN line: pressed = disengaged, released = engaged
-        hwApDiscEngaged = state;
-        maybeToggle("1-sim/ckpt/mcpApDiscSwitch/anim", hwApDiscEngaged, "1-sim/command/mcpApDiscSwitch_trigger");
-        return;
+}
+
+// Bank angle switch handler (5-position rotary switch)
+// Maps hardware positions to FF777 bank angle indices:
+// FF777 indices: 0=AUTO, 1=5°, 2=10°, 3=15°, 4=20°, 5=25°
+// Hardware positions (5 positions): AUTO, 5°, 10°, 20°, 25° (skip 15°)
+// Hardware bits: 0x02=pos1, 0x04=pos2, 0x08=pos3, 0x10=pos4, 0x20=pos5
+void FF777PAP3MCPProfile::handleBankAngleSwitch(uint8_t switchByte) {
+    int target = 0; // Default to AUTO
+
+    if (switchByte & 0x02) {
+        target = 0; // AUTO
+    } else if (switchByte & 0x04) {
+        target = 1; // 5°
+    } else if (switchByte & 0x08) {
+        target = 2; // 10°
+    } else if (switchByte & 0x10) {
+        target = 4; // 20° (skip 15°)
+    } else if (switchByte & 0x20) {
+        target = 5; // 25°
     }
+
+    // Build the command name and execute
+    std::string cmd = "1-sim/command/mcpBankAngleSwitch_set_" + std::to_string(target);
+    Dataref::getInstance()->executeCommand(cmd.c_str());
 }

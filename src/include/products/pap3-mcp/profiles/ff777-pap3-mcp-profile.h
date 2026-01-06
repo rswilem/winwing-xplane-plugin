@@ -33,6 +33,7 @@ class FF777PAP3MCPProfile : public PAP3MCPAircraftProfile {
         void encoderRotated(const PAP3MCPEncoderDef *encoder, int8_t delta) override;
 
         void handleSwitchChanged(uint8_t byteOffset, uint8_t bitMask, bool state) override;
+        void handleBankAngleSwitch(uint8_t switchByte) override;
 };
 
 #endif

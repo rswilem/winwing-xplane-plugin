@@ -300,7 +300,8 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
         // HDG: 3 digits - only draw if heading is visible
         if (displayData.headingVisible) {
             int h, t, u;
-            int hdg = std::clamp(heading, 0, 359);
+            // Normalize heading: 360 should display as 360, then wrap to 0
+            int hdg = (heading >= 360) ? 360 : std::clamp(heading, 0, 359);
             digits3(hdg, h, t, u);
             drawDigit(G1, payload, HDG_HUNDREDS, h);
             drawDigit(G1, payload, HDG_TENS, t);
@@ -359,10 +360,19 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
             // No dot for VSPD display
             setFlag(payload, OFF_1B, DOT_VSPD, false);
 
-            if (absV >= 1) {
-                setFlag(payload, OFF_38, LBL_VS, displayData.showLabels && true);
+            // Show V/S label whenever the display is visible and labels are enabled
+            setFlag(payload, OFF_38, LBL_VS, displayData.showLabels);
+            setFlag(payload, OFF_34, LBL_FPA, false);
+        } else if (displayData.showDashesWhenInactive) {
+            // V/S display is inactive - only draw dashes if configured
+            drawVviDashes(payload);
+            // Show VS label even when inactive if configured
+            if (displayData.showLabelsWhenInactive) {
+                setFlag(payload, OFF_38, LBL_VS, true);
             }
-            setFlag(payload, OFF_34, LBL_FPA, displayData.showLabels && false);
+        } else if (displayData.showLabelsWhenInactive) {
+            // Just show the label without dashes
+            setFlag(payload, OFF_38, LBL_VS, true);
         }
 
         // FO CRS: 3 digits
@@ -393,13 +403,7 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
                     setFlag(payload, OFF_32, LBL_HDG_R, true);
                 }
             }
-            if (!displayData.verticalSpeedVisible) {
-                drawVviDashes(payload);
-                // Show VS label even when inactive if configured
-                if (displayData.showLabelsWhenInactive) {
-                    setFlag(payload, OFF_38, LBL_VS, true);
-                }
-            }
+            // Note: V/S dashes are now handled in the main VVI section above
         }
     }
 
