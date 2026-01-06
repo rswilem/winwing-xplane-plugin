@@ -52,9 +52,9 @@ enum class FCUEfisDatarefType : unsigned char {
     EXECUTE_CMD_ONCE,
     BAROMETER_PILOT,
     BAROMETER_FO,
-    PUSH_BUTTON,    // for ff767-fcu-efis-profile
-    SET_DUAL_VALUE  // for ff767-fcu-efis-profile
-    
+    PUSH_BUTTON,   // for ff767-fcu-efis-profile
+    SET_DUAL_VALUE // for ff767-fcu-efis-profile
+
 };
 
 struct FCUEfisButtonDef {
@@ -62,7 +62,7 @@ struct FCUEfisButtonDef {
         std::string dataref;
         FCUEfisDatarefType datarefType = FCUEfisDatarefType::EXECUTE_CMD_ONCE;
         double value = 0.0;
-        std::string secondaryDataref = "";  // for ff767-fcu-efis-profile (optional)
+        std::string secondaryDataref = ""; // for ff767-fcu-efis-profile (optional)
 };
 
 enum class FCUEfisLed : int {
@@ -70,6 +70,8 @@ enum class FCUEfisLed : int {
     BACKLIGHT = 0,
     SCREEN_BACKLIGHT = 1,
     OVERALL_GREEN = 2,
+
+    _FCU_START = 3,
     LOC_GREEN = 3,
     AP1_GREEN = 5,
     AP2_GREEN = 7,
@@ -77,11 +79,14 @@ enum class FCUEfisLed : int {
     EXPED_GREEN = 11,
     APPR_GREEN = 13,
     EXPED_BACKLIGHT = 30,
+    _FCU_END = 30,
 
     // EFIS Right LEDs (100-199)
     EFISR_BACKLIGHT = 100,
     EFISR_SCREEN_BACKLIGHT = 101,
     EFISR_OVERALL_GREEN = 102,
+
+    _EFISR_START = 103,
     EFISR_FD_GREEN = 103,
     EFISR_LS_GREEN = 104,
     EFISR_CSTR_GREEN = 105,
@@ -89,18 +94,22 @@ enum class FCUEfisLed : int {
     EFISR_VORD_GREEN = 107,
     EFISR_NDB_GREEN = 108,
     EFISR_ARPT_GREEN = 109,
+    _EFISR_END = 109,
 
     // EFIS Left LEDs (200-299)
     EFISL_BACKLIGHT = 200,
     EFISL_SCREEN_BACKLIGHT = 201,
     EFISL_OVERALL_GREEN = 202,
+
+    _EFISL_START = 203,
     EFISL_FD_GREEN = 203,
     EFISL_LS_GREEN = 204,
     EFISL_CSTR_GREEN = 205,
     EFISL_WPT_GREEN = 206,
     EFISL_VORD_GREEN = 207,
     EFISL_NDB_GREEN = 208,
-    EFISL_ARPT_GREEN = 209
+    EFISL_ARPT_GREEN = 209,
+    _EFISL_END = 209
 };
 
 struct EfisDisplayValue {

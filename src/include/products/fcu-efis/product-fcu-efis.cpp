@@ -3,6 +3,7 @@
 #include "appstate.h"
 #include "config.h"
 #include "dataref.h"
+#include "plugins-menu.h"
 #include "profiles/ff350-fcu-efis-profile.h"
 #include "profiles/ff767-fcu-efis-profile.h"
 #include "profiles/ff777-fcu-efis-profile.h"
@@ -79,6 +80,27 @@ bool ProductFCUEfis::connect() {
             setProfileForCurrentAircraft();
         }
 
+        menuItemId = PluginsMenu::getInstance()->addItem(
+            classIdentifier(),
+            std::vector<MenuItem>{
+                {.name = "Identify", .content = [this](int menuId) {
+                     setLedBrightness(FCUEfisLed::BACKLIGHT, 180);
+                     setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, 180);
+                     setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, 180);
+                     setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, 180);
+                     setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, 180);
+                     setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, 180);
+
+                     setLedBrightness(FCUEfisLed::OVERALL_GREEN, 255);
+                     setLedBrightness(FCUEfisLed::EFISL_OVERALL_GREEN, 255);
+                     setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, 255);
+                     setAllLedsEnabled(true);
+                     AppState::getInstance()->executeAfter(2000, [this]() {
+                         setAllLedsEnabled(false);
+                     });
+                 }},
+            });
+
         return true;
     }
 
@@ -86,45 +108,22 @@ bool ProductFCUEfis::connect() {
 }
 
 void ProductFCUEfis::disconnect() {
-    const FCUEfisLed ledsToSet[] = {
-        FCUEfisLed::BACKLIGHT,
-        FCUEfisLed::SCREEN_BACKLIGHT,
-        FCUEfisLed::LOC_GREEN,
-        FCUEfisLed::AP1_GREEN,
-        FCUEfisLed::AP2_GREEN,
-        FCUEfisLed::ATHR_GREEN,
-        FCUEfisLed::EXPED_GREEN,
-        FCUEfisLed::APPR_GREEN,
-        FCUEfisLed::OVERALL_GREEN,
-        FCUEfisLed::EXPED_BACKLIGHT,
+    setLedBrightness(FCUEfisLed::BACKLIGHT, 0);
+    setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, 0);
+    setLedBrightness(FCUEfisLed::OVERALL_GREEN, 0);
+    
+    setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, 0);
+    setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, 0);
+    setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, 0);
 
-        FCUEfisLed::EFISR_BACKLIGHT,
-        FCUEfisLed::EFISR_SCREEN_BACKLIGHT,
-        FCUEfisLed::EFISR_OVERALL_GREEN,
-        FCUEfisLed::EFISR_FD_GREEN,
-        FCUEfisLed::EFISR_LS_GREEN,
-        FCUEfisLed::EFISR_CSTR_GREEN,
-        FCUEfisLed::EFISR_WPT_GREEN,
-        FCUEfisLed::EFISR_VORD_GREEN,
-        FCUEfisLed::EFISR_NDB_GREEN,
-        FCUEfisLed::EFISR_ARPT_GREEN,
-
-        FCUEfisLed::EFISL_BACKLIGHT,
-        FCUEfisLed::EFISL_SCREEN_BACKLIGHT,
-        FCUEfisLed::EFISL_OVERALL_GREEN,
-        FCUEfisLed::EFISL_FD_GREEN,
-        FCUEfisLed::EFISL_LS_GREEN,
-        FCUEfisLed::EFISL_CSTR_GREEN,
-        FCUEfisLed::EFISL_WPT_GREEN,
-        FCUEfisLed::EFISL_VORD_GREEN,
-        FCUEfisLed::EFISL_NDB_GREEN,
-        FCUEfisLed::EFISL_ARPT_GREEN};
-
-    for (auto led : ledsToSet) {
-        setLedBrightness(led, 0);
-    }
+    setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, 0);
+    setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, 0);
+    setLedBrightness(FCUEfisLed::EFISL_OVERALL_GREEN, 0);
+    setAllLedsEnabled(false);
 
     clearDisplays();
+
+    PluginsMenu::getInstance()->removeItem(menuItemId);
 
     if (profile) {
         delete profile;
@@ -399,6 +398,23 @@ void ProductFCUEfis::sendEfisDisplayWithFlags(EfisDisplayValue *data, bool isRig
     writeData(payload);
     if (++packetNumber == 0) {
         packetNumber = 1;
+    }
+}
+
+void ProductFCUEfis::setAllLedsEnabled(bool enable) {
+    for (unsigned char i = static_cast<unsigned char>(FCUEfisLed::_FCU_START); i <= static_cast<unsigned char>(FCUEfisLed::_FCU_END); ++i) {
+        FCUEfisLed led = static_cast<FCUEfisLed>(i);
+        setLedBrightness(led, enable ? 1 : 0);
+    }
+
+    for (unsigned char i = static_cast<unsigned char>(FCUEfisLed::_EFISR_START); i <= static_cast<unsigned char>(FCUEfisLed::_EFISR_END); ++i) {
+        FCUEfisLed led = static_cast<FCUEfisLed>(i);
+        setLedBrightness(led, enable ? 1 : 0);
+    }
+
+    for (unsigned char i = static_cast<unsigned char>(FCUEfisLed::_EFISL_START); i <= static_cast<unsigned char>(FCUEfisLed::_EFISL_END); ++i) {
+        FCUEfisLed led = static_cast<FCUEfisLed>(i);
+        setLedBrightness(led, enable ? 1 : 0);
     }
 }
 

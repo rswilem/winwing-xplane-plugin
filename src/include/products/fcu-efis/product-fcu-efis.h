@@ -11,6 +11,7 @@ class ProductFCUEfis : public USBDevice {
     private:
         uint8_t packetNumber = 1;
         FCUEfisAircraftProfile *profile;
+        int menuItemId;
         FCUDisplayData displayData;
         int lastUpdateCycle;
         int displayUpdateFrameCounter = 0;
@@ -40,6 +41,7 @@ class ProductFCUEfis : public USBDevice {
 
         void updateDisplays(bool force = true);
 
+        void setAllLedsEnabled(bool enable);
         void setLedBrightness(FCUEfisLed led, uint8_t brightness);
 
         void initializeDisplays();

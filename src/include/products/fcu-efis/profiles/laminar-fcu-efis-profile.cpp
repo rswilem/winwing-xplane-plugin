@@ -17,7 +17,8 @@ LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
         if (brightness.size() < 2) {
             return;
         }
-        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/battery_on");
+
+        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit2/autopilot/autopilot_has_power");
 
         uint8_t target = hasPower ? brightness[14] * 255 : 0;
         product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
@@ -36,96 +37,96 @@ LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
         product->forceStateSync();
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/battery_on", [](bool poweredOn) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit2/autopilot/autopilot_has_power", [](bool poweredOn) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/instrument_brightness_ratio");
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/ap1_mode", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::AP1_GREEN, engaged ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/autopilot/ap1_mode", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::AP1_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/ap2_mode", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::AP2_GREEN, engaged ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/autopilot/ap2_mode", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::AP2_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/a_thr_mode", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::ATHR_GREEN, engaged ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/autopilot/a_thr_mode", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::ATHR_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/loc_mode", [product](bool illuminated) {
-        product->setLedBrightness(FCUEfisLed::LOC_GREEN, illuminated ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/autopilot/loc_mode", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::LOC_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/autopilot/appr_mode", [product](bool illuminated) {
-        product->setLedBrightness(FCUEfisLed::APPR_GREEN, illuminated ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/autopilot/appr_mode", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::APPR_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<int>("laminar/A333/annun/autopilot/alt_mode", [product](bool illuminated) {
-        product->setLedBrightness(FCUEfisLed::EXPED_GREEN, illuminated ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/autopilot/alt_mode", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EXPED_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
     // Monitor EFIS Right (Captain) LED states
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/fo_flight_director_on", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, engaged ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/fo_flight_director_on", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISR_FD_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/fo_ls_bars_on", [product](bool on) {
-        product->setLedBrightness(FCUEfisLed::EFISR_LS_GREEN, on ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/fo_ls_bars_on", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISR_LS_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_cstr", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_CSTR_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_fo_cstr", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISR_CSTR_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_fix", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_WPT_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_fo_fix", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISR_WPT_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_vor", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_VORD_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_fo_vor", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISR_VORD_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_ndb", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_NDB_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_fo_ndb", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISR_NDB_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_fo_arpt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISR_ARPT_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_fo_arpt", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISR_ARPT_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
     // Monitor EFIS Left (First Officer) LED states
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/capt_flight_director_on", [product](bool engaged) {
-        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, engaged ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/capt_flight_director_on", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISL_FD_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/captain_ls_bars_on", [product](bool on) {
-        product->setLedBrightness(FCUEfisLed::EFISL_LS_GREEN, on ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/captain_ls_bars_on", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISL_LS_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_cstr", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_CSTR_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_capt_cstr", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISL_CSTR_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_fix", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_WPT_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_capt_fix", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISL_WPT_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_vor", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_VORD_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_capt_vor", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISL_VORD_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_ndb", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_NDB_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_capt_ndb", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISL_NDB_GREEN, brightness > 0.9f ? 1 : 0);
     });
 
-    Dataref::getInstance()->monitorExistingDataref<bool>("laminar/A333/annun/EFIS_capt_arpt", [product](bool show) {
-        product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, show ? 1 : 0);
+    Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/EFIS_capt_arpt", [product](float brightness) {
+        product->setLedBrightness(FCUEfisLed::EFISL_ARPT_GREEN, brightness > 0.9f ? 1 : 0);
     });
 }
 
 LaminarFCUEfisProfile::~LaminarFCUEfisProfile() {
     Dataref::getInstance()->unbind("sim/cockpit2/electrical/instrument_brightness_ratio");
-    Dataref::getInstance()->unbind("sim/cockpit/electrical/battery_on");
+    Dataref::getInstance()->unbind("sim/cockpit2/autopilot/autopilot_has_power");
 
     // Unbind FCU datarefs
     Dataref::getInstance()->unbind("laminar/A333/annun/autopilot/ap1_mode");
@@ -169,7 +170,6 @@ const std::vector<std::string> &LaminarFCUEfisProfile::displayDatarefs() const {
         "laminar/A333/autopilot/vvi_fpa_window_open",
         "sim/cockpit/autopilot/airspeed_is_mach",
         "sim/cockpit2/autopilot/vnav_speed_window_open",
-        "laminar/A333/autopilot/hdg_window_open",
         "sim/cockpit2/autopilot/trk_fpa",
         "sim/cockpit2/autopilot/airspeed_dial_kts_mach",
         "sim/cockpit/autopilot/heading_mag",
@@ -325,7 +325,7 @@ void LaminarFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
 
     // Format FCU heading display - using sim/cockpit/autopilot/heading_mag (float)
     float heading = datarefManager->getCached<float>("sim/cockpit/autopilot/heading_mag");
-    if (heading >= 0) {
+    if (heading >= 0 && data.hdgManaged == false) {
         // Convert 360 to 0 for display
         int hdgDisplay = static_cast<int>(heading) % 360;
         std::stringstream ss;
