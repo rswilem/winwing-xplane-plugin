@@ -102,6 +102,10 @@
 		F6E73EE22ED9CCA7000A8B6A /* toliss-ursa-minor-throttle-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6E73EDB2ED9CCA7000A8B6A /* toliss-ursa-minor-throttle-profile.cpp */; };
 		F6E73EE32ED9CCA7000A8B6A /* product-ursa-minor-throttle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6E73EDE2ED9CCA7000A8B6A /* product-ursa-minor-throttle.cpp */; };
 		F6E73EE42ED9CCA7000A8B6A /* toliss-ursa-minor-throttle-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6E73EDB2ED9CCA7000A8B6A /* toliss-ursa-minor-throttle-profile.cpp */; };
+		F6EF56242F0AC43300AB61F1 /* zibo-pdc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6EF561E2F0AC43300AB61F1 /* zibo-pdc-profile.cpp */; };
+		F6EF56252F0AC43300AB61F1 /* product-pdc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6EF56222F0AC43300AB61F1 /* product-pdc.cpp */; };
+		F6EF56262F0AC43300AB61F1 /* zibo-pdc-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6EF561E2F0AC43300AB61F1 /* zibo-pdc-profile.cpp */; };
+		F6EF56272F0AC43300AB61F1 /* product-pdc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6EF56222F0AC43300AB61F1 /* product-pdc.cpp */; };
 		F6F6F4E92EBF976E00321C19 /* ButtonIdentificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F6F4E72EBF976E00321C19 /* ButtonIdentificationView.swift */; };
 		F6F6F4EA2EBF976E00321C19 /* ButtonMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F6F4E82EBF976E00321C19 /* ButtonMapping.swift */; };
 		F6F77AB22E278F300060AFC0 /* product-ursa-minor-joystick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6F77AAD2E278F300060AFC0 /* product-ursa-minor-joystick.cpp */; };
@@ -229,6 +233,11 @@
 		F6E73EDD2ED9CCA7000A8B6A /* product-ursa-minor-throttle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-ursa-minor-throttle.h"; sourceTree = "<group>"; };
 		F6E73EDE2ED9CCA7000A8B6A /* product-ursa-minor-throttle.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-ursa-minor-throttle.cpp"; sourceTree = "<group>"; };
 		F6E73EDF2ED9CCA7000A8B6A /* ursa-minor-throttle-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ursa-minor-throttle-aircraft-profile.h"; sourceTree = "<group>"; };
+		F6EF561D2F0AC43300AB61F1 /* zibo-pdc-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "zibo-pdc-profile.h"; sourceTree = "<group>"; };
+		F6EF561E2F0AC43300AB61F1 /* zibo-pdc-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "zibo-pdc-profile.cpp"; sourceTree = "<group>"; };
+		F6EF56202F0AC43300AB61F1 /* pdc-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "pdc-aircraft-profile.h"; sourceTree = "<group>"; };
+		F6EF56212F0AC43300AB61F1 /* product-pdc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-pdc.h"; sourceTree = "<group>"; };
+		F6EF56222F0AC43300AB61F1 /* product-pdc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-pdc.cpp"; sourceTree = "<group>"; };
 		F6F6F4E72EBF976E00321C19 /* ButtonIdentificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonIdentificationView.swift; sourceTree = "<group>"; };
 		F6F6F4E82EBF976E00321C19 /* ButtonMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonMapping.swift; sourceTree = "<group>"; };
 		F6F77AAC2E278F300060AFC0 /* product-ursa-minor-joystick.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-ursa-minor-joystick.h"; sourceTree = "<group>"; };
@@ -538,6 +547,26 @@
 			path = "ursa-minor-throttle";
 			sourceTree = "<group>";
 		};
+		F6EF561F2F0AC43300AB61F1 /* profiles */ = {
+			isa = PBXGroup;
+			children = (
+				F6EF561D2F0AC43300AB61F1 /* zibo-pdc-profile.h */,
+				F6EF561E2F0AC43300AB61F1 /* zibo-pdc-profile.cpp */,
+			);
+			path = profiles;
+			sourceTree = "<group>";
+		};
+		F6EF56232F0AC43300AB61F1 /* pdc */ = {
+			isa = PBXGroup;
+			children = (
+				F6EF561F2F0AC43300AB61F1 /* profiles */,
+				F6EF56202F0AC43300AB61F1 /* pdc-aircraft-profile.h */,
+				F6EF56212F0AC43300AB61F1 /* product-pdc.h */,
+				F6EF56222F0AC43300AB61F1 /* product-pdc.cpp */,
+			);
+			path = pdc;
+			sourceTree = "<group>";
+		};
 		F6F77AAE2E278F300060AFC0 /* ursa-minor-joystick */ = {
 			isa = PBXGroup;
 			children = (
@@ -557,6 +586,7 @@
 				F6A1492E2E4F03A400FB8395 /* fmc */,
 				F6BB75772E32634700C2B21F /* fcu-efis */,
 				F6FC2A152E5C5377009A40E2 /* pap3-mcp */,
+				F6EF56232F0AC43300AB61F1 /* pdc */,
 				F6F77AAE2E278F300060AFC0 /* ursa-minor-joystick */,
 				F6E73EE02ED9CCA7000A8B6A /* ursa-minor-throttle */,
 			);
@@ -689,6 +719,8 @@
 				F6C69C0E2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp in Sources */,
 				F688808B2E523DE900B10AFA /* xcrafts-fmc-profile.cpp in Sources */,
 				F6BBFF0A2ED741B900FE9D7F /* rotatemd11-pap3-mcp-profile.cpp in Sources */,
+				F6EF56242F0AC43300AB61F1 /* zibo-pdc-profile.cpp in Sources */,
+				F6EF56252F0AC43300AB61F1 /* product-pdc.cpp in Sources */,
 				F6BBFF0B2ED741B900FE9D7F /* ff777-pap3-mcp-profile.cpp in Sources */,
 				F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F6E73EE32ED9CCA7000A8B6A /* product-ursa-minor-throttle.cpp in Sources */,
@@ -723,6 +755,8 @@
 				F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F6BB75782E32634700C2B21F /* product-fcu-efis.cpp in Sources */,
 				F68428652EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */,
+				F6EF56262F0AC43300AB61F1 /* zibo-pdc-profile.cpp in Sources */,
+				F6EF56272F0AC43300AB61F1 /* product-pdc.cpp in Sources */,
 				F6A77E742ED3514600061D03 /* toliss-agp-profile.cpp in Sources */,
 				F6A77E752ED3514600061D03 /* product-agp.cpp in Sources */,
 				F6BB75792E32634700C2B21F /* toliss-fcu-efis-profile.cpp in Sources */,

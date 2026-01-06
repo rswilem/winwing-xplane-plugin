@@ -6,6 +6,7 @@
 #include "product-fcu-efis.h"
 #include "product-fmc.h"
 #include "product-pap3-mcp.h"
+#include "product-pdc.h"
 #include "product-ursa-minor-joystick.h"
 #include "product-ursa-minor-throttle.h"
 
@@ -91,10 +92,17 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBF0F: // PAP3-MCP
             return new ProductPAP3MCP(hidDevice, vendorId, productId, vendorName, productName);
 
-            //        case 0xBB61: // PAP3-MCP (3N PDC L)
-            //        case 0xBB62: // PAP3-MCP (3N PDC R)
-            //        case 0xBB51: // PAP3-MCP (3M PDC L)
-            //        case 0xBB52: // PAP3-MCP (3M PDC R)
+        case 0xBB61:   // 3N PDC L
+        case 0xBB62: { // 3N PDC R
+            constexpr uint8_t identifierByte = 0x60;
+            return new ProductPDC(hidDevice, vendorId, productId, vendorName, productName, identifierByte);
+        }
+
+        case 0xBB51:   // 3M PDC L
+        case 0xBB52: { // 3M PDC R
+            constexpr uint8_t identifierByte = 0x50;
+            return new ProductPDC(hidDevice, vendorId, productId, vendorName, productName, identifierByte);
+        }
 
         case 0xBB70: // ECAM32
             return new ProductECAM32(hidDevice, vendorId, productId, vendorName, productName);
