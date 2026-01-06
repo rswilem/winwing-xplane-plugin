@@ -12,6 +12,7 @@ ProductPDC::ProductPDC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
     lastButtonStateLo = 0;
     lastButtonStateHi = 0;
     pressedButtonIndices = {};
+    is737MaxType = identifierByte == 0x50;
 
     connect();
 }
@@ -126,10 +127,6 @@ void ProductPDC::didReceiveData(int reportId, uint8_t *report, int reportLength)
 void ProductPDC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
     USBDevice::didReceiveButton(hardwareButtonIndex, pressed, count);
 
-    if (pressed) {
-        debug_force("PDC Button pressed: %i\n", hardwareButtonIndex);
-    }
-
     auto &buttons = profile->buttonDefs();
     auto it = buttons.find(hardwareButtonIndex);
     if (it == buttons.end()) {
@@ -137,6 +134,10 @@ void ProductPDC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, ui
     }
 
     const PDCButtonDef *buttonDef = &it->second;
+
+    if (pressed && !is737MaxType) {
+        debug_force("PDC Button pressed for 3NPDC: %i - mapped as %s\n", hardwareButtonIndex, buttonDef->name.c_str());
+    }
 
     if (buttonDef->dataref.empty()) {
         return;

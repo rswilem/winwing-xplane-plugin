@@ -17,6 +17,7 @@ class ProductPDC : public USBDevice {
         uint64_t lastButtonStateLo;
         uint32_t lastButtonStateHi;
         std::set<int> pressedButtonIndices;
+        bool is737MaxType;
 
         void setProfileForCurrentAircraft();
 
