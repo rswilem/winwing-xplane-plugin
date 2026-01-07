@@ -70,7 +70,7 @@ const std::unordered_map<uint16_t, PDCButtonDef> &ZiboPDCProfile::buttonDefs() c
         {19, {"BARO STD", "laminar/B738/EFIS_control/capt/push_button/std_press"}},
         {20, {"PDC3M RANGE MINUS", "laminar/B738/EFIS_control/capt/map_range_dn"}}, // PDC3N - laminar/B738/EFIS/capt/map_range,0,1,2,3,4,5,6,7
         {21, {"PDC3M RANGE PLUS", "laminar/B738/EFIS_control/capt/map_range_up"}},
-        {22, {"BARO knob left fast", "laminar/B738/pilot/barometer_dn_fast", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {22, {"BARO knob left fast", "laminar/B738/pilot/barometer_dn_fast", PDCDatarefType::EXECUTE_CMD_PHASED}},
         {23, {"BARO knob right fast", "laminar/B738/pilot/barometer_up_fast", PDCDatarefType::EXECUTE_CMD_PHASED}},
         {24, {"MINS RADIO", "laminar/B738/EFIS_control/cpt/minimums,laminar/B738/EFIS_control/cpt/minimums_up,laminar/B738/EFIS_control/cpt/minimums_dn", PDCDatarefType::SET_VALUE_USING_COMMANDS, 0.0}}, // Caution, up and down are inverted
         {25, {"MINS BARO", "laminar/B738/EFIS_control/cpt/minimums,laminar/B738/EFIS_control/cpt/minimums_up,laminar/B738/EFIS_control/cpt/minimums_dn", PDCDatarefType::SET_VALUE_USING_COMMANDS, 1.0}},  // Caution, up and down are inverted

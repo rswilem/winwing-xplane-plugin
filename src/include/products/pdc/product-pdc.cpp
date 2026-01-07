@@ -3,6 +3,7 @@
 #include "appstate.h"
 #include "dataref.h"
 #include "plugins-menu.h"
+#include "profiles/ff777-pdc-profile.h"
 #include "profiles/zibo-pdc-profile.h"
 
 #include <algorithm>
@@ -28,6 +29,9 @@ const char *ProductPDC::classIdentifier() {
 void ProductPDC::setProfileForCurrentAircraft() {
     if (ZiboPDCProfile::IsEligible()) {
         profile = new ZiboPDCProfile(this);
+        profileReady = true;
+    } else if (FF777PDCProfile::IsEligible()) {
+        profile = new FF777PDCProfile(this);
         profileReady = true;
     } else {
         profile = nullptr;
