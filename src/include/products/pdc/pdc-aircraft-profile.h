@@ -21,6 +21,14 @@ struct PDCButtonDef {
         double value = 0.0;
 };
 
+enum class PDCDeviceVariant : unsigned char {
+    VARIANT_3N_CAPTAIN = 0x00,
+    VARIANT_3N_FIRSTOFFICER = 0x01,
+    
+    VARIANT_3M_CAPTAIN = 0x10,
+    VARIANT_3M_FIRSTOFFICER = 0x11
+};
+
 class PDCAircraftProfile {
     protected:
         ProductPDC *product;

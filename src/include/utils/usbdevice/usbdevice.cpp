@@ -92,16 +92,24 @@ USBDevice *USBDevice::Device(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
         case 0xBF0F: // PAP3-MCP
             return new ProductPAP3MCP(hidDevice, vendorId, productId, vendorName, productName);
 
-        case 0xBB61:   // 3N PDC L
-        case 0xBB62: { // 3N PDC R
+        case 0xBB61: { // 3N PDC L
             constexpr uint8_t identifierByte = 0x60;
-            return new ProductPDC(hidDevice, vendorId, productId, vendorName, productName, identifierByte);
+            return new ProductPDC(hidDevice, vendorId, productId, vendorName, productName, PDCDeviceVariant::VARIANT_3N_CAPTAIN, identifierByte);
         }
 
-        case 0xBB51:   // 3M PDC L
+        case 0xBB62: { // 3N PDC R
+            constexpr uint8_t identifierByte = 0x60;
+            return new ProductPDC(hidDevice, vendorId, productId, vendorName, productName, PDCDeviceVariant::VARIANT_3N_FIRSTOFFICER, identifierByte);
+        }
+
+        case 0xBB51: { // 3M PDC L
+            constexpr uint8_t identifierByte = 0x50;
+            return new ProductPDC(hidDevice, vendorId, productId, vendorName, productName, PDCDeviceVariant::VARIANT_3M_CAPTAIN, identifierByte);
+        }
+
         case 0xBB52: { // 3M PDC R
             constexpr uint8_t identifierByte = 0x50;
-            return new ProductPDC(hidDevice, vendorId, productId, vendorName, productName, identifierByte);
+            return new ProductPDC(hidDevice, vendorId, productId, vendorName, productName, PDCDeviceVariant::VARIANT_3M_FIRSTOFFICER, identifierByte);
         }
 
         case 0xBB70: // ECAM32

@@ -17,15 +17,15 @@ class ProductPDC : public USBDevice {
         uint64_t lastButtonStateLo;
         uint32_t lastButtonStateHi;
         std::set<int> pressedButtonIndices;
-        bool is737MaxType;
 
         void setProfileForCurrentAircraft();
 
     public:
-        ProductPDC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, unsigned char identifierByte);
+        ProductPDC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, PDCDeviceVariant variant, unsigned char identifierByte);
         ~ProductPDC();
 
         const unsigned char identifierByte;
+        const PDCDeviceVariant deviceVariant;
 
         const char *classIdentifier() override;
         bool connect() override;

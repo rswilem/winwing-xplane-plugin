@@ -9,11 +9,10 @@
 #include <algorithm>
 #include <cmath>
 
-ProductPDC::ProductPDC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, unsigned char identifierByte) : USBDevice(hidDevice, vendorId, productId, vendorName, productName), identifierByte(identifierByte) {
+ProductPDC::ProductPDC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, PDCDeviceVariant variant, unsigned char identifierByte) : USBDevice(hidDevice, vendorId, productId, vendorName, productName), identifierByte(identifierByte), deviceVariant(variant) {
     lastButtonStateLo = 0;
     lastButtonStateHi = 0;
     pressedButtonIndices = {};
-    is737MaxType = identifierByte == 0x50;
 
     connect();
 }
@@ -139,7 +138,7 @@ void ProductPDC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, ui
 
     const PDCButtonDef *buttonDef = &it->second;
 
-    if (pressed && !is737MaxType) {
+    if (pressed && (deviceVariant == PDCDeviceVariant::VARIANT_3N_CAPTAIN || deviceVariant == PDCDeviceVariant::VARIANT_3N_FIRSTOFFICER)) {
         debug_force("PDC Button pressed for 3NPDC: %i - mapped as %s\n", hardwareButtonIndex, buttonDef->name.c_str());
     }
 

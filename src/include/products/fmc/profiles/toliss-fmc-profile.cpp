@@ -40,10 +40,14 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
         }
 
         uint8_t screenBrightness = hasPower ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7] * 255 : 0;
-        std::vector<int> elecConnectors = Dataref::getInstance()->get<std::vector<int>>("AirbusFBW/ElecConnectors");
-        
-        if (elecConnectors.size() > 11 && elecConnectors[11] != 1) {
-            screenBrightness = 0;
+
+        bool disableElecConnectorsTest = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ICAO").starts_with("A34");
+        if (!disableElecConnectorsTest) {
+            std::vector<int> elecConnectors = Dataref::getInstance()->get<std::vector<int>>("AirbusFBW/ElecConnectors");
+
+            if (elecConnectors.size() > 11 && elecConnectors[11] != 1) {
+                screenBrightness = 0;
+            }
         }
 
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, screenBrightness);

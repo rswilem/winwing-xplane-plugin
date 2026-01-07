@@ -99,14 +99,18 @@ KERNEL=="hidraw*", ATTRS{idProduct}=="bb37", ATTRS{idVendor}=="4098", MODE="0666
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb3f", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp7-fo"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb3b", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pfp7-obs"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb10", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu"
-KERNEL=="hidraw*", ATTRS{idProduct}=="bc1e", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis_r"
-KERNEL=="hidraw*", ATTRS{idProduct}=="bc1d", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis_l"
-KERNEL=="hidraw*", ATTRS{idProduct}=="ba01", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis_lr"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bc1e", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis-r"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bc1d", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis-l"
+KERNEL=="hidraw*", ATTRS{idProduct}=="ba01", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-fcu-efis-lr"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bf0f", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-pap3"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb70", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-ecam32"
 KERNEL=="hidraw*", ATTRS{idProduct}=="bb80", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-agp"
 KERNEL=="hidraw*", ATTRS{idProduct}=="b920", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-throttle-l"
 KERNEL=="hidraw*", ATTRS{idProduct}=="b930", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-throttle-r"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb61", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-3n-pdc-l"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb62", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-3n-pdc-r"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb51", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-3m-pdc-l"
+KERNEL=="hidraw*", ATTRS{idProduct}=="bb52", ATTRS{idVendor}=="4098", MODE="0666", SYMLINK+="winwing-3m-pdc-r"
 ```
 
 ### Demonstration
