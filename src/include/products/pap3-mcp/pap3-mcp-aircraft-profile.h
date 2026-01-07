@@ -35,9 +35,10 @@ enum class PAP3MCPLed : int {
 
 enum PAP3MCPDatarefType : unsigned char {
     EXECUTE_CMD_ONCE = 1,
-    EXECUTE_CMD_BEGIN_END = 2,
-    SET_VALUE = 3,
-    TOGGLE_VALUE = 4,
+    EXECUTE_CMD_PHASED,
+    SET_VALUE,
+    SET_VALUE_PHASED,
+    TOGGLE_VALUE,
 };
 
 struct PAP3MCPButtonDef {

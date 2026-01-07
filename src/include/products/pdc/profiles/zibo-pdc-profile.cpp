@@ -70,8 +70,8 @@ const std::unordered_map<uint16_t, PDCButtonDef> &ZiboPDCProfile::buttonDefs() c
         {19, {"BARO STD", "laminar/B738/EFIS_control/capt/push_button/std_press"}},
         {20, {"PDC3M RANGE MINUS", "laminar/B738/EFIS_control/capt/map_range_dn"}}, // PDC3N - laminar/B738/EFIS/capt/map_range,0,1,2,3,4,5,6,7
         {21, {"PDC3M RANGE PLUS", "laminar/B738/EFIS_control/capt/map_range_up"}},
-        {22, {"BARO turn left", "laminar/B738/pilot/barometer_down"}},
-        {23, {"BARO turn right", "laminar/B738/pilot/barometer_up"}},
+        {22, {"BARO knob left fast", "laminar/B738/pilot/barometer_dn_fast", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {23, {"BARO knob right fast", "laminar/B738/pilot/barometer_up_fast", PDCDatarefType::EXECUTE_CMD_PHASED}},
         {24, {"MINS RADIO", "laminar/B738/EFIS_control/cpt/minimums,laminar/B738/EFIS_control/cpt/minimums_up,laminar/B738/EFIS_control/cpt/minimums_dn", PDCDatarefType::SET_VALUE_USING_COMMANDS, 0.0}}, // Caution, up and down are inverted
         {25, {"MINS BARO", "laminar/B738/EFIS_control/cpt/minimums,laminar/B738/EFIS_control/cpt/minimums_up,laminar/B738/EFIS_control/cpt/minimums_dn", PDCDatarefType::SET_VALUE_USING_COMMANDS, 1.0}},  // Caution, up and down are inverted
         {26, {"Baro inHg", "laminar/B738/EFIS_control/capt/baro_in_hpa,laminar/B738/EFIS_control/capt/baro_in_hpa_dn,laminar/B738/EFIS_control/capt/baro_in_hpa_up", PDCDatarefType::SET_VALUE_USING_COMMANDS, 0.0}},
@@ -80,14 +80,14 @@ const std::unordered_map<uint16_t, PDCButtonDef> &ZiboPDCProfile::buttonDefs() c
         {29, {"Map VOR", "laminar/B738/EFIS_control/capt/map_mode_pos", PDCDatarefType::SET_VALUE, 1.0}},
         {30, {"Map MAP", "laminar/B738/EFIS_control/capt/map_mode_pos", PDCDatarefType::SET_VALUE, 2.0}},
         {31, {"Map PLN", "laminar/B738/EFIS_control/capt/map_mode_pos", PDCDatarefType::SET_VALUE, 3.0}},
-        {32, {"Mins turn left", "laminar/B738/pfd/dh_pilot_dn"}},
-        {33, {"Mins Unknown left", ""}},
-        {34, {"Mins Unknown center", ""}},
-        {35, {"Mins Unknown right", ""}},
-        {36, {"Mins turn right", "laminar/B738/pfd/dh_pilot_up"}},
-        {37, {"Baro Unknown left", ""}},
-        {38, {"Baro Unknown center", ""}},
-        {39, {"Baro Unknown right", ""}},
+        {32, {"Mins knob left fast", "laminar/B738/pfd/dh_pilot_dn_fast", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {33, {"Mins knob left slow", "laminar/B738/pfd/dh_pilot_dn_slow", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {34, {"Mins knob center", ""}},
+        {35, {"Mins knob right slow", "laminar/B738/pfd/dh_pilot_up_slow", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {36, {"Mins knob right fast", "laminar/B738/pfd/dh_pilot_up_fast", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {37, {"BARO knob left slow", "laminar/B738/pilot/barometer_dn_slow", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {38, {"BARO knob center", ""}},
+        {39, {"BARO knob right slow", "laminar/B738/pilot/barometer_up_slow", PDCDatarefType::EXECUTE_CMD_PHASED}},
     };
 
     return buttons;
@@ -124,11 +124,13 @@ void ZiboPDCProfile::buttonPressed(const PDCButtonDef *button, XPLMCommandPhase 
                 datarefManager->executeCommand(leftCmd.c_str());
             }
         }
-        return;
+
     } else if (phase == xplm_CommandBegin && button->datarefType == PDCDatarefType::SET_VALUE) {
         datarefManager->set<float>(button->dataref.c_str(), button->value);
-        return;
+
     } else if (phase == xplm_CommandBegin && button->datarefType == PDCDatarefType::EXECUTE_CMD_ONCE) {
         datarefManager->executeCommand(button->dataref.c_str());
+    } else if (phase == xplm_CommandBegin && button->datarefType == PDCDatarefType::EXECUTE_CMD_PHASED) {
+        datarefManager->executeCommand(button->dataref.c_str(), phase);
     }
 }

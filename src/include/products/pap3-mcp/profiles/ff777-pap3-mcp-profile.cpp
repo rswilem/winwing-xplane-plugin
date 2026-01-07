@@ -174,20 +174,14 @@ void FF777PAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
 }
 
 void FF777PAP3MCPProfile::buttonPressed(const PAP3MCPButtonDef *button, XPLMCommandPhase phase) {
-    if (!button || button->dataref.empty()) {
+    if (!button || button->dataref.empty() || phase == xplm_CommandContinue) {
         return;
     }
 
-    if (button->datarefType == PAP3MCPDatarefType::EXECUTE_CMD_ONCE) {
-        if (phase == xplm_CommandBegin) {
-            Dataref::getInstance()->executeCommand(button->dataref.c_str());
-        }
-    } else if (button->datarefType == PAP3MCPDatarefType::EXECUTE_CMD_BEGIN_END) {
-        if (phase == xplm_CommandBegin) {
-            Dataref::getInstance()->executeCommand(button->dataref.c_str(), xplm_CommandBegin);
-        } else if (phase == xplm_CommandEnd) {
-            Dataref::getInstance()->executeCommand(button->dataref.c_str(), xplm_CommandEnd);
-        }
+    if (phase == xplm_CommandBegin && button->datarefType == PAP3MCPDatarefType::EXECUTE_CMD_ONCE) {
+        Dataref::getInstance()->executeCommand(button->dataref.c_str());
+    } else if (button->datarefType == PAP3MCPDatarefType::EXECUTE_CMD_PHASED) {
+        Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
     }
 }
 

@@ -9,6 +9,7 @@ class ProductPDC;
 
 enum class PDCDatarefType : unsigned char {
     EXECUTE_CMD_ONCE = 1,
+    EXECUTE_CMD_PHASED,
     SET_VALUE,
     SET_VALUE_USING_COMMANDS
 };

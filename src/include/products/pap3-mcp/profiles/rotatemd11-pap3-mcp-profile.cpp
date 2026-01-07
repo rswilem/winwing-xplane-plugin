@@ -79,25 +79,25 @@ const std::unordered_map<uint16_t, PAP3MCPButtonDef> &RotateMD11PAP3MCPProfile::
     static const std::unordered_map<uint16_t, PAP3MCPButtonDef> buttons = {
         // Row 1 (byte 0x01) - Main autopilot mode buttons
         // Note: MD-11 uses dataref writes instead of commands for buttons
-        {1, {"SPEED (FMS SPD)", "Rotate/aircraft/controls/fgs_fms_spd", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {2, {"PROF (VNAV)", "Rotate/aircraft/controls/fgs_prof", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {3, {"LVL CHG", "Rotate/aircraft/controls/fgs_alt_mode_sel", PAP3MCPDatarefType::SET_VALUE, -1.0}},
-        {4, {"HDG SEL", "Rotate/aircraft/controls/fgs_hdg_mode_sel", PAP3MCPDatarefType::SET_VALUE, -1.0}},
-        {5, {"NAV (LNAV)", "Rotate/aircraft/controls/fgs_nav", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {7, {"APPR/LAND (APP)", "Rotate/aircraft/controls/fgs_appr_land", PAP3MCPDatarefType::SET_VALUE, 1.0}},
+        {1, {"SPEED (FMS SPD)", "Rotate/aircraft/controls/fgs_fms_spd", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {2, {"PROF (VNAV)", "Rotate/aircraft/controls/fgs_prof", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {3, {"LVL CHG", "Rotate/aircraft/controls/fgs_alt_mode_sel", PAP3MCPDatarefType::SET_VALUE_PHASED, -1.0}},
+        {4, {"HDG SEL", "Rotate/aircraft/controls/fgs_hdg_mode_sel", PAP3MCPDatarefType::SET_VALUE_PHASED, -1.0}},
+        {5, {"NAV (LNAV)", "Rotate/aircraft/controls/fgs_nav", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {7, {"APPR/LAND (APP)", "Rotate/aircraft/controls/fgs_appr_land", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
 
         // Row 2 (byte 0x02) - Additional autopilot buttons
-        {8, {"ALT HOLD", "Rotate/aircraft/controls/fgs_alt_mode_sel", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {9, {"V/S (FPA)", "Rotate/aircraft/controls/fgs_vs_fpa", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {10, {"CMD A (AP)", "Rotate/aircraft/controls/fgs_autoflight", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {11, {"CWS A (AFS OVR 1)", "Rotate/aircraft/controls/fgs_afs_ovrd_off_1", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {12, {"CMD B (AP)", "Rotate/aircraft/controls/fgs_autoflight", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {13, {"CWS B (AFS OVR 2)", "Rotate/aircraft/controls/fgs_afs_ovrd_off_2", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {14, {"C/O (IAS/MACH)", "Rotate/aircraft/controls/fgs_ias_mach", PAP3MCPDatarefType::SET_VALUE, 1.0}},
-        {15, {"SPD INTV", "Rotate/aircraft/controls/fgs_spd_sel_mode", PAP3MCPDatarefType::SET_VALUE, -1.0}},
+        {8, {"ALT HOLD", "Rotate/aircraft/controls/fgs_alt_mode_sel", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {9, {"V/S (FPA)", "Rotate/aircraft/controls/fgs_vs_fpa", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {10, {"CMD A (AP)", "Rotate/aircraft/controls/fgs_autoflight", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {11, {"CWS A (AFS OVR 1)", "Rotate/aircraft/controls/fgs_afs_ovrd_off_1", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {12, {"CMD B (AP)", "Rotate/aircraft/controls/fgs_autoflight", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {13, {"CWS B (AFS OVR 2)", "Rotate/aircraft/controls/fgs_afs_ovrd_off_2", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {14, {"C/O (IAS/MACH)", "Rotate/aircraft/controls/fgs_ias_mach", PAP3MCPDatarefType::SET_VALUE_PHASED, 1.0}},
+        {15, {"SPD INTV", "Rotate/aircraft/controls/fgs_spd_sel_mode", PAP3MCPDatarefType::SET_VALUE_PHASED, -1.0}},
 
         // Row 3 (byte 0x03)
-        {16, {"ALT INTV", "Rotate/aircraft/controls/fgs_alt_mode_sel", PAP3MCPDatarefType::SET_VALUE, -1.0}}};
+        {16, {"ALT INTV", "Rotate/aircraft/controls/fgs_alt_mode_sel", PAP3MCPDatarefType::SET_VALUE_PHASED, -1.0}}};
     return buttons;
 }
 
@@ -188,29 +188,17 @@ void RotateMD11PAP3MCPProfile::updateDisplayData(PAP3MCPDisplayData &data) {
 }
 
 void RotateMD11PAP3MCPProfile::buttonPressed(const PAP3MCPButtonDef *button, XPLMCommandPhase phase) {
-    if (!button || button->dataref.empty()) {
+    if (!button || button->dataref.empty() || phase == xplm_CommandContinue) {
         return;
     }
 
     // MD-11 uses dataref writes for buttons (momentary: press=1/value, release=0)
-    if (button->datarefType == PAP3MCPDatarefType::SET_VALUE) {
-        if (phase == xplm_CommandBegin) {
-            // Press: write the specified value
-            Dataref::getInstance()->set<int>(button->dataref.c_str(), static_cast<int>(button->value));
-        } else if (phase == xplm_CommandEnd) {
-            // Release: write 0
-            Dataref::getInstance()->set<int>(button->dataref.c_str(), 0);
-        }
-    } else if (button->datarefType == PAP3MCPDatarefType::EXECUTE_CMD_ONCE) {
-        if (phase == xplm_CommandBegin) {
-            Dataref::getInstance()->executeCommand(button->dataref.c_str());
-        }
-    } else if (button->datarefType == PAP3MCPDatarefType::EXECUTE_CMD_BEGIN_END) {
-        if (phase == xplm_CommandBegin) {
-            Dataref::getInstance()->executeCommand(button->dataref.c_str(), xplm_CommandBegin);
-        } else if (phase == xplm_CommandEnd) {
-            Dataref::getInstance()->executeCommand(button->dataref.c_str(), xplm_CommandEnd);
-        }
+    if (button->datarefType == PAP3MCPDatarefType::SET_VALUE_PHASED) {
+        Dataref::getInstance()->set<int>(button->dataref.c_str(), phase == xplm_CommandBegin ? static_cast<int>(button->value) : 0);
+    } else if (phase == xplm_CommandBegin && button->datarefType == PAP3MCPDatarefType::EXECUTE_CMD_ONCE) {
+        Dataref::getInstance()->executeCommand(button->dataref.c_str());
+    } else if (button->datarefType == PAP3MCPDatarefType::EXECUTE_CMD_PHASED) {
+        Dataref::getInstance()->executeCommand(button->dataref.c_str(), phase);
     }
 }
 
