@@ -53,11 +53,6 @@ struct FCUEfisControlView: View {
                 .font(.headline)
                 .padding(.top, 8)
             
-            Button(action: { device.forceStateSync() }) {
-                Text("Force state sync")
-            }
-            .buttonStyle(.bordered)
-            
             // Backlight Controls
             VStack(alignment: .leading, spacing: 12) {
                 Text("Backlights")

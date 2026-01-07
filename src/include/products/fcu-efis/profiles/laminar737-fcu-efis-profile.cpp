@@ -11,17 +11,17 @@
 #include <iomanip>
 #include <XPLMUtilities.h>
 
-Laminar737FCUEfisProfile::Laminar737FCUEfisProfile(ProductFCUEfis *product) :
-    FCUEfisAircraftProfile(product) {
+Laminar737FCUEfisProfile::Laminar737FCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
     // Monitor power and brightness
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
-        if (brightness.size() < 15) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/panel_brightness_ratio", [product](std::vector<float> brightness) {
+        if (brightness.size() < 4) {
             return;
         }
+        
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/battery_on");
 
         // Use appropriate brightness index for 737 instruments
-        uint8_t target = hasPower ? brightness[14] * 255 : 0;
+        uint8_t target = hasPower ? brightness[0] * 255 : 0;
         product->setLedBrightness(FCUEfisLed::BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, target);
         product->setLedBrightness(FCUEfisLed::EFISL_BACKLIGHT, target);
@@ -30,7 +30,7 @@ Laminar737FCUEfisProfile::Laminar737FCUEfisProfile(ProductFCUEfis *product) :
         product->setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, hasPower ? 255 : 0);
         product->setLedBrightness(FCUEfisLed::EFISL_OVERALL_GREEN, hasPower ? 255 : 0);
 
-        uint8_t screenBrightness = hasPower ? brightness[10] * 255 : 0;
+        uint8_t screenBrightness = hasPower ? 255 : 0;
         product->setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, screenBrightness);
         product->setLedBrightness(FCUEfisLed::EFISL_SCREEN_BACKLIGHT, screenBrightness);
@@ -39,7 +39,7 @@ Laminar737FCUEfisProfile::Laminar737FCUEfisProfile(ProductFCUEfis *product) :
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/battery_on", [](bool poweredOn) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/instrument_brightness_ratio");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/panel_brightness_ratio");
     });
 
     // Monitor autopilot engagement (CMD A and CMD B) - use 737-specific status datarefs
@@ -100,7 +100,7 @@ Laminar737FCUEfisProfile::~Laminar737FCUEfisProfile() {
     Dataref::getInstance()->unbind("sim/cockpit/autopilot/vertical_velocity");
     Dataref::getInstance()->unbind("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot");
     Dataref::getInstance()->unbind("sim/cockpit2/gauges/actuators/barometer_setting_in_hg_copilot");
-    Dataref::getInstance()->unbind("sim/cockpit2/electrical/instrument_brightness_ratio");
+    Dataref::getInstance()->unbind("sim/cockpit2/electrical/panel_brightness_ratio");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/battery_on");
     Dataref::getInstance()->unbind("laminar/B738/autopilot/cmd_a_status");
     Dataref::getInstance()->unbind("laminar/B738/autopilot/cmd_b_status");
@@ -302,7 +302,7 @@ void Laminar737FCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
         // Display as knots
         std::ostringstream ss;
         ss << static_cast<int>(speed);
-        data.speed = {ss.str(), {}};
+        data.speed = ss.str();
         data.spdMach = false;
     }
 
@@ -310,13 +310,13 @@ void Laminar737FCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     float heading = Dataref::getInstance()->getCached<float>("sim/cockpit/autopilot/heading_mag");
     std::ostringstream headingSs;
     headingSs << std::setw(3) << std::setfill('0') << static_cast<int>(heading);
-    data.heading = {headingSs.str(), {}};
+    data.heading = headingSs.str();
 
     // Altitude display
     float altitude = Dataref::getInstance()->getCached<float>("sim/cockpit/autopilot/altitude");
     std::ostringstream altSs;
     altSs << std::setw(5) << std::setfill('0') << static_cast<int>(altitude);
-    data.altitude = {altSs.str(), {}};
+    data.altitude = altSs.str();
 
     // Vertical speed display
     float vs = Dataref::getInstance()->getCached<float>("sim/cockpit/autopilot/vertical_velocity");
@@ -324,7 +324,7 @@ void Laminar737FCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     int vsInt = static_cast<int>(vs);
     int absVs = std::abs(vsInt);
     vsSs << std::setw(4) << std::setfill('0') << absVs;
-    data.verticalSpeed = {vsSs.str(), {}};
+    data.verticalSpeed = vsSs.str();
     data.vsSign = (vs >= 0);
     data.vsMode = true;
 

@@ -191,16 +191,16 @@ void device_force_state_sync(void* deviceHandle) {
 }
 
 // Joystick functions via handle
-bool joystick_setVibration(void* joystickHandle, uint8_t vibration) {
-    if (!joystickHandle) return false;
+void joystick_setVibration(void* joystickHandle, uint8_t vibration) {
+    if (!joystickHandle) return;
     auto joystick = static_cast<ProductUrsaMinorJoystick*>(joystickHandle);
-    return joystick->setVibration(vibration);
+    joystick->setVibration(vibration);
 }
 
-bool joystick_setLedBrightness(void* joystickHandle, uint8_t brightness) {
-    if (!joystickHandle) return false;
+void joystick_setLedBrightness(void* joystickHandle, uint8_t brightness) {
+    if (!joystickHandle) return;
     auto joystick = static_cast<ProductUrsaMinorJoystick*>(joystickHandle);
-    return joystick->setLedBrightness(brightness);
+    joystick->setLedBrightness(brightness);
 }
 
 // FMC functions via handle
@@ -335,30 +335,28 @@ bool isDeviceConnected(int deviceIndex) {
 }
 
 // Joystick-specific functions
-bool joystick_setVibration(int deviceIndex, uint8_t vibration) {
+void joystick_setVibration(int deviceIndex, uint8_t vibration) {
     auto& devices = USBController::getInstance()->devices;
     if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
-        return false;
+        return;
     }
     
     auto joystick = dynamic_cast<ProductUrsaMinorJoystick*>(devices[deviceIndex]);
     if (joystick) {
-        return joystick->setVibration(vibration);
+        joystick->setVibration(vibration);
     }
-    return false;
 }
 
-bool joystick_setLedBrightness(int deviceIndex, uint8_t brightness) {
+void joystick_setLedBrightness(int deviceIndex, uint8_t brightness) {
     auto& devices = USBController::getInstance()->devices;
     if (deviceIndex < 0 || deviceIndex >= static_cast<int>(devices.size())) {
-        return false;
+        return;
     }
     
     auto joystick = dynamic_cast<ProductUrsaMinorJoystick*>(devices[deviceIndex]);
     if (joystick) {
-        return joystick->setLedBrightness(brightness);
+        joystick->setLedBrightness(brightness);
     }
-    return false;
 }
 
 // FMC-specific functions

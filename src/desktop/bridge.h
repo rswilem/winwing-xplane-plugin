@@ -35,8 +35,8 @@ void device_update(void *deviceHandle);
 void device_force_state_sync(void *deviceHandle);
 
 // Joystick functions via handle
-bool joystick_setVibration(void *joystickHandle, uint8_t vibration);
-bool joystick_setLedBrightness(void *joystickHandle, uint8_t brightness);
+void joystick_setVibration(void *joystickHandle, uint8_t vibration);
+void joystick_setLedBrightness(void *joystickHandle, uint8_t brightness);
 
 // FMC functions via handle
 void fmc_clearDisplay(void *fmcHandle);

@@ -94,6 +94,9 @@
 		F6C6E0332E8D5DAA00558F46 /* product-pap3-mcp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02A2E8D5DAA00558F46 /* product-pap3-mcp.cpp */; };
 		F6C6E0342E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02C2E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp */; };
 		F6C6E0352E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6C6E02E2E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp */; };
+		F6CC2B492F0E4E5100C0A4D8 /* ff777-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8321A6012ED27B1E00E3746A /* ff777-fcu-efis-profile.cpp */; };
+		F6CC2B4A2F0E4E5500C0A4D8 /* ff350-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838AA8B42EEF2918006444F6 /* ff350-fcu-efis-profile.cpp */; };
+		F6CC2B4B2F0E4E5500C0A4D8 /* ff767-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83124BCF2EE0A3D700C34D9D /* ff767-fcu-efis-profile.cpp */; };
 		F6D8E6C72ED059390041C4FB /* product-ecam32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6D8E6C52ED059390041C4FB /* product-ecam32.cpp */; };
 		F6D8E6C82ED059390041C4FB /* toliss-ecam32-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6D8E6C12ED059390041C4FB /* toliss-ecam32-profile.cpp */; };
 		F6D8E6C92ED059390041C4FB /* product-ecam32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F6D8E6C52ED059390041C4FB /* product-ecam32.cpp */; };
@@ -752,6 +755,7 @@
 				F6827E0A2E05652E00382B28 /* WinwingDesktopApp.swift in Sources */,
 				F635AD4B2E05819E005D6CDC /* usbdevice_mac.cpp in Sources */,
 				F64BE3EB2E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
+				F6CC2B492F0E4E5100C0A4D8 /* ff777-fcu-efis-profile.cpp in Sources */,
 				F64BE3ED2E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				F6BB75782E32634700C2B21F /* product-fcu-efis.cpp in Sources */,
 				F68428652EC63F070027756D /* zibo-ursa-minor-joystick-profile.cpp in Sources */,
@@ -790,6 +794,8 @@
 				F6C6E0302E8D5DAA00558F46 /* product-pap3-mcp.cpp in Sources */,
 				F6C6E0312E8D5DAA00558F46 /* laminar-pap3-mcp-profile.cpp in Sources */,
 				F6C6E0322E8D5DAA00558F46 /* zibo-pap3-mcp-profile.cpp in Sources */,
+				F6CC2B4A2F0E4E5500C0A4D8 /* ff350-fcu-efis-profile.cpp in Sources */,
+				F6CC2B4B2F0E4E5500C0A4D8 /* ff767-fcu-efis-profile.cpp in Sources */,
 				F647201E2E16CF6D00C9976B /* usbdevice.cpp in Sources */,
 				F6C69C0F2EC0DAE300BFDA65 /* laminar737-fcu-efis-profile.cpp in Sources */,
 				5DBA92312E6F4D71007328BC /* ff767-fmc-profile.cpp in Sources */,
