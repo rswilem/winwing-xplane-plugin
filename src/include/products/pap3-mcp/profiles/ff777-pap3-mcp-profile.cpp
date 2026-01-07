@@ -10,11 +10,10 @@
 #include <iomanip>
 #include <XPLMUtilities.h>
 
-FF777PAP3MCPProfile::FF777PAP3MCPProfile(ProductPAP3MCP *product) :
-    PAP3MCPAircraftProfile(product) {
+FF777PAP3MCPProfile::FF777PAP3MCPProfile(ProductPAP3MCP *product) : PAP3MCPAircraftProfile(product) {
     // Monitor power and brightness
     Dataref::getInstance()->monitorExistingDataref<float>("1-sim/ckpt/lights/glareshield", [product](float brightness) {
-        bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit2/autopilot/autopilot_has_power");
+        bool hasPower = Dataref::getInstance()->getCached<bool>("1-sim/output/mcp/ok");
 
         float ratio = std::clamp(brightness, 0.0f, 1.0f);
         uint8_t panelBrightness = hasPower ? static_cast<uint8_t>(ratio * 255) : 0;
@@ -29,7 +28,16 @@ FF777PAP3MCPProfile::FF777PAP3MCPProfile(ProductPAP3MCP *product) :
         product->forceStateSync();
     });
 
+    // We abuse the GPU hatch dataref to trigger an update when the UI is closed.
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/anim/hatchGPU", [product](bool gpuHatchOpen) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/output/mcp/ok");
+    });
+
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit2/autopilot/autopilot_has_power", [](bool hasPower) {
+        Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lights/glareshield");
+    });
+
+    Dataref::getInstance()->monitorExistingDataref<bool>("1-sim/output/mcp/ok", [product](bool hasPower) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("1-sim/ckpt/lights/glareshield");
     });
 
@@ -73,7 +81,9 @@ FF777PAP3MCPProfile::FF777PAP3MCPProfile(ProductPAP3MCP *product) :
 
 FF777PAP3MCPProfile::~FF777PAP3MCPProfile() {
     Dataref::getInstance()->unbind("1-sim/ckpt/lights/glareshield");
+    Dataref::getInstance()->unbind("1-sim/anim/hatchGPU");
     Dataref::getInstance()->unbind("sim/cockpit2/autopilot/autopilot_has_power");
+    Dataref::getInstance()->unbind("1-sim/output/mcp/ok");
     Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/mcpVNAV");
     Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/mcpFLCH");
     Dataref::getInstance()->unbind("1-sim/ckpt/lampsGlow/mcpLNAV");

@@ -8,8 +8,7 @@
 #include <algorithm>
 #include <cstring>
 
-FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) :
-    FMCAircraftProfile(product) {
+FlightFactor777FMCProfile::FlightFactor777FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
     product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
 
