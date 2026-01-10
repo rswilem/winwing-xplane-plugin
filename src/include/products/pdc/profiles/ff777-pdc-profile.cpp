@@ -61,16 +61,16 @@ const std::unordered_map<uint16_t, PDCButtonDef> &FF777PDCProfile::buttonDefs() 
         {13, {"RIGHT VOR2", "1-sim/ckpt/cptHsiVorRSwitch/anim,1-sim/command/cptHsiVorRSwitch_button,1-sim/command/cptHsiVorRSwitch_trigger", PDCDatarefType::SET_VALUE_USING_COMMANDS, 1.0}},
         {14, {"RIGHT OFF", "1-sim/ckpt/cptHsiVorRSwitch/anim,1-sim/command/cptHsiVorRSwitch_button,1-sim/command/cptHsiVorRSwitch_trigger", PDCDatarefType::SET_VALUE_USING_COMMANDS, 0.0}},
         {15, {"RIGHT ADF2", "1-sim/ckpt/cptHsiVorRSwitch/anim,1-sim/command/cptHsiVorRSwitch_button,1-sim/command/cptHsiVorRSwitch_trigger", PDCDatarefType::SET_VALUE_USING_COMMANDS, -1.0}},
-        {16, {"BARO RST", "1-sim/command/cptHsiRstButton_button"}},
+        {16, {"Baro RST", "1-sim/command/cptHsiRstButton_button"}},
         {17, {"VOR MAP CTR", "1-sim/command/cptHsiCtrButton_button"}},
         {18, {"RANGE TFC", "1-sim/command/cptHsiTfcButton_button"}},
-        {19, {"BARO STD", "1-sim/command/cptHsiStdButton_button"}},
+        {19, {"Baro STD", "1-sim/command/cptHsiStdButton_button"}},
         {20, {"PDC3M RANGE MINUS", "1-sim/command/cptHsiRangeSwitch_switch-"}},
         {21, {"PDC3M RANGE PLUS", "1-sim/command/cptHsiRangeSwitch_switch+"}},
-        {22, {"BARO knob left fast", "1-sim/command/cptHsiBaroRotary_rotary-", PDCDatarefType::EXECUTE_CMD_PHASED}},
-        {23, {"BARO knob right fast", "1-sim/command/cptHsiBaroRotary_rotary+", PDCDatarefType::EXECUTE_CMD_PHASED}},
-        {24, {"MINS RADIO", "1-sim/command/cptHsiMinsModeRotary_set_0"}},
-        {25, {"MINS BARO", "1-sim/command/cptHsiMinsModeRotary_set_1"}},
+        {22, {"Baro knob left fast", "1-sim/command/cptHsiBaroRotary_rotary-", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {23, {"Baro knob right fast", "1-sim/command/cptHsiBaroRotary_rotary+", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {24, {"Mins RADIO", "1-sim/command/cptHsiMinsModeRotary_set_0"}},
+        {25, {"Mins BARO", "1-sim/command/cptHsiMinsModeRotary_set_1"}},
         {26, {"Baro inHg", "1-sim/command/cptHsiBaroModeRotary_set_0"}},
         {27, {"Baro HPA", "1-sim/command/cptHsiBaroModeRotary_set_1"}},
         {28, {"Map APP", "1-sim/command/cptHsiModeSwitch_set_0"}},
@@ -82,9 +82,9 @@ const std::unordered_map<uint16_t, PDCButtonDef> &FF777PDCProfile::buttonDefs() 
         {34, {"Mins knob center", ""}},
         {35, {"Mins knob right slow", "1-sim/command/cptHsiMinsRotary_rotary+", PDCDatarefType::EXECUTE_CMD_PHASED}},
         {36, {"Mins knob right fast", "1-sim/command/cptHsiMinsRotary_rotary+", PDCDatarefType::EXECUTE_CMD_PHASED}},
-        {37, {"BARO knob left slow", "1-sim/command/cptHsiBaroRotary_rotary-", PDCDatarefType::EXECUTE_CMD_PHASED}},
-        {38, {"BARO knob center", ""}},
-        {39, {"BARO knob right slow", "1-sim/command/cptHsiBaroRotary_rotary+", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {37, {"Baro knob left slow", "1-sim/command/cptHsiBaroRotary_rotary-", PDCDatarefType::EXECUTE_CMD_PHASED}},
+        {38, {"Baro knob center", ""}},
+        {39, {"Baro knob right slow", "1-sim/command/cptHsiBaroRotary_rotary+", PDCDatarefType::EXECUTE_CMD_PHASED}},
     };
 
     return buttons;
@@ -122,7 +122,7 @@ void FF777PDCProfile::buttonPressed(const PDCButtonDef *button, XPLMCommandPhase
 
     } else if (phase == xplm_CommandBegin && button->datarefType == PDCDatarefType::EXECUTE_CMD_ONCE) {
         datarefManager->executeCommand(button->dataref.c_str());
-    } else if (phase == xplm_CommandBegin && button->datarefType == PDCDatarefType::EXECUTE_CMD_PHASED) {
+    } else if (button->datarefType == PDCDatarefType::EXECUTE_CMD_PHASED) {
         datarefManager->executeCommand(button->dataref.c_str(), phase);
     }
 }
