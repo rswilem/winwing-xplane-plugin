@@ -41,8 +41,10 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
 
         uint8_t screenBrightness = hasPower ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7] * 255 : 0;
 
-        bool disableElecConnectorsTest = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ICAO").starts_with("A34");
-        if (!disableElecConnectorsTest) {
+        std::string aircraftIcao = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ICAO");
+        bool enableBusSwitchEmulation = aircraftIcao.starts_with("A31") || aircraftIcao.starts_with("A32");
+        // Bus switching on the A340 seems broken. For safety reasons, disable all, except A319/A320/A321
+        if (enableBusSwitchEmulation) {
             std::vector<int> elecConnectors = Dataref::getInstance()->get<std::vector<int>>("AirbusFBW/ElecConnectors");
 
             if (elecConnectors.size() > 11 && elecConnectors[11] != 1) {
