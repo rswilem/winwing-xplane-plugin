@@ -85,9 +85,9 @@ const std::unordered_map<uint16_t, PDCButtonDef> &ZiboPDCProfile::buttonDefs() c
         {34, {"Mins knob center", ""}},
         {35, {"Mins knob right slow", "laminar/B738/pfd/dh_pilot_up", PDCDatarefType::EXECUTE_CMD_PHASED}},
         {36, {"Mins knob right fast", "laminar/B738/pfd/dh_pilot_up", PDCDatarefType::EXECUTE_CMD_PHASED}},
-        {37, {"Baro knob left slow", "laminar/B738/pilot/barometer_up"}},
+        {37, {"Baro knob left slow", "laminar/B738/pilot/barometer_down"}},
         {38, {"Baro knob center", ""}},
-        {39, {"Baro knob right slow", "laminar/B738/pilot/barometer_down"}},
+        {39, {"Baro knob right slow", "laminar/B738/pilot/barometer_up"}},
     };
 
     return buttons;

@@ -5,9 +5,6 @@
 #include "default.h"
 #include "md11-cdu.h"
 #include "vga_1.h"
-#include "vga_2.h"
-#include "vga_3.h"
-#include "vga_4.h"
 #include "xcrafts.h"
 
 #include <cstddef>
@@ -30,18 +27,6 @@ const std::vector<std::vector<unsigned char>> Font::GlyphData(FontVariant varian
 
         case FontVariant::FontVGA1:
             result = fmcFontVGA1;
-            break;
-
-        case FontVariant::FontVGA2:
-            result = fmcFontVGA2;
-            break;
-
-        case FontVariant::FontVGA3:
-            result = fmcFontVGA3;
-            break;
-
-        case FontVariant::FontVGA4:
-            result = fmcFontVGA4;
             break;
 
         case FontVariant::FontMD11:
