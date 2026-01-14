@@ -16,8 +16,14 @@ enum class FontVariant : unsigned char {
 };
 
 class Font {
+    private:
+        static void convertGlyphDataForHardware(std::vector<std::vector<unsigned char>> &data, unsigned char hardwareIdentifier);
+
     public:
+        static const std::vector<std::vector<unsigned char>> GlyphData(std::string filename, unsigned char hardwareIdentifier);
         static const std::vector<std::vector<unsigned char>> GlyphData(FontVariant variant, unsigned char hardwareIdentifier);
+        static const std::vector<std::string> ReadCustomFontFiles();
+        static const bool IsCustomFontAvailable(std::string filename);
 };
 
 #endif

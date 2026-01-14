@@ -191,15 +191,9 @@ echo "Building has finished."
 if [ "$DEV_MODE" = true ]; then
     echo "\n\033[1;32mDevelopment build complete!\033[0m"
     if [ ! -z "$XPLANE_PLUGIN_PATH" ]; then
-        # Create plugin directory structure and copy assets
+        # Create plugin directory structure
         PLUGIN_DIR="$XPLANE_PLUGIN_PATH/$PROJECT_NAME"
         mkdir -p "$PLUGIN_DIR"
-        
-        # Copy assets folder if it exists
-        if [ -d "assets" ]; then
-            echo "Copying assets folder..."
-            cp -r assets "$PLUGIN_DIR/"
-        fi
         
         for platform in $PLATFORMS; do
             echo "Plugin installed to: $PLUGIN_DIR/${platform}_x64/$PROJECT_NAME.xpl"
@@ -221,7 +215,7 @@ for platform in $AVAILABLE_PLATFORMS; do
     fi
 done
 
-cp -r assets build/dist
+cp -r fonts build/dist
 
 # Only add Skunkcrafts for XP12
 if [ $SDK_VERSION -ge 400 ]; then

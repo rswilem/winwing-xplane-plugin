@@ -2,15 +2,13 @@
 
 #include "config.h"
 #include "dataref.h"
-#include "font.h"
 #include "product-fmc.h"
 
 #include <cstring>
 
-RotateMD11FMCProfile::RotateMD11FMCProfile(ProductFMC *product) :
-    FMCAircraftProfile(product) {
+RotateMD11FMCProfile::RotateMD11FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontMD11, product->identifierByte));
+    product->setFont(FontVariant::FontMD11);
 
     Dataref::getInstance()->monitorExistingDataref<float>("Rotate/aircraft/controls/mcdu_1_brt", [product](float brightness) {
         // Power is on if either AC bus 1 or emergency AC bus is powered
@@ -196,7 +194,8 @@ const std::vector<FMCButtonDef> &RotateMD11FMCProfile::buttonDefs() const {
                         {FMCKey::SPACE, "Rotate/aircraft/controls_c/" + cdu + "/mcdu_key_SPC"},
                         {FMCKey::SLASH, "Rotate/aircraft/controls_c/" + cdu + "/mcdu_key_BAR"},
                         {FMCKey::CLR, "Rotate/aircraft/controls_c/" + cdu + "/mcdu_key_CLR"},
-                        {FMCKey::MCDU_OVERFLY, "Rotate/aircraft/controls_c/" + cdu + "/mcdu_key_MINUS"}})
+                        {FMCKey::MCDU_OVERFLY, "Rotate/aircraft/controls_c/" + cdu + "/mcdu_key_MINUS"},
+                    })
         .first->second;
 }
 

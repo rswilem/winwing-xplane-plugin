@@ -210,11 +210,13 @@ void USBController::DeviceRemovedCallback(void *context, struct udev_device *dev
             if (len > 0) {
                 linkTarget[len] = '\0';
                 if (strcmp(linkTarget, devicePath) == 0) {
+                    (*it)->blackout();
                     (*it)->disconnect();
                     break;
                 }
             }
         } else {
+            (*it)->blackout();
             (*it)->disconnect();
             break;
         }
@@ -223,7 +225,7 @@ void USBController::DeviceRemovedCallback(void *context, struct udev_device *dev
     // Second pass: deferred erase
     AppState::getInstance()->executeAfter(0, [self, devicePath = std::string(devicePath)]() {
         for (auto it = self->devices.begin(); it != self->devices.end();) {
-            if (!(*it) || !(*it)->profileReady) {
+            if (!(*it) || !(*it)->profileReady || !(*it)->connected) {
                 delete *it;
                 it = self->devices.erase(it);
             } else {

@@ -21,7 +21,14 @@ ProductAGP::ProductAGP(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
 }
 
 ProductAGP::~ProductAGP() {
-    disconnect();
+    blackout();
+
+    PluginsMenu::getInstance()->removeItem(menuItemId);
+
+    if (profile) {
+        delete profile;
+        profile = nullptr;
+    }
 }
 
 const char *ProductAGP::classIdentifier() {
@@ -89,19 +96,12 @@ bool ProductAGP::connect() {
     return true;
 }
 
-void ProductAGP::disconnect() {
+void ProductAGP::blackout() {
     setLedBrightness(AGPLed::BACKLIGHT, 0);
     setLedBrightness(AGPLed::LCD_BRIGHTNESS, 0);
     setLedBrightness(AGPLed::OVERALL_LEDS_BRIGHTNESS, 0);
 
-    PluginsMenu::getInstance()->removeItem(menuItemId);
-
-    if (profile) {
-        delete profile;
-        profile = nullptr;
-    }
-
-    USBDevice::disconnect();
+    setAllLedsEnabled(false);
 }
 
 void ProductAGP::update() {

@@ -21,8 +21,7 @@
 #include <XPLMProcessing.h>
 #include <XPLMUtilities.h>
 
-ProductFCUEfis::ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) :
-    USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
+ProductFCUEfis::ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName) : USBDevice(hidDevice, vendorId, productId, vendorName, productName) {
     profile = nullptr;
     displayData = {};
     lastUpdateCycle = 0;
@@ -32,7 +31,14 @@ ProductFCUEfis::ProductFCUEfis(HIDDeviceHandle hidDevice, uint16_t vendorId, uin
 }
 
 ProductFCUEfis::~ProductFCUEfis() {
-    disconnect();
+    blackout();
+
+    PluginsMenu::getInstance()->removeItem(menuItemId);
+
+    if (profile) {
+        delete profile;
+        profile = nullptr;
+    }
 }
 
 void ProductFCUEfis::setProfileForCurrentAircraft() {
@@ -107,11 +113,11 @@ bool ProductFCUEfis::connect() {
     return false;
 }
 
-void ProductFCUEfis::disconnect() {
+void ProductFCUEfis::blackout() {
     setLedBrightness(FCUEfisLed::BACKLIGHT, 0);
     setLedBrightness(FCUEfisLed::SCREEN_BACKLIGHT, 0);
     setLedBrightness(FCUEfisLed::OVERALL_GREEN, 0);
-    
+
     setLedBrightness(FCUEfisLed::EFISR_BACKLIGHT, 0);
     setLedBrightness(FCUEfisLed::EFISR_SCREEN_BACKLIGHT, 0);
     setLedBrightness(FCUEfisLed::EFISR_OVERALL_GREEN, 0);
@@ -122,15 +128,6 @@ void ProductFCUEfis::disconnect() {
     setAllLedsEnabled(false);
 
     clearDisplays();
-
-    PluginsMenu::getInstance()->removeItem(menuItemId);
-
-    if (profile) {
-        delete profile;
-        profile = nullptr;
-    }
-
-    USBDevice::disconnect();
 }
 
 void ProductFCUEfis::update() {

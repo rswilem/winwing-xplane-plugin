@@ -134,7 +134,7 @@ void USBDevice::forceStateSync() {
 
 bool USBDevice::writeData(std::vector<uint8_t> data) {
     if (hidDevice == INVALID_HANDLE_VALUE || !connected || data.empty()) {
-        debug_force("HID device not open, not connected, or empty data\n");
+        debug("HID device not open, not connected, or empty data\n");
         return false;
     }
 

@@ -2,7 +2,6 @@
 
 #include "appstate.h"
 #include "dataref.h"
-#include "font.h"
 #include "product-fmc.h"
 
 #include <algorithm>
@@ -10,12 +9,11 @@
 #include <cmath>
 #include <cstring>
 
-ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) :
-    FMCAircraftProfile(product) {
+ZiboFMCProfile::ZiboFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     datarefRegex = std::regex("laminar/B738/fmc[0-9]+/Line([0-9]{2})_([A-Z]+)");
 
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::Font737, product->identifierByte));
+    product->setFont(FontVariant::Font737);
 
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/electric/instrument_brightness", [product](std::vector<float> screenBrightness) {
         if (screenBrightness.size() < 11) {

@@ -12,6 +12,7 @@ class ProductPAP3MCP : public USBDevice {
     private:
         uint8_t packetNumber = 1;
         PAP3MCPAircraftProfile *profile;
+        int menuItemId;
         PAP3MCPDisplayData displayData;
         int lastUpdateCycle;
         int displayUpdateFrameCounter = 0;
@@ -30,14 +31,15 @@ class ProductPAP3MCP : public USBDevice {
 
         const char *classIdentifier() override;
         bool connect() override;
-        void disconnect() override;
         void update() override;
+        void blackout() override;
         void didReceiveData(int reportId, uint8_t *report, int reportLength) override;
         void didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count = 1) override;
         void forceStateSync() override;
 
         void updateDisplays(bool force = true);
 
+        void setAllLedsEnabled(bool enable);
         void setLedBrightness(PAP3MCPLed led, uint8_t brightness);
         void setATSolenoid(bool engaged);
 

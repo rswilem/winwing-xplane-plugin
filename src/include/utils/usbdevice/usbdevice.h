@@ -71,11 +71,12 @@ class USBDevice {
 
         virtual const char *classIdentifier();
         virtual bool connect();
-        virtual void disconnect();
+        void disconnect();
         virtual void update();
         virtual void didReceiveData(int reportId, uint8_t *report, int reportLength);
         virtual void didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count = 1);
 
+        virtual void blackout();
         virtual void forceStateSync();
 
         void processOnMainThread(const InputEvent &event);

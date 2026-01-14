@@ -18,7 +18,14 @@ ProductUrsaMinorThrottle::ProductUrsaMinorThrottle(HIDDeviceHandle hidDevice, ui
 }
 
 ProductUrsaMinorThrottle::~ProductUrsaMinorThrottle() {
-    disconnect();
+    blackout();
+
+    PluginsMenu::getInstance()->removeItem(menuItemId);
+
+    if (profile) {
+        delete profile;
+        profile = nullptr;
+    }
 }
 
 const char *ProductUrsaMinorThrottle::classIdentifier() {
@@ -86,18 +93,11 @@ bool ProductUrsaMinorThrottle::connect() {
     return true;
 }
 
-void ProductUrsaMinorThrottle::disconnect() {
+void ProductUrsaMinorThrottle::blackout() {
     setLedBrightness(UrsaMinorThrottleLed::BACKLIGHT, 0);
     setLedBrightness(UrsaMinorThrottleLed::OVERALL_LEDS_AND_LCD_BRIGHTNESS, 0);
 
-    PluginsMenu::getInstance()->removeItem(menuItemId);
-
-    if (profile) {
-        delete profile;
-        profile = nullptr;
-    }
-
-    USBDevice::disconnect();
+    setAllLedsEnabled(false);
 }
 
 void ProductUrsaMinorThrottle::update() {

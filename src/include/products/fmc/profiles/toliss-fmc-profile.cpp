@@ -2,18 +2,16 @@
 
 #include "config.h"
 #include "dataref.h"
-#include "font.h"
 #include "product-fmc.h"
 
 #include <algorithm>
 
-TolissFMCProfile::TolissFMCProfile(ProductFMC *product) :
-    FMCAircraftProfile(product) {
+TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     datarefRegex = std::regex("AirbusFBW/MCDU(1|2)([s]{0,1})([a-zA-Z]+)([0-6]{0,1})([L]{0,1})([a-z]{1})");
     isSelfTest = false;
 
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontAirbus, product->identifierByte));
+    product->setFont(FontVariant::FontAirbus);
 
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("AirbusFBW/MCDUIntegBrightness_Raw", [product](std::vector<float> brightness) {
         if (brightness.size() < 2) {

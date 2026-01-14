@@ -2,19 +2,17 @@
 
 #include "appstate.h"
 #include "dataref.h"
-#include "font.h"
 #include "product-fmc.h"
 
 #include <algorithm>
 #include <cstring>
 #include <regex>
 
-SSG748FMCProfile::SSG748FMCProfile(ProductFMC *product) :
-    FMCAircraftProfile(product) {
+SSG748FMCProfile::SSG748FMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     datarefRegex = std::regex("SSG/UFMC/LINE_([0-9]+)");
 
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontVGA1, product->identifierByte));
+    product->setFont(FontVariant::FontVGA1);
 
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("ssg/LGT/mcdu_brt_sw", [product](std::vector<float> brightness) {
         if (brightness.size() < 27) {

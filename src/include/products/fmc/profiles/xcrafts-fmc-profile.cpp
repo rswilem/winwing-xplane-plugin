@@ -2,7 +2,6 @@
 
 #include "appstate.h"
 #include "dataref.h"
-#include "font.h"
 #include "product-fmc.h"
 
 #include <algorithm>
@@ -13,12 +12,11 @@
 #include <XPLMProcessing.h>
 #include <XPLMUtilities.h>
 
-XCraftsFMCProfile::XCraftsFMCProfile(ProductFMC *product) :
-    FMCAircraftProfile(product) {
+XCraftsFMCProfile::XCraftsFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     datarefRegex = std::regex("XCrafts/FMS/CDU_[0-9]+_([0-9]{2}|ScratchPad)");
 
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontXCrafts, product->identifierByte));
+    product->setFont(FontVariant::FontXCrafts);
 
     const std::string cdu = product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? "CDU1" : "CDU2";
     Dataref::getInstance()->monitorExistingDataref<float>(("XCrafts/FMS/" + cdu + "_brt").c_str(), [product](float rawBrightness) {

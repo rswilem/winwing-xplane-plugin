@@ -16,6 +16,13 @@ struct MenuItem {
         std::string name;
         bool checked = false;
         MenuItemContent content;
+
+        static MenuItem Separator() {
+            MenuItem item;
+            item.name = "---";
+            item.content = [](int) {};
+            return item;
+        }
 };
 
 class PluginsMenu {
@@ -42,7 +49,7 @@ class PluginsMenu {
         static PluginsMenu *getInstance();
         int addItem(const std::string &name, const MenuItemContent &content, bool checked = false);
         int addPersistentItem(const std::string &name, const MenuItemContent &content, bool checked = false);
-        void removeItem(int itemIndex);
+        void removeItem(int itemId);
         void setItemName(int itemIndex, const std::string &name);
         void setItemChecked(int itemId, bool checked);
         void uncheckSubmenuSiblings(int itemId);

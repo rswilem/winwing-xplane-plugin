@@ -7,13 +7,14 @@
 #include <vector>
 #include <XPLMUtilities.h>
 
-enum class PAP3MCPLed : int {
+enum class PAP3MCPLed : unsigned char {
     // Dimming channels (use sendDimming with brightness 0-255)
     BACKLIGHT = 0,              // Channel 0: Panel backlight dimming
     LCD_BACKLIGHT = 1,          // Channel 1: LCD screen dimming
     OVERALL_LED_BRIGHTNESS = 2, // Channel 2: Overall brightness
 
     // Individual LEDs (use sendLed with ON/OFF only)
+    _START = 3,
     N1 = 3,
     SPEED = 4,
     VNAV = 5,
@@ -30,7 +31,8 @@ enum class PAP3MCPLed : int {
     CWS_B = 16,
     AT_ARM = 17,
     MA_CAPT = 18,
-    MA_FO = 19
+    MA_FO = 19,
+    _END = 19,
 };
 
 enum PAP3MCPDatarefType : unsigned char {

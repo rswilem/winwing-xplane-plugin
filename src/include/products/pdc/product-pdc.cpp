@@ -18,7 +18,14 @@ ProductPDC::ProductPDC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
 }
 
 ProductPDC::~ProductPDC() {
-    disconnect();
+    blackout();
+
+    PluginsMenu::getInstance()->removeItem(menuItemId);
+
+    if (profile) {
+        delete profile;
+        profile = nullptr;
+    }
 }
 
 const char *ProductPDC::classIdentifier() {
@@ -64,17 +71,8 @@ bool ProductPDC::connect() {
     return true;
 }
 
-void ProductPDC::disconnect() {
+void ProductPDC::blackout() {
     setLedBrightness(PDCLed::BACKLIGHT, 0);
-
-    PluginsMenu::getInstance()->removeItem(menuItemId);
-
-    if (profile) {
-        delete profile;
-        profile = nullptr;
-    }
-
-    USBDevice::disconnect();
 }
 
 void ProductPDC::setLedBrightness(PDCLed led, uint8_t brightness) {

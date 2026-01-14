@@ -151,8 +151,9 @@ void USBController::DeviceRemovedCallback(void *context, IOReturn result, void *
     }
 
     auto *self = static_cast<USBController *>(context);
-    for (auto it = self->devices.begin(); it != self->devices.end(); ) {
+    for (auto it = self->devices.begin(); it != self->devices.end();) {
         if ((*it)->hidDevice == device) {
+            (*it)->blackout();
             (*it)->disconnect();
             ++it;
         } else {
@@ -162,7 +163,8 @@ void USBController::DeviceRemovedCallback(void *context, IOReturn result, void *
 
     AppState::getInstance()->executeAfter(0, [self, device]() {
         for (auto it = self->devices.begin(); it != self->devices.end();) {
-            if ((*it)->hidDevice == device || !(*it)->profileReady) {
+            if ((*it)->hidDevice == device || !(*it)->profileReady || !(*it)->connected) {
+                printf("Removing device %s because found. or was profile not ready? %i\n", (*it)->productName.c_str(), !(*it)->profileReady);
                 delete *it;
                 it = self->devices.erase(it);
             } else {

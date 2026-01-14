@@ -4,6 +4,7 @@
 #include "config.h"
 #include "dataref.h"
 #include "pap3-mcp-lcd-segments.h"
+#include "plugins-menu.h"
 #include "profiles/ff777-pap3-mcp-profile.h"
 #include "profiles/laminar-pap3-mcp-profile.h"
 #include "profiles/rotatemd11-pap3-mcp-profile.h"
@@ -32,7 +33,14 @@ ProductPAP3MCP::ProductPAP3MCP(HIDDeviceHandle hidDevice, uint16_t vendorId, uin
 }
 
 ProductPAP3MCP::~ProductPAP3MCP() {
-    disconnect();
+    blackout();
+
+    PluginsMenu::getInstance()->removeItem(menuItemId);
+
+    if (profile) {
+        delete profile;
+        profile = nullptr;
+    }
 }
 
 void ProductPAP3MCP::setProfileForCurrentAircraft() {
@@ -63,6 +71,23 @@ bool ProductPAP3MCP::connect() {
         setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, 0);
         setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, 0);
 
+        menuItemId = PluginsMenu::getInstance()->addItem(
+            classIdentifier(),
+            std::vector<MenuItem>{
+                {.name = "Identify", .content = [this](int menuId) {
+                     setLedBrightness(PAP3MCPLed::BACKLIGHT, 255);
+                     setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, 255);
+                     setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, 255);
+                     setAllLedsEnabled(true);
+                     AppState::getInstance()->executeAfter(2000, [this]() {
+                         setLedBrightness(PAP3MCPLed::BACKLIGHT, 128);
+                         setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, 128);
+                         setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, 128);
+                         setAllLedsEnabled(false);
+                     });
+                 }},
+            });
+
         if (!profile) {
             setProfileForCurrentAircraft();
         }
@@ -73,37 +98,15 @@ bool ProductPAP3MCP::connect() {
     return false;
 }
 
-void ProductPAP3MCP::disconnect() {
+void ProductPAP3MCP::blackout() {
     // Turn off all LEDs
     setLedBrightness(PAP3MCPLed::BACKLIGHT, 0);
     setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, 0);
     setLedBrightness(PAP3MCPLed::OVERALL_LED_BRIGHTNESS, 0);
-    setLedBrightness(PAP3MCPLed::N1, 0);
-    setLedBrightness(PAP3MCPLed::SPEED, 0);
-    setLedBrightness(PAP3MCPLed::VNAV, 0);
-    setLedBrightness(PAP3MCPLed::LVL_CHG, 0);
-    setLedBrightness(PAP3MCPLed::HDG_SEL, 0);
-    setLedBrightness(PAP3MCPLed::LNAV, 0);
-    setLedBrightness(PAP3MCPLed::VORLOC, 0);
-    setLedBrightness(PAP3MCPLed::APP, 0);
-    setLedBrightness(PAP3MCPLed::ALT_HLD, 0);
-    setLedBrightness(PAP3MCPLed::VS, 0);
-    setLedBrightness(PAP3MCPLed::CMD_A, 0);
-    setLedBrightness(PAP3MCPLed::CWS_A, 0);
-    setLedBrightness(PAP3MCPLed::CMD_B, 0);
-    setLedBrightness(PAP3MCPLed::CWS_B, 0);
-    setLedBrightness(PAP3MCPLed::AT_ARM, 0);
-    setLedBrightness(PAP3MCPLed::MA_CAPT, 0);
-    setLedBrightness(PAP3MCPLed::MA_FO, 0);
+
+    setAllLedsEnabled(false);
 
     clearDisplays();
-
-    if (profile) {
-        delete profile;
-        profile = nullptr;
-    }
-
-    USBDevice::disconnect();
 }
 
 void ProductPAP3MCP::update() {
@@ -490,6 +493,16 @@ void ProductPAP3MCP::sendLCDDisplay(const std::string &speed, int heading, int a
     writeData(commitFrame);
     if (++packetNumber == 0) {
         packetNumber = 1;
+    }
+}
+
+void ProductPAP3MCP::setAllLedsEnabled(bool enable) {
+    unsigned char start = static_cast<unsigned char>(PAP3MCPLed::_START);
+    unsigned char end = static_cast<unsigned char>(PAP3MCPLed::_END);
+
+    for (unsigned char i = start; i <= end; ++i) {
+        PAP3MCPLed led = static_cast<PAP3MCPLed>(i);
+        setLedBrightness(led, enable ? 1 : 0);
     }
 }
 

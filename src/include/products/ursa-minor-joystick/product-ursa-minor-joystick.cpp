@@ -9,13 +9,19 @@
 #include <algorithm>
 #include <cmath>
 
-ProductUrsaMinorJoystick::ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, unsigned char identifierByte) :
-    USBDevice(hidDevice, vendorId, productId, vendorName, productName), identifierByte(identifierByte) {
+ProductUrsaMinorJoystick::ProductUrsaMinorJoystick(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, unsigned char identifierByte) : USBDevice(hidDevice, vendorId, productId, vendorName, productName), identifierByte(identifierByte) {
     connect();
 }
 
 ProductUrsaMinorJoystick::~ProductUrsaMinorJoystick() {
-    disconnect();
+    blackout();
+
+    PluginsMenu::getInstance()->removeItem(menuItemId);
+
+    if (profile) {
+        delete profile;
+        profile = nullptr;
+    }
 }
 
 const char *ProductUrsaMinorJoystick::classIdentifier() {
@@ -102,17 +108,9 @@ bool ProductUrsaMinorJoystick::connect() {
     return true;
 }
 
-void ProductUrsaMinorJoystick::disconnect() {
+void ProductUrsaMinorJoystick::blackout() {
     setLedBrightness(0);
     setVibration(0);
-    PluginsMenu::getInstance()->removeItem(menuItemId);
-
-    if (profile) {
-        delete profile;
-        profile = nullptr;
-    }
-
-    USBDevice::disconnect();
 }
 
 void ProductUrsaMinorJoystick::update() {

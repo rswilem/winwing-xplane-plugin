@@ -1,16 +1,14 @@
 #include "laminar-airbus-fmc-profile.h"
 
 #include "dataref.h"
-#include "font.h"
 #include "product-fmc.h"
 
 #include <algorithm>
 #include <cstring>
 
-LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) :
-    FMCAircraftProfile(product) {
+LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(product) {
     product->setAllLedsEnabled(false);
-    product->setFont(Font::GlyphData(FontVariant::FontAirbus, product->identifierByte));
+    product->setFont(FontVariant::FontAirbus);
 
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {

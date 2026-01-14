@@ -17,7 +17,14 @@ ProductECAM32::ProductECAM32(HIDDeviceHandle hidDevice, uint16_t vendorId, uint1
 }
 
 ProductECAM32::~ProductECAM32() {
-    disconnect();
+    blackout();
+
+    PluginsMenu::getInstance()->removeItem(menuItemId);
+
+    if (profile) {
+        delete profile;
+        profile = nullptr;
+    }
 }
 
 const char *ProductECAM32::classIdentifier() {
@@ -63,19 +70,12 @@ bool ProductECAM32::connect() {
     return true;
 }
 
-void ProductECAM32::disconnect() {
+void ProductECAM32::blackout() {
     setLedBrightness(ECAM32Led::BACKLIGHT, 0);
     setLedBrightness(ECAM32Led::EMER_CANC_BRIGHTNESS, 0);
     setLedBrightness(ECAM32Led::OVERALL_LEDS_BRIGHTNESS, 0);
 
-    PluginsMenu::getInstance()->removeItem(menuItemId);
-
-    if (profile) {
-        delete profile;
-        profile = nullptr;
-    }
-
-    USBDevice::disconnect();
+    setAllLedsEnabled(false);
 }
 
 void ProductECAM32::setAllLedsEnabled(bool enable) {

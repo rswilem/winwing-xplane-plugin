@@ -95,6 +95,7 @@ void USBDevice::disconnect() {
         }
 
         IOHIDDeviceClose(hidDevice, kIOHIDOptionsTypeNone);
+
         hidDevice = nullptr;
     }
 }

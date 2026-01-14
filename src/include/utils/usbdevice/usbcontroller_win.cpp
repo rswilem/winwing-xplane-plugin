@@ -6,7 +6,7 @@
 
 #include <dbt.h>
 #include <functional>
-#include <hidsdi.h>
+#include <hidsidsdi.h>
 #include <initguid.h>
 #include <iostream>
 #include <map>
@@ -230,6 +230,7 @@ void USBController::checkForDeviceChanges() {
             found = std::find(currentDevicePaths.begin(), currentDevicePaths.end(), pathIt->second) != currentDevicePaths.end();
         }
         if (!found || dev->hidDevice == INVALID_HANDLE_VALUE || !dev->connected) {
+            dev->blackout();
             dev->disconnect();
         }
     }

@@ -132,6 +132,10 @@ const char *USBDevice::classIdentifier() {
     return "USBDevice (none)";
 }
 
+void USBDevice::blackout() {
+    // noop, expect override
+}
+
 void USBDevice::didReceiveData(int reportId, uint8_t *report, int reportLength) {
     // noop, expect override
 }

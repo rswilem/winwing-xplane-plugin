@@ -13,12 +13,12 @@
 #include "profiles/toliss-fmc-profile.h"
 #include "profiles/xcrafts-fmc-profile.h"
 #include "profiles/zibo-fmc-profile.h"
+#include "usbcontroller.h"
 
 #include <chrono>
 #include <XPLMProcessing.h>
 
-ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, FMCDeviceVariant variant, unsigned char identifierByte) :
-    USBDevice(hidDevice, vendorId, productId, vendorName, productName), hardwareType(hardwareType), identifierByte(identifierByte), deviceVariant(variant) {
+ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t productId, std::string vendorName, std::string productName, FMCHardwareType hardwareType, FMCDeviceVariant variant, unsigned char identifierByte) : USBDevice(hidDevice, vendorId, productId, vendorName, productName), hardwareType(hardwareType), identifierByte(identifierByte), deviceVariant(variant) {
     profile = nullptr;
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageBytesPerLine, ' '));
     lastUpdateCycle = 0;
@@ -31,7 +31,9 @@ ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
 }
 
 ProductFMC::~ProductFMC() {
-    disconnect();
+    blackout();
+    PluginsMenu::getInstance()->removeItem(menuItemId);
+    unloadProfile();
 }
 
 void ProductFMC::setProfileForCurrentAircraft() {
@@ -119,10 +121,6 @@ bool ProductFMC::connect() {
         setLedBrightness(FMCLed::MCDU_FAIL, 1);
         setLedBrightness(FMCLed::PFP_FAIL, 1);
 
-        if (!profile) {
-            setProfileForCurrentAircraft();
-        }
-
         std::vector<MenuItem> menuItems = {
             {.name = "Identify", .content = [this](int menuId) {
                  setLedBrightness(FMCLed::OVERALL_LEDS_BRIGHTNESS, 255);
@@ -151,22 +149,73 @@ bool ProductFMC::connect() {
                                            }});
         }
 
+        std::vector<std::string> customFontFiles = Font::ReadCustomFontFiles();
+        std::string fmcFontPreference = AppState::getInstance()->readPreference("FMCFont", "default");
+        std::vector<MenuItem> fontMenuItems = {
+            {
+                .name = "Managed by plugin",
+                .checked = fmcFontPreference == "default",
+                .content = [this](int itemId) {
+                    AppState::getInstance()->writePreference("FMCFont", "default");
+                    PluginsMenu::getInstance()->uncheckSubmenuSiblings(itemId);
+                    PluginsMenu::getInstance()->setItemChecked(itemId, true);
+
+                    setFont(preferredFontVariant);
+                    updatePage(true);
+                },
+            },
+            {
+                .name = "No custom font (reconnect USB)",
+                .checked = fmcFontPreference == "no_font",
+                .content = [this](int itemId) {
+                    AppState::getInstance()->writePreference("FMCFont", "no_font");
+                    PluginsMenu::getInstance()->uncheckSubmenuSiblings(itemId);
+                    PluginsMenu::getInstance()->setItemChecked(itemId, true);
+
+                    // No font updating - expect USB reconnect to clear the custom font.
+                },
+            },
+        };
+
+        if (customFontFiles.size() > 0) {
+            fontMenuItems.push_back(MenuItem::Separator());
+
+            for (const std::string &fontFile : customFontFiles) {
+                fontMenuItems.push_back(
+                    {
+                        .name = fontFile,
+                        .checked = fmcFontPreference == fontFile,
+                        .content = [this, fontFile](int itemId) {
+                            AppState::getInstance()->writePreference("FMCFont", fontFile);
+                            PluginsMenu::getInstance()->uncheckSubmenuSiblings(itemId);
+                            PluginsMenu::getInstance()->setItemChecked(itemId, true);
+
+                            setFont(preferredFontVariant);
+                            updatePage(true);
+                        },
+                    });
+            }
+        }
+
+        menuItems.push_back({.name = "Display font", .content = fontMenuItems});
         menuItemId = PluginsMenu::getInstance()->addItem(classIdentifier(), menuItems);
+
+        if (!profile) {
+            setProfileForCurrentAircraft();
+        }
+
         return true;
     }
 
     return false;
 }
 
-void ProductFMC::disconnect() {
-    PluginsMenu::getInstance()->removeItem(menuItemId);
+void ProductFMC::blackout() {
     setLedBrightness(FMCLed::BACKLIGHT, 0);
     setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 0);
     setAllLedsEnabled(false);
 
-    unloadProfile();
-
-    USBDevice::disconnect();
+    clearDisplay();
 }
 
 void ProductFMC::unloadProfile() {
@@ -370,7 +419,7 @@ void ProductFMC::writeLineToPage(std::vector<std::vector<char>> &page, int line,
 
 void ProductFMC::clearDisplay() {
     page = std::vector<std::vector<char>>(ProductFMC::PageLines, std::vector<char>(ProductFMC::PageBytesPerLine, ' '));
-    
+
     std::vector<uint8_t> blankLine = {};
     blankLine.push_back(0xf2);
     for (int i = 0; i < ProductFMC::PageCharsPerLine; ++i) {
@@ -384,8 +433,25 @@ void ProductFMC::clearDisplay() {
     }
 }
 
-void ProductFMC::setFont(std::vector<std::vector<unsigned char>> font) {
-    if (!fontUpdatingEnabled) {
+void ProductFMC::setFont(FontVariant preferredVariant) {
+    std::string fontPreference = AppState::getInstance()->readPreference("FMCFont", "default");
+
+    if (fontPreference == "no_font") {
+        return;
+    }
+
+    preferredFontVariant = preferredVariant;
+    bool shouldLoadDefaultFont = (fontPreference == "default") || (!Font::IsCustomFontAvailable(fontPreference));
+    std::vector<std::vector<unsigned char>> font = {};
+    if (shouldLoadDefaultFont) {
+        font = Font::GlyphData(preferredVariant, identifierByte);
+    } else {
+        font = Font::GlyphData(fontPreference, identifierByte);
+    }
+
+    if (font.empty()) {
+        debug_force("Failed to load font data for font '%s'\n", fontPreference.c_str());
+        AppState::getInstance()->writePreference("FMCFont", "default");
         return;
     }
 

@@ -198,7 +198,6 @@
 		F6A77E6E2ED3514600061D03 /* agp-aircraft-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "agp-aircraft-profile.h"; sourceTree = "<group>"; };
 		F6A77E6F2ED3514600061D03 /* product-agp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "product-agp.h"; sourceTree = "<group>"; };
 		F6A77E702ED3514600061D03 /* product-agp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "product-agp.cpp"; sourceTree = "<group>"; };
-		F6A77E762ED3620600061D03 /* packet-utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "packet-utils.h"; sourceTree = "<group>"; };
 		F6A77E772ED3620600061D03 /* segment-display.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "segment-display.h"; sourceTree = "<group>"; };
 		F6A77E782ED3620600061D03 /* segment-display.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "segment-display.cpp"; sourceTree = "<group>"; };
 		F6AF9EBB2D06F84900530297 /* dataref.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dataref.h; sourceTree = "<group>"; };
@@ -462,7 +461,6 @@
 				F6AF9EBC2D06F84900530297 /* dataref.cpp */,
 				F6C248442EBE498500617E89 /* plugins-menu.h */,
 				F6C248452EBE498500617E89 /* plugins-menu.cpp */,
-				F6A77E762ED3620600061D03 /* packet-utils.h */,
 				F6A77E772ED3620600061D03 /* segment-display.h */,
 				F6A77E782ED3620600061D03 /* segment-display.cpp */,
 			);

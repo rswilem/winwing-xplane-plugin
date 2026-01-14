@@ -21,8 +21,8 @@ class ProductUrsaMinorJoystick : public USBDevice {
 
         const char *classIdentifier() override;
         bool connect() override;
-        void disconnect() override;
         void update() override;
+        void blackout() override;
 
         void setVibration(uint8_t vibration);
         void setLedBrightness(uint8_t brightness);
