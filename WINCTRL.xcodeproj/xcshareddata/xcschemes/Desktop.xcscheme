@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D607B19809A556E400699BC3"
-               BuildableName = "winwing.xpl"
-               BlueprintName = "winwing"
-               ReferencedContainer = "container:Winwing.xcodeproj">
+               BuildableName = "winctrl.xpl"
+               BlueprintName = "winctrl"
+               ReferencedContainer = "container:WINCTRL.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -30,9 +30,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F6827DF72E0564F700382B28"
-               BuildableName = "WinwingDesktop.app"
-               BlueprintName = "WinwingDesktop"
-               ReferencedContainer = "container:Winwing.xcodeproj">
+               BuildableName = "WINCTRLDesktop.app"
+               BlueprintName = "WINCTRLDesktop"
+               ReferencedContainer = "container:WINCTRL.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -59,9 +59,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F6827DF72E0564F700382B28"
-            BuildableName = "WinwingDesktop.app"
-            BlueprintName = "WinwingDesktop"
-            ReferencedContainer = "container:Winwing.xcodeproj">
+            BuildableName = "WINCTRLDesktop.app"
+            BlueprintName = "WINCTRLDesktop"
+            ReferencedContainer = "container:WINCTRL.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -76,9 +76,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F6827DF72E0564F700382B28"
-            BuildableName = "WinwingDesktop.app"
-            BlueprintName = "WinwingDesktop"
-            ReferencedContainer = "container:Winwing.xcodeproj">
+            BuildableName = "WINCTRLDesktop.app"
+            BlueprintName = "WINCTRLDesktop"
+            ReferencedContainer = "container:WINCTRL.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

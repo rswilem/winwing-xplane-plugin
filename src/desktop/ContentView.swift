@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  WinwingDesktop
+//  WinctrlDesktop
 //
 //  Created by Ramon Swilem on 20/06/2025.
 //
@@ -41,7 +41,7 @@ func enumerateDevices() -> [String] {
 struct ContentView: View {
     @StateObject private var deviceManager = DeviceManager()
     @State private var refreshTimer: Timer?
-    @State private var selectedDevice: WinwingDevice?
+    @State private var selectedDevice: WinctrlDevice?
     @State private var showingButtonIdentification = false
     
     var body: some View {
@@ -152,7 +152,7 @@ struct ContentView: View {
     }
     
     @ViewBuilder
-    private func deviceControlView(for device: WinwingDevice) -> some View {
+    private func deviceControlView(for device: WinctrlDevice) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             switch device.type {
             case .joystick:

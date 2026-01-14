@@ -1,6 +1,6 @@
 //
 //  ButtonMapping.swift
-//  WinwingDesktop
+//  WinctrlDesktop
 //
 //  Created by Ramon Swilem on 08/11/2025.
 //

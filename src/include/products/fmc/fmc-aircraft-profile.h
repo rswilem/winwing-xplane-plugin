@@ -82,7 +82,7 @@ enum class FMCBackgroundVariant : unsigned char {
     BLUE,
     YELLOW,
     PURPLE,
-    WINWING_LOGO
+    WINCTRL_LOGO
 };
 
 class ProductFMC;
@@ -103,7 +103,10 @@ class FMCAircraftProfile {
         virtual void mapCharacter(std::vector<uint8_t> *buffer, uint8_t character, bool isFontSmall) = 0;
         virtual void updatePage(std::vector<std::vector<char>> &page) = 0;
         virtual void buttonPressed(const FMCButtonDef *button, XPLMCommandPhase phase) = 0;
-        virtual bool shouldReadDatarefAsBytes(const std::string &dataref) const { return false; }
+
+        virtual bool shouldReadDatarefAsBytes(const std::string &dataref) const {
+            return false;
+        }
 };
 
 #endif

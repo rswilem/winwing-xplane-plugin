@@ -1,6 +1,6 @@
 //
 //  FMCControlView.swift
-//  WinwingDesktop
+//  WinctrlDesktop
 //
 //  Created by Ramon Swilem on 15/08/2025.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FMCControlView: View {
-    let device: WinwingDevice
+    let device: WinctrlDevice
     @State private var backlight: Double = 0
     @State private var screenBacklight: Double = 0
     @State private var overallLedsBrightness: Double = 0
@@ -707,7 +707,7 @@ struct FMCControlView: View {
 
 #Preview {
     // Create a mock device for preview
-    let mockDevice = WinwingDevice(
+    let mockDevice = WinctrlDevice(
         id: 0,
         name: "Mock FMC",
         type: .fmc,

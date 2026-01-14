@@ -67,7 +67,7 @@ USBDevice *USBController::createDeviceFromHandle(HANDLE hidDevice, const std::st
     HIDD_ATTRIBUTES attributes = {};
     attributes.Size = sizeof(attributes);
 
-    if (!HidD_GetAttributes(hidDevice, &attributes) || attributes.VendorID != WINWING_VENDOR_ID) {
+    if (!HidD_GetAttributes(hidDevice, &attributes) || attributes.VendorID != WINCTRL_VENDOR_ID) {
         CloseHandle(hidDevice);
         return nullptr;
     }
@@ -188,7 +188,7 @@ void USBController::enumerateDevices() {
     enumerateHidDevices([this](HANDLE hidDevice, const std::string &devicePath) {
         HIDD_ATTRIBUTES attributes = {};
         attributes.Size = sizeof(attributes);
-        if (HidD_GetAttributes(hidDevice, &attributes) && attributes.VendorID == WINWING_VENDOR_ID) {
+        if (HidD_GetAttributes(hidDevice, &attributes) && attributes.VendorID == WINCTRL_VENDOR_ID) {
             if (deviceExistsWithVidPid(attributes.VendorID, attributes.ProductID)) {
                 CloseHandle(hidDevice);
                 return;
@@ -208,7 +208,7 @@ void USBController::checkForDeviceChanges() {
     enumerateHidDevices([this, &currentDevicePaths](HANDLE hidDevice, const std::string &devicePath) {
         HIDD_ATTRIBUTES attributes = {};
         attributes.Size = sizeof(attributes);
-        if (HidD_GetAttributes(hidDevice, &attributes) && attributes.VendorID == WINWING_VENDOR_ID) {
+        if (HidD_GetAttributes(hidDevice, &attributes) && attributes.VendorID == WINCTRL_VENDOR_ID) {
             currentDevicePaths.push_back(devicePath);
 
             if (!deviceExistsWithVidPid(attributes.VendorID, attributes.ProductID)) {

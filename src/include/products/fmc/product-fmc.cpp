@@ -116,7 +116,7 @@ bool ProductFMC::connect() {
         setLedBrightness(FMCLed::SCREEN_BACKLIGHT, 128);
         setLedBrightness(FMCLed::OVERALL_LEDS_BRIGHTNESS, 255);
         setAllLedsEnabled(false);
-        showBackground(FMCBackgroundVariant::WINWING_LOGO);
+        showBackground(FMCBackgroundVariant::WINCTRL_LOGO);
 
         setLedBrightness(FMCLed::MCDU_FAIL, 1);
         setLedBrightness(FMCLed::PFP_FAIL, 1);
@@ -316,7 +316,7 @@ void ProductFMC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, ui
 
     FMCKey key = FMCHardwareMapping::ButtonIdentifierForIndex(hardwareType, hardwareButtonIndex);
     if (key == FMCKey::INVALID_UNKNOWN) {
-        // For reference, we often get: [Winwing] Received unknown key from hardwareType 1 - hardwareButtonIndex: 207
+        // For reference, we often get: [WINCTRL] Received unknown key from hardwareType 1 - hardwareButtonIndex: 207
         debug("Received unknown key from hardwareType %i - hardwareButtonIndex: %i\n", (int) hardwareType, hardwareButtonIndex);
         return;
     }
@@ -494,7 +494,7 @@ void ProductFMC::showBackground(FMCBackgroundVariant variant) {
             data = {0xf0, 0x00, 0x09, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x05, 0xa7, 0x09, 0x00};
             break;
 
-        case FMCBackgroundVariant::WINWING_LOGO:
+        case FMCBackgroundVariant::WINCTRL_LOGO:
             data = {0xf0, 0x00, 0x0a, 0x12, identifierByte, 0xbb, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0xd4, 0xac, 0x09, 0x00};
             break;
 

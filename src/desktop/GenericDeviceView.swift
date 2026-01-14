@@ -1,6 +1,6 @@
 //
 //  GenericDeviceView.swift
-//  WinwingDesktop
+//  WinctrlDesktop
 //
 //  Created by Ramon Swilem on 08/07/2025.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct GenericDeviceView: View {
-    let device: WinwingDevice
+    let device: WinctrlDevice
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -70,7 +70,7 @@ struct GenericDeviceView: View {
 }
 
 #Preview {
-    GenericDeviceView(device: WinwingDevice(
+    GenericDeviceView(device: WinctrlDevice(
         id: 0,
         name: "Unknown Device",
         type: .unknown,

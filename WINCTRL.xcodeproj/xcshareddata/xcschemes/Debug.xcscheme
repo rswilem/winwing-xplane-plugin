@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1640"
-   version = "1.7">
+   version = "2.2">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
@@ -11,20 +11,29 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;cleaned_product_name=&quot;${PRODUCT_NAME//-mac/}&quot;&#10;cleaned_product_name=&quot;${cleaned_product_name//-win/}&quot;&#10;cleaned_product_name=&quot;${cleaned_product_name//-lin/}&quot;&#10;folder=&quot;$HOME/X-Plane 12/Resources/plugins/${cleaned_product_name}&quot;&#10;&#10;case &quot;$OSTYPE&quot; in&#10;darwin*) os_folder=&quot;mac_x64&quot; ;;&#10;linux*) os_folder=&quot;lin_x64&quot; ;;&#10;msys*) os_folder=&quot;win_x64&quot; ;;&#10;*) os_folder=&quot;unknown&quot; ;;&#10;esac&#10;&#10;[ &quot;$os_folder&quot; != &quot;unknown&quot; ] &amp;&amp; mkdir -p &quot;$folder/$os_folder&quot; &amp;&amp; cp &quot;$BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH&quot; &quot;$folder/$os_folder/&quot;&#10;">
+               scriptText = "cleaned_product_name=&quot;${PRODUCT_NAME//-mac/}&quot;&#10;cleaned_product_name=&quot;${cleaned_product_name//-win/}&quot;&#10;cleaned_product_name=&quot;${cleaned_product_name//-lin/}&quot;&#10;folder=&quot;$HOME/X-Plane 12/Resources/plugins/${cleaned_product_name}&quot;&#10;&#10;case &quot;$OSTYPE&quot; in&#10;darwin*) os_folder=&quot;mac_x64&quot; ;;&#10;linux*) os_folder=&quot;lin_x64&quot; ;;&#10;msys*) os_folder=&quot;win_x64&quot; ;;&#10;*) os_folder=&quot;unknown&quot; ;;&#10;esac&#10;&#10;[ &quot;$os_folder&quot; != &quot;unknown&quot; ] &amp;&amp; mkdir -p &quot;$folder/$os_folder&quot; &amp;&amp; cp &quot;$BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH&quot; &quot;$folder/$os_folder/&quot;&#10;&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
                      BlueprintIdentifier = "D607B19809A556E400699BC3"
-                     BuildableName = "winwing.xpl"
-                     BlueprintName = "winwing"
-                     ReferencedContainer = "container:Winwing.xcodeproj">
+                     BuildableName = "winctrl.xpl"
+                     BlueprintName = "winctrl"
+                     ReferencedContainer = "container:WINCTRL.xcodeproj">
                   </BuildableReference>
                </EnvironmentBuildable>
             </ActionContent>
          </ExecutionAction>
       </PostActions>
       <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <AutocreatedTestPlanReference>
+            </AutocreatedTestPlanReference>
+         </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
@@ -34,9 +43,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D607B19809A556E400699BC3"
-               BuildableName = "winwing.xpl"
-               BlueprintName = "winwing"
-               ReferencedContainer = "container:Winwing.xcodeproj">
+               BuildableName = "winctrl.xpl"
+               BlueprintName = "winctrl"
+               ReferencedContainer = "container:WINCTRL.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -49,10 +58,9 @@
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      checkedAllocationsOption = "1"
+      buildConfiguration = "Debug (x86_64)"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       customWorkingDirectory = "/Users/ramon/X-Plane 12"
@@ -79,9 +87,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D607B19809A556E400699BC3"
-            BuildableName = "winwing.xpl"
-            BlueprintName = "winwing"
-            ReferencedContainer = "container:Winwing.xcodeproj">
+            BuildableName = "winctrl.xpl"
+            BlueprintName = "winctrl"
+            ReferencedContainer = "container:WINCTRL.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

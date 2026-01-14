@@ -86,7 +86,7 @@ USBDevice *USBController::createDeviceFromPath(const std::string &devicePath) {
     }
 
     struct hidraw_devinfo info;
-    if (ioctl(fd, HIDIOCGRAWINFO, &info) < 0 || info.vendor != WINWING_VENDOR_ID) {
+    if (ioctl(fd, HIDIOCGRAWINFO, &info) < 0 || info.vendor != WINCTRL_VENDOR_ID) {
         close(fd);
         return nullptr;
     }
@@ -97,7 +97,7 @@ USBDevice *USBController::createDeviceFromPath(const std::string &devicePath) {
         return nullptr;
     }
 
-    return USBDevice::Device(fd, info.vendor, info.product, "Winwing", std::string(name));
+    return USBDevice::Device(fd, info.vendor, info.product, "WINCTRL", std::string(name));
 }
 
 bool USBController::deviceExistsAtPath(const std::string &devicePath) {

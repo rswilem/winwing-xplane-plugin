@@ -5,7 +5,7 @@ show_help() {
     cat << EOF
 Usage: ./build_platforms.sh [OPTIONS]
 
-Build script for the Winwing X-Plane plugin. Supports building for multiple platforms
+Build script for the WINCTRL X-Plane plugin. Supports building for multiple platforms
 and development mode with live reload to X-Plane.
 
 OPTIONS:
@@ -219,7 +219,7 @@ cp -r fonts build/dist
 
 # Only add Skunkcrafts for XP12
 if [ $SDK_VERSION -ge 400 ]; then
-    echo "module|https://ramonster.nl/winwing-plugin\nname|Winwing\nversion|$VERSION\nlocked|false\ndisabled|false\nzone|custom" > build/dist/skunkcrafts_updater.cfg
+    echo "module|https://ramonster.nl/winctrl-plugin\nname|WINCTRL\nversion|$VERSION\nlocked|false\ndisabled|false\nzone|custom" > build/dist/skunkcrafts_updater.cfg
 fi
 
 cd build

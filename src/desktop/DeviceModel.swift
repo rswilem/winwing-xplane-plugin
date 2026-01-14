@@ -1,6 +1,6 @@
 //
 //  DeviceModel.swift
-//  WinwingDesktop
+//  WinctrlDesktop
 //
 //  Created by Ramon Swilem on 08/07/2025.
 //
@@ -90,7 +90,7 @@ enum DeviceType: String, CaseIterable {
     case unknown = "unknown"
 }
 
-struct WinwingDevice: Identifiable, Equatable, Hashable {
+struct WinctrlDevice: Identifiable, Equatable, Hashable {
     let id: Int
     let name: String
     let type: DeviceType
@@ -117,7 +117,7 @@ struct WinwingDevice: Identifiable, Equatable, Hashable {
         self.fcuEfisHandle = c_getFCUEfisHandle(Int32(id))
     }
     
-    static func == (lhs: WinwingDevice, rhs: WinwingDevice) -> Bool {
+    static func == (lhs: WinctrlDevice, rhs: WinctrlDevice) -> Bool {
         return lhs.id == rhs.id && 
                lhs.name == rhs.name && 
                lhs.type == rhs.type && 
@@ -433,17 +433,17 @@ struct FCUEfisWrapper {
 
 @MainActor
 class DeviceManager: ObservableObject {
-    @Published var devices: [WinwingDevice] = []
+    @Published var devices: [WinctrlDevice] = []
     @Published var selectedDeviceId: Int?
     
-    var selectedDevice: WinwingDevice? {
+    var selectedDevice: WinctrlDevice? {
         guard let id = selectedDeviceId else { return nil }
         return devices.first { $0.id == id }
     }
     
     func refreshDevices() {
         let count = Int(c_getDeviceCount())
-        var newDevices: [WinwingDevice] = []
+        var newDevices: [WinctrlDevice] = []
         
         for i in 0..<count {
             guard let namePtr = c_getDeviceName(Int32(i)),
@@ -457,7 +457,7 @@ class DeviceManager: ObservableObject {
             let productId = c_getDeviceProductId(Int32(i))
             let isConnected = c_isDeviceConnected(Int32(i))
             
-            let device = WinwingDevice(
+            let device = WinctrlDevice(
                 id: i,
                 name: name,
                 type: type,
@@ -486,7 +486,7 @@ class DeviceManager: ObservableObject {
         }
     }
     
-    func selectDevice(_ device: WinwingDevice) {
+    func selectDevice(_ device: WinctrlDevice) {
         selectedDeviceId = device.id
     }
 }

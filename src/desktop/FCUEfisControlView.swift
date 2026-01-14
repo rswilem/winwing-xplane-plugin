@@ -1,6 +1,6 @@
 //
 //  FCUEfisControlView.swift
-//  WinwingDesktop
+//  WinctrlDesktop
 //
 //  Created by Ramon Swilem on 30/07/2025.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FCUEfisControlView: View {
-    let device: WinwingDevice
+    let device: WinctrlDevice
     @State private var backlight: Double = 0
     @State private var screenBacklight: Double = 0
     @State private var efisRightBacklight: Double = 0
@@ -439,7 +439,7 @@ struct FCUEfisControlView: View {
 }
 
 #Preview {
-    FCUEfisControlView(device: WinwingDevice(
+    FCUEfisControlView(device: WinctrlDevice(
         id: 0,
         name: "FCU-EFIS Device",
         type: .fcuEfis,

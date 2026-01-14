@@ -18,7 +18,7 @@ USBController::USBController() {
 
     CFMutableDictionaryRef matchingDict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     if (matchingDict) {
-        uint32_t vid = WINWING_VENDOR_ID;
+        uint32_t vid = WINCTRL_VENDOR_ID;
         CFNumberRef vidNum = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &vid);
         CFDictionarySetValue(matchingDict, CFSTR(kIOHIDVendorIDKey), vidNum);
         CFRelease(vidNum);

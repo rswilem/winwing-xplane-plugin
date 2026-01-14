@@ -39,7 +39,7 @@ void menuAction(void *mRef, void *iRef);
 PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
     strcpy(name, FRIENDLY_NAME);
     strcpy(sig, BUNDLE_ID);
-    strcpy(desc, "Winwing X-Plane plugin");
+    strcpy(desc, "WINCTRL X-Plane plugin");
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS", 1);
     XPLMEnableFeature("XPLM_USE_NATIVE_WIDGET_WINDOWS", 1);
     XPLMEnableFeature("XPLM_WANTS_DATAREF_NOTIFICATIONS", 1);

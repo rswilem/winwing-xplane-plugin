@@ -1,6 +1,6 @@
 //
 //  JoystickControlView.swift
-//  WinwingDesktop
+//  WinctrlDesktop
 //
 //  Created by Ramon Swilem on 08/07/2025.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct JoystickControlView: View {
-    let device: WinwingDevice
+    let device: WinctrlDevice
     @State private var vibration: Double = 0
     @State private var brightness: Double = 0
     
@@ -68,7 +68,7 @@ struct JoystickControlView: View {
 }
 
 #Preview {
-    JoystickControlView(device: WinwingDevice(
+    JoystickControlView(device: WinctrlDevice(
         id: 0,
         name: "Test Joystick",
         type: .joystick,
