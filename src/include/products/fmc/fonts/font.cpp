@@ -123,12 +123,12 @@ void Font::convertGlyphDataForHardware(std::vector<std::vector<unsigned char>> &
             uint8_t topOffset = 17;
             
             if (hardwareType == FMCHardwareType::HARDWARE_MCDU) {
-                // MCDU defaults Left 0x34, Top 0x25 (SAP L16, T17)
+                // MCDU default offsets Left 0x34, Top 0x25 (SAP L16, T17)
                 leftOffset = 16;
                 topOffset = 17;
             }
             else {
-                // PFP defaults Left 0x32, Top 0x20 (SAP L14, T12)
+                // PFP default offsets Left 0x32, Top 0x20 (SAP L14, T12)
                 leftOffset = 14;
                 topOffset = 12;
             }

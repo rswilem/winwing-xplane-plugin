@@ -6,7 +6,7 @@
 
 #include <dbt.h>
 #include <functional>
-#include <hidsidsdi.h>
+#include <hidsdi.h>
 #include <initguid.h>
 #include <iostream>
 #include <map>
