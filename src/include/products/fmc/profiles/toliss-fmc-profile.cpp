@@ -31,6 +31,10 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(pro
         bool hasPower = Dataref::getInstance()->get<bool>("sim/cockpit/electrical/avionics_on");
 
         std::vector<float> selfTestSecondsRemaining = Dataref::getInstance()->get<std::vector<float>>("AirbusFBW/DUSelfTestTimeLeft");
+        if (selfTestSecondsRemaining.size() < 8) {
+            return;
+        }
+        
         float secondsRemaining = selfTestSecondsRemaining[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7];
         if (hasPower && secondsRemaining > 1.0f) {
             // Don't control brightness when a self test is in progress

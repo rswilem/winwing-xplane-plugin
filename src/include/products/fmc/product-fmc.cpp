@@ -444,9 +444,9 @@ void ProductFMC::setFont(FontVariant preferredVariant) {
     bool shouldLoadDefaultFont = (fontPreference == "default") || (!Font::IsCustomFontAvailable(fontPreference));
     std::vector<std::vector<unsigned char>> font = {};
     if (shouldLoadDefaultFont) {
-        font = Font::GlyphData(preferredVariant, identifierByte);
+        font = Font::GlyphData(preferredVariant, identifierByte, hardwareType);
     } else {
-        font = Font::GlyphData(fontPreference, identifierByte);
+        font = Font::GlyphData(fontPreference, identifierByte, hardwareType);
     }
 
     if (font.empty()) {

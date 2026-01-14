@@ -286,9 +286,6 @@ struct FMCWrapper {
         case b737 = 2
         case xcrafts = 3
         case vga1 = 4
-        case vga2 = 5
-        case vga3 = 6
-        case vga4 = 7
         
         
         var displayName: String {
@@ -298,9 +295,6 @@ struct FMCWrapper {
             case .b737: return "737"
             case .xcrafts: return "X-Crafts E-Jet"
             case .vga1: return "VGA 1"
-            case .vga2: return "VGA 2"
-            case .vga3: return "VGA 3"
-            case .vga4: return "VGA 4"
             }
         }
     }

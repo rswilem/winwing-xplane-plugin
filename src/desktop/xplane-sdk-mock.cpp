@@ -573,3 +573,7 @@ void XPLMRemoveMenuItem(XPLMMenuID inMenu, int inIndex) {
 void XPLMSetMenuItemName(XPLMMenuID inMenu, int inIndex, const char *inItemName, int dep) {
     // noop
 }
+
+void XPLMAppendMenuSeparator(XPLMMenuID inMenu) {
+    // noop
+}

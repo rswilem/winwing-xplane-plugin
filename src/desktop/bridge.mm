@@ -261,15 +261,6 @@ void fmc_setFont(void* fmcHandle, int fontType) {
         case 4: // VGA 1
             variant = FontVariant::FontVGA1;
             break;
-        case 5: // VGA 2
-            variant = FontVariant::FontVGA2;
-            break;
-        case 6: // VGA 3
-            variant = FontVariant::FontVGA3;
-            break;
-        case 7: // VGA 4
-            variant = FontVariant::FontVGA4;
-            break;
             
         case 0:
         default:
@@ -277,8 +268,7 @@ void fmc_setFont(void* fmcHandle, int fontType) {
             break;
     }
     
-    auto glyphData = Font::GlyphData(variant, fmc->identifierByte);
-    fmc->setFont(glyphData);
+    fmc->setFont(variant);
 }
 
 void fmc_setFontUpdatingEnabled(void* fmcHandle, bool enabled) {
