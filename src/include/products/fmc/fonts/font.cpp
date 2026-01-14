@@ -119,8 +119,8 @@ void Font::convertGlyphDataForHardware(std::vector<std::vector<unsigned char>> &
         }
 
         if (row.size() > 23 && row[0] == 0xF0 && row[1] == 0x00 && row[17] == 0x08 && row[18] == 0x00 && row[21] == 0x34 && row[23] == 0x25) {
-            uint8_t leftOffset = 16; // MCDU std 0x34 (dec 52, sap 16) | PFP std 0x32 (dec 50, sap 14)
-            uint8_t topOffset = 17;  // MCDU std 0x25 (dec 37, sap 17) | PFP std 0x20 (dec 32, sap 12)
+            uint8_t leftOffset = 16;
+            uint8_t topOffset = 17;
             
             if (hardwareType == FMCHardwareType::HARDWARE_MCDU) {
                 // MCDU defaults Left 0x34, Top 0x25 (SAP L16, T17)
@@ -137,11 +137,4 @@ void Font::convertGlyphDataForHardware(std::vector<std::vector<unsigned char>> &
             row[23] = 20 + topOffset;
         }
     }
-
-    /*mcdu: top bottom 17, left right 16 char w/h 23/29
-pfp: top bottom 12, left right 14, char w/h 23/32
-f0 00 xx 2a 32 bb 00 00 18 01 00 00 AA AA AA 00 00 08 00 00 00 35 00 26 00 0e (top 18, left 17) (35 hex is 53, 26 hex is 38)
-f0 00 xx 2a 32 bb 00 00 18 01 00 00 AA AA AA 00 00 08 00 00 00 34 00 25 00 0e (top 17, left 16) (34 hex is 52, 25 hex is 37)
-f0 00 xx 2a 32 bb 00 00 18 01 00 00 AA AA AA 00 00 08 00 00 00 34 00 1c 00 0e (top 8, left 16) (34 hex is 52, 1c hex is 28)*/
-    //{0xF0, 0x00, 0xCD, 0x2A, 0x32, 0xBB, 0x00, 0x00, 0x18, 0x01, 0x00, 0x00, 0x51, 0x82, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x34, 0x00, 0x25, 0x00, 0x0E, 0x00, 0x18, 0x00, 0x32, 0xBB, 0x00, 0x00, 0x05, 0x01, 0x00, 0x00, 0x51, 0x82, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 }
