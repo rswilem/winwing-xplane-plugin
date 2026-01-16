@@ -37,6 +37,18 @@ bool AppState::initialize() {
 
     pluginInitialized = true;
 
+#ifdef DEBUG
+    Dataref::getInstance()->createCommand(
+        PRODUCT_NAME "/debug/disconnect_all_devices", "Disconnects all devices", [this](XPLMCommandPhase inPhase) {
+            if (inPhase != xplm_CommandBegin) {
+                return;
+            }
+
+            debug_force("Disconnecting all devices via debug command...\n");
+            USBController::getInstance()->disconnectAllDevices();
+        });
+#endif
+
     debug_force("Plugin initialized.\n");
     return true;
 }
@@ -54,9 +66,9 @@ void AppState::deinitialize() {
     Dataref::getInstance()->destroyAllBindings();
 
     pluginInitialized = false;
+
     taskQueue.clear();
 
-    delete instance;
     instance = nullptr;
 }
 
@@ -80,7 +92,7 @@ void AppState::update() {
             taskQueue[i].func();
         }
     }
-    
+
     taskQueue.erase(std::remove_if(taskQueue.begin(), taskQueue.end(), [&](auto &task) {
         return now >= task.runAt;
     }),
