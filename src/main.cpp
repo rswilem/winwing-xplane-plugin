@@ -37,8 +37,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void *params);
 void menuAction(void *mRef, void *iRef);
 
-void removeOldPlugin() {
-    // remove #include <fstream> when removing this function
+void removeOldPlugin() { // remove #include <fstream> when removing this function
     debug_force("Checking for old plugin versions to remove...\n");
     char systemPath[512];
     XPLMGetSystemPath(systemPath);
@@ -48,6 +47,15 @@ void removeOldPlugin() {
     }
 
     std::string pluginsDirectory = rootDirectory + ALL_PLUGINS_DIRECTORY;
+
+    std::string oldPluginDirectory = pluginsDirectory + "winwing/";
+    std::string newPluginDirectory = pluginsDirectory + "winctrl/";
+    std::ifstream hasNewDirectoryAlreadyCheck(newPluginDirectory);
+    if (hasNewDirectoryAlreadyCheck.good()) {
+        hasNewDirectoryAlreadyCheck.close();
+        return;
+    }
+
     std::vector<std::string> oldPluginPaths = {
         pluginsDirectory + "winwing/mac_x64/winwing.xpl",
         pluginsDirectory + "winwing/lin_x64/winwing.xpl",
@@ -74,12 +82,9 @@ void removeOldPlugin() {
     }
 
     // All done with the XPL. Rename the whole directory as well if winctrl/ does not exist.
-    std::string oldPluginDirectory = pluginsDirectory + "winwing/";
-    std::string newPluginDirectory = pluginsDirectory + "winctrl/";
+
     std::ifstream dirCheck(newPluginDirectory);
     if (!dirCheck.good()) {
-        dirCheck.close();
-
         // Rename the directory
         debug_force("Renaming old plugin directory from %s to %s\n", oldPluginDirectory.c_str(), newPluginDirectory.c_str());
         if (std::rename(oldPluginDirectory.c_str(), newPluginDirectory.c_str()) != 0) {
@@ -89,6 +94,8 @@ void removeOldPlugin() {
             changes++;
         }
     }
+
+    dirCheck.close();
 
     if (changes > 0) {
         // Deliberatery crash X-Plane
