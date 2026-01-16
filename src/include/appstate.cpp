@@ -54,8 +54,10 @@ void AppState::deinitialize() {
     Dataref::getInstance()->destroyAllBindings();
 
     pluginInitialized = false;
-    instance = nullptr;
     taskQueue.clear();
+
+    delete instance;
+    instance = nullptr;
 }
 
 float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
@@ -72,12 +74,13 @@ float AppState::Update(float inElapsedSinceLastCall, float inElapsedTimeSinceLas
 
 void AppState::update() {
     auto now = std::chrono::steady_clock::now();
-    for (auto &task : taskQueue) {
-        if (now >= task.runAt && task.func) {
-            task.func();
+
+    for (size_t i = 0; i < taskQueue.size(); ++i) {
+        if (now >= taskQueue[i].runAt && taskQueue[i].func) {
+            taskQueue[i].func();
         }
     }
-
+    
     taskQueue.erase(std::remove_if(taskQueue.begin(), taskQueue.end(), [&](auto &task) {
         return now >= task.runAt;
     }),
@@ -95,9 +98,7 @@ void AppState::update() {
 }
 
 void AppState::executeAfter(int milliseconds, std::function<void()> func) {
-    taskQueue.push_back({"",
-        std::chrono::steady_clock::now() + std::chrono::milliseconds(milliseconds),
-        func});
+    taskQueue.push_back({"", std::chrono::steady_clock::now() + std::chrono::milliseconds(milliseconds), func});
 }
 
 void AppState::executeAfterDebounced(std::string taskName, int milliseconds, std::function<void()> func) {

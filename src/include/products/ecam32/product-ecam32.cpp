@@ -98,14 +98,6 @@ void ProductECAM32::didReceiveData(int reportId, uint8_t *report, int reportLeng
     }
 
     if (reportId != 1 || reportLength < 13) {
-#if DEBUG
-//        printf("[%s] Ignoring reportId %d, length %d\n", classIdentifier(), reportId, reportLength);
-//        printf("[%s] Data (hex): ", classIdentifier());
-//        for (int i = 0; i < reportLength; ++i) {
-//            printf("%02X ", report[i]);
-//        }
-//        printf("\n");
-#endif
         return;
     }
 
