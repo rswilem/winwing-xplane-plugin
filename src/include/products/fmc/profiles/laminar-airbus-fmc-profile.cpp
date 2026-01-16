@@ -10,7 +10,7 @@ LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(p
     product->setAllLedsEnabled(false);
     product->setFont(FontVariant::FontAirbus);
 
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio_manual", [product](std::vector<float> brightness) {
         if (brightness.size() <= 6) {
             return;
         }
@@ -21,7 +21,7 @@ LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(p
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [this](bool poweredOn) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/instrument_brightness_ratio");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/instrument_brightness_ratio_manual");
     });
 
     product->setLedBrightness(FMCLed::BACKLIGHT, 128);
@@ -29,7 +29,7 @@ LaminarFMCProfile::LaminarFMCProfile(ProductFMC *product) : FMCAircraftProfile(p
 }
 
 LaminarFMCProfile::~LaminarFMCProfile() {
-    Dataref::getInstance()->unbind("sim/cockpit2/electrical/instrument_brightness_ratio");
+    Dataref::getInstance()->unbind("sim/cockpit2/electrical/instrument_brightness_ratio_manual");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
 }
 

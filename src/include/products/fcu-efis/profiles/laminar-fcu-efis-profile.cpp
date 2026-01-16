@@ -11,9 +11,8 @@
 #include <iomanip>
 #include <XPLMUtilities.h>
 
-LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
-    FCUEfisAircraftProfile(product) {
-    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio", [product](std::vector<float> brightness) {
+LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) : FCUEfisAircraftProfile(product) {
+    Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("sim/cockpit2/electrical/instrument_brightness_ratio_manual", [product](std::vector<float> brightness) {
         if (brightness.size() < 2) {
             return;
         }
@@ -38,7 +37,7 @@ LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
     });
 
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit2/autopilot/autopilot_has_power", [](bool poweredOn) {
-        Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/instrument_brightness_ratio");
+        Dataref::getInstance()->executeChangedCallbacksForDataref("sim/cockpit2/electrical/instrument_brightness_ratio_manual");
     });
 
     Dataref::getInstance()->monitorExistingDataref<float>("laminar/A333/annun/autopilot/ap1_mode", [product](float brightness) {
@@ -125,7 +124,7 @@ LaminarFCUEfisProfile::LaminarFCUEfisProfile(ProductFCUEfis *product) :
 }
 
 LaminarFCUEfisProfile::~LaminarFCUEfisProfile() {
-    Dataref::getInstance()->unbind("sim/cockpit2/electrical/instrument_brightness_ratio");
+    Dataref::getInstance()->unbind("sim/cockpit2/electrical/instrument_brightness_ratio_manual");
     Dataref::getInstance()->unbind("sim/cockpit2/autopilot/autopilot_has_power");
 
     // Unbind FCU datarefs
