@@ -271,13 +271,6 @@ void fmc_setFont(void* fmcHandle, int fontType) {
     fmc->setFont(variant);
 }
 
-void fmc_setFontUpdatingEnabled(void* fmcHandle, bool enabled) {
-    if (!fmcHandle) return;
-    auto fmc = static_cast<ProductFMC*>(fmcHandle);
-    fmc->fontUpdatingEnabled = enabled;
-}
-
-
 // Device enumeration and info functions
 int getDeviceCount() {
     return static_cast<int>(USBController::getInstance()->devices.size());

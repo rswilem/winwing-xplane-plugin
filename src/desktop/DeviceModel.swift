@@ -62,8 +62,6 @@ func c_fmc_setLedBrightness(_ handle: UnsafeRawPointer, _ ledId: Int32, _ bright
 func c_fmc_writeData(_ handle: UnsafeRawPointer, _ data: UnsafePointer<UInt8>, _ length: Int32) -> Bool
 @_silgen_name("fmc_setFont")
 func c_fmc_setFont(_ handle: UnsafeRawPointer, _ fontType: Int32) -> Void
-@_silgen_name("fmc_setFontUpdatingEnabled")
-func c_fmc_setFontUpdatingEnabled(_ handle: UnsafeRawPointer, _ enabled: Bool) -> Void
 
 // FCU-EFIS functions via handle
 @_silgen_name("fcuefis_clear")
@@ -302,11 +300,6 @@ struct FMCWrapper {
     // Set the font for the FMC display
     func setFont(_ fontType: FontType) {
         c_fmc_setFont(handle, Int32(fontType.rawValue))
-    }
-    
-    // Enable or disable font updating
-    func setFontUpdatingEnabled(_ enabled: Bool) {
-        c_fmc_setFontUpdatingEnabled(handle, enabled)
     }
 }
 
