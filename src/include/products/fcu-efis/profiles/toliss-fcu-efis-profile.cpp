@@ -205,6 +205,7 @@ const std::vector<std::string> &TolissFCUEfisProfile::displayDatarefs() const {
         "AirbusFBW/HDGdashed",
 
         "sim/cockpit/autopilot/altitude",
+        "toliss_airbus/pfdoutputs/general/ap_altitude_reference",
         "AirbusFBW/ALTmanaged",
 
         "sim/cockpit/autopilot/vertical_velocity",
@@ -332,12 +333,12 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
     data.displayEnabled = datarefManager->getCached<bool>("AirbusFBW/FCUAvail");
     data.displayTest = isAnnunTest(true);
 
-    // Set managed mode indicators - using validated int datarefs (1 or 0)
+    // Set managed mode indicators
     data.spdManaged = datarefManager->getCached<bool>("AirbusFBW/SPDmanaged");
     data.hdgManaged = datarefManager->getCached<bool>("AirbusFBW/HDGmanaged");
     data.altManaged = datarefManager->getCached<bool>("AirbusFBW/ALTmanaged");
 
-    // Speed/Mach mode - using sim/cockpit/autopilot/airspeed_is_mach (int, 1 or 0)
+    // Speed/Mach mode
     data.spdMach = datarefManager->getCached<bool>("sim/cockpit/autopilot/airspeed_is_mach");
     float speed = datarefManager->getCached<float>("sim/cockpit2/autopilot/airspeed_dial_kts_mach");
 
@@ -356,7 +357,7 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
         data.speed = "---";
     }
 
-    // Format FCU heading display - using sim/cockpit/autopilot/heading_mag (float)
+    // Format FCU heading display
     float heading = datarefManager->getCached<float>("sim/cockpit/autopilot/heading_mag");
     if (heading >= 0 && datarefManager->getCached<bool>("AirbusFBW/HDGdashed") == false) {
         // Convert 360 to 0 for display
@@ -368,8 +369,8 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
         data.heading = "---";
     }
 
-    // Format FCU altitude display - using sim/cockpit/autopilot/altitude (float)
-    float altitude = datarefManager->getCached<float>("sim/cockpit/autopilot/altitude");
+    // Format FCU altitude display
+    float altitude = datarefManager->getCached<float>("toliss_airbus/pfdoutputs/general/ap_altitude_reference");
     if (altitude >= 0) {
         int altInt = static_cast<int>(altitude);
         std::stringstream ss;
@@ -380,11 +381,11 @@ void TolissFCUEfisProfile::updateDisplayData(FCUDisplayData &data) {
         data.altitude = "-----";
     }
 
-    // Format vertical speed display - using sim/cockpit/autopilot/vertical_velocity (float)
+    // Format vertical speed display
     float vs = datarefManager->getCached<float>("sim/cockpit/autopilot/vertical_velocity");
     bool vsDashed = datarefManager->getCached<bool>("AirbusFBW/VSdashed");
 
-    // HDG/TRK mode - using AirbusFBW/HDGTRKmode (int, HDG=0, TRK=1)
+    // HDG/TRK mode
     data.hdgTrk = datarefManager->getCached<bool>("AirbusFBW/HDGTRKmode");
     data.vsMode = !data.hdgTrk; // VS mode when HDG mode
     data.fpaMode = data.hdgTrk; // FPA mode when TRK mode
