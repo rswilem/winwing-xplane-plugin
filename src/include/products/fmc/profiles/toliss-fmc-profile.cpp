@@ -34,7 +34,7 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(pro
         if (selfTestSecondsRemaining.size() < 8) {
             return;
         }
-        
+
         float secondsRemaining = selfTestSecondsRemaining[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7];
         if (hasPower && secondsRemaining > 1.0f) {
             // Don't control brightness when a self test is in progress
@@ -43,15 +43,10 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(pro
 
         uint8_t screenBrightness = hasPower ? brightness[product->deviceVariant == FMCDeviceVariant::VARIANT_CAPTAIN ? 6 : 7] * 255 : 0;
 
-        std::string aircraftIcao = Dataref::getInstance()->get<std::string>("sim/aircraft/view/acf_ICAO");
-        bool enableBusSwitchEmulation = aircraftIcao.starts_with("A31") || aircraftIcao.starts_with("A32");
-        // Bus switching on the A340 seems broken. For safety reasons, disable all, except A319/A320/A321
-        if (enableBusSwitchEmulation) {
-            std::vector<int> elecConnectors = Dataref::getInstance()->get<std::vector<int>>("AirbusFBW/ElecConnectors");
-
-            if (elecConnectors.size() > 11 && elecConnectors[11] != 1) {
-                screenBrightness = 0;
-            }
+        // Read com power to simulate bus switching flicker
+        bool hasComPower = Dataref::getInstance()->get<bool>("sim/cockpit2/radios/actuators/com1_power");
+        if (!hasComPower) {
+            screenBrightness = 0;
         }
 
         product->setLedBrightness(FMCLed::SCREEN_BACKLIGHT, screenBrightness);
@@ -62,7 +57,7 @@ TolissFMCProfile::TolissFMCProfile(ProductFMC *product) : FMCAircraftProfile(pro
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/MCDUIntegBrightness_Raw");
     });
 
-    Dataref::getInstance()->monitorExistingDataref<std::vector<int>>("AirbusFBW/ElecConnectors", [product](std::vector<int> brightness) {
+    Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit2/radios/actuators/com1_power", [product](bool enabled) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/DUBrightness");
         Dataref::getInstance()->executeChangedCallbacksForDataref("AirbusFBW/MCDUIntegBrightness_Raw");
     });
@@ -141,7 +136,7 @@ TolissFMCProfile::~TolissFMCProfile() {
     Dataref::getInstance()->unbind("AirbusFBW/MCDUIntegBrightness_Raw");
     Dataref::getInstance()->unbind("AirbusFBW/DUBrightness");
     Dataref::getInstance()->unbind("sim/cockpit/electrical/avionics_on");
-    Dataref::getInstance()->unbind("AirbusFBW/ElecConnectors");
+    Dataref::getInstance()->unbind("sim/cockpit2/radios/actuators/com1_power");
     Dataref::getInstance()->unbind("AirbusFBW/DUSelfTestTimeLeft");
     Dataref::getInstance()->unbind("AirbusFBW/MCDU1KeyClear");
     Dataref::getInstance()->unbind("AirbusFBW/MCDU2KeyClear");
