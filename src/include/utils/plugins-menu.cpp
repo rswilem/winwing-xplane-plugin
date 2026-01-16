@@ -95,53 +95,72 @@ void PluginsMenu::addMenuItemsToMenu(XPLMMenuID parentMenu, const std::vector<Me
     }
 }
 
-int PluginsMenu::addItemInternal(const std::string &name, const MenuItemContent &content, bool persistent, bool checked) {
+int PluginsMenu::addItemInternal(const std::string &name, const MenuItemContent &content, bool persistent, bool checked, int submenuId) {
     ensureMenuExists();
 
     int itemId = nextItemId++;
+    XPLMMenuID targetMenu = mainMenuId;
+
+    // If submenuId is provided, find the corresponding submenu
+    if (submenuId >= 0) {
+        auto it = submenus.find(submenuId);
+        if (it != submenus.end()) {
+            targetMenu = it->second.first;
+        }
+    }
 
     if (std::holds_alternative<std::function<void(int)>>(content)) {
         // Regular menu item
         const auto &callback = std::get<std::function<void(int)>>(content);
-        int itemIndex = XPLMAppendMenuItem(mainMenuId, name.c_str(), (void *) (intptr_t) itemId, 0);
+        int itemIndex = XPLMAppendMenuItem(targetMenu, name.c_str(), (void *) (intptr_t) itemId, 0);
         menuCallbacks[itemId] = std::make_pair(itemIndex, callback);
         itemNames[itemId] = name;
         persistentItems[itemId] = persistent;
-        itemToMenuId[itemId] = mainMenuId;
+        itemToMenuId[itemId] = targetMenu;
+
+        // Track this as a child of the parent submenu
+        if (submenuId >= 0) {
+            submenuChildren[submenuId].push_back(itemId);
+        }
 
         if (checked) {
-            XPLMCheckMenuItem(mainMenuId, itemIndex, xplm_Menu_Checked);
+            XPLMCheckMenuItem(targetMenu, itemIndex, xplm_Menu_Checked);
         }
 
         return itemId;
     } else {
         // Submenu
         const auto &items = std::get<std::vector<MenuItem>>(content);
-        int itemIndex = XPLMAppendMenuItem(mainMenuId, name.c_str(), nullptr, 0);
+        int itemIndex = XPLMAppendMenuItem(targetMenu, name.c_str(), nullptr, 0);
 
         // Create the submenu
-        XPLMMenuID submenuId = XPLMCreateMenu(name.c_str(), mainMenuId, itemIndex, handleMenuAction, this);
-        submenus[itemId] = std::make_pair(submenuId, items);
+        XPLMMenuID newSubmenuId = XPLMCreateMenu(name.c_str(), targetMenu, itemIndex, handleMenuAction, this);
+        submenus[itemId] = std::make_pair(newSubmenuId, items);
 
         itemNames[itemId] = name;
         persistentItems[itemId] = persistent;
-        itemToMenuId[itemId] = mainMenuId;
+        itemToMenuId[itemId] = targetMenu;
         // Store a placeholder in menuCallbacks so we can find the itemIndex
         menuCallbacks[itemId] = std::make_pair(itemIndex, [](int) {});
 
+        // Track this as a child of the parent submenu
+        if (submenuId >= 0) {
+            submenuChildren[submenuId].push_back(itemId);
+        }
+
         // Add items to the submenu (handles nested submenus recursively)
-        addMenuItemsToMenu(submenuId, items, persistent);
+        addMenuItemsToMenu(newSubmenuId, items, persistent);
 
         return itemId;
     }
 }
 
-int PluginsMenu::addItem(const std::string &name, const MenuItemContent &content, bool checked) {
-    return addItemInternal(name, content, false, checked);
+int PluginsMenu::addItem(const std::string &name, const MenuItemContent &content, bool checked, int submenuId) {
+    return addItemInternal(name, content, false, checked, submenuId);
 }
 
-int PluginsMenu::addPersistentItem(const std::string &name, const MenuItemContent &content, bool checked) {
-    return addItemInternal(name, content, true, checked);
+int PluginsMenu::addPersistentItem(const std::string &name, const MenuItemContent &content, bool checked, int submenuId) {
+    return addItemInternal(name, content, true, checked, submenuId);
 }
 
 void PluginsMenu::removeItem(int itemId) {

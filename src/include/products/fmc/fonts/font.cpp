@@ -10,32 +10,40 @@
 #include "xcrafts.h"
 
 #include <cstddef>
-#include <dirent.h>
+#include <filesystem>
+#include <fstream>
 #include <XPLMUtilities.h>
 
 const std::vector<std::vector<unsigned char>> Font::GlyphData(std::string filename, unsigned char hardwareIdentifier, FMCHardwareType hardwareType) {
-    std::string fontFile = AppState::getInstance()->getPluginDirectory() + "/fonts/" + filename;
-    FILE *file = fopen(fontFile.c_str(), "rb");
-    if (file == NULL) {
+    std::string pluginDir = AppState::getInstance()->getPluginDirectory();
+    if (pluginDir.empty()) {
+        debug_force("Plugin directory is empty\n");
+        return {};
+    }
+
+    std::filesystem::path fontFile = std::filesystem::path(pluginDir) / "fonts" / filename;
+    std::ifstream file(fontFile, std::ios::binary);
+    if (!file) {
         debug_force("Could not open custom font file: %s\n", fontFile.c_str());
         return {};
     }
 
     std::vector<std::vector<unsigned char>> result = {};
-    while (!feof(file)) {
-        unsigned char lengthByte = 0;
-        size_t bytesRead = fread(&lengthByte, sizeof(unsigned char), 1, file);
-        if (feof(file) || bytesRead == 0 || lengthByte == 0) {
+    unsigned char lengthByte = 0;
+
+    while (file.read(reinterpret_cast<char *>(&lengthByte), sizeof(lengthByte))) {
+        if (lengthByte == 0) {
             break;
         }
 
         std::vector<unsigned char> glyphData(lengthByte, 0);
-        size_t dataRead = fread(glyphData.data(), sizeof(unsigned char), lengthByte, file);
-        if (dataRead > 0) {
+        if (file.read(reinterpret_cast<char *>(glyphData.data()), lengthByte)) {
             result.push_back(glyphData);
+        } else {
+            debug_force("Failed to read glyph data from file: %s\n", fontFile.c_str());
+            break;
         }
     }
-    fclose(file);
 
     convertGlyphDataForHardware(result, hardwareIdentifier, hardwareType);
 
@@ -80,20 +88,26 @@ const std::vector<std::vector<unsigned char>> Font::GlyphData(FontVariant varian
 const std::vector<std::string> Font::ReadCustomFontFiles() {
     std::vector<std::string> fontFiles;
 
-    std::string fontsDirectory = AppState::getInstance()->getPluginDirectory() + "/fonts";
+    std::string pluginDir = AppState::getInstance()->getPluginDirectory();
+    if (pluginDir.empty()) {
+        debug_force("Plugin directory is empty\n");
+        return fontFiles;
+    }
 
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir(fontsDirectory.c_str())) != NULL) {
-        while ((ent = readdir(dir)) != NULL) {
-            std::string fileName = ent->d_name;
-            if (fileName.ends_with(".xpwwf")) {
-                fontFiles.push_back(fileName);
+    std::filesystem::path fontsDirectory = std::filesystem::path(pluginDir) / "fonts";
+
+    try {
+        if (std::filesystem::exists(fontsDirectory)) {
+            for (const auto &entry : std::filesystem::directory_iterator(fontsDirectory)) {
+                if (entry.is_regular_file() && entry.path().extension() == ".xpwwf") {
+                    fontFiles.push_back(entry.path().filename().string());
+                }
             }
+        } else {
+            debug_force("Fonts directory does not exist: %s\n", fontsDirectory.c_str());
         }
-        closedir(dir);
-    } else {
-        debug_force("Could not open fonts directory: %s\n", fontsDirectory.c_str());
+    } catch (const std::filesystem::filesystem_error &e) {
+        debug_force("Error reading fonts directory: %s\n", e.what());
     }
 
     return fontFiles;
@@ -121,13 +135,12 @@ void Font::convertGlyphDataForHardware(std::vector<std::vector<unsigned char>> &
         if (row.size() > 23 && row[0] == 0xF0 && row[1] == 0x00 && row[17] == 0x08 && row[18] == 0x00 && row[21] == 0x34 && row[23] == 0x25) {
             uint8_t leftOffset = 16;
             uint8_t topOffset = 17;
-            
+
             if (hardwareType == FMCHardwareType::HARDWARE_MCDU) {
                 // MCDU default offsets Left 0x34, Top 0x25 (SAP L16, T17)
                 leftOffset = 16;
                 topOffset = 17;
-            }
-            else {
+            } else {
                 // PFP default offsets Left 0x32, Top 0x20 (SAP L14, T12)
                 leftOffset = 14;
                 topOffset = 12;

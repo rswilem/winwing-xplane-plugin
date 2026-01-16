@@ -132,6 +132,7 @@ bool USBDevice::writeData(std::vector<uint8_t> data) {
         if (!connected || !writeThreadRunning) {
             return false;
         }
+
         writeQueue.push(std::move(data));
         writeQueueSize.store(writeQueue.size());
     }

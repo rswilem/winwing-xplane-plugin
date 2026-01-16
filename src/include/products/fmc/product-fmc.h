@@ -19,6 +19,7 @@ class ProductFMC : public USBDevice {
         uint64_t lastButtonStateLo;
         uint32_t lastButtonStateHi;
         int menuItemId;
+        int fontsMenuItemId;
         FontVariant preferredFontVariant = FontVariant::Default;
 
         void draw(const std::vector<std::vector<char>> *pagePtr = nullptr);
@@ -37,7 +38,6 @@ class ProductFMC : public USBDevice {
         FMCHardwareType hardwareType;
         const unsigned char identifierByte;
         const FMCDeviceVariant deviceVariant;
-        bool fontUpdatingEnabled;
 
         const char *classIdentifier() override;
         bool connect() override;
@@ -58,6 +58,8 @@ class ProductFMC : public USBDevice {
         void showBackground(FMCBackgroundVariant variant);
 
         void setDeviceVariant(FMCDeviceVariant variant);
+
+        void reloadFontsMenu();
 };
 
 #endif

@@ -42,13 +42,13 @@ class PluginsMenu {
 
         static void handleMenuAction(void *mRef, void *iRef);
         void ensureMenuExists();
-        int addItemInternal(const std::string &name, const MenuItemContent &content, bool persistent, bool checked);
+        int addItemInternal(const std::string &name, const MenuItemContent &content, bool persistent, bool checked, int submenuId);
         void addMenuItemsToMenu(XPLMMenuID parentMenu, const std::vector<MenuItem> &items, bool persistent);
 
     public:
         static PluginsMenu *getInstance();
-        int addItem(const std::string &name, const MenuItemContent &content, bool checked = false);
-        int addPersistentItem(const std::string &name, const MenuItemContent &content, bool checked = false);
+        int addItem(const std::string &name, const MenuItemContent &content, bool checked = false, int submenuId = -1);
+        int addPersistentItem(const std::string &name, const MenuItemContent &content, bool checked = false, int submenuId = -1);
         void removeItem(int itemId);
         void setItemName(int itemIndex, const std::string &name);
         void setItemChecked(int itemId, bool checked);
