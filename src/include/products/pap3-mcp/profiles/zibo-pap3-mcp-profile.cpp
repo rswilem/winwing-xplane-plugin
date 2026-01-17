@@ -22,7 +22,7 @@ ZiboPAP3MCPProfile::ZiboPAP3MCPProfile(ProductPAP3MCP *product) : PAP3MCPAircraf
         uint8_t brightness = hasPower ? ratio * 255 : 0;
         product->setLedBrightness(PAP3MCPLed::BACKLIGHT, brightness);
 
-        uint8_t ledBrightness = hasPower && hasMainBus ? 170 : 0;
+        uint8_t ledBrightness = hasPower && hasMainBus ? 180 : 0;
         if (isDisplayTestMode()) {
             ledBrightness = 255;
         }
@@ -34,7 +34,7 @@ ZiboPAP3MCPProfile::ZiboPAP3MCPProfile(ProductPAP3MCP *product) : PAP3MCPAircraf
     Dataref::getInstance()->monitorExistingDataref<bool>("sim/cockpit/electrical/avionics_on", [product](bool hasPower) {
         Dataref::getInstance()->executeChangedCallbacksForDataref("laminar/B738/electric/panel_brightness");
 
-        product->setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, hasPower ? 170 : 0);
+        product->setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, hasPower ? 180 : 0);
     });
 
     Dataref::getInstance()->monitorExistingDataref<std::vector<float>>("laminar/B738/dspl_light_test", [this](std::vector<float> displayTest) {

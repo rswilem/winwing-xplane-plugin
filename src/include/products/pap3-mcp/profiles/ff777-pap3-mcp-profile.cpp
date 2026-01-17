@@ -19,7 +19,7 @@ FF777PAP3MCPProfile::FF777PAP3MCPProfile(ProductPAP3MCP *product) : PAP3MCPAircr
         uint8_t panelBrightness = hasPower ? static_cast<uint8_t>(ratio * 255) : 0;
         product->setLedBrightness(PAP3MCPLed::BACKLIGHT, panelBrightness);
 
-        uint8_t lcdBrightness = hasPower ? 170 : 0;
+        uint8_t lcdBrightness = hasPower ? 180 : 0;
         product->setLedBrightness(PAP3MCPLed::LCD_BACKLIGHT, lcdBrightness);
 
         uint8_t ledBrightness = hasPower ? std::max(static_cast<uint8_t>(ratio * 255), static_cast<uint8_t>(153)) : 0; // At least 0.6 brightness
