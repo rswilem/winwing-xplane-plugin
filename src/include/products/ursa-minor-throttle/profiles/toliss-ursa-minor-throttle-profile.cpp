@@ -124,8 +124,8 @@ const std::unordered_map<uint16_t, UrsaMinorThrottleButtonDef> &TolissUrsaMinorT
         {35, {"UNKNOWN 35", ""}},
         {36, {"UNKNOWN 36", ""}},
 
-        {37, {"Speedbrake disarmed", "sim/cockpit2/controls/speedbrake_ratio", UrsaMinorThrottleDatarefType::SPEEDBRAKE_ARM, 0}},
-        {38, {"Speedbrake armed", "sim/cockpit2/controls/speedbrake_ratio", UrsaMinorThrottleDatarefType::SPEEDBRAKE_ARM, 1}},
+        {37, {"Speedbrake disarmed", "sim/cockpit2/controls/speedbrake_ratio", UrsaMinorThrottleDatarefType::SPEEDBRAKE_ARM, 0.0}},
+        {38, {"Speedbrake armed", "sim/cockpit2/controls/speedbrake_ratio", UrsaMinorThrottleDatarefType::SPEEDBRAKE_ARM, 1.0}},
 
         {39, {"Reversers active L", ""}},
         {40, {"Reversers active R", ""}},
@@ -148,10 +148,9 @@ void TolissUrsaMinorThrottleProfile::buttonPressed(const UrsaMinorThrottleButton
         float ratio = datarefManager->get<float>(button->dataref.c_str());
         if (button->value > std::numeric_limits<double>::epsilon()) {
             datarefManager->set<float>(button->dataref.c_str(), -0.5f);
-        } else if (ratio <= 0.0f) {
+        } else if (ratio < -std::numeric_limits<float>::epsilon()) {
             datarefManager->set<float>(button->dataref.c_str(), 0.0f);
         }
-
     } else if (button->datarefType == UrsaMinorThrottleDatarefType::SET_VALUE) {
         if (phase != xplm_CommandBegin) {
             return;
