@@ -13,6 +13,8 @@
 		8321A6022ED27B1E00E3746A /* ff777-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8321A6012ED27B1E00E3746A /* ff777-fcu-efis-profile.cpp */; };
 		838AA8B52EEF2918006444F6 /* ff350-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 838AA8B42EEF2918006444F6 /* ff350-fcu-efis-profile.cpp */; };
 		F61F8B1E2D0456D700E63C3F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F66F91662D0332F600F84283 /* main.cpp */; };
+		F621F80C2F1C264A00DDB31E /* jf146-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F621F80B2F1C264A00DDB31E /* jf146-fcu-efis-profile.cpp */; };
+		F621F80D2F1C264A00DDB31E /* jf146-fcu-efis-profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F621F80B2F1C264A00DDB31E /* jf146-fcu-efis-profile.cpp */; };
 		F635AD422E05697B005D6CDC /* bridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = F6827E102E05664C00382B28 /* bridge.mm */; };
 		F635AD462E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */; };
 		F635AD472E0579E9005D6CDC /* usbcontroller_mac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F635AD442E0579E9005D6CDC /* usbcontroller_mac.cpp */; };
@@ -131,6 +133,8 @@
 		838AA8B42EEF2918006444F6 /* ff350-fcu-efis-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ff350-fcu-efis-profile.cpp"; sourceTree = "<group>"; };
 		D607B19909A556E400699BC3 /* winctrl.xpl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = winctrl.xpl; sourceTree = BUILT_PRODUCTS_DIR; };
 		F61F8B2D2D059ED500E63C3F /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		F621F80A2F1C264A00DDB31E /* jf146-fcu-efis-profile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "jf146-fcu-efis-profile.h"; sourceTree = "<group>"; };
+		F621F80B2F1C264A00DDB31E /* jf146-fcu-efis-profile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "jf146-fcu-efis-profile.cpp"; sourceTree = "<group>"; };
 		F62304282E59DF8500EE0089 /* vga_1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vga_1.h; sourceTree = "<group>"; };
 		F623042D2E5A230B00EE0089 /* font.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = font.h; sourceTree = "<group>"; };
 		F62D2DF52E55FA4C00D307A4 /* xcrafts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xcrafts.h; sourceTree = "<group>"; };
@@ -464,6 +468,8 @@
 		F6BB75732E32634700C2B21F /* profiles */ = {
 			isa = PBXGroup;
 			children = (
+				F621F80A2F1C264A00DDB31E /* jf146-fcu-efis-profile.h */,
+				F621F80B2F1C264A00DDB31E /* jf146-fcu-efis-profile.cpp */,
 				838AA8B32EEF2918006444F6 /* ff350-fcu-efis-profile.h */,
 				838AA8B42EEF2918006444F6 /* ff350-fcu-efis-profile.cpp */,
 				83124BCE2EE0A3D700C34D9D /* ff767-fcu-efis-profile.h */,
@@ -725,6 +731,7 @@
 				F6BBFF0B2ED741B900FE9D7F /* ff777-pap3-mcp-profile.cpp in Sources */,
 				F64BE3E72E1BF625003C1B73 /* usbdevice_win.cpp in Sources */,
 				F6E73EE32ED9CCA7000A8B6A /* product-ursa-minor-throttle.cpp in Sources */,
+				F621F80C2F1C264A00DDB31E /* jf146-fcu-efis-profile.cpp in Sources */,
 				F6E73EE42ED9CCA7000A8B6A /* toliss-ursa-minor-throttle-profile.cpp in Sources */,
 				F64BE3E92E1BF625003C1B73 /* usbcontroller_win.cpp in Sources */,
 				8321A6022ED27B1E00E3746A /* ff777-fcu-efis-profile.cpp in Sources */,
@@ -803,6 +810,7 @@
 				F635AD422E05697B005D6CDC /* bridge.mm in Sources */,
 				F6A77E792ED3620600061D03 /* segment-display.cpp in Sources */,
 				F6F6F4E92EBF976E00321C19 /* ButtonIdentificationView.swift in Sources */,
+				F621F80D2F1C264A00DDB31E /* jf146-fcu-efis-profile.cpp in Sources */,
 				F6F6F4EA2EBF976E00321C19 /* ButtonMapping.swift in Sources */,
 				F6D8E6C72ED059390041C4FB /* product-ecam32.cpp in Sources */,
 				F6D8E6C82ED059390041C4FB /* toliss-ecam32-profile.cpp in Sources */,
