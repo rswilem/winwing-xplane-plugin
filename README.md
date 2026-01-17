@@ -34,19 +34,19 @@ For linux, see the [Linux udev rules](#linux-udev-rules) section below to ensure
 
 The matrix below shows device and aircraft compatibility. Devices are listed vertically, aircraft horizontally.
 
-| Device                      | Toliss A3xx | Laminar A330 | Laminar 737 | AeroGenesis A330 | Zibo / LevelUp 737 | IXEG 737 | FlightFactor 767/777 | FlightFactor A350 V1 | SSG 747 |
-| --------------------------- | ----------- | ------------ | ----------- | ---------------- | ------------------ | -------- | -------------------- | -------------------- | ------- |
-| **URSA MINOR Joystick L+R** | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟢      |
-| **URSA MINOR Throttle**     | 🟢          | 🔴           | 🔴          | 🔴               | 🔴                 | 🔴       | 🔴                   | 🔴                   | 🔴      |
-| **MCDU-32**                 | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟠      |
-| **PFP 3N**                  | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟠      |
-| **PFP 4**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟠      |
-| **PFP 7**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟠      |
-| **PAP3 / PAP3 Mag**         | 🔴          | 🔴           | 🔴          | 🔴               | 🟢                 | 🔴       | 🟢                   | 🔴                   | 🔴      |
-| **FCU and EFIS L+R**        | 🟢          | 🟢           | 🟠          | 🔴               | 🔴                 | 🔴       | 🟢                   | 🟢                   | 🔴      |
-| **ECAM32**                  | 🟢          | 🔴           | 🔴          | 🔴               | 🔴                 | 🔴       | 🔴                   | 🔴                   | 🔴      |
-| **AGP**                     | 🟢          | 🔴           | 🔴          | 🔴               | 🔴                 | 🔴       | 🔴                   | 🔴                   | 🔴      |
-| **3N / 3M PDC**             | 🔴          | 🔴           | 🔴          | 🔴               | 🟢                 | 🔴       | 🟢                   | 🔴                   | 🔴      |
+| Device                      | Toliss A3xx | Laminar A330 | Laminar 737 | AeroGenesis A330 | Zibo / LevelUp 737 | IXEG 737 | FlightFactor 767/777 | FlightFactor A350 V1 | SSG 747 | JF146 |
+| --------------------------- | ----------- | ------------ | ----------- | ---------------- | ------------------ | -------- | -------------------- | -------------------- | ------- | ----- |
+| **URSA MINOR Joystick L+R** | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟢      | 🔴    |
+| **URSA MINOR Throttle**     | 🟢          | 🔴           | 🔴          | 🔴               | 🔴                 | 🔴       | 🔴                   | 🔴                   | 🔴      | 🔴    |
+| **MCDU-32**                 | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟠      | 🔴    |
+| **PFP 3N**                  | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟠      | 🔴    |
+| **PFP 4**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟠      | 🔴    |
+| **PFP 7**                   | 🟢          | 🟢           | 🔴          | 🟢               | 🟢                 | 🟢       | 🟢                   | 🔴                   | 🟠      | 🔴    |
+| **PAP3 / PAP3 Mag**         | 🔴          | 🔴           | 🔴          | 🔴               | 🟢                 | 🔴       | 🟢                   | 🔴                   | 🔴      | 🔴    |
+| **FCU and EFIS L+R**        | 🟢          | 🟢           | 🟠          | 🔴               | 🔴                 | 🔴       | 🟢                   | 🟢                   | 🔴      | 🟢    |
+| **ECAM32**                  | 🟢          | 🔴           | 🔴          | 🔴               | 🔴                 | 🔴       | 🔴                   | 🔴                   | 🔴      | 🔴    |
+| **AGP**                     | 🟢          | 🔴           | 🔴          | 🔴               | 🔴                 | 🔴       | 🔴                   | 🔴                   | 🔴      | 🔴    |
+| **3N / 3M PDC**             | 🔴          | 🔴           | 🔴          | 🔴               | 🟢                 | 🔴       | 🟢                   | 🔴                   | 🔴      | 🔴    |
 
 #### Legend
 
@@ -74,6 +74,7 @@ The matrix below shows device and aircraft compatibility. Devices are listed ver
 - [@teropa](https://forums.x-plane.org/profile/1028374-teropa/) for data capture and testing of multiple devices.
 - [@SoarByWire](https://forums.x-plane.org/profile/411164-soarbywire/) for the testing of multiple devices.
 - [@MortyMars](https://github.com/MortyMars) for the FCU/EFIS FF777 and FF767 profile.
+- [@loftwing](https://github.com/loftwing) for the JF146 profile and testing.
 
 ### Linux udev rules
 
