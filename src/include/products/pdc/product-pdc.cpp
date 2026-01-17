@@ -128,18 +128,18 @@ void ProductPDC::didReceiveData(int reportId, uint8_t *report, int reportLength)
 void ProductPDC::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uint8_t count) {
     USBDevice::didReceiveButton(hardwareButtonIndex, pressed, count);
 
+    bool isDeviceVariant3N = deviceVariant == PDCDeviceVariant::VARIANT_3N_CAPTAIN || deviceVariant == PDCDeviceVariant::VARIANT_3N_FIRSTOFFICER;
+
     auto &buttons = profile->buttonDefs();
-    auto it = buttons.find(hardwareButtonIndex);
+    auto it = std::find_if(buttons.begin(), buttons.end(), [hardwareButtonIndex, isDeviceVariant3N](const auto &kv) {
+        return isDeviceVariant3N ? kv.first.first == hardwareButtonIndex : kv.first.second == hardwareButtonIndex;
+    });
+
     if (it == buttons.end()) {
         return;
     }
 
     const PDCButtonDef *buttonDef = &it->second;
-
-    if (pressed && (deviceVariant == PDCDeviceVariant::VARIANT_3N_CAPTAIN || deviceVariant == PDCDeviceVariant::VARIANT_3N_FIRSTOFFICER)) {
-        debug_force("PDC Button pressed for 3NPDC: %i - mapped as %s\n", hardwareButtonIndex, buttonDef->name.c_str());
-    }
-
     if (buttonDef->dataref.empty()) {
         return;
     }
