@@ -20,6 +20,8 @@ void USBController::connectAllDevices() {
 
 void USBController::disconnectAllDevices() {
     for (auto ptr : devices) {
+        ptr->blackout();
+        ptr->disconnect();
         delete ptr;
     }
     devices.clear();

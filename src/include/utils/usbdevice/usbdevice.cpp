@@ -147,6 +147,10 @@ void USBDevice::didReceiveButton(uint16_t hardwareButtonIndex, bool pressed, uin
 }
 
 void USBDevice::processOnMainThread(const InputEvent &event) {
+    if (!connected) {
+        return;
+    }
+
     std::lock_guard<std::mutex> lock(eventQueueMutex);
     eventQueue.push(event);
 }

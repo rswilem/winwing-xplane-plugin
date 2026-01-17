@@ -200,6 +200,8 @@ PLUGIN_API int XPluginStart(char *name, char *sig, char *desc) {
 }
 
 PLUGIN_API void XPluginStop(void) {
+    USBController::getInstance()->disconnectAllDevices();
+    PluginsMenu::getInstance()->clearAllItems();
     AppState::getInstance()->deinitialize();
     debug_force("Plugin stopped\n");
 }
@@ -212,6 +214,7 @@ PLUGIN_API int XPluginEnable(void) {
 
 PLUGIN_API void XPluginDisable(void) {
     debug_force("Disabling plugin...\n");
+    USBController::getInstance()->disconnectAllDevices();
 }
 
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void *params) {
