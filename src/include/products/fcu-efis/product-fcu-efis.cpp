@@ -10,6 +10,7 @@
 #include "profiles/laminar-fcu-efis-profile.h"
 #include "profiles/laminar737-fcu-efis-profile.h"
 #include "profiles/toliss-fcu-efis-profile.h"
+#include "profiles/jf146-fcu-efis-profile.h"
 #include "segment-display.h"
 
 #include <algorithm>
@@ -59,6 +60,9 @@ void ProductFCUEfis::setProfileForCurrentAircraft() {
         profileReady = true;
     } else if (FF767FCUEfisProfile::IsEligible()) {
         profile = new FF767FCUEfisProfile(this);
+        profileReady = true;
+    } else if (JF146FCUEfisProfile::IsEligible()) {
+        profile = new JF146FCUEfisProfile(this);
         profileReady = true;
     }
 }
