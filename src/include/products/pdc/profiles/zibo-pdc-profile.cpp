@@ -139,7 +139,7 @@ void ZiboPDCProfile::buttonPressed(const PDCButtonDef *button, XPLMCommandPhase 
         }
 
     } else if (phase == xplm_CommandBegin && button->datarefType == PDCDatarefType::SET_VALUE) {
-        datarefManager->set<float>(button->dataref.c_str(), button->value);
+        datarefManager->set<double>(button->dataref.c_str(), button->value);
 
     } else if (phase == xplm_CommandBegin && button->datarefType == PDCDatarefType::EXECUTE_CMD_ONCE) {
         datarefManager->executeCommand(button->dataref.c_str());

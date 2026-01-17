@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <fstream>
+#include <filesystem>
 #include <memory>
 #include <vector>
 #include <XPLMDisplay.h>
@@ -37,7 +37,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, long msg, void *params);
 void menuAction(void *mRef, void *iRef);
 
-void removeOldPlugin() { // remove #include <fstream> when removing this function
+void removeOldPlugin() { // remove <filesystem> when removing this function
     debug_force("Checking for old plugin versions to remove...\n");
     char systemPath[512];
     XPLMGetSystemPath(systemPath);
@@ -50,63 +50,59 @@ void removeOldPlugin() { // remove #include <fstream> when removing this functio
 
     std::string oldPluginDirectory = pluginsDirectory + "winwing/";
     std::string newPluginDirectory = pluginsDirectory + "winctrl/";
-    std::ifstream hasNewDirectoryAlreadyCheck(newPluginDirectory);
-    if (hasNewDirectoryAlreadyCheck.good()) {
-        hasNewDirectoryAlreadyCheck.close();
-        return;
-    }
 
-    std::vector<std::string> oldPluginPaths = {
-        pluginsDirectory + "winwing/mac_x64/winwing.xpl",
-        pluginsDirectory + "winwing/lin_x64/winwing.xpl",
-        pluginsDirectory + "winwing/win_x64/winwing.xpl",
-    };
+    try {
+        std::vector<std::string> oldPluginPaths = {
+            pluginsDirectory + "winwing/mac_x64/winwing.xpl",
+            pluginsDirectory + "winwing/lin_x64/winwing.xpl",
+            pluginsDirectory + "winwing/win_x64/winwing.xpl",
+            newPluginDirectory + "winctrl/mac_x64/winwing.xpl",
+            newPluginDirectory + "winctrl/lin_x64/winwing.xpl",
+            newPluginDirectory + "winctrl/win_x64/winwing.xpl",
+        };
 
-    // in the current plugin directory, attempt to delete any old versions of the plugin
-    int changes = 0;
-    for (const auto &path : oldPluginPaths) {
-        std::ifstream fileCheck(path);
-        if (fileCheck.good()) {
-            fileCheck.close();
+        // Attempt to delete any old versions of the plugin
+        int changes = 0;
+        for (const auto &path : oldPluginPaths) {
+            if (std::filesystem::exists(path)) {
+                // We have winctrl.xpl at this path now, so attempt to delete the old plugin
+                debug_force("Found old plugin at path: %s. Removing...\n", path.c_str());
 
-            // We have winctrl.xpl at this path now, so attempt to delete the old plugin
-            debug_force("Found old plugin at path: %s. Removing...\n", path.c_str());
-
-            if (std::remove(path.c_str()) != 0) {
-                debug_force("Failed to remove old plugin at path: %s\n", path.c_str());
-            } else {
-                debug_force("Successfully removed old plugin at path: %s\n", path.c_str());
-                changes++;
+                if (std::filesystem::remove(path) > 0) {
+                    debug_force("Successfully removed old plugin at path: %s\n", path.c_str());
+                    changes++;
+                } else {
+                    debug_force("Failed to remove old plugin at path: %s\n", path.c_str());
+                }
             }
         }
-    }
 
-    // All done with the XPL. Rename the whole directory as well if winctrl/ does not exist.
+        // Check if new directory already exists
+        if (std::filesystem::exists(newPluginDirectory)) {
+            return;
+        }
 
-    std::ifstream dirCheck(newPluginDirectory);
-    if (!dirCheck.good()) {
-        // Rename the directory
-        debug_force("Renaming old plugin directory from %s to %s\n", oldPluginDirectory.c_str(), newPluginDirectory.c_str());
-        if (std::rename(oldPluginDirectory.c_str(), newPluginDirectory.c_str()) != 0) {
-            debug_force("Failed to rename old plugin directory.\n");
-        } else {
+        // Rename the whole directory if winctrl/ does not exist
+        if (!std::filesystem::exists(newPluginDirectory)) {
+            debug_force("Renaming old plugin directory from %s to %s\n", oldPluginDirectory.c_str(), newPluginDirectory.c_str());
+            std::filesystem::rename(oldPluginDirectory, newPluginDirectory);
             debug_force("Successfully renamed old plugin directory.\n");
             changes++;
         }
-    }
 
-    dirCheck.close();
+        if (changes > 0) {
+            // Deliberately crash X-Plane
+            debug_force("Crashing X-Plane deliberately so the user restarts with the new plugin version... Sorry!\n");
+            debug_force("Just try restarting X-Plane after this crash to complete the update.\n");
 
-    if (changes > 0) {
-        // Deliberatery crash X-Plane
-        debug_force("Crashing X-Plane deliberately so the user restarts with the new plugin version... Sorry!\n");
-        debug_force("Just try restarting X-Plane after this crash to complete the update.\n");
+            // mini sleep to allow debug messages to flush
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        // mini sleep to allow debug messages to flush
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-        int *crash = nullptr;
-        *crash = 42;
+            int *crash = nullptr;
+            *crash = 42;
+        }
+    } catch (const std::filesystem::filesystem_error &e) {
+        debug_force("Error during plugin migration: %s\n", e.what());
     }
 }
 
