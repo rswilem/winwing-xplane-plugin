@@ -75,7 +75,8 @@ void PluginsMenu::addMenuItemsToMenu(XPLMMenuID parentMenu, const std::vector<Me
             // Nested submenu
             const auto &nestedItems = std::get<std::vector<MenuItem>>(item.content);
             int subItemId = nextItemId++;
-            int subItemIndex = XPLMAppendMenuItem(parentMenu, item.name.c_str(), nullptr, 0);
+            // Use -1 as sentinel to prevent accidental callback execution
+            int subItemIndex = XPLMAppendMenuItem(parentMenu, item.name.c_str(), (void *) (intptr_t) -1, 0);
 
             // Create nested submenu
             XPLMMenuID nestedSubmenuId = XPLMCreateMenu(item.name.c_str(), parentMenu, subItemIndex, handleMenuAction, this);
@@ -131,7 +132,8 @@ int PluginsMenu::addItemInternal(const std::string &name, const MenuItemContent 
     } else {
         // Submenu
         const auto &items = std::get<std::vector<MenuItem>>(content);
-        int itemIndex = XPLMAppendMenuItem(targetMenu, name.c_str(), nullptr, 0);
+        // Use -1 as sentinel to prevent accidental callback execution
+        int itemIndex = XPLMAppendMenuItem(targetMenu, name.c_str(), (void *) (intptr_t) -1, 0);
 
         // Create the submenu
         XPLMMenuID newSubmenuId = XPLMCreateMenu(name.c_str(), targetMenu, itemIndex, handleMenuAction, this);
@@ -168,31 +170,71 @@ void PluginsMenu::removeItem(int itemId) {
         return;
     }
 
-    // Find the itemIndex for this itemId
+    // Find the itemIndex and menu for this itemId
     int itemIndexToRemove = -1;
+    XPLMMenuID menuToRemoveFrom = nullptr;
     auto callbackIt = menuCallbacks.find(itemId);
     if (callbackIt != menuCallbacks.end()) {
         itemIndexToRemove = callbackIt->second.first;
     }
 
-    if (itemIndexToRemove >= 0) {
+    auto menuIdIt = itemToMenuId.find(itemId);
+    if (menuIdIt != itemToMenuId.end()) {
+        menuToRemoveFrom = menuIdIt->second;
+    }
+
+    if (itemIndexToRemove >= 0 && menuToRemoveFrom != nullptr) {
+        // If this is a submenu, destroy it and all its children
         auto submenuIt = submenus.find(itemId);
         if (submenuIt != submenus.end()) {
             XPLMDestroyMenu(submenuIt->second.first);
+
+            // Recursively clean up children
+            auto childrenIt = submenuChildren.find(itemId);
+            if (childrenIt != submenuChildren.end()) {
+                for (int childId : childrenIt->second) {
+                    menuCallbacks.erase(childId);
+                    itemNames.erase(childId);
+                    persistentItems.erase(childId);
+                    itemToMenuId.erase(childId);
+                    submenus.erase(childId);
+                    submenuChildren.erase(childId);
+                }
+                submenuChildren.erase(childrenIt);
+            }
+
             submenus.erase(submenuIt);
         }
 
-        XPLMRemoveMenuItem(mainMenuId, itemIndexToRemove);
+        // Remove from the menu it belongs to
+        XPLMRemoveMenuItem(menuToRemoveFrom, itemIndexToRemove);
         menuCallbacks.erase(itemId);
         itemNames.erase(itemId);
         persistentItems.erase(itemId);
         itemToMenuId.erase(itemId);
 
-        // Update stored indices for items after the removed one
+        // Update stored indices for items in the same menu after the removed one
         for (auto &entry : menuCallbacks) {
-            int &storedIndex = entry.second.first;
-            if (storedIndex > itemIndexToRemove) {
-                storedIndex--;
+            XPLMMenuID entryMenu = mainMenuId;
+            auto entryMenuIt = itemToMenuId.find(entry.first);
+            if (entryMenuIt != itemToMenuId.end()) {
+                entryMenu = entryMenuIt->second;
+            }
+
+            if (entryMenu == menuToRemoveFrom) {
+                int &storedIndex = entry.second.first;
+                if (storedIndex > itemIndexToRemove) {
+                    storedIndex--;
+                }
+            }
+        }
+
+        // Remove from submenu children tracking
+        for (auto &entry : submenuChildren) {
+            auto &children = entry.second;
+            auto childIt = std::find(children.begin(), children.end(), itemId);
+            if (childIt != children.end()) {
+                children.erase(childIt);
             }
         }
     }
@@ -323,12 +365,23 @@ void PluginsMenu::clearAllItems() {
 }
 
 void PluginsMenu::handleMenuAction(void *mRef, void *iRef) {
+    if (mRef == nullptr) {
+        return;
+    }
+
     auto *self = static_cast<PluginsMenu *>(mRef);
     int itemId = (int) (intptr_t) iRef;
 
-    auto it = self->menuCallbacks.find(itemId);
-    if (it != self->menuCallbacks.end()) {
-        auto &callback = it->second.second;
-        callback(itemId); // Pass itemId instead of itemIndex
+    if (itemId < 0) {
+        return;
+    }
+
+    try {
+        auto it = self->menuCallbacks.find(itemId);
+        if (it != self->menuCallbacks.end() && it->second.second) {
+            it->second.second(itemId);
+        }
+    } catch (...) {
+        // Swallow all exceptions to prevent crashes from menu callbacks
     }
 }

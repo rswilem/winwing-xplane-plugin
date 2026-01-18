@@ -24,6 +24,7 @@ ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
     lastUpdateCycle = 0;
     lastButtonStateLo = 0;
     lastButtonStateHi = 0;
+    menuItemId = -1;
     fontsMenuItemId = -1;
 
     pressedButtonIndices = {};
@@ -33,7 +34,13 @@ ProductFMC::ProductFMC(HIDDeviceHandle hidDevice, uint16_t vendorId, uint16_t pr
 
 ProductFMC::~ProductFMC() {
     blackout();
-    PluginsMenu::getInstance()->removeItem(menuItemId);
+    if (fontsMenuItemId >= 0) {
+        PluginsMenu::getInstance()->removeItem(fontsMenuItemId);
+        fontsMenuItemId = -1;
+    }
+    if (menuItemId >= 0) {
+        PluginsMenu::getInstance()->removeItem(menuItemId);
+    }
     unloadProfile();
 }
 
@@ -502,7 +509,7 @@ void ProductFMC::setDeviceVariant(FMCDeviceVariant variant) {
 }
 
 void ProductFMC::reloadFontsMenu() {
-    if (!menuItemId) {
+    if (menuItemId < 0) {
         return;
     }
 
@@ -551,9 +558,17 @@ void ProductFMC::reloadFontsMenu() {
         fontMenuItems.push_back(MenuItem::Separator());
 
         for (const std::string &fontFile : customFontFiles) {
+            // Clean up font file name by removing whitespace and control characters
+            std::string cleanName = fontFile;
+            cleanName.erase(std::remove_if(cleanName.begin(), cleanName.end(),
+                                [](unsigned char c) {
+                                    return std::isspace(c) || std::iscntrl(c);
+                                }),
+                cleanName.end());
+
             fontMenuItems.push_back(
                 {
-                    .name = fontFile,
+                    .name = cleanName,
                     .checked = fmcFontPreference == fontFile,
                     .content = [this, fontFile](int itemId) {
                         AppState::getInstance()->writePreference("FMCFont", fontFile);
