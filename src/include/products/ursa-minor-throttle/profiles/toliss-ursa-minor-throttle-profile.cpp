@@ -121,11 +121,10 @@ const std::unordered_map<uint16_t, UrsaMinorThrottleButtonDef> &TolissUrsaMinorT
         {33, {"FLAP 1", "AirbusFBW/FlapLeverRatio", UrsaMinorThrottleDatarefType::SET_VALUE, 0.25}},
         {34, {"FLAP 0", "AirbusFBW/FlapLeverRatio", UrsaMinorThrottleDatarefType::SET_VALUE, 0}},
 
-        {35, {"UNKNOWN 35", ""}},
-        {36, {"UNKNOWN 36", ""}},
-
-        {37, {"Speedbrake disarmed", "sim/cockpit2/controls/speedbrake_ratio", UrsaMinorThrottleDatarefType::SPEEDBRAKE_ARM, 0.0}},
-        {38, {"Speedbrake armed", "sim/cockpit2/controls/speedbrake_ratio", UrsaMinorThrottleDatarefType::SPEEDBRAKE_ARM, 1.0}},
+        {35, {"Speedbrake full", ""}},
+        {36, {"Speedbrake half", ""}},
+        {37, {"Speedbrake stowed", ""}},
+        {38, {"Speedbrake armed", "sim/cockpit2/controls/speedbrake_ratio", UrsaMinorThrottleDatarefType::SPEEDBRAKE, -0.5}},
 
         {39, {"Reversers active L", ""}},
         {40, {"Reversers active R", ""}},
@@ -140,17 +139,9 @@ void TolissUrsaMinorThrottleProfile::buttonPressed(const UrsaMinorThrottleButton
     }
 
     auto datarefManager = Dataref::getInstance();
-    if (button->datarefType == UrsaMinorThrottleDatarefType::SPEEDBRAKE_ARM) {
-        if (phase != xplm_CommandBegin) {
-            return;
-        }
-
-        float ratio = datarefManager->get<float>(button->dataref.c_str());
-        if (button->value > std::numeric_limits<double>::epsilon()) {
-            datarefManager->set<float>(button->dataref.c_str(), -0.5f);
-        } else if (ratio < -std::numeric_limits<float>::epsilon()) {
-            datarefManager->set<float>(button->dataref.c_str(), 0.0f);
-        }
+    if (button->datarefType == UrsaMinorThrottleDatarefType::SPEEDBRAKE) {
+        bool shouldArm = phase == xplm_CommandBegin;
+        datarefManager->set<float>(button->dataref.c_str(), shouldArm ? static_cast<float>(button->value) : 0.0f);
     } else if (button->datarefType == UrsaMinorThrottleDatarefType::SET_VALUE) {
         if (phase != xplm_CommandBegin) {
             return;
@@ -176,7 +167,7 @@ void TolissUrsaMinorThrottleProfile::updateDisplays() {
     if (isAnnunTest()) {
         newTrimText = "R88.8";
     }
-    
+
     if (newTrimText != trimText) {
         trimText = newTrimText;
         product->setLCDText(trimText);

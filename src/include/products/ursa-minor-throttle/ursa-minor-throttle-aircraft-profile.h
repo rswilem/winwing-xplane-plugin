@@ -10,7 +10,7 @@ class ProductUrsaMinorThrottle;
 enum class UrsaMinorThrottleDatarefType : unsigned char {
     EXECUTE_CMD = 1,
     SET_VALUE,
-    SPEEDBRAKE_ARM
+    SPEEDBRAKE
 };
 
 struct UrsaMinorThrottleButtonDef {
